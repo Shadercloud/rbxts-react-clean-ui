@@ -190,7 +190,7 @@ npx rbxtsc -w
 ```
 
 ```
-cd C:\Users\username\Documents\dev-game\src\Packages
+cd C:\Users\username\Documents\dev-game\src\Packages\rbxts-react-clean-ui
 npx rbxtsc -w
 ```
 
