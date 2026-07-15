@@ -1,0 +1,22 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "..",
+        "noEmit": true,
+        "incremental": false,
+        "baseUrl": "..",
+        "paths": {
+            "@rbxts/react-clean-ui": [
+                "src/index.ts"
+            ]
+        }
+    },
+    "include": [
+        "./**/*.ts",
+        "./**/*.tsx"
+    ],
+    "exclude": [
+        "../node_modules",
+        "../out"
+    ]
+}
