@@ -5,11 +5,15 @@ This project is similar to Bootstrap or Shadecn framework but for Roblox-ts Reac
 It will allow you create smart looking UIs quickly with premade themed components instead of having to use and style the native Roblox UI elements directly.
 
 # Installation
-npm install @rbxts/react-clean-ui
+*Package is not yet published to NPM; this install will not work yet*
+
+`npm install @rbxts/react-clean-ui`
 
 # Usage
 
 Coming Soon
+
+Look in the `/Stories` directory to see examples of the working syntax
 
 # Development Environment
 
