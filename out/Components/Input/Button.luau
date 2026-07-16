@@ -11,6 +11,8 @@ local Corners = _Decorators.Corners
 local Padding = _Decorators.Padding
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local ColorHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").ColorHelper
+local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
+local HStack = TS.import(script, script.Parent.Parent, "Layout").HStack
 local Button
 do
 	local super = Component
@@ -67,16 +69,14 @@ do
 		local _exp_2 = React.createElement(BoxShadow, _attributes_1)
 		local _attributes_2 = table.clone(self.props)
 		setmetatable(_attributes_2, nil)
-		return React.createElement("imagebutton", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), self.props.icon ~= nil and React.createElement("imagelabel", {
-			Size = UDim2.fromOffset(20, 20),
-			Image = `rbxassetid://{self.context.icons[self.props.icon]}`,
-			BackgroundTransparency = 1,
-			ImageColor3 = ColorHelper:getIntentColor(self.context, self.props.intent, "text", self.context.components.button.intents, nil, self.context.components.button.textColor),
+		return React.createElement("imagebutton", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), (self.props.icon ~= nil or self.props.text ~= nil) and React.createElement(HStack, nil, self.props.icon ~= nil and React.createElement(Icon, {
+			icon = self.props.icon,
+			color = ColorHelper:getIntentColor(self.context, self.props.intent, "text", self.context.components.button.intents, nil, self.context.components.button.textColor),
 		}), self.props.text ~= nil and React.createElement(Text, {
 			text = self.props.text,
 			typography = self.context.components.button.typography,
 			TextColor3 = ColorHelper:getIntentColor(self.context, self.props.intent, "text", self.context.components.button.intents, nil, self.context.components.button.textColor),
-		}), self.props.children)
+		})), self.props.children)
 	end
 	Button.contextType = CleanThemeContext
 	Button = ReactComponent(Button) or Button

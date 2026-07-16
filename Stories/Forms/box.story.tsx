@@ -21,10 +21,10 @@ export = createStory((props) => (
                     <Container>
                         <HStack>
                             <FlexItem>
-                                <Button text="Information" intent="info"></Button>
+                                <Button text="Information" intent="info" icon="info-circle"></Button>
                             </FlexItem>
-                            <Button text="Continue" intent="success"></Button>
-                            <Button text="Save" intent="warning"></Button>
+                            <Button text="Continue" intent="success" icon="arrow-circle-right"></Button>
+                            <Button text="Save" intent="warning" icon="floppy"></Button>
                         </HStack>
                     </Container>
                 </VStack>

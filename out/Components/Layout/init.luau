@@ -7,13 +7,16 @@ end
 for _k, _v in TS.import(script, script, "Container") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "HStack") or {} do
-	exports[_k] = _v
-end
 for _k, _v in TS.import(script, script, "FlexItem") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "HStack") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "Row") or {} do
+	exports[_k] = _v
+end
+for _k, _v in TS.import(script, script, "Scroller") or {} do
 	exports[_k] = _v
 end
 for _k, _v in TS.import(script, script, "VStack") or {} do

@@ -35,6 +35,7 @@ export class Text extends Component<TextProps> {
             TextWrap
             FontFace={Font.fromName(style.font.Name, weight)}
             FontSize={style.size}
+            RichText
             TextScaled={false} >
             {this.props.children}
         </textlabel>

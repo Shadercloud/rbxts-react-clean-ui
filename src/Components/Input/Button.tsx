@@ -1,13 +1,14 @@
 import React, { Component, ReactComponent } from "@rbxts/react"
-import { BackgroundElementProps, Icon, IntentElementProps, ShadowElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
+import { BackgroundElementProps, IconElementProps, IntentElementProps, ShadowElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
 import { BoxShadow, Corners, Padding } from "../Decorators";
 import { Text } from "../Typography";
 import { ColorHelper } from "../../Helpers";
+import { Icon } from "../Surface";
+import { HStack } from "../Layout";
 
-interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIndexElementProps, BackgroundElementProps, IntentElementProps {
+interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIndexElementProps, BackgroundElementProps, IntentElementProps, IconElementProps {
     text?: string;
-    icon?: Icon;
     fontWeight?: Enum.FontWeight;
 }
 
@@ -66,32 +67,36 @@ export class Button extends Component<ButtonProps, ButtonState> {
 
             <BoxShadow {...this.props} value={this.context.components.button.boxShadow} />
             <Padding {...this.props} />
-            {this.props.icon !== undefined &&
-                <imagelabel
-                    Size={UDim2.fromOffset(20, 20)}
-                    Image={`rbxassetid://${this.context.icons[this.props.icon]}`}
-                    BackgroundTransparency={1}
-                    ImageColor3={ColorHelper.getIntentColor(
-                        this.context,
-                        this.props.intent,
-                        "text",
-                        this.context.components.button.intents,
-                        undefined,
-                        this.context.components.button.textColor
-                    )}
-                />
-            }
-            {this.props.text !== undefined &&
-                <Text text={this.props.text} typography={this.context.components.button.typography} TextColor3={
-                    ColorHelper.getIntentColor(
-                        this.context,
-                        this.props.intent,
-                        "text",
-                        this.context.components.button.intents,
-                        undefined,
-                        this.context.components.button.textColor
-                    )
-                } />
+            {(this.props.icon !== undefined || this.props.text !== undefined) &&
+                <HStack>
+                    {this.props.icon !== undefined &&
+                        <Icon
+                            icon={this.props.icon}
+                            color={
+                                ColorHelper.getIntentColor(
+                                    this.context,
+                                    this.props.intent,
+                                    "text",
+                                    this.context.components.button.intents,
+                                    undefined,
+                                    this.context.components.button.textColor
+                                )
+
+                            } />
+                    }
+                    {this.props.text !== undefined &&
+                        <Text text={this.props.text} typography={this.context.components.button.typography} TextColor3={
+                            ColorHelper.getIntentColor(
+                                this.context,
+                                this.props.intent,
+                                "text",
+                                this.context.components.button.intents,
+                                undefined,
+                                this.context.components.button.textColor
+                            )
+                        } />
+                    }
+                </HStack>
             }
             {this.props.children}
         </imagebutton>

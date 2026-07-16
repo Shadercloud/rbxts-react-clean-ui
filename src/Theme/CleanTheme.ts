@@ -1,4 +1,4 @@
-import { CssShadow, CssSize, Breakpoint, BreakpointValue, SpaceSizeValue, SpaceSize, Intent, Icon } from "../Interfaces/";
+import { CssShadow, CssSize, Breakpoint, BreakpointValue, SpaceSizeValue, SpaceSize, Intent, IconSet } from "../Interfaces/";
 
 export interface TypographyStyle {
     font: Enum.Font;
@@ -48,6 +48,9 @@ export interface CleanTheme {
     };
 
     components: {
+        scroller: {
+            barColor: Color3;
+        },
         boxShadow: {
             color: Color3;
             transparency: number
@@ -75,5 +78,5 @@ export interface CleanTheme {
         };
     };
 
-    icons: Record<Icon, number>;
+    icons: Partial<IconSet>;
 }

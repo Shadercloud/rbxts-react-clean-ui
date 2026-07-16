@@ -106,6 +106,9 @@ local DefaultTheme = {
 		},
 	},
 	components = {
+		scroller = {
+			barColor = Color3.fromHex("#000000"),
+		},
 		boxShadow = {
 			color = Color3.fromHex("#000000"),
 			transparency = 0.9,
@@ -133,8 +136,7 @@ local DefaultTheme = {
 		},
 	},
 	icons = {
-		shoppingCart = 112388431913339,
-		times = 104942966197113,
+		["shopping-cart"] = 112388431913339,
 	},
 }
 return {

@@ -106,6 +106,9 @@ local DarkTheme = {
 		},
 	},
 	components = {
+		scroller = {
+			barColor = Color3.fromHex("#FFFFFF"),
+		},
 		boxShadow = {
 			color = Color3.fromHex("#000000"),
 			transparency = 0.55,
@@ -126,10 +129,7 @@ local DarkTheme = {
 			cornerRadius = 8,
 		},
 	},
-	icons = {
-		shoppingCart = 112388431913339,
-		times = 104942966197113,
-	},
+	icons = {},
 }
 return {
 	DarkTheme = DarkTheme,

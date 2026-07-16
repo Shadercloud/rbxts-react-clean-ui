@@ -1,3 +1,5 @@
+import { IconName } from "./icon";
+
 export type CssUnit = "px" | "%";
 
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl";
@@ -18,10 +20,6 @@ export type Intent =
     | "warning"
     | "danger"
     | "info";
-
-export type Icon =
-    | "shoppingCart"
-    | "times";
 
 
 export type GridSpan =
@@ -145,4 +143,8 @@ export interface ShadowElementProps {
     "box-shadow"?: CssShadow;
     "box-shadow-color"?: Color3;
     "box-shadow-transparency"?: number;
+}
+
+export interface IconElementProps {
+    icon?: IconName
 }

@@ -36,6 +36,7 @@ do
 			TextWrap = true,
 			FontFace = Font.fromName(style.font.Name, weight),
 			FontSize = style.size,
+			RichText = true,
 			TextScaled = false,
 		}, self.props.children)
 	end

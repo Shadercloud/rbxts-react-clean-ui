@@ -1,9 +1,9 @@
+import { IconName } from "./icon";
 export type CssUnit = "px" | "%";
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl";
 export type SpaceSize = "xs" | "sm" | "md" | "lg" | "xl";
 export type TextVariant = "display" | "title" | "heading" | "body" | "label" | "caption";
 export type Intent = "primary" | "success" | "warning" | "danger" | "info";
-export type Icon = "shoppingCart" | "times";
 export type GridSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 export interface ResponsiveGridSpan {
     xs?: GridSpan;
@@ -80,4 +80,7 @@ export interface ShadowElementProps {
     "box-shadow"?: CssShadow;
     "box-shadow-color"?: Color3;
     "box-shadow-transparency"?: number;
+}
+export interface IconElementProps {
+    icon?: IconName;
 }

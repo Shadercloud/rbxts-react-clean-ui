@@ -118,6 +118,9 @@ export const DarkTheme: CleanTheme = {
     },
 
     components: {
+        scroller: {
+            barColor: Color3.fromHex("#FFFFFF")
+        },
         boxShadow: {
             color: Color3.fromHex("#000000"),
             transparency: 0.55,
@@ -141,8 +144,5 @@ export const DarkTheme: CleanTheme = {
         },
     },
 
-    icons: {
-        shoppingCart: 112388431913339,
-        times: 104942966197113
-    },
+    icons: {},
 };

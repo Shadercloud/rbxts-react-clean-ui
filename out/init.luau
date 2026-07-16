@@ -4,16 +4,13 @@ local exports = {}
 for _k, _v in TS.import(script, script, "Components") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "Contexts") or {} do
-	exports[_k] = _v
-end
 for _k, _v in TS.import(script, script, "Helpers") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "Interfaces") or {} do
+for _k, _v in TS.import(script, script, "Theme") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "Theme") or {} do
+for _k, _v in TS.import(script, script, "Interfaces") or {} do
 	exports[_k] = _v
 end
 return exports

@@ -1,9 +1,8 @@
 import React, { Component } from "@rbxts/react";
-import { BackgroundElementProps, Icon, IntentElementProps, ShadowElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
+import { BackgroundElementProps, IconElementProps, IntentElementProps, ShadowElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
-interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIndexElementProps, BackgroundElementProps, IntentElementProps {
+interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIndexElementProps, BackgroundElementProps, IntentElementProps, IconElementProps {
     text?: string;
-    icon?: Icon;
     fontWeight?: Enum.FontWeight;
 }
 interface ButtonState {
