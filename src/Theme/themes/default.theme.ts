@@ -54,6 +54,7 @@ export const DefaultTheme: CleanTheme = {
 
 
     default: {
+        scale: "md",
         spacing: "md"
     },
 
@@ -117,6 +118,14 @@ export const DefaultTheme: CleanTheme = {
         },
     },
 
+    typeScaleMap: {
+        xs: "caption",
+        sm: "label",
+        md: "body",
+        lg: "heading",
+        xl: "title"
+    },
+
     components: {
         scroller: {
             barColor: Color3.fromHex("#000000")
@@ -145,11 +154,18 @@ export const DefaultTheme: CleanTheme = {
                     text: Color3.fromHex("#1D2433"),
                     hover: Color3.fromHex("#CCCCCC")
                 }
-            }
+            },
         },
     },
 
     icons: {
         "shopping-cart": 112388431913339,
+    },
+    iconSize: {
+        xs: 10,
+        sm: 16,
+        md: 20,
+        lg: 24,
+        xl: 30,
     }
 };

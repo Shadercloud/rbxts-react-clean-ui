@@ -1,4 +1,4 @@
-import { CssShadow, CssSize, Breakpoint, BreakpointValue, SpaceSizeValue, SpaceSize, Intent, IconSet } from "../Interfaces/";
+import { CssShadow, CssSize, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant } from "../Interfaces/";
 
 export interface TypographyStyle {
     font: Enum.Font;
@@ -6,6 +6,8 @@ export interface TypographyStyle {
     weight?: Enum.FontWeight;
     lineHeight?: number;
 }
+
+export type ScaledTypographyStyle = Partial<Record<ScaleSize, Partial<TypographyStyle>>>
 
 export interface IntentColors {
     text: Color3;
@@ -26,10 +28,11 @@ export interface CleanTheme {
     breakpoints: BreakpointValue<number>;
 
     default: {
-        spacing: SpaceSize
+        scale: ScaleSize;
+        spacing: ScaleSize;
     },
 
-    spacing: SpaceSizeValue<number>;
+    spacing: ScaleSizeValue<number>;
 
     radius: {
         sm: number;
@@ -46,6 +49,8 @@ export interface CleanTheme {
         label: TypographyStyle;
         caption: TypographyStyle;
     };
+
+    typeScaleMap: Record<ScaleSize, TextVariant>;
 
     components: {
         scroller: {
@@ -72,11 +77,12 @@ export interface CleanTheme {
             boxShadow?: CssShadow;
             borderColor: Color3;
             borderThickness: number;
-            typography?: TypographyStyle;
+            typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             breaks?: BreakpointValue<number>;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
     };
 
     icons: Partial<IconSet>;
+    iconSize: ScaleSizeValue<number>;
 }

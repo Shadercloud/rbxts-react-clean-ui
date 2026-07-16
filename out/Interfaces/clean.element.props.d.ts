@@ -1,7 +1,8 @@
 import { IconName } from "./icon";
 export type CssUnit = "px" | "%";
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl";
-export type SpaceSize = "xs" | "sm" | "md" | "lg" | "xl";
+export declare const ScaleSizes: readonly ["xs", "sm", "md", "lg", "xl"];
+export type ScaleSize = typeof ScaleSizes[number];
 export type TextVariant = "display" | "title" | "heading" | "body" | "label" | "caption";
 export type Intent = "primary" | "success" | "warning" | "danger" | "info";
 export type GridSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
@@ -20,7 +21,7 @@ export interface BreakpointValue<T> {
     lg?: T;
     xl?: T;
 }
-export interface SpaceSizeValue<T> {
+export interface ScaleSizeValue<T> {
     xs?: T;
     sm?: T;
     md?: T;
@@ -59,6 +60,9 @@ export interface SizeElementProps {
     height?: CssSize;
     AutomaticSize?: Enum.AutomaticSize;
 }
+export interface ScalableElementProps {
+    scale?: ScaleSize;
+}
 export interface PositionElementProps {
     Position?: UDim2;
     AnchorPoint?: Vector2;
@@ -74,7 +78,7 @@ export interface IntentElementProps {
 export interface CleanElementProps extends SizeElementProps, PositionElementProps {
 }
 export interface SpacedElementProps {
-    spacing?: SpaceSize;
+    spacing?: ScaleSize;
 }
 export interface ShadowElementProps {
     "box-shadow"?: CssShadow;

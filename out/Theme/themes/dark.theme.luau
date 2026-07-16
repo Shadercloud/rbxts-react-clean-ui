@@ -47,6 +47,7 @@ local DarkTheme = {
 		},
 	},
 	default = {
+		scale = "md",
 		spacing = "md",
 	},
 	breakpoints = {
@@ -105,6 +106,13 @@ local DarkTheme = {
 			lineHeight = 1.3,
 		},
 	},
+	typeScaleMap = {
+		xs = "body",
+		sm = "body",
+		md = "body",
+		lg = "body",
+		xl = "body",
+	},
 	components = {
 		scroller = {
 			barColor = Color3.fromHex("#FFFFFF"),
@@ -130,6 +138,13 @@ local DarkTheme = {
 		},
 	},
 	icons = {},
+	iconSize = {
+		xs = 10,
+		sm = 16,
+		md = 20,
+		lg = 24,
+		xl = 30,
+	},
 }
 return {
 	DarkTheme = DarkTheme,

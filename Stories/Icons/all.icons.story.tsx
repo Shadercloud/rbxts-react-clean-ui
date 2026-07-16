@@ -11,7 +11,7 @@ entries.sort((a, b) => a[0] < b[0]);
 
 const icons = entries.map(([icon]) => (
     <Button key={icon}>
-        <Icon icon={icon} color={Color3.fromHex("#000000")} />
+        <Icon icon={icon} color={Color3.fromHex("#000000")} scale="xl" />
     </Button>
 ));
 

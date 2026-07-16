@@ -4,7 +4,9 @@ export type CssUnit = "px" | "%";
 
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl";
 
-export type SpaceSize = "xs" | "sm" | "md" | "lg" | "xl";
+export const ScaleSizes = ["xs", "sm", "md", "lg", "xl"] as const;
+
+export type ScaleSize = typeof ScaleSizes[number];
 
 export type TextVariant =
     | "display"
@@ -56,15 +58,13 @@ export interface BreakpointValue<T> {
     xl?: T;
 }
 
-export interface SpaceSizeValue<T> {
+export interface ScaleSizeValue<T> {
     xs?: T;
     sm?: T;
     md?: T;
     lg?: T;
     xl?: T;
 }
-
-
 
 
 export type CssSize =
@@ -114,6 +114,11 @@ export interface SizeElementProps {
     width?: ResponsiveCssSize;
     height?: CssSize;
     AutomaticSize?: Enum.AutomaticSize;
+
+}
+
+export interface ScalableElementProps {
+    scale?: ScaleSize;
 }
 
 export interface PositionElementProps {
@@ -136,7 +141,7 @@ export interface CleanElementProps extends SizeElementProps, PositionElementProp
 }
 
 export interface SpacedElementProps {
-    spacing?: SpaceSize
+    spacing?: ScaleSize
 }
 
 export interface ShadowElementProps {

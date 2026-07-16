@@ -13,6 +13,7 @@ local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local ColorHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").ColorHelper
 local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
 local HStack = TS.import(script, script.Parent.Parent, "Layout").HStack
+local TypographyHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers", "typography.helper").TypographyHelper
 local Button
 do
 	local super = Component
@@ -69,12 +70,16 @@ do
 		local _exp_2 = React.createElement(BoxShadow, _attributes_1)
 		local _attributes_2 = table.clone(self.props)
 		setmetatable(_attributes_2, nil)
-		return React.createElement("imagebutton", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), (self.props.icon ~= nil or self.props.text ~= nil) and React.createElement(HStack, nil, self.props.icon ~= nil and React.createElement(Icon, {
+		return React.createElement("imagebutton", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), (self.props.icon ~= nil or self.props.text ~= nil) and React.createElement(HStack, {
+			valign = "Center",
+			spacing = self.props.spacing,
+		}, self.props.icon ~= nil and React.createElement(Icon, {
+			scale = self.props.scale,
 			icon = self.props.icon,
 			color = ColorHelper:getIntentColor(self.context, self.props.intent, "text", self.context.components.button.intents, nil, self.context.components.button.textColor),
 		}), self.props.text ~= nil and React.createElement(Text, {
 			text = self.props.text,
-			typography = self.context.components.button.typography,
+			typography = TypographyHelper:getTypography(self.context, self.props.scale, self.context.components.button.typography),
 			TextColor3 = ColorHelper:getIntentColor(self.context, self.props.intent, "text", self.context.components.button.intents, nil, self.context.components.button.textColor),
 		})), self.props.children)
 	end

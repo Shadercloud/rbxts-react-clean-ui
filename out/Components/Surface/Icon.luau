@@ -13,8 +13,9 @@ local function Icon(props)
 		_condition = DefaultIconSet[props.icon]
 	end
 	local iconId = _condition
+	local size = theme.iconSize[props.scale or theme.default.scale]
 	return React.createElement("imagelabel", {
-		Size = UDim2.fromOffset(20, 20),
+		Size = UDim2.fromOffset(size, size),
 		Image = `rbxassetid://{iconId}`,
 		BackgroundTransparency = 1,
 		ImageColor3 = props.color or Color3.fromHex("#FFFFFF"),

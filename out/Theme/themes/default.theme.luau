@@ -47,6 +47,7 @@ local DefaultTheme = {
 		},
 	},
 	default = {
+		scale = "md",
 		spacing = "md",
 	},
 	breakpoints = {
@@ -105,6 +106,13 @@ local DefaultTheme = {
 			lineHeight = 1.3,
 		},
 	},
+	typeScaleMap = {
+		xs = "caption",
+		sm = "label",
+		md = "body",
+		lg = "heading",
+		xl = "title",
+	},
 	components = {
 		scroller = {
 			barColor = Color3.fromHex("#000000"),
@@ -137,6 +145,13 @@ local DefaultTheme = {
 	},
 	icons = {
 		["shopping-cart"] = 112388431913339,
+	},
+	iconSize = {
+		xs = 10,
+		sm = 16,
+		md = 20,
+		lg = 24,
+		xl = 30,
 	},
 }
 return {

@@ -54,6 +54,7 @@ export const DarkTheme: CleanTheme = {
     },
 
     default: {
+        scale: "md",
         spacing: "md",
     },
 
@@ -117,6 +118,14 @@ export const DarkTheme: CleanTheme = {
         },
     },
 
+    typeScaleMap: {
+        xs: "body",
+        sm: "body",
+        md: "body",
+        lg: "body",
+        xl: "body"
+    },
+
     components: {
         scroller: {
             barColor: Color3.fromHex("#FFFFFF")
@@ -145,4 +154,11 @@ export const DarkTheme: CleanTheme = {
     },
 
     icons: {},
+    iconSize: {
+        xs: 10,
+        sm: 16,
+        md: 20,
+        lg: 24,
+        xl: 30,
+    }
 };

@@ -1,13 +1,22 @@
 import React, { Component, ReactComponent } from "@rbxts/react"
-import { BackgroundElementProps, IconElementProps, IntentElementProps, ShadowElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
+import { BackgroundElementProps, IconElementProps, IntentElementProps, ScalableElementProps, ShadowElementProps, SpacedElementProps, TextVariant, ZIndexElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
 import { BoxShadow, Corners, Padding } from "../Decorators";
 import { Text } from "../Typography";
 import { ColorHelper } from "../../Helpers";
 import { Icon } from "../Surface";
 import { HStack } from "../Layout";
+import { TypographyStyle } from "../../Theme";
+import { TypographyHelper } from "../../Helpers/typography.helper";
 
-interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIndexElementProps, BackgroundElementProps, IntentElementProps, IconElementProps {
+interface ButtonProps extends
+    SpacedElementProps,
+    ShadowElementProps,
+    ZIndexElementProps,
+    BackgroundElementProps,
+    IntentElementProps,
+    ScalableElementProps,
+    IconElementProps {
     text?: string;
     fontWeight?: Enum.FontWeight;
 }
@@ -20,8 +29,9 @@ interface ButtonState {
 export class Button extends Component<ButtonProps, ButtonState> {
     static contextType = CleanThemeContext;
 
-    declare context: React.ContextType<typeof CleanThemeContext>;
+    declare context: React.ContextType<typeof CleanThemeContext>
     render() {
+
         return <imagebutton
             Event={{
                 MouseEnter: () => {
@@ -68,9 +78,10 @@ export class Button extends Component<ButtonProps, ButtonState> {
             <BoxShadow {...this.props} value={this.context.components.button.boxShadow} />
             <Padding {...this.props} />
             {(this.props.icon !== undefined || this.props.text !== undefined) &&
-                <HStack>
+                <HStack valign="Center" spacing={this.props.spacing}>
                     {this.props.icon !== undefined &&
                         <Icon
+                            scale={this.props.scale}
                             icon={this.props.icon}
                             color={
                                 ColorHelper.getIntentColor(
@@ -85,16 +96,19 @@ export class Button extends Component<ButtonProps, ButtonState> {
                             } />
                     }
                     {this.props.text !== undefined &&
-                        <Text text={this.props.text} typography={this.context.components.button.typography} TextColor3={
-                            ColorHelper.getIntentColor(
-                                this.context,
-                                this.props.intent,
-                                "text",
-                                this.context.components.button.intents,
-                                undefined,
-                                this.context.components.button.textColor
-                            )
-                        } />
+                        <Text
+                            text={this.props.text}
+                            typography={TypographyHelper.getTypography(this.context, this.props.scale, this.context.components.button.typography)}
+                            TextColor3={
+                                ColorHelper.getIntentColor(
+                                    this.context,
+                                    this.props.intent,
+                                    "text",
+                                    this.context.components.button.intents,
+                                    undefined,
+                                    this.context.components.button.textColor
+                                )
+                            } />
                     }
                 </HStack>
             }
