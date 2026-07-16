@@ -1,5 +1,5 @@
 -- Compiled with roblox-ts v3.0.0
-local font = Enum.Font.Montserrat
+local font = Enum.Font.Jura
 local DarkTheme = {
 	colors = {
 		intents = {
@@ -107,11 +107,11 @@ local DarkTheme = {
 		},
 	},
 	typeScaleMap = {
-		xs = "body",
-		sm = "body",
+		xs = "caption",
+		sm = "label",
 		md = "body",
-		lg = "body",
-		xl = "body",
+		lg = "heading",
+		xl = "title",
 	},
 	components = {
 		scroller = {
@@ -132,7 +132,6 @@ local DarkTheme = {
 		button = {
 			textColor = Color3.fromHex("#FFFFFF"),
 			backgroundTransparency = 0,
-			borderColor = Color3.fromHex("#4B5565"),
 			borderThickness = 1,
 			cornerRadius = 8,
 		},

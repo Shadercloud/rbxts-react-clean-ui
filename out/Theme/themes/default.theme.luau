@@ -132,7 +132,6 @@ local DefaultTheme = {
 		button = {
 			textColor = Color3.fromHex("#FFFFFF"),
 			backgroundTransparency = 0,
-			borderColor = Color3.fromHex("#D9DEE8"),
 			borderThickness = 1,
 			cornerRadius = 8,
 			intents = {

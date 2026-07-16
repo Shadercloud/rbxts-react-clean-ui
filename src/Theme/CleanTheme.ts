@@ -75,7 +75,6 @@ export interface CleanTheme {
             backgroundTransparency: number;
             cornerRadius: CssSize;
             boxShadow?: CssShadow;
-            borderColor: Color3;
             borderThickness: number;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             breaks?: BreakpointValue<number>;

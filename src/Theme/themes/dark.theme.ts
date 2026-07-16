@@ -1,6 +1,6 @@
 import { CleanTheme } from "../CleanTheme";
 
-const font = Enum.Font.Montserrat;
+const font = Enum.Font.Jura;
 
 export const DarkTheme: CleanTheme = {
     colors: {
@@ -119,11 +119,11 @@ export const DarkTheme: CleanTheme = {
     },
 
     typeScaleMap: {
-        xs: "body",
-        sm: "body",
+        xs: "caption",
+        sm: "label",
         md: "body",
-        lg: "body",
-        xl: "body"
+        lg: "heading",
+        xl: "title"
     },
 
     components: {
@@ -147,7 +147,6 @@ export const DarkTheme: CleanTheme = {
         button: {
             textColor: Color3.fromHex("#FFFFFF"),
             backgroundTransparency: 0,
-            borderColor: Color3.fromHex("#4B5565"),
             borderThickness: 1,
             cornerRadius: 8,
         },
