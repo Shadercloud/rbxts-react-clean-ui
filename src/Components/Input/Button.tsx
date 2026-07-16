@@ -6,7 +6,6 @@ import { Text } from "../Typography";
 import { ColorHelper } from "../../Helpers";
 import { Icon } from "../Surface";
 import { HStack } from "../Layout";
-import { TypographyStyle } from "../../Theme";
 import { TypographyHelper } from "../../Helpers/typography.helper";
 
 interface ButtonProps extends
@@ -19,6 +18,7 @@ interface ButtonProps extends
     IconElementProps {
     text?: string;
     fontWeight?: Enum.FontWeight;
+    Event?: React.InstanceEvent<ImageButton>;
 }
 
 interface ButtonState {
@@ -34,15 +34,22 @@ export class Button extends Component<ButtonProps, ButtonState> {
 
         return <imagebutton
             Event={{
-                MouseEnter: () => {
+                ...this.props.Event,
+
+                MouseEnter: (button, x, y) => {
                     this.setState({
-                        hover: true
-                    })
+                        hover: true,
+                    });
+
+                    this.props.Event?.MouseEnter?.(button, x, y);
                 },
-                MouseLeave: () => {
+
+                MouseLeave: (button, x, y) => {
                     this.setState({
-                        hover: false
-                    })
+                        hover: false,
+                    });
+
+                    this.props.Event?.MouseLeave?.(button, x, y);
                 },
             }}
             Size={UDim2.fromScale(0, 0)}

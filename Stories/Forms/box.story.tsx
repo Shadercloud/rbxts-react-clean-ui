@@ -24,7 +24,11 @@ export = createStory((props) => (
                 <Container>
                     <HStack valign="Bottom">
                         <FlexItem>
-                            <Button text="Information" intent="info" icon="info-circle" scale="xl"></Button>
+                            <Button text="Information" intent="info" icon="info-circle" scale="xl" Event={{
+                                Activated: () => {
+                                    print("Clicked Information")
+                                }
+                            }}></Button>
                         </FlexItem>
                         <Button text="Continue" intent="success" icon="arrow-circle-right"></Button>
                         <Button text="Save" intent="warning" icon="floppy"></Button>

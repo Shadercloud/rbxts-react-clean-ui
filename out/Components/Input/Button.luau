@@ -32,22 +32,41 @@ do
 		super.constructor(self, ...)
 	end
 	function Button:render()
-		local _attributes = {
-			Event = {
-				MouseEnter = function()
-					self:setState({
-						hover = true,
-					})
-				end,
-				MouseLeave = function()
-					self:setState({
-						hover = false,
-					})
-				end,
-			},
-			Size = UDim2.fromScale(0, 0),
-			AutomaticSize = Enum.AutomaticSize.XY,
-		}
+		local _attributes = {}
+		local _object = {}
+		local _spread = self.props.Event
+		if _spread then
+			for _k, _v in _spread do
+				_object[_k] = _v
+			end
+		end
+		_object.MouseEnter = function(button, x, y)
+			self:setState({
+				hover = true,
+			})
+			local _result = self.props.Event
+			if _result ~= nil then
+				_result = _result.MouseEnter
+				if _result ~= nil then
+					_result(button, x, y)
+				end
+			end
+		end
+		_object.MouseLeave = function(button, x, y)
+			self:setState({
+				hover = false,
+			})
+			local _result = self.props.Event
+			if _result ~= nil then
+				_result = _result.MouseLeave
+				if _result ~= nil then
+					_result(button, x, y)
+				end
+			end
+		end
+		_attributes.Event = _object
+		_attributes.Size = UDim2.fromScale(0, 0)
+		_attributes.AutomaticSize = Enum.AutomaticSize.XY
 		local _condition = self.props.BackgroundTransparency
 		if _condition == nil then
 			_condition = self.context.components.button.backgroundTransparency
