@@ -1,19 +1,22 @@
 import React from "@rbxts/react";
-import { Box, Button, Container, createStory, Group, Menu, MenuItem } from "@rbxts/react-clean-ui";
+import { Box, Container, createStory, Menu, MenuItem } from "@rbxts/react-clean-ui";
 
 export = createStory((props) => (
-    <><Container>
+    <Container>
         <Box
             width="Auto"
             height="100%"
         >
             <Menu title="Main Menu">
-                <MenuItem title="New Game" icon="plus-circle"></MenuItem>
-                <MenuItem title="Create Character" icon="user-plus"></MenuItem>
-                <MenuItem title="Load Game " icon="database"></MenuItem>
-                <MenuItem title="Quit" icon="sign-out"></MenuItem>
+                <MenuItem title="New Game" icon="plus-circle"
+                    Event={{
+                        Activated: () => { print("Clicked New Game") }
+                    }} />
+                <MenuItem title="Create Character" icon="user-plus" />
+                <MenuItem title="Load Game " icon="database" />
+                <MenuItem title="Quit" icon="sign-out" />
             </Menu>
         </Box>
     </Container>
-    </>
+
 ));

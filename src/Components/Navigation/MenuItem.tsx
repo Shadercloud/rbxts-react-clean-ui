@@ -3,7 +3,7 @@ import { Button, ButtonProps } from "../Input";
 import { NavigationContext } from "../../Contexts";
 
 interface MenuItemProps extends ButtonProps {
-    title: string
+    title: string;
 }
 
 export function MenuItem(props: MenuItemProps) {

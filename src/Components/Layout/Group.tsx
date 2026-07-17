@@ -25,7 +25,6 @@ export function Group(props: GroupProps) {
     };
 
     const reportSize = (id: string, absoluteSize: Vector2) => {
-        print(id, absoluteSize)
         if (sizes.current.get(id)?.X === absoluteSize.X && sizes.current.get(id)?.Y === absoluteSize.Y) {
             return;
         }

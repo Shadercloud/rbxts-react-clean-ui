@@ -23,7 +23,6 @@ local function Group(props)
 		setSize(if largestSize.X > 0 or largestSize.Y > 0 then largestSize else nil)
 	end
 	local reportSize = function(id, absoluteSize)
-		print(id, absoluteSize)
 		local _current = sizes.current
 		local _id = id
 		local _result = _current[_id]
