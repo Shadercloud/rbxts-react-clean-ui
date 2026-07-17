@@ -14,13 +14,18 @@ do
 	end
 	function SizeHelper:constructor()
 	end
-	function SizeHelper:GetSize(props)
+	function SizeHelper:GetSize(props, defaultSize)
 		if props.Size then
 			return props.Size
 		end
+		if props.width == nil and props.height == nil and defaultSize ~= nil then
+			return defaultSize
+		end
 		local width
 		if props.width ~= nil then
-			if self:isBreakpointSize(props.width) then
+			if props.width == "Auto" then
+				width = 0
+			elseif self:isBreakpointSize(props.width) then
 				width = self:resolveResponsiveValue(props.width, "sm")
 			else
 				width = props.width
@@ -51,9 +56,12 @@ do
 		local y = if props.top == nil and props.bottom ~= nil then 1 else 0
 		return Vector2.new(x, y)
 	end
-	function SizeHelper:GetAutoSize(props)
-		if props.AutomaticSize then
+	function SizeHelper:GetAutoSize(props, defaultValue)
+		if props.AutomaticSize ~= nil then
 			return props.AutomaticSize
+		end
+		if props.width == "Auto" then
+			return Enum.AutomaticSize.X
 		end
 		local _condition = props.Size
 		if not _condition then
@@ -66,20 +74,14 @@ do
 		if _condition ~= 0 and _condition == _condition and _condition ~= "" and _condition then
 			return Enum.AutomaticSize.None
 		end
-		local _value = props.width
-		local _condition_1 = not (_value ~= 0 and _value == _value and _value ~= "" and _value)
-		if _condition_1 then
-			local _value_1 = props.height
-			_condition_1 = not (_value_1 ~= 0 and _value_1 == _value_1 and _value_1 ~= "" and _value_1)
-		end
-		if _condition_1 then
+		if props.width == nil and props.height == nil and defaultValue == nil then
 			return Enum.AutomaticSize.XY
 		end
-		local _value_1 = props.width
-		if not (_value_1 ~= 0 and _value_1 == _value_1 and _value_1 ~= "" and _value_1) then
+		local _value = props.width
+		if not (_value ~= 0 and _value == _value and _value ~= "" and _value) then
 			return Enum.AutomaticSize.X
 		end
-		return Enum.AutomaticSize.Y
+		return if defaultValue ~= nil then defaultValue else Enum.AutomaticSize.Y
 	end
 	function SizeHelper:toUDim(size)
 		if size == nil then

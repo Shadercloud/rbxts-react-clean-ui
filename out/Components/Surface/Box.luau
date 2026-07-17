@@ -5,10 +5,12 @@ local React = _react
 local Component = _react.Component
 local ReactComponent = _react.ReactComponent
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
-local _Decorators = TS.import(script, script.Parent.Parent, "Decorators")
-local Padding = _Decorators.Padding
-local Corners = _Decorators.Corners
-local BoxShadow = _Decorators.BoxShadow
+local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
+local Padding = _Decorator.Padding
+local Corners = _Decorator.Corners
+local BoxShadow = _Decorator.BoxShadow
+local Container = TS.import(script, script.Parent.Parent, "Layout").Container
+local SizeHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").SizeHelper
 local Box
 do
 	local super = Component
@@ -28,8 +30,8 @@ do
 	end
 	function Box:render()
 		local _attributes = {
-			Size = UDim2.fromScale(1, 1),
-			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = SizeHelper:GetSize(self.props, UDim2.fromScale(1, 1)),
+			AutomaticSize = Enum.AutomaticSize.XY,
 		}
 		local _condition = self.props.BackgroundTransparency
 		if _condition == nil then
@@ -52,7 +54,7 @@ do
 		local _exp_2 = React.createElement(BoxShadow, _attributes_1)
 		local _attributes_2 = table.clone(self.props)
 		setmetatable(_attributes_2, nil)
-		return React.createElement("frame", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), self.props.children)
+		return React.createElement(Container, _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), self.props.children)
 	end
 	Box.contextType = CleanThemeContext
 	Box = ReactComponent(Box) or Box

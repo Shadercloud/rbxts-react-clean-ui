@@ -1,3 +1,4 @@
+import { Binding } from "@rbxts/react";
 import { IconName } from "./icon";
 
 export type CssUnit = "px" | "%";
@@ -68,6 +69,7 @@ export interface ScaleSizeValue<T> {
 
 
 export type CssSize =
+    | "Auto"
     | number
     | `${number}`
     | `${number}${CssUnit}`;
@@ -110,7 +112,7 @@ export interface BackgroundElementProps {
 }
 
 export interface SizeElementProps {
-    Size?: UDim2;
+    Size?: UDim2 | Binding<UDim2>;
     width?: ResponsiveCssSize;
     height?: CssSize;
     AutomaticSize?: Enum.AutomaticSize;
@@ -141,7 +143,7 @@ export interface CleanElementProps extends SizeElementProps, PositionElementProp
 }
 
 export interface SpacedElementProps {
-    spacing?: ScaleSize
+    spacing?: ScaleSize | "None"
 }
 
 export interface ShadowElementProps {
@@ -152,4 +154,19 @@ export interface ShadowElementProps {
 
 export interface IconElementProps {
     icon?: IconName
+}
+
+export interface PaddingProps extends SpacedElementProps {
+    right?: ScaleSize | "None";
+    left?: ScaleSize | "None";
+    top?: ScaleSize | "None";
+    bottom?: ScaleSize | "None";
+    padding?: CssPadding;
+}
+
+export interface ResolvedPadding {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
 }

@@ -1,14 +1,21 @@
-import React, { Component, ReactComponent } from "@rbxts/react"
-import { BackgroundElementProps, IconElementProps, IntentElementProps, ScalableElementProps, ShadowElementProps, SpacedElementProps, TextVariant, ZIndexElementProps } from "../../Interfaces/";
-import { CleanThemeContext } from "../../Contexts/";
-import { BoxShadow, Corners, Padding } from "../Decorators";
+import React from "@rbxts/react";
+import {
+    BackgroundElementProps,
+    IconElementProps,
+    IntentElementProps,
+    ScalableElementProps,
+    ShadowElementProps,
+    SpacedElementProps,
+    ZIndexElementProps,
+} from "../../Interfaces/";
+import { CleanThemeContext, useGroupElement } from "../../Contexts/";
+import { BoxShadow, Corners, Padding } from "../Decorator";
 import { Text } from "../Typography";
-import { ColorHelper } from "../../Helpers";
+import { ColorHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { Icon } from "../Surface";
-import { HStack } from "../Layout";
-import { TypographyHelper } from "../../Helpers/typography.helper";
+import { GroupMeasurement, HStack } from "../Layout";
 
-interface ButtonProps extends
+export interface ButtonProps extends
     SpacedElementProps,
     ShadowElementProps,
     ZIndexElementProps,
@@ -19,107 +26,112 @@ interface ButtonProps extends
     text?: string;
     fontWeight?: Enum.FontWeight;
     Event?: React.InstanceEvent<ImageButton>;
+    children?: React.ReactNode;
+    group?: boolean;
 }
 
-interface ButtonState {
-    hover: boolean;
-}
+export function Button(props: ButtonProps) {
+    const context = React.useContext(CleanThemeContext);
+    const [hover, setHover] = React.useState(false);
 
-@ReactComponent
-export class Button extends Component<ButtonProps, ButtonState> {
-    static contextType = CleanThemeContext;
+    const group = useGroupElement(props.group);
 
-    declare context: React.ContextType<typeof CleanThemeContext>
-    render() {
+    const padding = SpacingHelper.GetResolvedPadding(context, props);
 
-        return <imagebutton
+    return (
+        <imagebutton
             Event={{
-                ...this.props.Event,
+                ...props.Event,
 
                 MouseEnter: (button, x, y) => {
-                    this.setState({
-                        hover: true,
-                    });
+                    setHover(true);
 
-                    this.props.Event?.MouseEnter?.(button, x, y);
+                    props.Event?.MouseEnter?.(button, x, y);
                 },
 
                 MouseLeave: (button, x, y) => {
-                    this.setState({
-                        hover: false,
-                    });
+                    setHover(false);
 
-                    this.props.Event?.MouseLeave?.(button, x, y);
+                    props.Event?.MouseLeave?.(button, x, y);
                 },
+
             }}
-            Size={UDim2.fromScale(0, 0)}
+
+            Size={UDim2.fromOffset(group?.groupSize?.X ?? 0, 0)}
             AutomaticSize={Enum.AutomaticSize.XY}
             BackgroundTransparency={
-                this.props.BackgroundTransparency ??
-                this.context.components.button.backgroundTransparency
+                props.BackgroundTransparency ??
+                context.components.button.backgroundTransparency
             }
             BackgroundColor3={ColorHelper.getIntentColor(
-                this.context,
-                this.props.intent,
-                this.state.hover ? "hover" : "background",
-                this.context.components.button.intents,
-                this.props.BackgroundColor3,
+                context,
+                props.intent,
+                hover ? "hover" : "background",
+                context.components.button.intents,
+                props.BackgroundColor3,
             )}
             AutoButtonColor={false}
-            ZIndex={this.props.ZIndex}
+            ZIndex={props.ZIndex}
         >
-
-            <Corners radius={this.context.components.button.cornerRadius} />
+            <Corners radius={context.components.button.cornerRadius} />
 
             <uistroke
-                Thickness={this.context.components.button.borderThickness}
+                Thickness={context.components.button.borderThickness}
                 BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                 Color={ColorHelper.getIntentColor(
-                    this.context,
-                    this.props.intent,
+                    context,
+                    props.intent,
                     "border",
-                    this.context.components.button.intents,
+                    context.components.button.intents,
                 )}
             />
 
-            <BoxShadow {...this.props} value={this.context.components.button.boxShadow} />
-            <Padding {...this.props} />
-            {(this.props.icon !== undefined || this.props.text !== undefined) &&
-                <HStack valign="Center" spacing={this.props.spacing}>
-                    {this.props.icon !== undefined &&
-                        <Icon
-                            scale={this.props.scale}
-                            icon={this.props.icon}
-                            color={
-                                ColorHelper.getIntentColor(
-                                    this.context,
-                                    this.props.intent,
-                                    "text",
-                                    this.context.components.button.intents,
-                                    undefined,
-                                    this.context.components.button.textColor
-                                )
+            <BoxShadow {...props} value={context.components.button.boxShadow} />
+            <Padding {...props} />
+            <GroupMeasurement enabled={props.group} group={group} padding={padding}>
 
-                            } />
-                    }
-                    {this.props.text !== undefined &&
-                        <Text
-                            text={this.props.text}
-                            typography={TypographyHelper.getTypography(this.context, this.props.scale, this.context.components.button.typography)}
-                            TextColor3={
-                                ColorHelper.getIntentColor(
-                                    this.context,
-                                    this.props.intent,
-                                    "text",
-                                    this.context.components.button.intents,
-                                    undefined,
-                                    this.context.components.button.textColor
-                                )
-                            } />
-                    }
-                </HStack>
-            }
-            {this.props.children}
+                {(props.icon !== undefined || props.text !== undefined) &&
+                    <HStack valign="Center" spacing={props.spacing}>
+                        {props.icon !== undefined &&
+                            <Icon
+                                scale={props.scale}
+                                icon={props.icon}
+                                color={
+                                    ColorHelper.getIntentColor(
+                                        context,
+                                        props.intent,
+                                        "text",
+                                        context.components.button.intents,
+                                        undefined,
+                                        context.components.button.textColor
+                                    )
+
+                                } />
+                        }
+                        {props.text !== undefined &&
+                            <Text
+                                text={props.text}
+                                typography={TypographyHelper.getTypography(
+                                    context,
+                                    props.scale,
+                                    context.components.button.typography
+                                )}
+                                TextColor3={
+                                    ColorHelper.getIntentColor(
+                                        context,
+                                        props.intent,
+                                        "text",
+                                        context.components.button.intents,
+                                        undefined,
+                                        context.components.button.textColor
+                                    )
+                                } />
+                        }
+                    </HStack>
+                }
+
+                {props.children}
+            </GroupMeasurement>
         </imagebutton>
-    }
+    );
 }

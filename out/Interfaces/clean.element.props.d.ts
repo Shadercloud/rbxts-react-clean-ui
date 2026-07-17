@@ -1,3 +1,4 @@
+import { Binding } from "@rbxts/react";
 import { IconName } from "./icon";
 export type CssUnit = "px" | "%";
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl";
@@ -28,7 +29,7 @@ export interface ScaleSizeValue<T> {
     lg?: T;
     xl?: T;
 }
-export type CssSize = number | `${number}` | `${number}${CssUnit}`;
+export type CssSize = "Auto" | number | `${number}` | `${number}${CssUnit}`;
 export type CssBreakpoint = {
     xs: number;
     sm: number;
@@ -55,7 +56,7 @@ export interface BackgroundElementProps {
     BackgroundColor3?: Color3;
 }
 export interface SizeElementProps {
-    Size?: UDim2;
+    Size?: UDim2 | Binding<UDim2>;
     width?: ResponsiveCssSize;
     height?: CssSize;
     AutomaticSize?: Enum.AutomaticSize;
@@ -78,7 +79,7 @@ export interface IntentElementProps {
 export interface CleanElementProps extends SizeElementProps, PositionElementProps {
 }
 export interface SpacedElementProps {
-    spacing?: ScaleSize;
+    spacing?: ScaleSize | "None";
 }
 export interface ShadowElementProps {
     "box-shadow"?: CssShadow;
@@ -87,4 +88,17 @@ export interface ShadowElementProps {
 }
 export interface IconElementProps {
     icon?: IconName;
+}
+export interface PaddingProps extends SpacedElementProps {
+    right?: ScaleSize | "None";
+    left?: ScaleSize | "None";
+    top?: ScaleSize | "None";
+    bottom?: ScaleSize | "None";
+    padding?: CssPadding;
+}
+export interface ResolvedPadding {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
 }

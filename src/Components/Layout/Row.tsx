@@ -2,7 +2,7 @@ import React, { Component, ReactComponent } from "@rbxts/react";
 import { Column } from "./Column";
 import { BreakpointValue, SpacedElementProps } from "../../Interfaces/";
 import { CleanThemeContext, RowContext } from "../../Contexts";
-import { BreakpointHelper } from "../../Helpers/";
+import { BreakpointHelper, SpacingHelper } from "../../Helpers/";
 
 interface RowProps extends SpacedElementProps {
     breakpoints?: BreakpointValue<number>;
@@ -24,7 +24,7 @@ export class Row extends Component<RowProps, RowState> {
 
     public render() {
         const breakpoints: BreakpointValue<number> = (this.props.breakpoints !== undefined ? this.props.breakpoints : this.context.breakpoints)
-        const padding = new UDim(0, this.context.spacing[this.props.spacing ?? this.context.default.spacing])
+        const padding = new UDim(0, SpacingHelper.GetPadding(this.context, this.props.spacing))
 
         return (
             <frame

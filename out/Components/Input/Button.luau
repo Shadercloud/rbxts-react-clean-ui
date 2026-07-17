@@ -1,109 +1,107 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
-local _react = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local React = _react
-local Component = _react.Component
-local ReactComponent = _react.ReactComponent
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
-local _Decorators = TS.import(script, script.Parent.Parent, "Decorators")
-local BoxShadow = _Decorators.BoxShadow
-local Corners = _Decorators.Corners
-local Padding = _Decorators.Padding
+local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
+local _ = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _.CleanThemeContext
+local useGroupElement = _.useGroupElement
+local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
+local BoxShadow = _Decorator.BoxShadow
+local Corners = _Decorator.Corners
+local Padding = _Decorator.Padding
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
-local ColorHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").ColorHelper
+local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local ColorHelper = _Helpers.ColorHelper
+local SpacingHelper = _Helpers.SpacingHelper
+local TypographyHelper = _Helpers.TypographyHelper
 local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
-local HStack = TS.import(script, script.Parent.Parent, "Layout").HStack
-local TypographyHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers", "typography.helper").TypographyHelper
-local Button
-do
-	local super = Component
-	Button = setmetatable({}, {
-		__tostring = function()
-			return "Button"
-		end,
-		__index = super,
+local _Layout = TS.import(script, script.Parent.Parent, "Layout")
+local GroupMeasurement = _Layout.GroupMeasurement
+local HStack = _Layout.HStack
+local function Button(props)
+	local context = React.useContext(CleanThemeContext)
+	local hover, setHover = React.useState(false)
+	local group = useGroupElement(props.group)
+	local padding = SpacingHelper:GetResolvedPadding(context, props)
+	local _attributes = {}
+	local _object = {}
+	local _spread = props.Event
+	if _spread then
+		for _k, _v in _spread do
+			_object[_k] = _v
+		end
+	end
+	_object.MouseEnter = function(button, x, y)
+		setHover(true)
+		local _result = props.Event
+		if _result ~= nil then
+			_result = _result.MouseEnter
+			if _result ~= nil then
+				_result(button, x, y)
+			end
+		end
+	end
+	_object.MouseLeave = function(button, x, y)
+		setHover(false)
+		local _result = props.Event
+		if _result ~= nil then
+			_result = _result.MouseLeave
+			if _result ~= nil then
+				_result(button, x, y)
+			end
+		end
+	end
+	_attributes.Event = _object
+	local _result = group
+	if _result ~= nil then
+		_result = _result.groupSize
+		if _result ~= nil then
+			_result = _result.X
+		end
+	end
+	local _condition = _result
+	if _condition == nil then
+		_condition = 0
+	end
+	_attributes.Size = UDim2.fromOffset(_condition, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.XY
+	local _condition_1 = props.BackgroundTransparency
+	if _condition_1 == nil then
+		_condition_1 = context.components.button.backgroundTransparency
+	end
+	_attributes.BackgroundTransparency = _condition_1
+	_attributes.BackgroundColor3 = ColorHelper:getIntentColor(context, props.intent, if hover then "hover" else "background", context.components.button.intents, props.BackgroundColor3)
+	_attributes.AutoButtonColor = false
+	_attributes.ZIndex = props.ZIndex
+	local _exp = React.createElement(Corners, {
+		radius = context.components.button.cornerRadius,
 	})
-	Button.__index = Button
-	function Button.new(...)
-		local self = setmetatable({}, Button)
-		return self:constructor(...) or self
-	end
-	function Button:constructor(...)
-		super.constructor(self, ...)
-	end
-	function Button:render()
-		local _attributes = {}
-		local _object = {}
-		local _spread = self.props.Event
-		if _spread then
-			for _k, _v in _spread do
-				_object[_k] = _v
-			end
-		end
-		_object.MouseEnter = function(button, x, y)
-			self:setState({
-				hover = true,
-			})
-			local _result = self.props.Event
-			if _result ~= nil then
-				_result = _result.MouseEnter
-				if _result ~= nil then
-					_result(button, x, y)
-				end
-			end
-		end
-		_object.MouseLeave = function(button, x, y)
-			self:setState({
-				hover = false,
-			})
-			local _result = self.props.Event
-			if _result ~= nil then
-				_result = _result.MouseLeave
-				if _result ~= nil then
-					_result(button, x, y)
-				end
-			end
-		end
-		_attributes.Event = _object
-		_attributes.Size = UDim2.fromScale(0, 0)
-		_attributes.AutomaticSize = Enum.AutomaticSize.XY
-		local _condition = self.props.BackgroundTransparency
-		if _condition == nil then
-			_condition = self.context.components.button.backgroundTransparency
-		end
-		_attributes.BackgroundTransparency = _condition
-		_attributes.BackgroundColor3 = ColorHelper:getIntentColor(self.context, self.props.intent, if self.state.hover then "hover" else "background", self.context.components.button.intents, self.props.BackgroundColor3)
-		_attributes.AutoButtonColor = false
-		_attributes.ZIndex = self.props.ZIndex
-		local _exp = React.createElement(Corners, {
-			radius = self.context.components.button.cornerRadius,
-		})
-		local _exp_1 = React.createElement("uistroke", {
-			Thickness = self.context.components.button.borderThickness,
-			BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-			Color = ColorHelper:getIntentColor(self.context, self.props.intent, "border", self.context.components.button.intents),
-		})
-		local _attributes_1 = table.clone(self.props)
-		setmetatable(_attributes_1, nil)
-		_attributes_1.value = self.context.components.button.boxShadow
-		local _exp_2 = React.createElement(BoxShadow, _attributes_1)
-		local _attributes_2 = table.clone(self.props)
-		setmetatable(_attributes_2, nil)
-		return React.createElement("imagebutton", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), (self.props.icon ~= nil or self.props.text ~= nil) and React.createElement(HStack, {
-			valign = "Center",
-			spacing = self.props.spacing,
-		}, self.props.icon ~= nil and React.createElement(Icon, {
-			scale = self.props.scale,
-			icon = self.props.icon,
-			color = ColorHelper:getIntentColor(self.context, self.props.intent, "text", self.context.components.button.intents, nil, self.context.components.button.textColor),
-		}), self.props.text ~= nil and React.createElement(Text, {
-			text = self.props.text,
-			typography = TypographyHelper:getTypography(self.context, self.props.scale, self.context.components.button.typography),
-			TextColor3 = ColorHelper:getIntentColor(self.context, self.props.intent, "text", self.context.components.button.intents, nil, self.context.components.button.textColor),
-		})), self.props.children)
-	end
-	Button.contextType = CleanThemeContext
-	Button = ReactComponent(Button) or Button
+	local _exp_1 = React.createElement("uistroke", {
+		Thickness = context.components.button.borderThickness,
+		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
+		Color = ColorHelper:getIntentColor(context, props.intent, "border", context.components.button.intents),
+	})
+	local _attributes_1 = table.clone(props)
+	setmetatable(_attributes_1, nil)
+	_attributes_1.value = context.components.button.boxShadow
+	local _exp_2 = React.createElement(BoxShadow, _attributes_1)
+	local _attributes_2 = table.clone(props)
+	setmetatable(_attributes_2, nil)
+	return React.createElement("imagebutton", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), React.createElement(GroupMeasurement, {
+		enabled = props.group,
+		group = group,
+		padding = padding,
+	}, (props.icon ~= nil or props.text ~= nil) and React.createElement(HStack, {
+		valign = "Center",
+		spacing = props.spacing,
+	}, props.icon ~= nil and React.createElement(Icon, {
+		scale = props.scale,
+		icon = props.icon,
+		color = ColorHelper:getIntentColor(context, props.intent, "text", context.components.button.intents, nil, context.components.button.textColor),
+	}), props.text ~= nil and React.createElement(Text, {
+		text = props.text,
+		typography = TypographyHelper:getTypography(context, props.scale, context.components.button.typography),
+		TextColor3 = ColorHelper:getIntentColor(context, props.intent, "text", context.components.button.intents, nil, context.components.button.textColor),
+	})), props.children))
 end
 return {
 	Button = Button,

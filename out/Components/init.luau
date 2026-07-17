@@ -7,13 +7,16 @@ end
 for _k, _v in TS.import(script, script, "Layout") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "Decorators") or {} do
+for _k, _v in TS.import(script, script, "Decorator") or {} do
 	exports[_k] = _v
 end
 for _k, _v in TS.import(script, script, "Surface") or {} do
 	exports[_k] = _v
 end
 for _k, _v in TS.import(script, script, "Typography") or {} do
+	exports[_k] = _v
+end
+for _k, _v in TS.import(script, script, "Navigation") or {} do
 	exports[_k] = _v
 end
 return exports

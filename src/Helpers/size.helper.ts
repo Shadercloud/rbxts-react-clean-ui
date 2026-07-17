@@ -1,5 +1,5 @@
 import { Binding } from "@rbxts/react";
-import { CleanElementProps, CssBreakpointSize, CssSize, ResponsiveCssSize, Breakpoint, ResponsiveValue, BreakpointValue, SizeElementProps, PositionElementProps } from "../Interfaces/clean.element.props";
+import { CssBreakpointSize, CssSize, ResponsiveCssSize, Breakpoint, ResponsiveValue, BreakpointValue, SizeElementProps, PositionElementProps } from "../Interfaces/clean.element.props";
 
 const breakpointOrder: Breakpoint[] = [
     "xs",
@@ -10,13 +10,18 @@ const breakpointOrder: Breakpoint[] = [
 ];
 
 export class SizeHelper {
-    public static GetSize(props: SizeElementProps): UDim2 | Binding<UDim2> {
+    public static GetSize(props: SizeElementProps, defaultSize?: UDim2): UDim2 | Binding<UDim2> {
         if (props.Size)
             return props.Size
 
+        if (props.width === undefined && props.height === undefined && defaultSize !== undefined)
+            return defaultSize
+
         let width
         if (props.width !== undefined) {
-            if (this.isBreakpointSize(props.width)) {
+            if (props.width === "Auto")
+                width = 0
+            else if (this.isBreakpointSize(props.width)) {
                 width = this.resolveResponsiveValue(props.width, "sm")
             } else {
                 width = props.width
@@ -66,19 +71,22 @@ export class SizeHelper {
         return new Vector2(x, y);
     }
 
-    public static GetAutoSize(props: SizeElementProps): Enum.AutomaticSize | "None" | "X" | "Y" | "XY" | Binding<Enum.AutomaticSize> {
-        if (props.AutomaticSize)
+    public static GetAutoSize(props: SizeElementProps, defaultValue?: Enum.AutomaticSize): Enum.AutomaticSize | "None" | "X" | "Y" | "XY" | Binding<Enum.AutomaticSize> {
+        if (props.AutomaticSize !== undefined)
             return props.AutomaticSize
+
+        if (props.width === "Auto")
+            return Enum.AutomaticSize.X
 
         if (props.Size || (props.width && props.height))
             return Enum.AutomaticSize.None
-        if (!props.width && !props.height)
+        if (props.width === undefined && props.height === undefined && defaultValue === undefined)
             return Enum.AutomaticSize.XY
 
         if (!props.width)
             return Enum.AutomaticSize.X
 
-        return Enum.AutomaticSize.Y
+        return defaultValue !== undefined ? defaultValue : Enum.AutomaticSize.Y
     }
 
     public static toUDim(size?: CssSize): UDim {

@@ -8,7 +8,9 @@ local Column = TS.import(script, script.Parent, "Column").Column
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local CleanThemeContext = _Contexts.CleanThemeContext
 local RowContext = _Contexts.RowContext
-local BreakpointHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").BreakpointHelper
+local _ = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local BreakpointHelper = _.BreakpointHelper
+local SpacingHelper = _.SpacingHelper
 local Row
 do
 	local super = Component
@@ -31,7 +33,7 @@ do
 	end
 	function Row:render()
 		local breakpoints = (if self.props.breakpoints ~= nil then self.props.breakpoints else self.context.breakpoints)
-		local padding = UDim.new(0, self.context.spacing[self.props.spacing or self.context.default.spacing])
+		local padding = UDim.new(0, SpacingHelper:GetPadding(self.context, self.props.spacing))
 		local _exp = React.createElement("uilistlayout", {
 			FillDirection = Enum.FillDirection.Horizontal,
 			SortOrder = Enum.SortOrder.LayoutOrder,

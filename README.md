@@ -83,16 +83,19 @@ git clone https://github.com/Shadercloud/rbxts-react-clean-ui
 			"@rbxts/ui-labs": [
 				"../node_modules/@rbxts/ui-labs"
 			],
+			"@rbxts/services": [
+				"../node_modules/@rbxts/services"
+			],
 			"@rbxts/react-clean-ui": [
 				"Packages/rbxts-react-clean-ui"
 			]
 		}
 	},
 	"exclude": [
-		"src/Packages/*/src",
-		"src/Packages/*/node_modules",
-		"src/Packages/*/out",
-		"src/Packages/*/.vscode"
+		"src/Packages/**/src",
+		"src/Packages/**/node_modules",
+		"src/Packages/**/out",
+		"src/Packages/**/.vscode"
 	]
 }
 ```

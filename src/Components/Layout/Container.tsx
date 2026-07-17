@@ -1,21 +1,30 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import { PositionElementProps, SizeElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { SizeHelper } from "../../Helpers/";
+import { useGroupElement } from "../../Contexts";
+import { GroupMeasurement } from "./GroupMeasurement";
 
-interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexElementProps { }
+interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexElementProps {
+    BackgroundTransparency?: number;
+    BackgroundColor3?: Color3;
+    group?: boolean;
+    children?: React.ReactNode;
+}
 
-@ReactComponent
-export class Container extends Component<ContainerProps> {
-    render(): React.ReactNode {
-        return <frame
-            Size={SizeHelper.GetSize(this.props)}
-            AutomaticSize={SizeHelper.GetAutoSize(this.props)}
-            Position={SizeHelper.GetPosition(this.props)}
-            AnchorPoint={SizeHelper.GetAnchor(this.props)}
-            BackgroundTransparency={1}
-            ZIndex={this.props.ZIndex}
-        >
-            {this.props.children}
-        </frame>
-    }
+export function Container(props: ContainerProps) {
+    const group = useGroupElement(props.group);
+    return <frame
+        Size={SizeHelper.GetSize(props, UDim2.fromOffset(group?.groupSize?.X ?? 0, 0))}
+        AutomaticSize={SizeHelper.GetAutoSize(props)}
+        Position={SizeHelper.GetPosition(props)}
+        AnchorPoint={SizeHelper.GetAnchor(props)}
+        BackgroundTransparency={props.BackgroundTransparency ?? 1}
+        BackgroundColor3={props.BackgroundColor3}
+        ZIndex={props.ZIndex}
+    >
+        <GroupMeasurement enabled={props.group} group={group}>
+            {props.children}
+        </GroupMeasurement>
+    </frame>
+
 }

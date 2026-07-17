@@ -10,6 +10,12 @@ end
 for _k, _v in TS.import(script, script, "FlexItem") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "Group") or {} do
+	exports[_k] = _v
+end
+for _k, _v in TS.import(script, script, "GroupMeasurement") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "HStack") or {} do
 	exports[_k] = _v
 end

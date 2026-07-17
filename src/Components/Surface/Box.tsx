@@ -1,9 +1,11 @@
 import React, { Component, ReactComponent } from "@rbxts/react";
-import { BackgroundElementProps, ShadowElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
+import { BackgroundElementProps, ShadowElementProps, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
-import { Padding, Corners, BoxShadow } from "../Decorators";
+import { Padding, Corners, BoxShadow } from "../Decorator";
+import { Container } from "../Layout";
+import { SizeHelper } from "../../Helpers";
 
-interface BoxProps extends SpacedElementProps, ShadowElementProps, BackgroundElementProps, ZIndexElementProps { }
+interface BoxProps extends SpacedElementProps, ShadowElementProps, BackgroundElementProps, ZIndexElementProps, SizeElementProps { }
 
 @ReactComponent
 export class Box extends Component<BoxProps> {
@@ -12,9 +14,9 @@ export class Box extends Component<BoxProps> {
     declare context: React.ContextType<typeof CleanThemeContext>;
     render() {
         return (
-            <frame
-                Size={UDim2.fromScale(1, 1)}
-                AutomaticSize={Enum.AutomaticSize.Y}
+            <Container
+                Size={SizeHelper.GetSize(this.props, UDim2.fromScale(1, 1))}
+                AutomaticSize={Enum.AutomaticSize.XY}
                 BackgroundTransparency={
                     this.props.BackgroundTransparency ??
                     this.context.components.box.backgroundTransparency
@@ -36,7 +38,7 @@ export class Box extends Component<BoxProps> {
                 <Padding {...this.props} />
 
                 {this.props.children}
-            </frame>
+            </Container>
         );
     }
 }

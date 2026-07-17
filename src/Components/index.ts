@@ -1,5 +1,6 @@
 export * from './Input';
 export * from './Layout';
-export * from './Decorators';
+export * from './Decorator';
 export * from './Surface';
 export * from './Typography';
+export * from './Navigation'
