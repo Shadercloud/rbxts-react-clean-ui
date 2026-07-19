@@ -1,13 +1,232 @@
 ---
+
 title: React Clean UI
-description: Your first document
+description: A themed React component library for building polished Roblox interfaces with roblox-ts.
+icon: PanelsTopLeft
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+## About React Clean UI
 
-## What is Next?
+**React Clean UI** is a component library for building polished Roblox interfaces with [`roblox-ts`](https://roblox-ts.com/) and [`@rbxts/react`](https://www.npmjs.com/package/@rbxts/react).
 
-<Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
-</Cards>
+It provides reusable, theme-aware components for common interface patterns, allowing you to compose your UI using expressive React components instead of repeatedly styling native Roblox instances.
+
+```tsx
+import React from "@rbxts/react";
+import {
+    Box,
+    Button,
+    Container,
+    HStack,
+    Text,
+    VStack,
+} from "@rbxts/react-clean-ui";
+export function WelcomePanel() {
+    return (
+        <Container width="100%" height="100%" center="50%">
+            <Box spacing="lg">
+                <VStack>
+                    <Text text="Welcome" variant="title" />
+                    <Text
+                        text="Build consistent Roblox interfaces from reusable components."
+                        variant="body"
+                    />
+                    <HStack>
+                        <Button text="Continue" intent="primary" />
+                        <Button text="Cancel" />
+                    </HStack>
+                </VStack>
+            </Box>
+        </Container>
+    );
+}
+```
+
+## Why React Clean UI?
+
+Roblox provides powerful low-level UI instances, but creating a complete interface often involves repeating the same work:
+
+* calculating sizes and positions;
+* configuring layouts and spacing;
+* applying colours, typography, corners, and shadows;
+* implementing responsive behaviour;
+* maintaining a consistent visual style across every screen.
+
+React Clean UI moves this repeated work into reusable components, helpers, and theme definitions.
+
+You describe **what the interface should contain**, while the library handles much of the styling and layout needed to present it consistently.
+
+## Features
+
+### Composable components
+
+Build interfaces from small components that work together naturally.
+
+The library includes primitives for:
+
+* containers, rows, columns, and stacks;
+* boxes and other styled surfaces;
+* buttons and interactive controls;
+* text and icons;
+* padding, corners, and shadows;
+* scrolling content;
+* navigation;
+* grouped and equally sized elements.
+
+Components can be nested and combined without requiring a large monolithic screen component.
+
+### Theme-driven design
+
+Colours, spacing, typography, border radii, component styles, icons, and intent colours can be defined centrally through a theme.
+
+This makes it possible to:
+
+* keep every screen visually consistent;
+* change the appearance of an entire interface from one place;
+* create light, dark, or game-specific themes;
+* give semantic meaning to styles such as `primary`, `success`, and `danger`.
+
+```tsx
+<ThemeProvider theme={MyTheme}>
+    <App />
+</ThemeProvider>
+```
+
+### Familiar sizing and spacing
+
+Many components provide concise props inspired by web UI frameworks.
+
+```tsx
+<Container width="80%" height="400px">
+    <Box spacing="lg">
+        <Text text="Account settings" variant="heading" />
+    </Box>
+</Container>
+```
+
+Supported values can include theme scales and CSS-like sizes such as:
+
+```tsx
+width="100%"
+height="320px"
+spacing="md"
+scale="lg"
+```
+
+These values are translated into the Roblox types required by the rendered instances.
+
+### Responsive layouts
+
+Responsive values and breakpoint-aware layout components make it easier to create interfaces that adapt to different viewport sizes.
+
+```tsx
+<Row gap={12}>
+    <Column span={{ xs: 12, md: 6, lg: 4 }}>
+        <Box />
+    </Column>
+
+    <Column span={{ xs: 12, md: 6, lg: 8 }}>
+        <Box />
+    </Column>
+</Row>
+```
+
+This allows the same component tree to work across phones, tablets, desktops, and consoles without maintaining separate versions of every screen.
+
+### Built for Roblox React
+
+React Clean UI renders ordinary Roblox GUI instances through `@rbxts/react`.
+
+It is designed to fit into an existing roblox-ts workflow and remains compatible with:
+
+* React state and hooks;
+* React contexts;
+* Roblox events and property bindings;
+* Rojo projects;
+* UI Labs stories;
+* native Roblox UI instances placed alongside library components.
+
+You can use a high-level component where it saves time and fall back to native elements whenever you need direct control.
+
+```tsx
+<Box>
+    <frame
+        Size={UDim2.fromScale(1, 1)}
+        BackgroundTransparency={1}
+    />
+</Box>
+```
+
+## Design principles
+
+React Clean UI is built around a few simple principles:
+
+### Consistency over repetition
+
+Common design decisions belong in themes and reusable components, not scattered across dozens of screens.
+
+### Composition over configuration
+
+Small components should combine naturally instead of requiring one enormous component with hundreds of props.
+
+### Sensible defaults with escape hatches
+
+Components should look good with minimal configuration while still allowing native Roblox properties and instances where more control is required.
+
+### Responsive by default
+
+Interfaces should be capable of adapting to different screen sizes without needing completely separate component trees.
+
+### Roblox first
+
+CSS-like props are provided for convenience, but the library ultimately targets Roblox and works with Roblox concepts such as `UDim`, `UDim2`, `Color3`, GUI instances, and instance events.
+
+## Previewing components
+
+The repository includes [UI Labs](https://ui-labs.luau.page/) stories demonstrating the available syntax and components.
+
+After setting up the development environment, open UI Labs in Roblox Studio to browse and interact with the stories.
+
+The examples are organised into areas including:
+
+* forms;
+* icons;
+* layouts.
+
+You can also inspect the repository’s [`Stories`](https://github.com/Shadercloud/rbxts-react-clean-ui/tree/master/Stories) directory directly.
+
+## Project status
+
+React Clean UI is an early-stage project and is being developed in public.
+
+Some areas are still evolving, including:
+
+* the final public API;
+* component documentation;
+* package publishing;
+* browser-based component previews;
+* the complete component collection;
+* testing and release processes.
+
+The current source is available on [GitHub](https://github.com/Shadercloud/rbxts-react-clean-ui).
+
+## Next steps
+
+Start by exploring the component examples, then create a small interface using a `ThemeProvider`, a layout component, and a few styled elements.
+
+A typical first screen might use:
+
+```tsx
+<ThemeProvider>
+    <Container>
+        <Box>
+            <VStack>
+                <Text text="My game" variant="title" />
+                <Button text="Play" intent="primary" />
+            </VStack>
+        </Box>
+    </Container>
+</ThemeProvider>
+```
+
+From there, you can customise the theme, add responsive columns, introduce navigation, and compose larger interfaces from the same primitives.
