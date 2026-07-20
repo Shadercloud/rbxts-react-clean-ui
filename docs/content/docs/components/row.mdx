@@ -1,0 +1,143 @@
+---
+
+title: Row / Column
+description: Build responsive layouts using a flexible 12-column grid.
+icon: Columns3Cog
+---
+
+## Grid System
+
+The **Row** and **Column** components provide a responsive grid system inspired by Bootstrap.
+
+Every row is divided into **12 equal columns**. Each `Column` occupies a number of those columns using its `span` property. When the total span exceeds 12, additional columns automatically wrap onto the next line.
+
+For example:
+
+* `span={12}` – Full width
+* `span={6}` – Half width (2 columns per row)
+* `span={4}` – One third width (3 columns per row)
+* `span={3}` – One quarter width (4 columns per row)
+
+```text
+12
+████████████
+
+6 + 6
+████████  ████████
+
+4 + 4 + 4
+█████  █████  █████
+
+3 + 3 + 3 + 3
+████  ████  ████  ████
+```
+
+If you don't specify a `span`, the available width is divided equally between all columns in the row.
+
+## Responsive layouts
+
+Rather than giving a column a single width, you can specify different widths for different screen sizes.
+
+The available breakpoints are:
+
+| Breakpoint | Typical devices |
+| ---------- | --------------- |
+| `xs`       | Small phones    |
+| `sm`       | Large phones    |
+| `md`       | Tablets         |
+| `lg`       | Desktop         |
+| `xl`       | Large desktop   |
+
+As the viewport grows, the column automatically changes size using the nearest matching breakpoint.
+
+For example:
+
+```tsx
+<Column
+    span={{
+        md: 6,
+        lg: 3,
+    }}
+>
+```
+
+This means:
+
+* On **medium** screens (`md`), the column occupies **6** grid units (half the row).
+* On **large** screens (`lg`) and above, it occupies **3** grid units (one quarter of the row).
+
+If four columns use this configuration:
+
+* **Medium screens** display **2 columns per row**.
+* **Large screens** display **4 columns per row**.
+
+## Example
+
+```tsx
+<Container width="75%" center="50%">
+    <Box>
+        <Row>
+            <Column span={{ md: 6, lg: 3 }}>
+                <frame
+                    Size={new UDim2(1, 0, 0, 100)}
+                    BackgroundColor3={Color3.fromHex("#FF0000")}
+                />
+            </Column>
+
+            <Column span={{ md: 6, lg: 3 }}>
+                <frame
+                    Size={new UDim2(1, 0, 0, 100)}
+                    BackgroundColor3={Color3.fromHex("#FFFF00")}
+                />
+            </Column>
+
+            <Column span={{ md: 6, lg: 3 }}>
+                <frame
+                    Size={new UDim2(1, 0, 0, 100)}
+                    BackgroundColor3={Color3.fromHex("#FF00FF")}
+                />
+            </Column>
+
+            <Column span={{ md: 6, lg: 3 }}>
+                <frame
+                    Size={new UDim2(1, 0, 0, 100)}
+                    BackgroundColor3={Color3.fromHex("#0000FF")}
+                />
+            </Column>
+        </Row>
+    </Box>
+</Container>
+```
+
+## Setting Breakpoints
+
+By default the theme has sizes for the different breakpoints under `/src/Theme/themes/default.theme.ts` you can see this section:
+```ts
+breakpoints: {
+        xs: 100,
+        sm: 200,
+        md: 300,
+        lg: 400,
+        xl: 500
+    },
+```
+
+For means, for example, if the **Row** width containing the columns is between 400px and 500px it is considered `lg`.  You can change these settings by using a custom theme.
+
+You can also pass custom breakpoints into the **Row**, such as this:
+
+```tsx
+<Row breakpoints={
+    {
+        xs: 200,
+        sm: 250,
+        md: 350,
+        lg: 550,
+        xl: 700
+    }
+}>
+    <Column>
+        ...
+    </Column>
+</Row>
+```

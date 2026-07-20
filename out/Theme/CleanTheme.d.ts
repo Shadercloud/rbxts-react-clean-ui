@@ -65,7 +65,6 @@ export interface CleanTheme {
             boxShadow?: CssShadow;
             borderThickness: number;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
-            breaks?: BreakpointValue<number>;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
     };

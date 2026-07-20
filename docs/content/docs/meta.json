@@ -3,6 +3,12 @@
         "index",
         "---Getting Started---",
         "quickstart",
-        "development"
+        "development",
+        "---Layout Components---",
+        "components/container",
+        "components/row",
+        "---Form Components---",
+        "components/input",
+        "components/select"
     ]
 }

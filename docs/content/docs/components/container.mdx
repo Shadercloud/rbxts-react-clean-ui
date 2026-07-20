@@ -1,0 +1,116 @@
+---
+
+title: Container
+description: A flexible wrapper for sizing and positioning your UI.
+icon: VectorSquare
+---
+
+The `Container` component is a lightweight wrapper around a Roblox `Frame` that makes it easy to size and position your interface using simple, CSS-inspired props.
+
+Use a `Container` whenever you need to define the size or placement of a section of your UI before adding layouts or other components inside it.
+
+## Features
+
+* Set width and height using percentages or pixel values.
+* Position elements using `top`, `left`, `right`, and `bottom`.
+* Centre elements horizontally, vertically, or both.
+* Works seamlessly with layout components such as `Row`, `Column`, `HStack`, and `VStack`.
+* Accepts all native `Frame` properties through React.
+
+## Sizing
+
+The `width` and `height` props accept CSS-style values.
+
+```tsx
+<Container width="100%" height="100%">
+    ...
+</Container>
+```
+
+You can use either percentages or pixels.
+
+```tsx
+<Container width="75%" height="400px">
+    ...
+</Container>
+```
+
+## Centering
+
+Use the `center` prop to quickly centre a container.
+
+```tsx
+<Container
+    width="300px"
+    height="200px"
+    center
+>
+    ...
+</Container>
+```
+
+You can also centre on a specific point.
+
+```tsx
+<Container
+    width="400px"
+    center="50%"
+>
+    ...
+</Container>
+```
+
+## Positioning
+
+Containers can be positioned relative to their parent using familiar directional props.
+
+```tsx
+<Container
+    top="20px"
+    left="20px"
+    width="250px"
+>
+    ...
+</Container>
+```
+
+Or anchored to another edge.
+
+```tsx
+<Container
+    right="16px"
+    bottom="16px"
+    width="200px"
+>
+    ...
+</Container>
+```
+
+## Example
+
+```tsx
+<Container width="75%" center="50%">
+    <Box spacing="lg">
+        <Text
+            text="Welcome"
+            variant="title"
+        />
+
+        <Text
+            text="Containers make it easy to size and position your UI."
+        />
+    </Box>
+</Container>
+```
+
+## Common uses
+
+A `Container` is commonly used to:
+
+* create a page or screen area;
+* centre dialogs or menus;
+* position floating UI elements;
+* define the bounds of a layout component;
+* wrap sections of an interface before applying additional styling.
+
+Unlike `Box`, which provides visual styling such as padding and shadows, `Container` is primarily concerned with **layout**—controlling **where** content appears and **how much space** it occupies.

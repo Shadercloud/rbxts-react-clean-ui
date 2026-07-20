@@ -11,8 +11,7 @@ export = createStory((props) => (
                     md: 6,
                     lg: 3
                 }}>
-                    <frame Size={new UDim2(1, 0, 0, 100)} BackgroundColor3={Color3.fromHex("#FF0000")}>
-                    </frame>
+                    <frame Size={new UDim2(1, 0, 0, 100)} BackgroundColor3={Color3.fromHex("#FF0000")} />
                 </Column>
                 <Column span={{
                     md: 6,
