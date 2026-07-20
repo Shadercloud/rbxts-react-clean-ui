@@ -3,6 +3,8 @@ import { SpacedElementProps } from "../../Interfaces";
 interface HStackProps extends SpacedElementProps {
     children?: React.ReactNode;
     valign?: Enum.VerticalAlignment | "Center" | "Top" | "Bottom" | React.Binding<Enum.VerticalAlignment> | undefined;
+    Wraps?: boolean;
+    HorizontalFlex?: Enum.UIFlexAlignment;
 }
 export declare function HStack(props: HStackProps): React.JSX.Element;
 export {};

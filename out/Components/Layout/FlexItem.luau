@@ -7,6 +7,8 @@ local function FlexItem(props)
 		AutomaticSize = Enum.AutomaticSize.XY,
 	}, React.createElement("uiflexitem", {
 		FlexMode = props.mode or "Grow",
+		GrowRatio = props.GrowRatio,
+		ShrinkRatio = props.ShrinkRatio,
 	}), React.createElement("uilistlayout", {
 		FillDirection = Enum.FillDirection.Horizontal,
 		HorizontalAlignment = props.align,

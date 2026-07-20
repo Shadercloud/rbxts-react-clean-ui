@@ -6,6 +6,8 @@ import { SpacingHelper } from "../../Helpers";
 interface HStackProps extends SpacedElementProps {
     children?: React.ReactNode;
     valign?: Enum.VerticalAlignment | "Center" | "Top" | "Bottom" | React.Binding<Enum.VerticalAlignment> | undefined;
+    Wraps?: boolean;
+    HorizontalFlex?: Enum.UIFlexAlignment;
 }
 
 export function HStack(props: HStackProps) {
@@ -15,9 +17,10 @@ export function HStack(props: HStackProps) {
         <>
             <uilistlayout
                 FillDirection={Enum.FillDirection.Horizontal}
+                HorizontalFlex={props.HorizontalFlex}
                 VerticalAlignment={props.valign}
                 Padding={padding}
-                Wraps
+                Wraps={props.Wraps === undefined ? true : props.Wraps}
             />
             {props.children}
         </>

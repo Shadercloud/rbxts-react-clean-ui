@@ -1,8 +1,7 @@
 import React, { Component } from "@rbxts/react";
-import { BreakpointValue, SpacedElementProps } from "../../Interfaces/";
+import { BreakPointElementProps, SpacedElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts";
-interface RowProps extends SpacedElementProps {
-    breakpoints?: BreakpointValue<number>;
+interface RowProps extends SpacedElementProps, BreakPointElementProps {
 }
 interface RowState {
     width: number;

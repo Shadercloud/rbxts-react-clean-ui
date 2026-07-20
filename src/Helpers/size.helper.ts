@@ -39,7 +39,11 @@ export class SizeHelper {
         }
 
         if (props.center !== undefined) {
-            const center = this.toUDim(props.center);
+            const c =
+                typeIs(props.center, "boolean")
+                    ? (props.center ? "50%" : undefined)
+                    : props.center;
+            const center = this.toUDim(c as CssSize);
             return new UDim2(center, center);
         }
 

@@ -30,6 +30,14 @@ do
 	end
 	function Menu:constructor(...)
 		super.constructor(self, ...)
+		local _object = {}
+		local _left = "collapsed"
+		local _condition = self.props.collapsed
+		if _condition == nil then
+			_condition = false
+		end
+		_object[_left] = _condition
+		self.state = _object
 	end
 	function Menu:render()
 		return React.createElement(NavigationContext.Provider, {

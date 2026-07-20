@@ -5,6 +5,7 @@ interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexE
     BackgroundColor3?: Color3;
     group?: boolean;
     children?: React.ReactNode;
+    Change?: React.InstanceChangeEvent<Frame> | undefined;
 }
 export declare function Container(props: ContainerProps): React.JSX.Element;
 export {};

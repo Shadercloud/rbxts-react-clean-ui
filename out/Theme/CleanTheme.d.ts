@@ -67,6 +67,12 @@ export interface CleanTheme {
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
+        input: {
+            borderColor: Color3;
+            borderThickness: number;
+            cornerRadius: CssSize;
+            typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+        };
     };
     icons: Partial<IconSet>;
     iconSize: ScaleSizeValue<number>;

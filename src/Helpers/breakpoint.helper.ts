@@ -4,6 +4,13 @@ import {
 } from "../Interfaces/";
 
 export class BreakpointHelper {
+    private static readonly breakpointOrder: Record<Breakpoint, number> = {
+        xs: 0,
+        sm: 1,
+        md: 2,
+        lg: 3,
+        xl: 4,
+    };
     public static getValue<T>(
         breakpoint: Breakpoint,
         value?: BreakpointValue<T>,
@@ -38,6 +45,36 @@ export class BreakpointHelper {
             case "xs":
             default:
                 return value.xs;
+        }
+    }
+
+    public static compare(
+        left: Breakpoint,
+        operator: ">" | ">=" | "<" | "<=" | "==" | "!=",
+        right: Breakpoint,
+    ): boolean {
+        const a = BreakpointHelper.breakpointOrder[left];
+        const b = BreakpointHelper.breakpointOrder[right];
+
+        switch (operator) {
+            case ">":
+                return a > b;
+
+            case ">=":
+                return a >= b;
+
+            case "<":
+                return a < b;
+
+            case "<=":
+                return a <= b;
+
+            case "!=":
+                return a !== b;
+
+            case "==":
+            default:
+                return a === b;
         }
     }
 

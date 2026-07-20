@@ -8,7 +8,9 @@
         "components/container",
         "components/row",
         "---Form Components---",
+        "components/fieldset",
         "components/input",
         "components/select"
+
     ]
 }

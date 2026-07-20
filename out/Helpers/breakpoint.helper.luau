@@ -70,6 +70,31 @@ do
 			return value.xs
 		until true
 	end
+	function BreakpointHelper:compare(left, operator, right)
+		local a = BreakpointHelper.breakpointOrder[left]
+		local b = BreakpointHelper.breakpointOrder[right]
+		repeat
+			local _fallthrough = false
+			if operator == ">" then
+				return a > b
+			end
+			if operator == ">=" then
+				return a >= b
+			end
+			if operator == "<" then
+				return a < b
+			end
+			if operator == "<=" then
+				return a <= b
+			end
+			if operator == "!=" then
+				return a ~= b
+			end
+			if operator == "==" then
+			end
+			return a == b
+		until true
+	end
 	function BreakpointHelper:getBreakpoint(width, breakpoints)
 		local active = "xs"
 		if breakpoints.sm ~= nil and width >= breakpoints.sm then
@@ -86,6 +111,13 @@ do
 		end
 		return active
 	end
+	BreakpointHelper.breakpointOrder = {
+		xs = 0,
+		sm = 1,
+		md = 2,
+		lg = 3,
+		xl = 4,
+	}
 end
 return {
 	BreakpointHelper = BreakpointHelper,

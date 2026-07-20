@@ -9,6 +9,7 @@ interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexE
     BackgroundColor3?: Color3;
     group?: boolean;
     children?: React.ReactNode;
+    Change?: React.InstanceChangeEvent<Frame> | undefined
 }
 
 export function Container(props: ContainerProps) {
@@ -21,6 +22,7 @@ export function Container(props: ContainerProps) {
         BackgroundTransparency={props.BackgroundTransparency ?? 1}
         BackgroundColor3={props.BackgroundColor3}
         ZIndex={props.ZIndex}
+        Change={props.Change}
     >
         <GroupMeasurement enabled={props.group} group={group}>
             {props.children}

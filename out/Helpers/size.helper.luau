@@ -38,7 +38,9 @@ do
 			return props.Position
 		end
 		if props.center ~= nil then
-			local center = self:toUDim(props.center)
+			local _center = props.center
+			local c = if type(_center) == "boolean" then (if props.center then "50%" else nil) else props.center
+			local center = self:toUDim(c)
 			return UDim2.new(center, center)
 		end
 		local x = if props.left ~= nil then self:toUDim(props.left) elseif props.right ~= nil then self:fromFarEdge(props.right) else UDim.new(0, 0)

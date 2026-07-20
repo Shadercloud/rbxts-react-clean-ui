@@ -18,10 +18,10 @@ local _Layout = TS.import(script, script.Parent.Parent, "Layout")
 local GroupMeasurement = _Layout.GroupMeasurement
 local HStack = _Layout.HStack
 local function Button(props)
-	local context = React.useContext(CleanThemeContext)
+	local theme = React.useContext(CleanThemeContext)
 	local hover, setHover = React.useState(false)
 	local group = useGroupElement(props.group)
-	local padding = SpacingHelper:GetResolvedPadding(context, props)
+	local padding = SpacingHelper:GetResolvedPadding(theme, props)
 	local _attributes = {}
 	local _object = {}
 	local _spread = props.Event
@@ -66,23 +66,23 @@ local function Button(props)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	local _condition_1 = props.BackgroundTransparency
 	if _condition_1 == nil then
-		_condition_1 = context.components.button.backgroundTransparency
+		_condition_1 = theme.components.button.backgroundTransparency
 	end
 	_attributes.BackgroundTransparency = _condition_1
-	_attributes.BackgroundColor3 = ColorHelper:getIntentColor(context, props.intent, if hover then "hover" else "background", context.components.button.intents, props.BackgroundColor3)
+	_attributes.BackgroundColor3 = ColorHelper:getIntentColor(theme, props.intent, if hover then "hover" else "background", theme.components.button.intents, props.BackgroundColor3)
 	_attributes.AutoButtonColor = false
 	_attributes.ZIndex = props.ZIndex
 	local _exp = React.createElement(Corners, {
-		radius = context.components.button.cornerRadius,
+		radius = theme.components.button.cornerRadius,
 	})
 	local _exp_1 = React.createElement("uistroke", {
-		Thickness = context.components.button.borderThickness,
+		Thickness = theme.components.button.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-		Color = ColorHelper:getIntentColor(context, props.intent, "border", context.components.button.intents),
+		Color = ColorHelper:getIntentColor(theme, props.intent, "border", theme.components.button.intents),
 	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
-	_attributes_1.value = context.components.button.boxShadow
+	_attributes_1.value = theme.components.button.boxShadow
 	local _exp_2 = React.createElement(BoxShadow, _attributes_1)
 	local _attributes_2 = table.clone(props)
 	setmetatable(_attributes_2, nil)
@@ -96,11 +96,11 @@ local function Button(props)
 	}, props.icon ~= nil and React.createElement(Icon, {
 		scale = props.scale,
 		icon = props.icon,
-		color = ColorHelper:getIntentColor(context, props.intent, "text", context.components.button.intents, nil, context.components.button.textColor),
+		color = ColorHelper:getIntentColor(theme, props.intent, "text", theme.components.button.intents, nil, theme.components.button.textColor),
 	}), props.text ~= nil and React.createElement(Text, {
 		text = props.text,
-		typography = TypographyHelper:getTypography(context, props.scale, context.components.button.typography),
-		TextColor3 = ColorHelper:getIntentColor(context, props.intent, "text", context.components.button.intents, nil, context.components.button.textColor),
+		typography = TypographyHelper:getTypography(theme, props.scale, theme.components.button.typography),
+		TextColor3 = ColorHelper:getIntentColor(theme, props.intent, "text", theme.components.button.intents, nil, theme.components.button.textColor),
 	})), props.children))
 end
 return {

@@ -1,11 +1,10 @@
 import React, { Component, ReactComponent } from "@rbxts/react";
 import { Column } from "./Column";
-import { BreakpointValue, SpacedElementProps } from "../../Interfaces/";
+import { BreakPointElementProps, BreakpointValue, SpacedElementProps } from "../../Interfaces/";
 import { CleanThemeContext, RowContext } from "../../Contexts";
 import { BreakpointHelper, SpacingHelper } from "../../Helpers/";
 
-interface RowProps extends SpacedElementProps {
-    breakpoints?: BreakpointValue<number>;
+interface RowProps extends SpacedElementProps, BreakPointElementProps {
 }
 
 interface RowState {

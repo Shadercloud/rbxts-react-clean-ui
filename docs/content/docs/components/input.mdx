@@ -1,7 +1,302 @@
 ---
+
 title: Input
-description: Text Input Box
+description: A themed text input with responsive sizing, spacing, validation, and change events
 icon: TextCursorInput
 ---
 
-Coming Soon
+`Input` is a styled wrapper around Roblox's native [`TextBox`](https://create.roblox.com/docs/reference/engine/classes/TextBox).
+
+It automatically applies the current Clean UI theme, including typography, border styling, corner radius, text color, and internal padding.
+
+## Basic Usage
+
+```tsx
+import React, { useState } from "@rbxts/react";
+import { Input } from "@rbxts/react-clean-ui";
+
+export function UsernameInput() {
+    const [username, setUsername] = useState("");
+
+    return (
+        <Input
+            value={username}
+            placeholder="Enter your username"
+            onChange={setUsername}
+        />
+    );
+}
+```
+
+The `value` prop sets the initial value of the input, while `onChange` is called whenever the text changes.
+
+## Placeholder
+
+You can provide placeholder text using the simplified `placeholder` prop:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter your name"
+/>
+```
+
+You can also use the native Roblox `PlaceholderText` prop:
+
+```tsx
+<Input
+    value=""
+    PlaceholderText="Enter your name"
+    PlaceholderColor3={Color3.fromHex("#888888")}
+/>
+```
+
+When both are provided, `PlaceholderText` takes priority over `placeholder`.
+
+## Validation
+
+The `validation` prop can restrict which values may be entered.
+
+### Number
+
+Use `Number` to allow integers and decimal numbers:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter an amount"
+    validation="Number"
+    onChange={(value) => {
+        print(`Amount changed to: ${value}`);
+    }}
+/>
+```
+
+The input also temporarily allows an empty string or a single minus sign, making it possible to enter negative numbers.
+
+### Integer
+
+Use `Int` to only allow whole numbers:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter your age"
+    validation="Int"
+/>
+```
+
+Decimal values are rejected.
+
+### String
+
+Use `String` for a normal text input:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter your display name"
+    validation="String"
+/>
+```
+
+`String` currently behaves the same as `None` and does not restrict the entered text.
+
+### None
+
+Use `None`, or omit `validation`, to disable validation:
+
+```tsx
+<Input
+    value=""
+    validation="None"
+/>
+```
+
+## Responding to Changes
+
+Use `onChange` to receive the current text whenever the user edits the input:
+
+```tsx
+function SearchInput() {
+    const [query, setQuery] = React.useState("");
+
+    return (
+        <Input
+            value={query}
+            placeholder="Search..."
+            onChange={(value) => {
+                setQuery(value);
+                print(`Searching for: ${value}`);
+            }}
+        />
+    );
+}
+```
+
+## Roblox Events
+
+The native `TextBox` events can be passed through the `Event` prop:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter a message"
+    Event={{
+        Focused: () => {
+            print("Input focused");
+        },
+
+        FocusLost: (enterPressed) => {
+            if (enterPressed) {
+                print("Enter was pressed");
+            }
+        },
+    }}
+/>
+```
+
+## Scaling
+
+`Input` supports the shared `scale` prop. The selected scale is used to resolve the input typography from the active theme.
+
+```tsx
+<Input
+    value=""
+    placeholder="Small input"
+    scale="sm"
+/>
+
+<Input
+    value=""
+    placeholder="Large input"
+    scale="lg"
+/>
+```
+
+Available scales are:
+
+* `xs`
+* `sm`
+* `md`
+* `lg`
+* `xl`
+
+The exact font size and font weight are determined by the active theme.
+
+## Spacing
+
+The shared `spacing` prop controls the internal padding around the text:
+
+```tsx
+<Input
+    value=""
+    placeholder="Spacious input"
+    spacing="lg"
+/>
+```
+
+You can also control individual sides:
+
+```tsx
+<Input
+    value=""
+    placeholder="Custom padding"
+    left="lg"
+    right="lg"
+    top="sm"
+    bottom="sm"
+/>
+```
+
+## Native TextBox Properties
+
+`Input` extends `React.InstanceProps<TextBox>`, so native Roblox `TextBox` properties can be passed directly to it.
+
+```tsx
+<Input
+    value="Hello"
+    TextXAlignment={Enum.TextXAlignment.Center}
+    TextColor3={Color3.fromHex("#FFFFFF")}
+    PlaceholderColor3={Color3.fromHex("#AAAAAA")}
+    TextScaled={false}
+/>
+```
+
+Some properties are managed internally by the component, including:
+
+* `Text`
+* `FontFace`
+* `FontSize`
+* `BackgroundTransparency`
+* `ClearTextOnFocus`
+* `AutomaticSize`
+
+## Props
+
+| Prop                | Type                                      | Default                  | Description                                                        |
+| ------------------- | ----------------------------------------- | ------------------------ | ------------------------------------------------------------------ |
+| `value`             | `string`                                  | Required                 | The initial text displayed by the input.                           |
+| `placeholder`       | `string`                                  | `undefined`              | Simplified alias for `PlaceholderText`.                            |
+| `validation`        | `"Number" \| "String" \| "None" \| "Int"` | `undefined`              | Restricts the values accepted by the input.                        |
+| `onChange`          | `(value: string) => void`                 | `undefined`              | Called whenever the input value changes.                           |
+| `Event`             | `React.InstanceEvent<TextBox>`            | `undefined`              | Native Roblox event handlers for the underlying `TextBox`.         |
+| `scale`             | `ScaleSize`                               | Theme default            | Controls the typography scale.                                     |
+| `spacing`           | `SpaceSize`                               | Theme default            | Controls the internal padding.                                     |
+| `PlaceholderText`   | `string`                                  | `placeholder`            | Native Roblox placeholder text. Takes priority over `placeholder`. |
+| `TextXAlignment`    | `Enum.TextXAlignment`                     | `Left`                   | Controls horizontal text alignment.                                |
+| `TextColor3`        | `Color3`                                  | Theme primary text color | Controls the input text color.                                     |
+| `PlaceholderColor3` | `Color3`                                  | Roblox default           | Controls the placeholder text color.                               |
+| `TextScaled`        | `boolean`                                 | Roblox default           | Enables Roblox text scaling.                                       |
+
+All other compatible native `TextBox` properties are also accepted.
+
+## Theme Styling
+
+The appearance of the input is controlled by `theme.components.input`.
+
+The component uses the following theme values:
+
+```ts
+theme.components.input.typography
+theme.components.input.borderThickness
+theme.components.input.borderColor
+theme.components.input.cornerRadius
+```
+
+The default text color is resolved from:
+
+```ts
+theme.colors.intents.primary.text
+```
+
+These values can be changed by providing a custom Clean UI theme.
+
+## Complete Example
+
+```tsx
+import React, { useState } from "@rbxts/react";
+import { Input, VStack } from "@rbxts/react-clean-ui";
+
+export function RegistrationForm() {
+    const [username, setUsername] = useState("");
+    const [age, setAge] = useState("");
+
+    return (
+        <VStack spacing="md">
+            <Input
+                value={username}
+                placeholder="Username"
+                onChange={setUsername}
+            />
+
+            <Input
+                value={age}
+                placeholder="Age"
+                validation="Int"
+                onChange={setAge}
+            />
+        </VStack>
+    );
+}
+```

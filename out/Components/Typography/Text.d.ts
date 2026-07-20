@@ -8,6 +8,7 @@ interface TextProps extends React.InstanceProps<TextLabel> {
     typography?: TypographyStyle;
     weight?: Enum.FontWeight | "bold";
     align?: "Left" | "Right" | "Center";
+    TextWrap?: boolean;
 }
 export declare class Text extends Component<TextProps> {
     static contextType: React.Context<import("../../Theme").CleanTheme>;

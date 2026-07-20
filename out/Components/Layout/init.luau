@@ -7,6 +7,9 @@ end
 for _k, _v in TS.import(script, script, "Container") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "Fieldset") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "FlexItem") or {} do
 	exports[_k] = _v
 end

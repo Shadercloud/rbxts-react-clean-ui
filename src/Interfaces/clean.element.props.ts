@@ -127,7 +127,7 @@ export interface PositionElementProps {
     Position?: UDim2;
     AnchorPoint?: Vector2;
 
-    center?: CssSize;
+    center?: CssSize | boolean;
     top?: CssSize;
     left?: CssSize;
     right?: CssSize;
@@ -144,6 +144,10 @@ export interface CleanElementProps extends SizeElementProps, PositionElementProp
 
 export interface SpacedElementProps {
     spacing?: ScaleSize | "None"
+}
+
+export interface BreakPointElementProps {
+    breakpoints?: BreakpointValue<number>;
 }
 
 export interface ShadowElementProps {

@@ -1,5 +1,6 @@
 export * from './Column';
 export * from './Container';
+export * from './Fieldset';
 export * from './FlexItem';
 export * from './Group';
 export * from './GroupMeasurement';

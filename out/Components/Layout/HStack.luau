@@ -8,9 +8,10 @@ local function HStack(props)
 	local padding = UDim.new(0, math.ceil(SpacingHelper:GetPadding(theme, props.spacing) / 2))
 	return React.createElement(React.Fragment, nil, React.createElement("uilistlayout", {
 		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalFlex = props.HorizontalFlex,
 		VerticalAlignment = props.valign,
 		Padding = padding,
-		Wraps = true,
+		Wraps = if props.Wraps == nil then true else props.Wraps,
 	}), props.children)
 end
 return {

@@ -31,12 +31,12 @@ export interface ButtonProps extends
 }
 
 export function Button(props: ButtonProps) {
-    const context = React.useContext(CleanThemeContext);
+    const theme = React.useContext(CleanThemeContext);
     const [hover, setHover] = React.useState(false);
 
     const group = useGroupElement(props.group);
 
-    const padding = SpacingHelper.GetResolvedPadding(context, props);
+    const padding = SpacingHelper.GetResolvedPadding(theme, props);
 
     return (
         <imagebutton
@@ -61,32 +61,32 @@ export function Button(props: ButtonProps) {
             AutomaticSize={Enum.AutomaticSize.XY}
             BackgroundTransparency={
                 props.BackgroundTransparency ??
-                context.components.button.backgroundTransparency
+                theme.components.button.backgroundTransparency
             }
             BackgroundColor3={ColorHelper.getIntentColor(
-                context,
+                theme,
                 props.intent,
                 hover ? "hover" : "background",
-                context.components.button.intents,
+                theme.components.button.intents,
                 props.BackgroundColor3,
             )}
             AutoButtonColor={false}
             ZIndex={props.ZIndex}
         >
-            <Corners radius={context.components.button.cornerRadius} />
+            <Corners radius={theme.components.button.cornerRadius} />
 
             <uistroke
-                Thickness={context.components.button.borderThickness}
+                Thickness={theme.components.button.borderThickness}
                 BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                 Color={ColorHelper.getIntentColor(
-                    context,
+                    theme,
                     props.intent,
                     "border",
-                    context.components.button.intents,
+                    theme.components.button.intents,
                 )}
             />
 
-            <BoxShadow {...props} value={context.components.button.boxShadow} />
+            <BoxShadow {...props} value={theme.components.button.boxShadow} />
             <Padding {...props} />
             <GroupMeasurement enabled={props.group} group={group} padding={padding}>
 
@@ -98,12 +98,12 @@ export function Button(props: ButtonProps) {
                                 icon={props.icon}
                                 color={
                                     ColorHelper.getIntentColor(
-                                        context,
+                                        theme,
                                         props.intent,
                                         "text",
-                                        context.components.button.intents,
+                                        theme.components.button.intents,
                                         undefined,
-                                        context.components.button.textColor
+                                        theme.components.button.textColor
                                     )
 
                                 } />
@@ -112,18 +112,18 @@ export function Button(props: ButtonProps) {
                             <Text
                                 text={props.text}
                                 typography={TypographyHelper.getTypography(
-                                    context,
+                                    theme,
                                     props.scale,
-                                    context.components.button.typography
+                                    theme.components.button.typography
                                 )}
                                 TextColor3={
                                     ColorHelper.getIntentColor(
-                                        context,
+                                        theme,
                                         props.intent,
                                         "text",
-                                        context.components.button.intents,
+                                        theme.components.button.intents,
                                         undefined,
-                                        context.components.button.textColor
+                                        theme.components.button.textColor
                                     )
                                 } />
                         }

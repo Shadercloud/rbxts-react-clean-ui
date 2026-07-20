@@ -33,7 +33,7 @@ do
 			TextXAlignment = self.props.align or (self.props.TextXAlignment or Enum.TextXAlignment.Left),
 			TextColor3 = self.props.TextColor3 or self.context.colors.intents.primary.text,
 			Text = self.props.text,
-			TextWrap = true,
+			TextWrap = self.props.TextWrap == nil or self.props.TextWrap == true,
 			FontFace = Font.fromName(style.font.Name, weight),
 			FontSize = style.size,
 			RichText = true,

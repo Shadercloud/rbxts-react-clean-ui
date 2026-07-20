@@ -1,40 +1,66 @@
 ---
-title: Developement
-description: Help to develop the React Clean UI Project
+title: Development
+description: Set up a local development environment and contribute to React Clean UI.
 icon: SquareTerminal
-
 ---
 
-## Development Environment
+This guide explains how to set up a local environment for developing **React Clean UI** or contributing to the documentation.
 
-If you want to help build `React Clean UI` you can setup a local development environment using these steps (this assumes you are familiar with roblox-ts and rojo):
+<Callout type="info">
+This guide assumes you're already familiar with **roblox-ts**, **Rojo**, and **Roblox Studio**.
+</Callout>
 
-1) Create new project directory, for example `C:\Users\username\Documents\dev-game`
+# Developing React Clean UI
 
-2) Setup rbxts in the new directory (Leave "Project directory" blank and "Y" to all questions):
-```
+## 1. Create a development project
+
+Create a new roblox-ts project outside of the React Clean UI repository.
+
+```bash
+mkdir C:\Users\username\Documents\dev-game
 cd C:\Users\username\Documents\dev-game
+
 npm init roblox-ts game
 ```
 
-3) Install some basic packages:
-```
+When prompted:
+
+- Leave **Project directory** blank.
+- Answer **Y** to the remaining questions.
+
+## 2. Install the required packages
+
+Install the packages required for the development project.
+
+```bash
 npm install @rbxts/react @rbxts/react-roblox @rbxts/ui-labs @rbxts/services
 ```
 
-4) Create Packages directory in `src/Packages`:
-```
+## 3. Clone React Clean UI
+
+Create a `/src/Packages` directory and clone the repository into it.
+
+```bash
 cd src
 mkdir Packages
 cd Packages
+
+git clone https://github.com/Shadercloud/rbxts-react-clean-ui.git
 ```
 
-5) Clone the `React Clean UI` git repo into your Packages directory
-```
-git clone https://github.com/Shadercloud/rbxts-react-clean-ui
+Your project should now look like this:
+
+```text
+dev-game/
+├── src/
+│   └── Packages/
+│       └── rbxts-react-clean-ui/
 ```
 
-6) Update your `tsconfig.json` file in the root `dev-game` project to the following:
+## 4. Configure TypeScript
+
+Replace your root project's `tsconfig.json` with the following:
+
 ```json
 {
 	"compilerOptions": {
@@ -85,12 +111,16 @@ git clone https://github.com/Shadercloud/rbxts-react-clean-ui
 		"src/Packages/**/src",
 		"src/Packages/**/node_modules",
 		"src/Packages/**/out",
-		"src/Packages/**/.vscode"
+		"src/Packages/**/.vscode",
+		"src/Packages/**/docs"
 	]
 }
 ```
 
-7) In your root `dev-game` directory create a `default.project.json` file (for Rojo) and paste the following config into it:
+## 5. Configure Rojo
+
+Create a `default.project.json` file in the root of your development project.
+
 ```json
 {
 	"name": "React Clean UI Dev Environment",
@@ -179,26 +209,82 @@ git clone https://github.com/Shadercloud/rbxts-react-clean-ui
 }
 ```
 
-8) You will need to have 3 separate terminals running
+## 6. Start the development environment
 
-```
+You'll need **three terminals** running simultaneously.
+
+### Terminal 1 — Compile your game
+
+```bash
 cd C:\Users\username\Documents\dev-game
 npx rbxtsc -w
 ```
 
-```
+### Terminal 2 — Compile React Clean UI
+
+```bash
 cd C:\Users\username\Documents\dev-game\src\Packages\rbxts-react-clean-ui
 npx rbxtsc -w
 ```
 
-9) Run Rojo
-```
+### Terminal 3 — Run Rojo
+
+```bash
 cd C:\Users\username\Documents\dev-game
 rojo serve
 ```
 
-10) Open up Roblox and connect to Rojo
+## 7. Open Roblox Studio
 
-11) Install the UI Labs plugin for Roblox as this will allow you to preview your development work: https://ui-labs.luau.page/docs/installation
+Open your development place in Roblox Studio and connect it to the running Rojo server.
 
-In Roblox Studio if you go to `Plugins -> UI Labs` you should see a "button" in the story explorer
+## 8. Install UI Labs
+
+Install the UI Labs plugin:
+
+https://ui-labs.luau.page/docs/installation
+
+Once installed, open **Plugins → UI Labs**. You should see the React Clean UI component stories, allowing you to preview components while you develop.
+
+---
+
+# Writing the Documentation
+
+The documentation is built using **Fumadocs**.
+
+## 1. Clone the repository
+
+```bash
+git clone https://github.com/Shadercloud/rbxts-react-clean-ui.git
+```
+
+## 2. Install dependencies
+
+```bash
+cd rbxts-react-clean-ui/docs
+npm install
+```
+
+## 3. Start the development server
+
+```bash
+npm run dev
+```
+
+## 4. Open the documentation
+
+Open the following URL in your browser:
+
+```text
+http://localhost:3000
+```
+
+## 5. Start editing
+
+Documentation pages are located in:
+
+```text
+docs/content/docs/
+```
+
+Any changes you make will automatically reload in your browser while the development server is running.

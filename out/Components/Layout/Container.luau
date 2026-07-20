@@ -30,6 +30,7 @@ local function Container(props)
 	_attributes.BackgroundTransparency = _condition_1
 	_attributes.BackgroundColor3 = props.BackgroundColor3
 	_attributes.ZIndex = props.ZIndex
+	_attributes.Change = props.Change
 	return React.createElement("frame", _attributes, React.createElement(GroupMeasurement, {
 		enabled = props.group,
 		group = group,

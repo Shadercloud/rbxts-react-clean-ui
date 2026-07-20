@@ -6,6 +6,7 @@ import { NavigationContext } from "../../Contexts";
 
 interface MenuProps {
     title: string;
+    collapsed?: boolean;
 }
 
 interface MenuState {
@@ -14,6 +15,9 @@ interface MenuState {
 
 @ReactComponent
 export class Menu extends Component<MenuProps, MenuState> {
+    state: MenuState = {
+        collapsed: this.props.collapsed ?? false
+    }
     render(): React.ReactNode {
         return <NavigationContext.Provider value={{
             collapsed: this.state.collapsed

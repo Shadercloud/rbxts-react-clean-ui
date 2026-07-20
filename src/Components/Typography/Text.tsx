@@ -8,7 +8,8 @@ interface TextProps extends React.InstanceProps<TextLabel> {
     variant?: TextVariant;
     typography?: TypographyStyle;
     weight?: Enum.FontWeight | "bold";
-    align?: "Left" | "Right" | "Center"
+    align?: "Left" | "Right" | "Center";
+    TextWrap?: boolean
 }
 @ReactComponent
 export class Text extends Component<TextProps> {
@@ -32,7 +33,7 @@ export class Text extends Component<TextProps> {
             TextXAlignment={this.props.align ?? (this.props.TextXAlignment ?? Enum.TextXAlignment.Left)}
             TextColor3={this.props.TextColor3 ?? this.context.colors.intents.primary.text}
             Text={this.props.text}
-            TextWrap
+            TextWrap={this.props.TextWrap === undefined || this.props.TextWrap === true}
             FontFace={Font.fromName(style.font.Name, weight)}
             FontSize={style.size}
             RichText

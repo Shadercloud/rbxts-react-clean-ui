@@ -155,6 +155,12 @@ export const DefaultTheme: CleanTheme = {
                 }
             },
         },
+
+        input: {
+            borderColor: Color3.fromHex("#D9DEE8"),
+            borderThickness: 1,
+            cornerRadius: 8,
+        }
     },
 
     icons: {
