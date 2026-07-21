@@ -51,6 +51,7 @@ export function Input(props: InputProps) {
                 PlaceholderText={props.PlaceholderText ?? props.placeholder}
                 PlaceholderColor3={props.PlaceholderColor3}
                 TextScaled={props.TextScaled}
+                LineHeight={typography.lineHeight}
                 Text={value}
                 TextColor3={props.TextColor3 ?? theme.colors.intents.primary.text}
                 ClearTextOnFocus={false}

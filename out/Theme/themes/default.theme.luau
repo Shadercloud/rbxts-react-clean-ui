@@ -146,6 +146,12 @@ local DefaultTheme = {
 			borderThickness = 1,
 			cornerRadius = 8,
 		},
+		select = {
+			dropDownBackgroundColor = Color3.fromHex("#FFFFFF"),
+			borderColor = Color3.fromHex("#D9DEE8"),
+			borderThickness = 1,
+			cornerRadius = 8,
+		},
 	},
 	icons = {
 		["shopping-cart"] = 112388431913339,

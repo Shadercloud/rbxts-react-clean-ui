@@ -1,8 +1,20 @@
 import React, { Component, ReactComponent } from "@rbxts/react";
-import { Button } from "../Input";
+import { Button, ButtonProps } from "../Input";
 import { Container, FlexItem, Group, HStack, Scroller, VStack } from "../Layout";
 import { Text } from "../Typography";
 import { NavigationContext } from "../../Contexts";
+
+
+interface MenuItemProps extends ButtonProps {
+    title: string;
+}
+
+export function MenuItem(props: MenuItemProps) {
+    const context = React.useContext(NavigationContext);
+    return (
+        <Button text={!context.collapsed ? props.title : undefined} icon={props.icon} Event={props.Event} group />
+    );
+}
 
 interface MenuProps {
     title: string;
@@ -15,6 +27,8 @@ interface MenuState {
 
 @ReactComponent
 export class Menu extends Component<MenuProps, MenuState> {
+    static Item = MenuItem;
+
     state: MenuState = {
         collapsed: this.props.collapsed ?? false
     }

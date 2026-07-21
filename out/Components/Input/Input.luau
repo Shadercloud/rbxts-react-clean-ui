@@ -41,6 +41,7 @@ local function Input(props)
 	_attributes_1.PlaceholderText = _condition
 	_attributes_1.PlaceholderColor3 = props.PlaceholderColor3
 	_attributes_1.TextScaled = props.TextScaled
+	_attributes_1.LineHeight = typography.lineHeight
 	_attributes_1.Text = value
 	_attributes_1.TextColor3 = props.TextColor3 or theme.colors.intents.primary.text
 	_attributes_1.ClearTextOnFocus = false

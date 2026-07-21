@@ -7,4 +7,7 @@ end
 for _k, _v in TS.import(script, script, "Input") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "Select") or {} do
+	exports[_k] = _v
+end
 return exports

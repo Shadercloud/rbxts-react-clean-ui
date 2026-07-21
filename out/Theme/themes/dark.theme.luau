@@ -136,7 +136,13 @@ local DarkTheme = {
 			cornerRadius = 8,
 		},
 		input = {
-			borderColor = Color3.fromHex("#D9DEE8"),
+			borderColor = Color3.fromHex("#353C49"),
+			borderThickness = 1,
+			cornerRadius = 8,
+		},
+		select = {
+			dropDownBackgroundColor = Color3.fromHex("#1E222B"),
+			borderColor = Color3.fromHex("#353C49"),
 			borderThickness = 1,
 			cornerRadius = 8,
 		},

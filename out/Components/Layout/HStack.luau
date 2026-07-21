@@ -12,6 +12,8 @@ local function HStack(props)
 		VerticalAlignment = props.valign,
 		Padding = padding,
 		Wraps = if props.Wraps == nil then true else props.Wraps,
+		Change = props.Change,
+		Event = props.Event,
 	}), props.children)
 end
 return {

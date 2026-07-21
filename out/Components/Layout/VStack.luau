@@ -10,6 +10,8 @@ local function VStack(props)
 		FillDirection = Enum.FillDirection.Vertical,
 		HorizontalFlex = props.HorizontalFlex or Enum.UIFlexAlignment.Fill,
 		Padding = padding,
+		Change = props.Change,
+		Event = props.Event,
 	}), props.children)
 end
 return {

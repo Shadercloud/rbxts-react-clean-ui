@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Box, Button, Container, createStory, HStack, FlexItem, Text, VStack, Input, Fieldset } from "@rbxts/react-clean-ui";
+import { Box, Button, Container, createStory, HStack, FlexItem, Text, VStack, Input, Fieldset, Select } from "@rbxts/react-clean-ui";
 
 export = createStory((props) => (
     <><Container
@@ -28,12 +28,20 @@ export = createStory((props) => (
                 </Fieldset>
                 <Fieldset>
                     <Fieldset.Label>
-                        <Text text="Enter Delivery Address:" />
+                        <Text text="Select Option:" />
                     </Fieldset.Label>
                     <Fieldset.Control>
-                        <Input
-                            placeholder="123 Main Street"
-                            value="" />
+                        <Select>
+                            <Select.Option text="Something Goes here" />
+                            <Select.Option text="Something Else" />
+                            <Select.Option text="Something Else" />
+                            <Select.Option text="Something Else" />
+                            <Select.Option text="Something Else" />
+                            <Select.Option text="Something Else" />
+                            <Select.Option text="Something Else" />
+                            <Select.Option text="Something Else" />
+                            <Select.Option text="Something Else" />
+                        </Select>
                     </Fieldset.Control>
                 </Fieldset>
                 <Container>

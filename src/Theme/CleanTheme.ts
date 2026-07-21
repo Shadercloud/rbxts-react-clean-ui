@@ -85,7 +85,14 @@ export interface CleanTheme {
             borderThickness: number;
             cornerRadius: CssSize;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
-        }
+        };
+        select: {
+            borderColor: Color3;
+            borderThickness: number;
+            cornerRadius: CssSize;
+            dropDownBackgroundColor: Color3;
+            typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+        };
     };
 
     icons: Partial<IconSet>;

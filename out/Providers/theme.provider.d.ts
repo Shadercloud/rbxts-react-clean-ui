@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { CleanTheme } from "./CleanTheme";
+import { CleanTheme } from "../Theme";
 interface ThemeProviderProps {
     theme: CleanTheme;
     children?: React.ReactNode;

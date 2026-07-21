@@ -1,7 +1,8 @@
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
-import { ThemeProvider, DarkTheme, DefaultTheme } from "../Theme";
+import { DarkTheme, DefaultTheme } from "../Theme";
 import { InferProps, Choose } from "@rbxts/ui-labs";
+import { OverlayProvider, ThemeProvider } from "../Providers/";
 
 const controls = {
     Theme: Choose(["Default", "Dark"]),
@@ -25,7 +26,9 @@ export function createStory(
 
             return (
                 <ThemeProvider theme={theme}>
-                    {render(props)}
+                    <OverlayProvider>
+                        {render(props)}
+                    </OverlayProvider>
                 </ThemeProvider>
             );
         },

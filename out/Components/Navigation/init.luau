@@ -4,7 +4,4 @@ local exports = {}
 for _k, _v in TS.import(script, script, "Menu") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "MenuItem") or {} do
-	exports[_k] = _v
-end
 return exports

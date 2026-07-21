@@ -1,10 +1,10 @@
 
 import React from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
-import { SizeElementProps } from "../../Interfaces";
-import { SizeHelper } from "../../Helpers";
+import { SizeElementProps, SpacedElementProps } from "../../Interfaces";
+import { SizeHelper, SpacingHelper } from "../../Helpers";
 
-interface ScrollerProps extends SizeElementProps {
+interface ScrollerProps extends SizeElementProps, SpacedElementProps {
     children?: React.ReactNode;
 }
 
@@ -42,6 +42,8 @@ export function Scroller(props: ScrollerProps) {
         };
     }, []);
 
+    const spacing = SpacingHelper.GetPadding(theme, props.spacing)
+
     return (
         <scrollingframe
             ref={ref}
@@ -57,7 +59,7 @@ export function Scroller(props: ScrollerProps) {
             AutomaticCanvasSize={Enum.AutomaticSize.Y}
         >
             <frame
-                Size={new UDim2(1, isScrolling ? -thickness - (theme.spacing[theme.default.spacing] ?? 0) : 0, 0, 0)}
+                Size={new UDim2(1, isScrolling ? -thickness - (spacing) : 0, 0, 0)}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 BackgroundTransparency={1}
             >

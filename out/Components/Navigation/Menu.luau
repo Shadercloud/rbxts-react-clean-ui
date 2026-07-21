@@ -14,6 +14,15 @@ local Scroller = _Layout.Scroller
 local VStack = _Layout.VStack
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local NavigationContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").NavigationContext
+local function MenuItem(props)
+	local context = React.useContext(NavigationContext)
+	return React.createElement(Button, {
+		text = if not context.collapsed then props.title else nil,
+		icon = props.icon,
+		Event = props.Event,
+		group = true,
+	})
+end
 local Menu
 do
 	local super = Component
@@ -73,8 +82,10 @@ do
 			HorizontalFlex = Enum.UIFlexAlignment.None,
 		}, self.props.children))))))
 	end
+	Menu.Item = MenuItem
 	Menu = ReactComponent(Menu) or Menu
 end
 return {
+	MenuItem = MenuItem,
 	Menu = Menu,
 }

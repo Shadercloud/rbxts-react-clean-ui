@@ -5,6 +5,8 @@ interface HStackProps extends SpacedElementProps {
     valign?: Enum.VerticalAlignment | "Center" | "Top" | "Bottom" | React.Binding<Enum.VerticalAlignment> | undefined;
     Wraps?: boolean;
     HorizontalFlex?: Enum.UIFlexAlignment;
+    Event?: React.InstanceEvent<UIListLayout>;
+    Change?: React.InstanceChangeEvent<UIListLayout>;
 }
 export declare function HStack(props: HStackProps): React.JSX.Element;
 export {};

@@ -7,8 +7,8 @@ interface GroupMeasureProps {
     padding?: ResolvedPadding;
     group?: GroupElement;
 }
-export declare function GroupMeasurement(props: GroupMeasureProps): boolean | ReadonlyMap<React.Key, React.ReactNode> | {
+export declare function GroupMeasurement(props: GroupMeasureProps): boolean | React.JSX.Element | ReadonlyMap<React.Key, React.ReactNode> | {
     readonly [key: string]: React.ReactNode;
     readonly [key: number]: React.ReactNode;
-} | readonly React.ReactNode[] | React.JSX.Element | undefined;
+} | readonly React.ReactNode[] | undefined;
 export {};
