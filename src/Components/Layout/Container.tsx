@@ -1,8 +1,7 @@
 import React from "@rbxts/react";
 import { PositionElementProps, SizeElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { SizeHelper } from "../../Helpers/";
-import { useGroupElement } from "../../Contexts";
-import { GroupMeasurement } from "./GroupMeasurement";
+import { Group, GroupContext } from "./Group";
 
 interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexElementProps {
     BackgroundTransparency?: number;
@@ -13,9 +12,10 @@ interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexE
 }
 
 export function Container(props: ContainerProps) {
-    const group = useGroupElement(props.group);
+    const group = React.useContext(GroupContext)
+
     return <frame
-        Size={SizeHelper.GetSize(props, UDim2.fromOffset(group?.groupSize?.X ?? 0, 0))}
+        Size={SizeHelper.GetSize(props, UDim2.fromOffset(props.group ? group?.size?.X ?? 0 : 0, 0))}
         AutomaticSize={SizeHelper.GetAutoSize(props)}
         Position={SizeHelper.GetPosition(props)}
         AnchorPoint={SizeHelper.GetAnchor(props)}
@@ -24,9 +24,9 @@ export function Container(props: ContainerProps) {
         ZIndex={props.ZIndex}
         Change={props.Change}
     >
-        <GroupMeasurement enabled={props.group} group={group}>
+        <Group.Element enabled={props.group}>
             {props.children}
-        </GroupMeasurement>
+        </Group.Element>
     </frame>
 
 }

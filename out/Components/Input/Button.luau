@@ -1,9 +1,7 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local _ = TS.import(script, script.Parent.Parent.Parent, "Contexts")
-local CleanThemeContext = _.CleanThemeContext
-local useGroupElement = _.useGroupElement
+local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local BoxShadow = _Decorator.BoxShadow
 local Corners = _Decorator.Corners
@@ -14,13 +12,14 @@ local ColorHelper = _Helpers.ColorHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
-local _Layout = TS.import(script, script.Parent.Parent, "Layout")
-local GroupMeasurement = _Layout.GroupMeasurement
-local HStack = _Layout.HStack
+local HStack = TS.import(script, script.Parent.Parent, "Layout").HStack
+local _ = TS.import(script, script.Parent.Parent, "Layout")
+local Group = _.Group
+local GroupContext = _.GroupContext
 local function Button(props)
 	local theme = React.useContext(CleanThemeContext)
 	local hover, setHover = React.useState(false)
-	local group = useGroupElement(props.group)
+	local group = React.useContext(GroupContext)
 	local padding = SpacingHelper:GetResolvedPadding(theme, props)
 	local _attributes = {}
 	local _object = {}
@@ -51,24 +50,30 @@ local function Button(props)
 		end
 	end
 	_attributes.Event = _object
-	local _result = group
-	if _result ~= nil then
-		_result = _result.groupSize
-		if _result ~= nil then
-			_result = _result.X
+	local _result
+	if props.group then
+		local _result_1 = group
+		if _result_1 ~= nil then
+			_result_1 = _result_1.size
+			if _result_1 ~= nil then
+				_result_1 = _result_1.X
+			end
 		end
+		local _condition = _result_1
+		if _condition == nil then
+			_condition = 0
+		end
+		_result = _condition
+	else
+		_result = 0
 	end
-	local _condition = _result
-	if _condition == nil then
-		_condition = 0
-	end
-	_attributes.Size = UDim2.fromOffset(_condition, 0)
+	_attributes.Size = UDim2.fromOffset(_result, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
-	local _condition_1 = props.BackgroundTransparency
-	if _condition_1 == nil then
-		_condition_1 = theme.components.button.backgroundTransparency
+	local _condition = props.BackgroundTransparency
+	if _condition == nil then
+		_condition = theme.components.button.backgroundTransparency
 	end
-	_attributes.BackgroundTransparency = _condition_1
+	_attributes.BackgroundTransparency = _condition
 	_attributes.BackgroundColor3 = ColorHelper:getIntentColor(theme, props.intent, if hover then "hover" else "background", theme.components.button.intents, props.BackgroundColor3)
 	_attributes.AutoButtonColor = false
 	_attributes.ZIndex = props.ZIndex
@@ -86,9 +91,8 @@ local function Button(props)
 	local _exp_2 = React.createElement(BoxShadow, _attributes_1)
 	local _attributes_2 = table.clone(props)
 	setmetatable(_attributes_2, nil)
-	return React.createElement("imagebutton", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), React.createElement(GroupMeasurement, {
+	return React.createElement("imagebutton", _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), React.createElement(Group.Element, {
 		enabled = props.group,
-		group = group,
 		padding = padding,
 	}, (props.icon ~= nil or props.text ~= nil) and React.createElement(HStack, {
 		valign = "Center",

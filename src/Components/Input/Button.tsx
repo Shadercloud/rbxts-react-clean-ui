@@ -8,12 +8,13 @@ import {
     SpacedElementProps,
     ZIndexElementProps,
 } from "../../Interfaces/";
-import { CleanThemeContext, useGroupElement } from "../../Contexts/";
+import { CleanThemeContext } from "../../Contexts/";
 import { BoxShadow, Corners, Padding } from "../Decorator";
 import { Text } from "../Typography";
 import { ColorHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { Icon } from "../Surface";
-import { GroupMeasurement, HStack } from "../Layout";
+import { HStack } from "../Layout";
+import { Group, GroupContext } from "../Layout/";
 
 export interface ButtonProps extends
     SpacedElementProps,
@@ -34,7 +35,7 @@ export function Button(props: ButtonProps) {
     const theme = React.useContext(CleanThemeContext);
     const [hover, setHover] = React.useState(false);
 
-    const group = useGroupElement(props.group);
+    const group = React.useContext(GroupContext)
 
     const padding = SpacingHelper.GetResolvedPadding(theme, props);
 
@@ -57,7 +58,7 @@ export function Button(props: ButtonProps) {
 
             }}
 
-            Size={UDim2.fromOffset(group?.groupSize?.X ?? 0, 0)}
+            Size={UDim2.fromOffset(props.group ? group?.size?.X ?? 0 : 0, 0)}
             AutomaticSize={Enum.AutomaticSize.XY}
             BackgroundTransparency={
                 props.BackgroundTransparency ??
@@ -88,7 +89,7 @@ export function Button(props: ButtonProps) {
 
             <BoxShadow {...props} value={theme.components.button.boxShadow} />
             <Padding {...props} />
-            <GroupMeasurement enabled={props.group} group={group} padding={padding}>
+            <Group.Element enabled={props.group} padding={padding}>
 
                 {(props.icon !== undefined || props.text !== undefined) &&
                     <HStack valign="Center" spacing={props.spacing}>
@@ -131,7 +132,7 @@ export function Button(props: ButtonProps) {
                 }
 
                 {props.children}
-            </GroupMeasurement>
+            </Group.Element>
         </imagebutton>
     );
 }
