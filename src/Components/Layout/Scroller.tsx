@@ -1,10 +1,10 @@
 
 import React from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
-import { SizeElementProps, SpacedElementProps } from "../../Interfaces";
+import { PositionElementProps, SizeElementProps, SpacedElementProps } from "../../Interfaces";
 import { SizeHelper, SpacingHelper } from "../../Helpers";
 
-interface ScrollerProps extends SizeElementProps, SpacedElementProps {
+interface ScrollerProps extends SizeElementProps, SpacedElementProps, PositionElementProps {
     children?: React.ReactNode;
 }
 
@@ -47,7 +47,9 @@ export function Scroller(props: ScrollerProps) {
     return (
         <scrollingframe
             ref={ref}
+            AnchorPoint={SizeHelper.GetAnchor(props)}
             AutomaticSize={SizeHelper.GetAutoSize(props, Enum.AutomaticSize.None)}
+            Position={SizeHelper.GetPosition(props)}
             Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 1))}
             BorderSizePixel={0}
             ScrollingDirection={Enum.ScrollingDirection.Y}

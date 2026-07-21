@@ -29,7 +29,9 @@ local function Scroller(props)
 	local spacing = SpacingHelper:GetPadding(theme, props.spacing)
 	return React.createElement("scrollingframe", {
 		ref = ref,
+		AnchorPoint = SizeHelper:GetAnchor(props),
 		AutomaticSize = SizeHelper:GetAutoSize(props, Enum.AutomaticSize.None),
+		Position = SizeHelper:GetPosition(props),
 		Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1)),
 		BorderSizePixel = 0,
 		ScrollingDirection = Enum.ScrollingDirection.Y,

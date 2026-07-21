@@ -14,7 +14,9 @@ interface SelectState {
 interface SelectOptionProps {
     text?: string;
     children?: React.ReactNode;
+    Event?: React.InstanceEvent<ImageButton>;
     index?: number;
+    BackgroundColor3?: Color3;
 }
 declare function SelectOption(props: SelectOptionProps): React.JSX.Element;
 declare class Select extends Component<SelectProps, SelectState> {

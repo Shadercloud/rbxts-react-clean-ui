@@ -4,8 +4,9 @@ import {
     CleanThemeContext,
     OverlayContext,
 } from "../../Contexts";
-import { TypographyHelper } from "../../Helpers";
+import { ColorHelper, TypographyHelper } from "../../Helpers";
 import {
+    IntentElementProps,
     ScalableElementProps,
     SpacedElementProps,
 } from "../../Interfaces";
@@ -52,10 +53,14 @@ const SelectContext =
 interface SelectOptionProps {
     text?: string;
     children?: React.ReactNode;
+    Event?: React.InstanceEvent<ImageButton>;
     index?: number;
+    BackgroundColor3?: Color3;
 }
 
 function SelectOption(props: SelectOptionProps) {
+    const theme = React.useContext(CleanThemeContext);
+    const [hover, setHover] = React.useState(false);
     const context = React.useContext(SelectContext);
 
     assert(
@@ -66,16 +71,44 @@ function SelectOption(props: SelectOptionProps) {
     assert(props.index !== undefined, "Select.Option must be a direct child of Select",);
 
     return (
-        <Button
-            text={props.text}
+        <imagebutton
             Event={{
+                ...props.Event,
+
+                MouseEnter: (button, x, y) => {
+                    setHover(true);
+
+                    props.Event?.MouseEnter?.(button, x, y);
+                },
+
+                MouseLeave: (button, x, y) => {
+                    setHover(false);
+
+                    props.Event?.MouseLeave?.(button, x, y);
+                },
                 Activated: () => {
                     context.setSelected(props.index!); context.toggleOpen();
                 },
+
             }}
+
+            Size={new UDim2(1, 0, 0, 0)}
+            AutomaticSize={Enum.AutomaticSize.Y}
+            BackgroundTransparency={0}
+            BackgroundColor3={ColorHelper.getIntentColor(
+                theme,
+                context.selected === props.index ? "info" : "primary",
+                hover || context.selected === props.index ? "hover" : "background",
+                theme.components.select.intents,
+                props.BackgroundColor3,
+            )}
+            AutoButtonColor={false}
         >
+            <Padding {...props} />
+            {props.text !== undefined && <Text text={props.text} />}
             {props.children}
-        </Button>
+        </imagebutton>
+
     );
 }
 
@@ -171,14 +204,14 @@ function SelectRenderer() {
                         Position={context.dropdownPosition.add(new UDim2(0, 0, 0, context.dropdownSize.Y.Offset))}
                         Size={UDim2.fromOffset(context.dropdownSize.X.Offset, 0)}
                         AutomaticSize={Enum.AutomaticSize.Y}
-
+                        ClipsDescendants={true}
                         ZIndex={1000}
                     >
-                        <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Inner} Color={theme.components.select.borderColor} />
+                        <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={theme.components.select.borderColor} />
 
                         <Corners radius={theme.components.select.cornerRadius} />
                         <Scroller Size={new UDim2(1, 0, 0, dropdownHeight)} spacing="None">
-
+                            <Corners radius={theme.components.select.cornerRadius} />
                             <VStack
                                 spacing="None"
                                 Change={{

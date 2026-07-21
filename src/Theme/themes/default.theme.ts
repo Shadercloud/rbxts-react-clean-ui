@@ -166,6 +166,12 @@ export const DefaultTheme: CleanTheme = {
             borderColor: Color3.fromHex("#D9DEE8"),
             borderThickness: 1,
             cornerRadius: 8,
+            intents: {
+                primary: {
+                    text: Color3.fromHex("#1D2433"),
+                    hover: Color3.fromHex("#CCCCCC")
+                }
+            },
         }
     },
 

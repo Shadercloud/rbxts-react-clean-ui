@@ -92,6 +92,7 @@ export interface CleanTheme {
             cornerRadius: CssSize;
             dropDownBackgroundColor: Color3;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+            intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
     };
 
