@@ -28,6 +28,14 @@ export = createStory((props) => (
                 </Fieldset>
                 <Fieldset checkbox>
                     <Fieldset.Control>
+                        <Checkbox checked />
+                    </Fieldset.Control>
+                    <Fieldset.Label>
+                        <Text text="Initially Checked" />
+                    </Fieldset.Label>
+                </Fieldset>
+                <Fieldset checkbox>
+                    <Fieldset.Control>
                         <Checkbox scale="xl" spacing="xl" />
                     </Fieldset.Control>
                     <Fieldset.Label>

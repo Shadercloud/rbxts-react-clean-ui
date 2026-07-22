@@ -4,13 +4,20 @@
         "---Getting Started---",
         "quickstart",
         "development",
+
         "---Layout Components---",
         "components/container",
         "components/row",
+
         "---Form Components---",
         "components/fieldset",
         "components/input",
         "components/select",
+        "components/checkbox",
+
+        "---Navigation Components---",
+        "components/menu",
+
         "---More---",
         "known_issues"
     ]

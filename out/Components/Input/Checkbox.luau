@@ -13,7 +13,11 @@ local SpacingHelper = _Helpers.SpacingHelper
 local function Checkbox(props)
 	local theme = React.useContext(CleanThemeContext)
 	local fieldset = React.useContext(FieldsetContext)
-	local checked, setChecked = React.useState(false)
+	local _condition = props.checked
+	if _condition == nil then
+		_condition = false
+	end
+	local checked, setChecked = React.useState(_condition)
 	React.useEffect(function()
 		if not fieldset then
 			return nil
@@ -49,11 +53,11 @@ local function Checkbox(props)
 			end,
 		},
 	}
-	local _condition = props.BackgroundTransparency
-	if _condition == nil then
-		_condition = theme.components.button.backgroundTransparency
+	local _condition_1 = props.BackgroundTransparency
+	if _condition_1 == nil then
+		_condition_1 = theme.components.button.backgroundTransparency
 	end
-	_attributes.BackgroundTransparency = _condition
+	_attributes.BackgroundTransparency = _condition_1
 	_attributes.BackgroundColor3 = ColorHelper:getIntentColor(theme, props.intent, "background", theme.components.button.intents, props.BackgroundColor3)
 	_attributes.AutoButtonColor = false
 	return React.createElement("imagebutton", _attributes, React.createElement(Corners, {

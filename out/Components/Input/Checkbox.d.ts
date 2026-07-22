@@ -1,6 +1,7 @@
 import React from "@rbxts/react";
 import { BackgroundElementProps, IconName, Intent, IntentElementProps, PaddingProps, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 interface CheckboxProps extends IntentElementProps, PaddingProps, BackgroundElementProps, SpacedElementProps, ScalableElementProps {
+    checked?: boolean;
     onChange?: (value: boolean) => void;
     'icon-checked'?: IconName;
     'icon-unchecked'?: IconName;
