@@ -1,0 +1,376 @@
+---
+title: Icon
+description: Display scalable, theme-aware icons with optional rotation and continuous spinning animation.
+icon: Sparkles
+----------------------------------------------------------------------------------------------------------
+
+The `Icon` component displays an icon from the active theme's icon set.
+
+Icons support theme-based sizing, custom colors, fixed sizes, rotation, and continuous spinning animations.
+
+## Import
+
+```tsx
+import { Icon } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+Use the `icon` prop to select an icon.
+
+```tsx
+<Icon icon="check" />
+```
+
+The icon is resolved from the active theme's `icons` collection. If the active theme does not define the requested icon, the component falls back to `DefaultIconSet`.
+
+## Examples
+
+### Basic icon
+
+```tsx
+<Icon icon="home" />
+```
+
+### Custom color
+
+Use the `color` prop to change the icon color.
+
+```tsx
+<Icon
+    icon="heart"
+    color={Color3.fromHex("#EF4444")}
+/>
+```
+
+By default, icons are rendered in white.
+
+### Scale
+
+Use the `scale` prop to select a size from the active theme's `iconSize` configuration.
+
+```tsx
+<HStack spacing="md">
+    <Icon icon="star" scale="xs" />
+    <Icon icon="star" scale="sm" />
+    <Icon icon="star" scale="md" />
+    <Icon icon="star" scale="lg" />
+    <Icon icon="star" scale="xl" />
+</HStack>
+```
+
+When `scale` is not provided, the component uses `theme.default.scale`.
+
+### Custom size
+
+Use the Roblox `Size` property when the icon needs a specific size rather than a theme scale.
+
+```tsx
+<Icon
+    icon="camera"
+    Size={UDim2.fromOffset(48, 48)}
+/>
+```
+
+A custom `Size` takes precedence over the size calculated from `scale`.
+
+### Rotation
+
+Use `Rotation` to rotate an icon by a fixed number of degrees.
+
+```tsx
+<Icon
+    icon="arrow-right"
+    Rotation={90}
+/>
+```
+
+`Rotation` also accepts a React binding.
+
+```tsx
+const [rotation, setRotation] = React.useBinding(0);
+
+<Icon
+    icon="refresh"
+    Rotation={rotation}
+/>
+```
+
+### Spinning icon
+
+<Image alt="Spinning icon demonstration" src="/images/spinning_icon_preview.gif"  />
+
+Set `spinning` to continuously rotate the icon.
+
+```tsx
+<Icon
+    icon="spinner"
+    spinning
+/>
+```
+
+This is useful for loading indicators, refresh states, and background operations.
+
+### Spin speed
+
+Use `speed` to control how many seconds a complete rotation takes.
+
+```tsx
+<Icon
+    icon="spinner"
+    spinning
+    speed={0.5}
+/>
+```
+
+Lower values produce a faster animation.
+
+```tsx
+<VStack spacing="md">
+    <Icon icon="spinner" spinning speed={0.5} />
+    <Icon icon="spinner" spinning speed={1} />
+    <Icon icon="spinner" spinning speed={2} />
+</VStack>
+```
+
+The default speed is `1` second per rotation.
+
+### Loading indicator
+
+```tsx
+<HStack spacing="sm">
+    <Icon
+        icon="circle-o-notch"
+        spinning
+        color={Color3.fromHex("#FFFFFF")}
+    />
+
+    <Text text="Loading..." />
+</HStack>
+```
+
+### Icon button
+
+Icons can be used by components such as `Button`.
+
+```tsx
+<Button>
+    <Icon icon="download" />
+    <Text text="Download" />
+</Button>
+```
+
+Depending on your `Button` API, you can also pass an icon directly:
+
+```tsx
+<Button
+    text="Download"
+    icon="download"
+/>
+```
+
+## Props
+
+| Prop       | Type                        | Default                     | Description                                                                           |
+| ---------- | --------------------------- | --------------------------- | ------------------------------------------------------------------------------------- |
+| `icon`     | `IconName`                  | `undefined`                 | The name of the icon to display.                                                      |
+| `color`    | `Color3`                    | `Color3.fromHex("#FFFFFF")` | The color applied to the icon image.                                                  |
+| `scale`    | `ScaleSize`                 | `theme.default.scale`       | Selects the icon size from `theme.iconSize`.                                          |
+| `Size`     | `UDim2`                     | Theme icon size             | Overrides the size calculated from `scale`.                                           |
+| `Rotation` | `number \| Binding<number>` | `0`                         | Rotates the icon in degrees or binds it to an animated value.                         |
+| `spinning` | `boolean`                   | `false`                     | Continuously rotates the icon.                                                        |
+| `speed`    | `number`                    | `1`                         | Duration, in seconds, of one complete rotation. Only used when `spinning` is enabled. |
+
+## Icon resolution
+
+The component resolves an icon using the following order:
+
+1. The active theme's `icons` collection.
+2. `DefaultIconSet`.
+
+Conceptually, the lookup behaves like this:
+
+```tsx
+const iconId =
+    props.icon === undefined
+        ? undefined
+        : theme.icons[props.icon] ?? DefaultIconSet[props.icon];
+```
+
+This allows a theme to replace individual icons while continuing to use the default icon set for any icons it does not override.
+
+## Theme configuration
+
+Icon sizes are read from the active theme's `iconSize` property.
+
+```tsx
+const theme = {
+    default: {
+        scale: "md",
+    },
+
+    iconSize: {
+        xs: 12,
+        sm: 16,
+        md: 20,
+        lg: 28,
+        xl: 36,
+    },
+};
+```
+
+With this theme, the following icon renders at `28 × 28` pixels:
+
+```tsx
+<Icon icon="settings" scale="lg" />
+```
+
+A theme can also replace icon asset IDs:
+
+```tsx
+const theme = {
+    icons: {
+        check: 1234567890,
+        close: 9876543210,
+    },
+};
+```
+
+Only the overridden icons need to differ from `DefaultIconSet`.
+
+## Available icons
+
+The `icon` prop accepts any value from the exported `IconName` type.
+
+Some commonly used icons include:
+
+### Actions
+
+```tsx
+<Icon icon="check" />
+<Icon icon="times" />
+<Icon icon="plus" />
+<Icon icon="minus" />
+<Icon icon="edit" />
+<Icon icon="trash" />
+<Icon icon="save" />
+<Icon icon="download" />
+<Icon icon="upload" />
+<Icon icon="refresh" />
+```
+
+### Navigation
+
+```tsx
+<Icon icon="home" />
+<Icon icon="bars" />
+<Icon icon="chevron-left" />
+<Icon icon="chevron-right" />
+<Icon icon="chevron-up" />
+<Icon icon="chevron-down" />
+<Icon icon="arrow-left" />
+<Icon icon="arrow-right" />
+```
+
+### Status
+
+```tsx
+<Icon icon="info-circle" />
+<Icon icon="question-circle" />
+<Icon icon="exclamation-circle" />
+<Icon icon="exclamation-triangle" />
+<Icon icon="check-circle" />
+<Icon icon="times-circle" />
+```
+
+### Users
+
+```tsx
+<Icon icon="user" />
+<Icon icon="users" />
+<Icon icon="user-plus" />
+<Icon icon="user-times" />
+<Icon icon="user-circle" />
+```
+
+### Media
+
+```tsx
+<Icon icon="play" />
+<Icon icon="pause" />
+<Icon icon="stop" />
+<Icon icon="forward" />
+<Icon icon="backward" />
+<Icon icon="volume-up" />
+<Icon icon="volume-down" />
+<Icon icon="volume-off" />
+```
+
+### Interface
+
+```tsx
+<Icon icon="cog" />
+<Icon icon="search" />
+<Icon icon="filter" />
+<Icon icon="calendar" />
+<Icon icon="clock-o" />
+<Icon icon="bell" />
+<Icon icon="envelope" />
+<Icon icon="folder" />
+```
+
+## Rendering an icon gallery
+
+Because `IconName` is a TypeScript union type, it cannot be directly iterated at runtime. To build an icon browser, iterate over `DefaultIconSet` instead.
+
+```tsx
+const icons = new Array<IconName>();
+
+for (const [icon] of pairs(DefaultIconSet)) {
+    icons.push(icon);
+}
+
+icons.sort((a, b) => a < b);
+
+return (
+    <Scroller>
+        <frame
+            BackgroundTransparency={1}
+            Size={UDim2.fromScale(1, 0)}
+            AutomaticSize={Enum.AutomaticSize.Y}
+        >
+            <uigridlayout
+                CellSize={UDim2.fromOffset(160, 64)}
+                CellPadding={UDim2.fromOffset(8, 8)}
+                SortOrder={Enum.SortOrder.LayoutOrder}
+            />
+
+            {icons.map((icon, index) => (
+                <frame
+                    key={icon}
+                    LayoutOrder={index}
+                    BackgroundTransparency={1}
+                >
+                    <HStack spacing="sm">
+                        <Icon icon={icon} />
+
+                        <Text
+                            text={icon}
+                            variant="label"
+                        />
+                    </HStack>
+                </frame>
+            ))}
+        </frame>
+    </Scroller>
+);
+```
+
+## Notes
+
+* When `icon` is `undefined`, the underlying `Image` property is also `undefined`.
+* `Size` overrides the size provided by the theme.
+* `speed` only affects icons with `spinning` enabled.
+* A spinning icon uses an infinite linear tween from `0` to `360` degrees.
+* Theme icon overrides automatically fall back to `DefaultIconSet`.
+* Use `circle-o-notch`, `spinner`, `refresh`, or `cog` for common spinning indicators.

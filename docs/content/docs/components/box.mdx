@@ -1,0 +1,47 @@
+---
+title: Box
+description: A simple themed container for grouping content.
+icon: Box
+---
+
+The `Box` component is a themed container that provides a background, border, rounded corners, padding, and shadow. It is useful for grouping related UI elements such as forms, cards, panels, or settings sections.
+
+## Example
+
+```tsx
+<Box spacing="md">
+    <VStack>
+        <Text text="Account Settings" variant="heading" />
+        <Text text="Manage your account preferences." />
+    </VStack>
+</Box>
+```
+
+## Sizing
+
+`Box` supports the standard sizing props, allowing it to fill available space or use fixed dimensions.
+
+```tsx
+<Box width="300px" height="200px">
+    <Text text="Fixed size box" />
+</Box>
+```
+
+## Props
+
+| Prop                     | Type        | Description                                                  |
+| ------------------------ | ----------- | ------------------------------------------------------------ |
+| `width`                  | `CssSize`   | Width of the box.                                            |
+| `height`                 | `CssSize`   | Height of the box.                                           |
+| `Size`                   | `UDim2`     | Overrides `width` and `height` with an explicit Roblox size. |
+| `spacing`                | `SpaceSize` | Controls the internal padding.                               |
+| `BackgroundColor3`       | `Color3`    | Overrides the themed background colour.                      |
+| `BackgroundTransparency` | `number`    | Overrides the themed background transparency.                |
+| `box-shadow`             | `CssShadow` | Overrides the default shadow.                                |
+| `ZIndex`                 | `number`    | Sets the rendering order.                                    |
+
+## Notes
+
+- Uses the current theme for colours, border, corner radius, shadow, and padding.
+- Automatically sizes vertically to fit its children.
+- Accepts any child components.

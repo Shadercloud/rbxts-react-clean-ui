@@ -1,4 +1,4 @@
-import React from "@rbxts/react";
+import React, { Component, ReactComponent } from "@rbxts/react";
 import {
     BackgroundElementProps,
     IconElementProps,
@@ -12,7 +12,7 @@ import { CleanThemeContext } from "../../Contexts/";
 import { BoxShadow, Corners, Padding } from "../Decorator";
 import { Text } from "../Typography";
 import { ColorHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
-import { Icon } from "../Surface";
+import { Icon, IconProps } from "../Surface";
 import { HStack } from "../Layout";
 import { Group, GroupContext } from "../Layout/";
 
@@ -31,7 +31,59 @@ export interface ButtonProps extends
     group?: boolean;
 }
 
-export function Button(props: ButtonProps) {
+export interface ButtonTextProps extends ScalableElementProps, IntentElementProps {
+    children?: string;
+    text: string;
+}
+
+function ButtonText(props: ButtonTextProps) {
+    const theme = React.useContext(CleanThemeContext);
+
+    return (
+        <Text
+            text={props.text}
+            typography={TypographyHelper.getTypography(
+                theme,
+                props.scale,
+                theme.components.button.typography
+            )}
+            TextColor3={
+                ColorHelper.getIntentColor(
+                    theme,
+                    props.intent,
+                    "text",
+                    theme.components.button.intents,
+                    undefined,
+                    theme.components.button.textColor
+                )
+            } />
+    );
+}
+
+
+export interface ButtonIconProps extends IconProps, IntentElementProps { }
+
+function ButtonIcon(props: ButtonIconProps) {
+    const theme = React.useContext(CleanThemeContext);
+    return <Icon
+        scale={props.scale}
+        icon={props.icon}
+        spinning={props.spinning}
+        speed={props.speed}
+        color={
+            ColorHelper.getIntentColor(
+                theme,
+                props.intent,
+                "text",
+                theme.components.button.intents,
+                undefined,
+                theme.components.button.textColor
+            )
+
+        } />
+}
+
+function ButtonRender(props: ButtonProps) {
     const theme = React.useContext(CleanThemeContext);
     const [hover, setHover] = React.useState(false);
 
@@ -94,39 +146,15 @@ export function Button(props: ButtonProps) {
                 {(props.icon !== undefined || props.text !== undefined) &&
                     <HStack valign="Center" spacing={props.spacing}>
                         {props.icon !== undefined &&
-                            <Icon
+                            <ButtonIcon
                                 scale={props.scale}
-                                icon={props.icon}
-                                color={
-                                    ColorHelper.getIntentColor(
-                                        theme,
-                                        props.intent,
-                                        "text",
-                                        theme.components.button.intents,
-                                        undefined,
-                                        theme.components.button.textColor
-                                    )
-
-                                } />
+                                icon={props.icon} />
                         }
                         {props.text !== undefined &&
-                            <Text
+                            <ButtonText
                                 text={props.text}
-                                typography={TypographyHelper.getTypography(
-                                    theme,
-                                    props.scale,
-                                    theme.components.button.typography
-                                )}
-                                TextColor3={
-                                    ColorHelper.getIntentColor(
-                                        theme,
-                                        props.intent,
-                                        "text",
-                                        theme.components.button.intents,
-                                        undefined,
-                                        theme.components.button.textColor
-                                    )
-                                } />
+                                intent={props.intent}
+                                scale={props.scale} />
                         }
                     </HStack>
                 }
@@ -135,4 +163,13 @@ export function Button(props: ButtonProps) {
             </Group.Element>
         </imagebutton>
     );
+}
+
+@ReactComponent
+export class Button extends Component<ButtonProps> {
+    static Text = ButtonText
+    static Icon = ButtonIcon
+    render(): React.ReactNode {
+        return <ButtonRender  {...this.props} />
+    }
 }

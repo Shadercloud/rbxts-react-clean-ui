@@ -4,7 +4,6 @@ import { Container, FlexItem, Group, HStack, Scroller, VStack } from "../Layout"
 import { Text } from "../Typography";
 import { NavigationContext } from "../../Contexts";
 
-
 interface MenuItemProps extends ButtonProps {
     title: string;
 }

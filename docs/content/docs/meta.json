@@ -9,6 +9,10 @@
         "components/container",
         "components/row",
 
+        "---Surface Components---",
+        "components/icon",
+        "components/box",
+
         "---Form Components---",
         "components/fieldset",
         "components/input",

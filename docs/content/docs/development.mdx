@@ -7,7 +7,7 @@ icon: SquareTerminal
 This guide explains how to set up a local environment for developing **React Clean UI** or contributing to the documentation.
 
 <Callout type="info">
-This guide assumes you're already familiar with **roblox-ts**, **Rojo**, and **Roblox Studio**.
+    This guide assumes you're already familiar with **roblox-ts**, **Rojo**, and **Roblox Studio**.
 </Callout>
 
 # Developing React Clean UI
@@ -33,7 +33,7 @@ When prompted:
 Install the packages required for the development project.
 
 ```bash
-npm install @rbxts/react @rbxts/react-roblox @rbxts/ui-labs @rbxts/services
+npm install @rbxts/react @rbxts/react-roblox @rbxts/ui-labs @rbxts/services @rbxts/react-ripple
 ```
 
 ## 3. Clone React Clean UI
@@ -63,57 +63,63 @@ Replace your root project's `tsconfig.json` with the following:
 
 ```json
 {
-	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
-		"downlevelIteration": true,
-		"jsx": "react",
-		"jsxFactory": "React.createElement",
-		"jsxFragmentFactory": "React.Fragment",
-		"module": "commonjs",
-		"moduleResolution": "Node",
-		"noLib": true,
-		"resolveJsonModule": true,
-		"experimentalDecorators": true,
-		"forceConsistentCasingInFileNames": true,
-		"moduleDetection": "force",
-		"strict": true,
-		"target": "ESNext",
-		"typeRoots": [
-			"node_modules/@rbxts"
-		],
-		"types": [
-			"types"
-		],
-		"rootDir": "src",
-		"outDir": "out",
-		"baseUrl": "src",
-		"incremental": true,
-		"tsBuildInfoFile": "out/tsconfig.tsbuildinfo",
-		"paths": {
-			"@rbxts/react": [
-				"../node_modules/@rbxts/react"
-			],
-			"@rbxts/react-roblox": [
-				"../node_modules/@rbxts/react-roblox"
-			],
-			"@rbxts/ui-labs": [
-				"../node_modules/@rbxts/ui-labs"
-			],
-			"@rbxts/services": [
-				"../node_modules/@rbxts/services"
-			],
-			"@rbxts/react-clean-ui": [
-				"Packages/rbxts-react-clean-ui"
-			]
-		}
-	},
-	"exclude": [
-		"src/Packages/**/src",
-		"src/Packages/**/node_modules",
-		"src/Packages/**/out",
-		"src/Packages/**/.vscode",
-		"src/Packages/**/docs"
-	]
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true,
+        "jsx": "react",
+        "jsxFactory": "React.createElement",
+        "jsxFragmentFactory": "React.Fragment",
+        "module": "commonjs",
+        "moduleResolution": "Node",
+        "noLib": true,
+        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "moduleDetection": "force",
+        "strict": true,
+        "target": "ESNext",
+        "typeRoots": [
+            "node_modules/@rbxts"
+        ],
+        "types": [
+            "types"
+        ],
+        "rootDir": "src",
+        "outDir": "out",
+        "baseUrl": "src",
+        "incremental": true,
+        "tsBuildInfoFile": "out/tsconfig.tsbuildinfo",
+        "paths": {
+            "@rbxts/react": [
+                "../node_modules/@rbxts/react"
+            ],
+            "@rbxts/react-roblox": [
+                "../node_modules/@rbxts/react-roblox"
+            ],
+            "@rbxts/ui-labs": [
+                "../node_modules/@rbxts/ui-labs"
+            ],
+            "ripple": {
+                "$path": "node_modules/@rbxts/ripple"
+            },
+            "react-ripple": {
+                "$path": "node_modules/@rbxts/react-ripple"
+            },
+            "@rbxts/services": [
+                "../node_modules/@rbxts/services"
+            ],
+            "@rbxts/react-clean-ui": [
+                "Packages/rbxts-react-clean-ui"
+            ]
+        }
+    },
+    "exclude": [
+        "src/Packages/**/src",
+        "src/Packages/**/node_modules",
+        "src/Packages/**/out",
+        "src/Packages/**/.vscode",
+        "src/Packages/**/docs"
+    ]
 }
 ```
 
@@ -123,89 +129,89 @@ Create a `default.project.json` file in the root of your development project.
 
 ```json
 {
-	"name": "React Clean UI Dev Environment",
-	"globIgnorePaths": [
-		"**/package.json",
-		"**/tsconfig.json"
-	],
-	"tree": {
-		"$className": "DataModel",
-		"ServerScriptService": {
-			"$className": "ServerScriptService",
-			"TS": {
-				"$path": "out/server"
-			}
-		},
-		"ReplicatedStorage": {
-			"$className": "ReplicatedStorage",
-			"rbxts_include": {
-				"$path": "include",
-				"node_modules": {
-					"$className": "Folder",
-					"@rbxts": {
-						"$className": "Folder",
-						"compiler-types": {
-							"$path": "node_modules/@rbxts/compiler-types"
-						},
-						"react": {
-							"$path": "node_modules/@rbxts/react"
-						},
-						"react-roblox": {
-							"$path": "node_modules/@rbxts/react-roblox"
-						},
-						"ui-labs": {
-							"$path": "node_modules/@rbxts/ui-labs"
-						},
-						"services": {
-							"$path": "node_modules/@rbxts/services"
-						},
-						"types": {
-							"$path": "node_modules/@rbxts/types"
-						},
-						"rbxts-react-clean-ui": {
-							"$path": "out/Packages/rbxts-react-clean-ui/out"
-						}
-					},
-					"@rbxts-js": {
-						"$path": "node_modules/@rbxts-js"
-					}
-				}
-			},
-			"TS": {
-				"$path": "out/shared"
-			},
-			"PackageStories": {
-				"$path": "out/Packages/rbxts-react-clean-ui/Stories"
-			}
-		},
-		"StarterPlayer": {
-			"$className": "StarterPlayer",
-			"StarterPlayerScripts": {
-				"$className": "StarterPlayerScripts",
-				"TS": {
-					"$path": "out/client"
-				}
-			}
-		},
-		"Workspace": {
-			"$className": "Workspace",
-			"$properties": {
-				"FilteringEnabled": true
-			}
-		},
-		"HttpService": {
-			"$className": "HttpService",
-			"$properties": {
-				"HttpEnabled": true
-			}
-		},
-		"SoundService": {
-			"$className": "SoundService",
-			"$properties": {
-				"RespectFilteringEnabled": true
-			}
-		}
-	}
+    "name": "React Clean UI Dev Environment",
+    "globIgnorePaths": [
+        "**/package.json",
+        "**/tsconfig.json"
+    ],
+    "tree": {
+        "$className": "DataModel",
+        "ServerScriptService": {
+            "$className": "ServerScriptService",
+            "TS": {
+                "$path": "out/server"
+            }
+        },
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+            "rbxts_include": {
+                "$path": "include",
+                "node_modules": {
+                    "$className": "Folder",
+                    "@rbxts": {
+                        "$className": "Folder",
+                        "compiler-types": {
+                            "$path": "node_modules/@rbxts/compiler-types"
+                        },
+                        "react": {
+                            "$path": "node_modules/@rbxts/react"
+                        },
+                        "react-roblox": {
+                            "$path": "node_modules/@rbxts/react-roblox"
+                        },
+                        "ui-labs": {
+                            "$path": "node_modules/@rbxts/ui-labs"
+                        },
+                        "services": {
+                            "$path": "node_modules/@rbxts/services"
+                        },
+                        "types": {
+                            "$path": "node_modules/@rbxts/types"
+                        },
+                        "rbxts-react-clean-ui": {
+                            "$path": "out/Packages/rbxts-react-clean-ui/out"
+                        }
+                    },
+                    "@rbxts-js": {
+                        "$path": "node_modules/@rbxts-js"
+                    }
+                }
+            },
+            "TS": {
+                "$path": "out/shared"
+            },
+            "PackageStories": {
+                "$path": "out/Packages/rbxts-react-clean-ui/Stories"
+            }
+        },
+        "StarterPlayer": {
+            "$className": "StarterPlayer",
+            "StarterPlayerScripts": {
+                "$className": "StarterPlayerScripts",
+                "TS": {
+                    "$path": "out/client"
+                }
+            }
+        },
+        "Workspace": {
+            "$className": "Workspace",
+            "$properties": {
+                "FilteringEnabled": true
+            }
+        },
+        "HttpService": {
+            "$className": "HttpService",
+            "$properties": {
+                "HttpEnabled": true
+            }
+        },
+        "SoundService": {
+            "$className": "SoundService",
+            "$properties": {
+                "RespectFilteringEnabled": true
+            }
+        }
+    }
 }
 ```
 

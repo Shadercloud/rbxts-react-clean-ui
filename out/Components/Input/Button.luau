@@ -1,6 +1,9 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
-local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
+local _react = TS.import(script, TS.getModule(script, "@rbxts", "react"))
+local React = _react
+local Component = _react.Component
+local ReactComponent = _react.ReactComponent
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local BoxShadow = _Decorator.BoxShadow
@@ -16,7 +19,25 @@ local HStack = TS.import(script, script.Parent.Parent, "Layout").HStack
 local _ = TS.import(script, script.Parent.Parent, "Layout")
 local Group = _.Group
 local GroupContext = _.GroupContext
-local function Button(props)
+local function ButtonText(props)
+	local theme = React.useContext(CleanThemeContext)
+	return React.createElement(Text, {
+		text = props.text,
+		typography = TypographyHelper:getTypography(theme, props.scale, theme.components.button.typography),
+		TextColor3 = ColorHelper:getIntentColor(theme, props.intent, "text", theme.components.button.intents, nil, theme.components.button.textColor),
+	})
+end
+local function ButtonIcon(props)
+	local theme = React.useContext(CleanThemeContext)
+	return React.createElement(Icon, {
+		scale = props.scale,
+		icon = props.icon,
+		spinning = props.spinning,
+		speed = props.speed,
+		color = ColorHelper:getIntentColor(theme, props.intent, "text", theme.components.button.intents, nil, theme.components.button.textColor),
+	})
+end
+local function ButtonRender(props)
 	local theme = React.useContext(CleanThemeContext)
 	local hover, setHover = React.useState(false)
 	local group = React.useContext(GroupContext)
@@ -97,15 +118,40 @@ local function Button(props)
 	}, (props.icon ~= nil or props.text ~= nil) and React.createElement(HStack, {
 		valign = "Center",
 		spacing = props.spacing,
-	}, props.icon ~= nil and React.createElement(Icon, {
+	}, props.icon ~= nil and React.createElement(ButtonIcon, {
 		scale = props.scale,
 		icon = props.icon,
-		color = ColorHelper:getIntentColor(theme, props.intent, "text", theme.components.button.intents, nil, theme.components.button.textColor),
-	}), props.text ~= nil and React.createElement(Text, {
+	}), props.text ~= nil and React.createElement(ButtonText, {
 		text = props.text,
-		typography = TypographyHelper:getTypography(theme, props.scale, theme.components.button.typography),
-		TextColor3 = ColorHelper:getIntentColor(theme, props.intent, "text", theme.components.button.intents, nil, theme.components.button.textColor),
+		intent = props.intent,
+		scale = props.scale,
 	})), props.children))
+end
+local Button
+do
+	local super = Component
+	Button = setmetatable({}, {
+		__tostring = function()
+			return "Button"
+		end,
+		__index = super,
+	})
+	Button.__index = Button
+	function Button.new(...)
+		local self = setmetatable({}, Button)
+		return self:constructor(...) or self
+	end
+	function Button:constructor(...)
+		super.constructor(self, ...)
+	end
+	function Button:render()
+		local _attributes = table.clone(self.props)
+		setmetatable(_attributes, nil)
+		return React.createElement(ButtonRender, _attributes)
+	end
+	Button.Text = ButtonText
+	Button.Icon = ButtonIcon
+	Button = ReactComponent(Button) or Button
 end
 return {
 	Button = Button,

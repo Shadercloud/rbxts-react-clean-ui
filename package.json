@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@rbxts/react": "^17.3.7-ts.2",
+    "@rbxts/react-ripple": "^3.0.1",
     "@rbxts/react-roblox": "^17.3.7-ts.2",
     "@rbxts/services": "^1.6.0",
     "@rbxts/ui-labs": "^2.4.2"
