@@ -1,8 +1,9 @@
 import React, { Component } from "@rbxts/react";
-import { ScalableElementProps, SpacedElementProps } from "../../Interfaces";
+import { CssSize, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 interface SelectProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
     selected?: number;
-    onChange?: (value: string) => void;
+    'max-height'?: CssSize;
+    onChange?: (value: number) => void;
     Event?: React.InstanceEvent<TextBox>;
 }
 interface SelectState {

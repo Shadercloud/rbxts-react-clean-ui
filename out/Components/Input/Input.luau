@@ -9,11 +9,32 @@ local TypographyHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
+local FieldsetContext = TS.import(script, script.Parent.Parent, "Layout").FieldsetContext
 local function Input(props)
 	local theme = React.useContext(CleanThemeContext)
+	local fieldset = React.useContext(FieldsetContext)
+	local _labelActivated = fieldset
+	if _labelActivated ~= nil then
+		_labelActivated = _labelActivated.labelActivated
+	end
+	local labelActivated = _labelActivated
 	local ref = useRef()
 	local value, setValue = useState(props.value)
 	local typography = TypographyHelper:getTypography(theme, props.scale, theme.components.input.typography)
+	React.useEffect(function()
+		if not labelActivated then
+			return nil
+		end
+		local connection = labelActivated.Event:Connect(function()
+			local _result = ref.current
+			if _result ~= nil then
+				_result:CaptureFocus()
+			end
+		end)
+		return function()
+			return connection:Disconnect()
+		end
+	end, { labelActivated, ref })
 	local _exp = React.createElement("uistroke", {
 		Thickness = theme.components.input.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,

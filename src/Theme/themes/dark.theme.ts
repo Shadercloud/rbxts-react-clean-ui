@@ -157,10 +157,16 @@ export const DarkTheme: CleanTheme = {
         },
         select: {
             dropDownBackgroundColor: Color3.fromHex("#1E222B"),
+            maxDropDownHeight: 200,
             borderColor: Color3.fromHex("#353C49"),
             borderThickness: 1,
             cornerRadius: 8,
-        }
+        },
+        checkbox: {
+            borderColor: Color3.fromHex("#353C49"),
+            borderThickness: 1,
+            cornerRadius: 8,
+        },
     },
 
     icons: {},

@@ -10,7 +10,8 @@
         "---Form Components---",
         "components/fieldset",
         "components/input",
-        "components/select"
-
+        "components/select",
+        "---More---",
+        "known_issues"
     ]
 }

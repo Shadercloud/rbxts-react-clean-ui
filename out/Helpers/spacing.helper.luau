@@ -13,8 +13,8 @@ do
 	end
 	function SpacingHelper:constructor()
 	end
-	function SpacingHelper:GetResolvedPadding(theme, props)
-		local amount = self:GetPadding(theme, props.spacing)
+	function SpacingHelper:GetResolvedPadding(theme, props, component)
+		local amount = self:GetPadding(theme, props.spacing, component)
 		return {
 			top = if props.top then self:GetPadding(theme, props.top) else amount,
 			bottom = if props.bottom then self:GetPadding(theme, props.bottom) else amount,
@@ -22,16 +22,26 @@ do
 			right = if props.right then self:GetPadding(theme, props.right) else amount,
 		}
 	end
-	function SpacingHelper:GetPadding(theme, spacing)
+	function SpacingHelper:GetPadding(theme, spacing, component)
 		if spacing == "None" then
 			return 0
 		end
 		local resolveSpacing = if spacing ~= nil then spacing else theme.default.spacing
-		local _condition = theme.spacing[resolveSpacing]
-		if _condition == nil then
-			_condition = 0
+		local _result
+		if component ~= nil then
+			local _condition = component[resolveSpacing]
+			if _condition == nil then
+				_condition = 0
+			end
+			_result = _condition
+		else
+			local _condition = theme.spacing[resolveSpacing]
+			if _condition == nil then
+				_condition = 0
+			end
+			_result = _condition
 		end
-		return _condition
+		return _result
 	end
 end
 return {

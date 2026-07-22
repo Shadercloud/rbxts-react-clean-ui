@@ -98,6 +98,7 @@ export interface PaddingProps extends SpacedElementProps {
     top?: ScaleSize | "None";
     bottom?: ScaleSize | "None";
     padding?: CssPadding;
+    resolvedPadding?: ResolvedPadding;
 }
 export interface ResolvedPadding {
     top: number;

@@ -7,7 +7,7 @@ import { SpacingHelper } from "../../Helpers";
 export function Padding(props: PaddingProps) {
     const theme = React.useContext(CleanThemeContext);
 
-    const padding = SpacingHelper.GetResolvedPadding(theme, props);
+    const padding = props.resolvedPadding !== undefined ? props.resolvedPadding : SpacingHelper.GetResolvedPadding(theme, props);
 
     return (
         <uipadding

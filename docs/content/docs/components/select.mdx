@@ -1,7 +1,383 @@
 ---
+
 title: Select
-description: Select Input Box
+description: Allow users to choose one option from a dropdown list.
 icon: Rows3
 ---
 
-Coming Soon
+<Image alt="Select demonstration" src="/images/select_preview.gif" style={{float: "right", width: "40%", marginLeft: "2rem", marginBottom: "1rem",}} />
+
+The `<Select>` component displays a dropdown menu containing a list of selectable options.
+
+Use `<Select.Option>` components as direct children of `<Select>` to define the available choices.
+
+## Import
+
+```tsx
+import {
+    Fieldset,
+    Select,
+    Text,
+} from "@rbxts/react-clean-ui";
+```
+
+## Basic Usage
+
+```tsx
+<Select>
+    <Select.Option text="Option One" />
+    <Select.Option text="Option Two" />
+    <Select.Option text="Option Three" />
+</Select>
+```
+
+## Example
+
+The `Select` component can be combined with a `Fieldset` to provide a label and consistent form layout.
+
+```tsx
+<Fieldset>
+    <Fieldset.Label>
+        <Text text="Country:" />
+    </Fieldset.Label>
+
+    <Fieldset.Control>
+        <Select>
+            <Select.Option text="United Kingdom" />
+            <Select.Option text="United States" />
+            <Select.Option text="Canada" />
+            <Select.Option text="Germany" />
+            <Select.Option text="France" />
+            <Select.Option text="Australia" />
+            <Select.Option text="New Zealand" />
+            <Select.Option text="Japan" />
+            <Select.Option text="South Africa" />
+        </Select>
+    </Fieldset.Control>
+</Fieldset>
+```
+
+## Handling Selection Changes
+
+Use the `onChange` callback to receive the index of the selected option.
+
+```tsx
+function CountrySelect() {
+    const [selectedCountry, setSelectedCountry] =
+        React.useState(0);
+
+    return (
+        <Fieldset>
+            <Fieldset.Label>
+                <Text text="Country:" />
+            </Fieldset.Label>
+
+            <Fieldset.Control>
+                <Select
+                    selected={selectedCountry}
+                    onChange={(index) => {
+                        setSelectedCountry(index);
+                        print(`Selected option: ${index}`);
+                    }}
+                >
+                    <Select.Option text="United Kingdom" />
+                    <Select.Option text="United States" />
+                    <Select.Option text="Canada" />
+                </Select>
+            </Fieldset.Control>
+        </Fieldset>
+    );
+}
+```
+
+The callback receives the zero-based index of the selected option:
+
+```tsx
+<Select
+    onChange={(index) => {
+        print(index);
+    }}
+>
+    <Select.Option text="First" />
+    <Select.Option text="Second" />
+    <Select.Option text="Third" />
+</Select>
+```
+
+Selecting `First` returns `0`, selecting `Second` returns `1`, and selecting `Third` returns `2`.
+
+## Default Selection
+
+Use the `selected` property to specify which option is initially selected.
+
+```tsx
+<Select selected={1}>
+    <Select.Option text="Small" />
+    <Select.Option text="Medium" />
+    <Select.Option text="Large" />
+</Select>
+```
+
+In this example, `Medium` is initially selected because it has an index of `1`.
+
+When `selected` is not provided, the first option is selected.
+
+## Custom Option Content
+
+An option can contain custom children instead of only displaying text.
+
+```tsx
+<Select>
+    <Select.Option text="Information" />
+
+    <Select.Option>
+        <Text
+            text="Custom Option"
+            weight="bold"
+        />
+    </Select.Option>
+</Select>
+```
+
+You can also combine the `text` property with additional children.
+
+```tsx
+<Select>
+    <Select.Option text="Standard" />
+
+    <Select.Option text="Premium">
+        <Text text="Recommended" />
+    </Select.Option>
+</Select>
+```
+
+The value shown in the closed select control is taken from the selected option's `text` property.
+
+For this reason, options should normally provide `text`, even when they also contain custom children.
+
+## Option Events
+
+`Select.Option` accepts Roblox instance events through the `Event` property.
+
+```tsx
+<Select>
+    <Select.Option
+        text="United Kingdom"
+        Event={{
+            MouseEnter: () => {
+                print("Hovering United Kingdom");
+            },
+        }}
+    />
+
+    <Select.Option
+        text="United States"
+        Event={{
+            Activated: () => {
+                print("United States selected");
+            },
+        }}
+    />
+</Select>
+```
+
+The component preserves its internal hover and selection behaviour while calling the supplied event handlers.
+
+## Option Background Colour
+
+Use `BackgroundColor3` to provide a custom base colour for an option.
+
+```tsx
+<Select>
+    <Select.Option
+        text="Standard"
+        BackgroundColor3={Color3.fromHex("#FFFFFF")}
+    />
+
+    <Select.Option
+        text="Highlighted"
+        BackgroundColor3={Color3.fromHex("#E8F1FF")}
+    />
+</Select>
+```
+
+Hover and selected-state colours may still be adjusted by the active theme.
+
+## Dropdown Height and Scrolling
+
+The dropdown automatically grows to fit its options until it reaches its configured maximum height.
+
+By default, the maximum height is taken from the active theme:
+```tsx
+<Select>
+    <Select.Option text="Option 1" />
+    <Select.Option text="Option 2" />
+    <Select.Option text="Option 3" />
+</Select>
+```
+
+Use the "max-height" property to override the theme value for an individual select.
+
+```tsx
+<Select max-height="300px">
+    <Select.Option text="Option 1" />
+    <Select.Option text="Option 2" />
+    <Select.Option text="Option 3" />
+    <Select.Option text="Option 4" />
+    <Select.Option text="Option 5" />
+    <Select.Option text="Option 6" />
+    <Select.Option text="Option 7" />
+    <Select.Option text="Option 8" />
+    <Select.Option text="Option 9" />
+    <Select.Option text="Option 10" />
+</Select>
+```
+
+When the options exceed the maximum height, the dropdown becomes scrollable.
+
+When "max-height" is not provided, the value configured in theme.components.select is used.
+
+## Overlay Provider
+
+The dropdown is rendered through the library's overlay system.
+
+Your interface must be wrapped in an `OverlayProvider` for the dropdown to appear correctly.
+
+```tsx
+<OverlayProvider>
+    <App />
+</OverlayProvider>
+```
+
+A typical application structure may look like this:
+
+```tsx
+<ThemeProvider>
+    <OverlayProvider>
+        <App />
+    </OverlayProvider>
+</ThemeProvider>
+```
+
+The overlay allows the dropdown to render above surrounding interface elements without being clipped by parent containers.
+
+When a `Select` is opened without an available overlay, the component emits a warning.
+
+## Direct Children
+
+`Select.Option` components must be direct children of `Select`.
+
+```tsx
+<Select>
+    <Select.Option text="Valid Option" />
+</Select>
+```
+
+Avoid wrapping options inside another component or frame:
+
+```tsx
+<Select>
+    <frame>
+        <Select.Option text="Invalid Option" />
+    </frame>
+</Select>
+```
+
+The `Select` component assigns option indexes while processing its direct children.
+
+## Select Properties
+
+| Property     | Type                           | Default       | Description                                                           |
+| ------------ | ------------------------------ | ------------- | --------------------------------------------------------------------- |
+| `selected`   | `number`                       | `0`           | The zero-based index of the selected option.                          |
+| `onChange`   | `(value: number) => void`      | —             | Called when an option is selected.                                    |
+| `scale`      | `ScaleSize`                    | Theme default | Controls the typography scale used by the select.                     |
+| `spacing`    | `SpaceSize`                    | Theme default | Controls the internal padding of the select.                          |
+| `max-height` | `CssSize`                      | Theme default | Sets the maximum height of the dropdown before it becomes scrollable. |
+| `children`   | `React.ReactNode`              | —             | The `Select.Option` components displayed in the dropdown.             |
+| `Event`      | `React.InstanceEvent<TextBox>` | —             | Roblox instance events passed to the component.                       |
+
+The component also supports applicable Roblox instance properties inherited from its base component properties.
+
+## Select.Option Properties
+
+| Property           | Type                               | Default      | Description                                             |
+| ------------------ | ---------------------------------- | ------------ | ------------------------------------------------------- |
+| `text`             | `string`                           | —            | The option label and the value displayed when selected. |
+| `children`         | `React.ReactNode`                  | —            | Additional custom content rendered inside the option.   |
+| `Event`            | `React.InstanceEvent<ImageButton>` | —            | Roblox events for the option button.                    |
+| `BackgroundColor3` | `Color3`                           | Theme colour | Overrides the option's base background colour.          |
+
+The `index` property is assigned internally by `Select` and should not be set manually.
+
+## Controlled Selection
+
+The `selected` property is used as the component's initial selection.
+
+After mounting, the component manages its selected index internally and calls `onChange` whenever the selection changes.
+
+```tsx
+<Select
+    selected={0}
+    onChange={(index) => {
+        print(`Selection changed to ${index}`);
+    }}
+>
+    <Select.Option text="One" />
+    <Select.Option text="Two" />
+</Select>
+```
+
+## No Options
+
+When no options are supplied, the select displays:
+
+```text
+No Options
+```
+
+```tsx
+<Select />
+```
+
+## Complete Example
+
+```tsx
+import React from "@rbxts/react";
+import {
+    Fieldset,
+    Select,
+    Text,
+} from "@rbxts/react-clean-ui";
+
+export function SettingsForm() {
+    const [country, setCountry] = React.useState(0);
+
+    return (
+        <Fieldset>
+            <Fieldset.Label>
+                <Text text="Country:" />
+            </Fieldset.Label>
+
+            <Fieldset.Control>
+                <Select
+                    selected={country}
+                    onChange={(index) => {
+                        setCountry(index);
+                    }}
+                >
+                    <Select.Option text="United Kingdom" />
+                    <Select.Option text="United States" />
+                    <Select.Option text="Canada" />
+                    <Select.Option text="Germany" />
+                    <Select.Option text="France" />
+                    <Select.Option text="Australia" />
+                    <Select.Option text="New Zealand" />
+                    <Select.Option text="Japan" />
+                    <Select.Option text="South Africa" />
+                </Select>
+            </Fieldset.Control>
+        </Fieldset>
+    );
+}
+```

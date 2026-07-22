@@ -10,11 +10,13 @@ local CleanThemeContext = _Contexts.CleanThemeContext
 local OverlayContext = _Contexts.OverlayContext
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
+local SizeHelper = _Helpers.SizeHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
 local _Layout = TS.import(script, script.Parent.Parent, "Layout")
+local FieldsetContext = _Layout.FieldsetContext
 local FlexItem = _Layout.FlexItem
 local HStack = _Layout.HStack
 local Scroller = _Layout.Scroller
@@ -60,7 +62,7 @@ local function SelectOption(props)
 	end
 	_object.Activated = function()
 		context.setSelected(props.index)
-		context.toggleOpen()
+		context.closeDropdown()
 	end
 	_attributes.Event = _object
 	_attributes.Size = UDim2.new(1, 0, 0, 0)
@@ -70,21 +72,65 @@ local function SelectOption(props)
 	_attributes.AutoButtonColor = false
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
-	return React.createElement("imagebutton", _attributes, React.createElement(Padding, _attributes_1), props.text ~= nil and React.createElement(Text, {
+	return React.createElement("imagebutton", _attributes, React.createElement(Padding, _attributes_1), props.text ~= nil and props.children == nil and React.createElement(Text, {
 		text = props.text,
 	}), props.children)
 end
-local function SelectRenderer()
+local function ActivateSelect(context, overlay)
+	local button = context.buttonRef.current
+	if button and overlay.overlay then
+		if context.open then
+			context.closeDropdown()
+			return nil
+		end
+		local buttonPosition = button.AbsolutePosition
+		local overlayPosition = overlay.overlay.AbsolutePosition
+		local localPosition = buttonPosition - overlayPosition
+		context.openDropdown(UDim2.fromOffset(button.AbsoluteSize.X, button.AbsoluteSize.Y), UDim2.fromOffset(localPosition.X, localPosition.Y))
+	end
+end
+local function SelectRenderer(props)
 	local context = React.useContext(SelectContext)
 	local theme = React.useContext(CleanThemeContext)
 	local overlay = React.useContext(OverlayContext)
+	local fieldset = React.useContext(FieldsetContext)
 	local contentHeight, setContentHeight = React.useState(0)
+	local _labelActivated = fieldset
+	if _labelActivated ~= nil then
+		_labelActivated = _labelActivated.labelActivated
+	end
+	local labelActivated = _labelActivated
+	local overlayInstance = overlay.overlay
+	local _buttonRef = context
+	if _buttonRef ~= nil then
+		_buttonRef = _buttonRef.buttonRef
+	end
+	local buttonRef = _buttonRef
+	local _openDropdown = context
+	if _openDropdown ~= nil then
+		_openDropdown = _openDropdown.openDropdown
+	end
+	local openDropdown = _openDropdown
 	local _arg0 = context ~= nil
 	assert(_arg0, "SelectRenderer must be used inside a Select")
+	if context.open and overlay.overlay == nil then
+		warn("You have used a Select component without using the Overlay Provider")
+	end
 	local typography = TypographyHelper:getTypography(theme, context.props.scale, theme.components.select.typography)
 	local children = React.Children.toArray(context.props.children)
 	local selectedOption = (children[context.selected + 1] or children[1])
-	local dropdownHeight = math.min(contentHeight, 200)
+	local dropdownHeight = math.min(contentHeight, if props["max-height"] ~= nil then SizeHelper:toUDim(props["max-height"]).Offset else theme.components.select.maxDropDownHeight)
+	React.useEffect(function()
+		if not labelActivated then
+			return nil
+		end
+		local connection = labelActivated.Event:Connect(function()
+			ActivateSelect(context, overlay)
+		end)
+		return function()
+			return connection:Disconnect()
+		end
+	end, { labelActivated, overlayInstance, buttonRef, openDropdown })
 	local _exp = React.createElement("uistroke", {
 		Thickness = theme.components.select.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
@@ -124,7 +170,6 @@ local function SelectRenderer()
 		_attributes_2.Size = UDim2.fromOffset(context.dropdownSize.X.Offset, 0)
 		_attributes_2.AutomaticSize = Enum.AutomaticSize.Y
 		_attributes_2.ClipsDescendants = true
-		_attributes_2.ZIndex = 1000
 		_condition_1 = ReactRoblox.createPortal(React.createElement("frame", _attributes_2, React.createElement("uistroke", {
 			Thickness = theme.components.select.borderThickness,
 			BorderStrokePosition = Enum.BorderStrokePosition.Outer,
@@ -134,9 +179,7 @@ local function SelectRenderer()
 		}), React.createElement(Scroller, {
 			Size = UDim2.new(1, 0, 0, dropdownHeight),
 			spacing = "None",
-		}, React.createElement(Corners, {
-			radius = theme.components.select.cornerRadius,
-		}), React.createElement(VStack, {
+		}, React.createElement(VStack, {
 			spacing = "None",
 			Change = {
 				AbsoluteContentSize = function(layout)
@@ -159,14 +202,7 @@ local function SelectRenderer()
 		BackgroundTransparency = 1,
 		Event = {
 			Activated = function()
-				local button = context.buttonRef.current
-				if button and overlay.overlay then
-					local buttonPosition = button.AbsolutePosition
-					local overlayPosition = overlay.overlay.AbsolutePosition
-					local localPosition = buttonPosition - overlayPosition
-					context.setDropdown(UDim2.fromOffset(button.AbsoluteSize.X, button.AbsoluteSize.Y), UDim2.fromOffset(localPosition.X, localPosition.Y))
-				end
-				context.toggleOpen()
+				ActivateSelect(context, overlay)
 			end,
 		},
 	}, _exp, _exp_1, _exp_2, _exp_3, _condition_1)
@@ -209,15 +245,24 @@ do
 			dropdownPosition = self.state.dropdownPosition,
 			buttonRef = self.buttonRef,
 			setSelected = function(selected)
-				print(selected)
+				local _result = self.props.onChange
+				if _result ~= nil then
+					_result(selected)
+				end
 				self:setState({
 					selected = selected,
 				})
 			end,
-			setDropdown = function(size, position)
+			openDropdown = function(size, position)
 				self:setState({
 					dropdownSize = size,
 					dropdownPosition = position,
+					open = true,
+				})
+			end,
+			closeDropdown = function()
+				self:setState({
+					open = false,
 				})
 			end,
 			toggleOpen = function()
@@ -228,9 +273,11 @@ do
 				end)
 			end,
 		}
+		local _attributes = table.clone(self.props)
+		setmetatable(_attributes, nil)
 		return React.createElement(SelectContext.Provider, {
 			value = context,
-		}, React.createElement(SelectRenderer))
+		}, React.createElement(SelectRenderer, _attributes))
 	end
 	Select.Option = SelectOption
 	Select = ReactComponent(Select) or Select

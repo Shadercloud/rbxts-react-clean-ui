@@ -163,6 +163,7 @@ export const DefaultTheme: CleanTheme = {
         },
         select: {
             dropDownBackgroundColor: Color3.fromHex("#FFFFFF"),
+            maxDropDownHeight: 200,
             borderColor: Color3.fromHex("#D9DEE8"),
             borderThickness: 1,
             cornerRadius: 8,
@@ -172,7 +173,19 @@ export const DefaultTheme: CleanTheme = {
                     hover: Color3.fromHex("#CCCCCC")
                 }
             },
-        }
+        },
+        checkbox: {
+            borderColor: Color3.fromHex("#D9DEE8"),
+            borderThickness: 1,
+            cornerRadius: 8,
+            spacing: {
+                xs: 1,
+                sm: 2,
+                md: 4,
+                lg: 6,
+                xl: 8,
+            }
+        },
     },
 
     icons: {

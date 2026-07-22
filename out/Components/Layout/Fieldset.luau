@@ -18,7 +18,19 @@ local function FieldsetLabel(props)
 		mode = "Custom",
 		ShrinkRatio = 0,
 		GrowRatio = 0,
-	}, props.children)
+	}, React.createElement("imagebutton", {
+		Size = UDim2.fromOffset(0, 0),
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		Event = {
+			Activated = function()
+				local _result = context.labelActivated
+				if _result ~= nil then
+					_result:Fire()
+				end
+			end,
+		},
+	}, props.children))
 end
 local function FieldsetControl(props)
 	local context = React.useContext(FieldsetContext)
@@ -26,8 +38,8 @@ local function FieldsetControl(props)
 	assert(_arg0, "Fieldset.Control must be used inside a Fieldset")
 	return React.createElement(FlexItem, {
 		mode = "Custom",
-		ShrinkRatio = 1,
-		GrowRatio = 1,
+		ShrinkRatio = if context.checkbox then 0 else 1,
+		GrowRatio = if context.checkbox then 0 else 1,
 	}, props.children)
 end
 local Fieldset
@@ -46,23 +58,45 @@ do
 	end
 	function Fieldset:constructor(...)
 		super.constructor(self, ...)
+		self.labelActivated = Instance.new("BindableEvent")
+		self.fieldsetContext = {
+			disabled = false,
+			checkbox = false,
+			labelActivated = self.labelActivated,
+		}
 	end
-	function Fieldset:render()
-		local _object = {}
-		local _left = "disabled"
+	function Fieldset:getFieldsetContext()
 		local _condition = self.props.disabled
 		if _condition == nil then
 			_condition = false
 		end
-		_object[_left] = _condition
-		local context = _object
+		local disabled = _condition
+		local _condition_1 = self.props.checkbox
+		if _condition_1 == nil then
+			_condition_1 = false
+		end
+		local checkbox = _condition_1
+		if self.fieldsetContext.disabled ~= disabled or self.fieldsetContext.checkbox ~= checkbox then
+			self.fieldsetContext = {
+				disabled = disabled,
+				checkbox = checkbox,
+				labelActivated = self.labelActivated,
+			}
+		end
+		return self.fieldsetContext
+	end
+	function Fieldset:componentWillUnmount()
+		self.labelActivated:Destroy()
+	end
+	function Fieldset:render()
+		local context = self:getFieldsetContext()
 		local wrap = false
 		local breakpoints = (if self.props.breakpoints ~= nil then self.props.breakpoints else self.context.breakpoints)
-		local _condition_1 = self.state.width
-		if _condition_1 == nil then
-			_condition_1 = 0
+		local _condition = self.state.width
+		if _condition == nil then
+			_condition = 0
 		end
-		local breakpoint = BreakpointHelper:getBreakpoint(_condition_1, breakpoints)
+		local breakpoint = BreakpointHelper:getBreakpoint(_condition, breakpoints)
 		if BreakpointHelper:compare(breakpoint, "<=", self.props.wrap or "lg") then
 			wrap = true
 		end
@@ -91,5 +125,6 @@ do
 	Fieldset = ReactComponent(Fieldset) or Fieldset
 end
 return {
+	FieldsetContext = FieldsetContext,
 	Fieldset = Fieldset,
 }

@@ -7,16 +7,19 @@ import { Breakpoint, BreakPointElementProps, BreakpointValue } from "../../Inter
 import { BreakpointHelper } from "../../Helpers";
 
 
-interface FieldsetContextValue {
+export interface FieldsetContextValue {
     disabled: boolean;
+    checkbox: boolean;
+    labelActivated?: BindableEvent;
 }
 
-const FieldsetContext = React.createContext<FieldsetContextValue | undefined>(
+export const FieldsetContext = React.createContext<FieldsetContextValue | undefined>(
     undefined,
 );
 
 interface FieldsetProps extends BreakPointElementProps {
     disabled?: boolean;
+    checkbox?: boolean;
     wrap?: Breakpoint;
 }
 
@@ -38,7 +41,14 @@ function FieldsetLabel(props: FieldsetSlotProps) {
             ShrinkRatio={0}
             GrowRatio={0}
         >
-            {props.children}
+            <imagebutton Size={UDim2.fromOffset(0, 0)} BackgroundTransparency={1} AutomaticSize={Enum.AutomaticSize.XY}
+            Event={{
+                Activated: () => {
+                    context.labelActivated?.Fire();
+                }
+            }}>
+                {props.children}
+            </imagebutton>
         </FlexItem>
     );
 }
@@ -54,8 +64,8 @@ function FieldsetControl(props: FieldsetSlotProps) {
     return (
         <FlexItem
             mode="Custom"
-            ShrinkRatio={1}
-            GrowRatio={1}
+            ShrinkRatio={context.checkbox ? 0 : 1}
+            GrowRatio={context.checkbox ? 0 : 1}
         >
             {props.children}
         </FlexItem>
@@ -75,10 +85,38 @@ export class Fieldset extends Component<FieldsetProps, FieldsetState> {
 
     declare context: React.ContextType<typeof CleanThemeContext>;
 
+    private readonly labelActivated = new Instance("BindableEvent");
+
+    private fieldsetContext: FieldsetContextValue = {
+        disabled: false,
+        checkbox: false,
+        labelActivated: this.labelActivated,
+    };
+
+    private getFieldsetContext(): FieldsetContextValue {
+        const disabled = this.props.disabled ?? false;
+        const checkbox = this.props.checkbox ?? false;
+
+        if (
+            this.fieldsetContext.disabled !== disabled ||
+            this.fieldsetContext.checkbox !== checkbox
+        ) {
+            this.fieldsetContext = {
+                disabled,
+                checkbox,
+                labelActivated: this.labelActivated,
+            };
+        }
+
+        return this.fieldsetContext;
+    }
+
+    public componentWillUnmount() {
+        this.labelActivated.Destroy();
+    }
+
     public render() {
-        const context: FieldsetContextValue = {
-            disabled: this.props.disabled ?? false,
-        };
+        const context = this.getFieldsetContext();
 
         let wrap = false;
 

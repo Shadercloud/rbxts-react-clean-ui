@@ -4,6 +4,7 @@ import { TypographyHelper } from "../../Helpers";
 import { ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 import { TypographyStyle } from "../../Theme";
 import { Corners, Padding } from "../Decorator";
+import { FieldsetContext } from "../Layout";
 
 interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
     value: string;
@@ -15,6 +16,9 @@ interface InputProps extends ScalableElementProps, SpacedElementProps, React.Ins
 
 export function Input(props: InputProps) {
     const theme = React.useContext(CleanThemeContext);
+    const fieldset = React.useContext(FieldsetContext);
+
+    const labelActivated = fieldset?.labelActivated;
 
     const ref = useRef<TextBox>();
 
@@ -25,6 +29,21 @@ export function Input(props: InputProps) {
         props.scale,
         theme.components.input.typography
     )
+
+    React.useEffect(() => {
+        if (!labelActivated) {
+            return;
+        }
+
+        const connection = labelActivated.Event.Connect(() => {
+            ref.current?.CaptureFocus();
+        });
+
+        return () => connection.Disconnect();
+    }, [
+        labelActivated,
+        ref
+    ]);
 
     return (
         <frame

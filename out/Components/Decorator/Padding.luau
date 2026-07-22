@@ -5,7 +5,7 @@ local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contex
 local SpacingHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").SpacingHelper
 local function Padding(props)
 	local theme = React.useContext(CleanThemeContext)
-	local padding = SpacingHelper:GetResolvedPadding(theme, props)
+	local padding = if props.resolvedPadding ~= nil then props.resolvedPadding else SpacingHelper:GetResolvedPadding(theme, props)
 	return React.createElement("uipadding", {
 		PaddingTop = UDim.new(0, padding.top),
 		PaddingBottom = UDim.new(0, padding.bottom),

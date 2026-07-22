@@ -80,6 +80,14 @@ export interface CleanTheme {
             dropDownBackgroundColor: Color3;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
+            maxDropDownHeight: number;
+        };
+        checkbox: {
+            borderColor: Color3;
+            borderThickness: number;
+            cornerRadius: CssSize;
+            intents?: Partial<Record<Intent, InlineIntentColors>>;
+            spacing?: ScaleSizeValue<number>;
         };
     };
     icons: Partial<IconSet>;

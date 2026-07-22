@@ -55,35 +55,91 @@ Then add the `@rbxts-js` path below it so that it looks like this:
 
 ## Basic usage
 
-Import components directly from the package:
+Create a file `/src/client/demo.client.tsx`.
 
 ```tsx
 import React from "@rbxts/react";
+import ReactRoblox from "@rbxts/react-roblox";
 import {
-    Box,
-    Button,
-    Container,
-    HStack,
-    Text,
-    VStack,
+	ThemeProvider,
+	OverlayProvider,
+	Container,
+	Box,
+	VStack,
+	HStack,
+	FlexItem,
+	Text,
+	Button,
+	Fieldset,
+	Input,
+	Select,
+	DefaultTheme,
 } from "@rbxts/react-clean-ui";
-export function WelcomePanel() {
-    return (
-        <Container width="100%" height="100%" center="50%">
-            <Box spacing="lg">
-                <VStack>
-                    <Text text="Welcome" variant="title" />
-                    <Text
-                        text="Build consistent Roblox interfaces from reusable components."
-                        variant="body"
-                    />
-                    <HStack>
-                        <Button text="Continue" intent="primary" />
-                        <Button text="Cancel" />
-                    </HStack>
-                </VStack>
-            </Box>
-        </Container>
-    );
-}
+
+const playerGui = game.GetService("Players").LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
+
+const screenGui = new Instance("ScreenGui");
+screenGui.ResetOnSpawn = false;
+screenGui.IgnoreGuiInset = true;
+screenGui.Parent = playerGui;
+
+const root = ReactRoblox.createRoot(screenGui);
+
+root.render(
+	<ThemeProvider theme={DefaultTheme}>
+		<OverlayProvider>
+			<Container width="90%" center>
+				<Box>
+					<VStack>
+						<Container>
+							<HStack>
+								<FlexItem>
+									<Text text="Basic Form" variant="title" />
+								</FlexItem>
+								<Button icon="times" />
+							</HStack>
+						</Container>
+						<Fieldset>
+							<Fieldset.Label>
+								<Text text="Enter Name:" />
+							</Fieldset.Label>
+							<Fieldset.Control>
+								<Input placeholder="John Doe" value="" />
+							</Fieldset.Control>
+						</Fieldset>
+						<Fieldset>
+							<Fieldset.Label>
+								<Text text="Country:" />
+							</Fieldset.Label>
+
+							<Fieldset.Control>
+								<Select>
+									<Select.Option text="United Kingdom" />
+									<Select.Option text="United States" />
+									<Select.Option text="Canada" />
+									<Select.Option text="Germany" />
+									<Select.Option text="France" />
+									<Select.Option text="Australia" />
+									<Select.Option text="New Zealand" />
+									<Select.Option text="Japan" />
+									<Select.Option text="South Africa" />
+								</Select>
+							</Fieldset.Control>
+						</Fieldset>
+						<Container>
+							<Button text="Submit Form" intent="info" icon="arrow-circle-right"></Button>
+						</Container>
+					</VStack>
+				</Box>
+			</Container>
+		</OverlayProvider>
+	</ThemeProvider>,
+);
+
 ```
+
+### Notes
+
+You do not need to include the `<ThemeProvider>` if you plan to use only the default theme.
+
+`<OverlayProvider>` is only required if you plan to use certain components that popup, such as `<Select>`

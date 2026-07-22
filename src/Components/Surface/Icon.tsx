@@ -5,22 +5,20 @@ import { DefaultIconSet } from "../../Theme";
 
 interface IconProps extends IconElementProps, ScalableElementProps {
     color?: Color3;
+    Size?: UDim2;
 }
 
 export function Icon(props: IconProps) {
-
-    if (!props.icon) return undefined
-
     const theme = React.useContext(CleanThemeContext);
 
-    const iconId = theme.icons[props.icon] ?? DefaultIconSet[props.icon]
+    const iconId = props.icon === undefined ? undefined : theme.icons[props.icon] ?? DefaultIconSet[props.icon]
 
     const size = theme.iconSize[props.scale ?? theme.default.scale]
 
     return (
         <imagelabel
-            Size={UDim2.fromOffset(size, size)}
-            Image={`rbxassetid://${iconId}`}
+            Size={props.Size ?? UDim2.fromOffset(size, size)}
+            Image={iconId === undefined ? undefined : `rbxassetid://${iconId}`}
             BackgroundTransparency={1}
             ImageColor3={props.color ?? Color3.fromHex("#FFFFFF")}
         />
