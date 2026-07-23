@@ -1,72 +1,72 @@
 import { CleanTheme } from "../CleanTheme";
 
-const font = Enum.Font.Jura;
+const font = Enum.Font.SourceSans;
 
-export const DarkTheme: CleanTheme = {
+export const SandstoneTheme: CleanTheme = {
     colors: {
         intents: {
             primary: {
                 default: {
-                    textColor: Color3.fromHex("#E8EDF8"),
-                    borderColor: Color3.fromHex("#4B74C7"),
-                    backgroundColor: Color3.fromHex("#365FAF"),
+                    textColor: Color3.fromHex("#244F4A"),
+                    borderColor: Color3.fromHex("#4E8179"),
+                    backgroundColor: Color3.fromHex("#D9E9E5"),
                 },
                 hover: {
-                    textColor: Color3.fromHex("#FFFFFF"),
-                    borderColor: Color3.fromHex("#6B96F0"),
-                    backgroundColor: Color3.fromHex("#4775CC"),
+                    textColor: Color3.fromHex("#183B37"),
+                    borderColor: Color3.fromHex("#376A63"),
+                    backgroundColor: Color3.fromHex("#C4DDD7"),
                 },
             },
 
             success: {
                 default: {
-                    textColor: Color3.fromHex("#75E0A7"),
-                    borderColor: Color3.fromHex("#258A56"),
-                    backgroundColor: Color3.fromHex("#237A4D"),
+                    textColor: Color3.fromHex("#2E6245"),
+                    borderColor: Color3.fromHex("#5B8A6A"),
+                    backgroundColor: Color3.fromHex("#DDEBDD"),
                 },
                 hover: {
-                    textColor: Color3.fromHex("#FFFFFF"),
-                    borderColor: Color3.fromHex("#42C982"),
-                    backgroundColor: Color3.fromHex("#2D965F"),
+                    textColor: Color3.fromHex("#214E35"),
+                    borderColor: Color3.fromHex("#467554"),
+                    backgroundColor: Color3.fromHex("#C9E0CB"),
                 },
             },
 
             danger: {
                 default: {
-                    textColor: Color3.fromHex("#FF8D8D"),
-                    borderColor: Color3.fromHex("#B93A3A"),
-                    backgroundColor: Color3.fromHex("#A63737"),
+                    textColor: Color3.fromHex("#8A3D3A"),
+                    borderColor: Color3.fromHex("#B46861"),
+                    backgroundColor: Color3.fromHex("#F2D9D5"),
                 },
                 hover: {
-                    textColor: Color3.fromHex("#FFFFFF"),
-                    borderColor: Color3.fromHex("#EB6262"),
-                    backgroundColor: Color3.fromHex("#C64646"),
+                    textColor: Color3.fromHex("#6F2D2B"),
+                    borderColor: Color3.fromHex("#9F504A"),
+                    backgroundColor: Color3.fromHex("#EBC5C0"),
                 },
             },
 
             warning: {
                 default: {
-                    textColor: Color3.fromHex("#FFD978"),
-                    borderColor: Color3.fromHex("#B68522"),
-                    backgroundColor: Color3.fromHex("#916B1D"),
+                    textColor: Color3.fromHex("#7A5721"),
+                    borderColor: Color3.fromHex("#C3994C"),
+                    backgroundColor: Color3.fromHex("#F5E8C8"),
                 },
                 hover: {
-                    textColor: Color3.fromHex("#FFF8E5"),
-                    borderColor: Color3.fromHex("#E0AD3E"),
-                    backgroundColor: Color3.fromHex("#AF8427"),
+                    textColor: Color3.fromHex("#644515"),
+                    borderColor: Color3.fromHex("#AA7E34"),
+                    backgroundColor: Color3.fromHex("#EED9A7"),
                 },
             },
 
             info: {
                 default: {
-                    textColor: Color3.fromHex("#8DD0FF"),
-                    borderColor: Color3.fromHex("#2F79B4"),
-                    backgroundColor: Color3.fromHex("#286D9F"),
+                    textColor: Color3.fromHex("#365F78"),
+                    borderColor: Color3.fromHex("#6F98AE"),
+                    backgroundColor: Color3.fromHex("#DDEAF0"),
                 },
                 hover: {
-                    textColor: Color3.fromHex("#FFFFFF"),
-                    borderColor: Color3.fromHex("#58ACE8"),
-                    backgroundColor: Color3.fromHex("#3487BE"),
+                    textColor: Color3.fromHex("#294A5D"),
+                    borderColor: Color3.fromHex("#578097"),
+                    backgroundColor: Color3.fromHex("#C8DDE7"),
                 },
             },
         },
@@ -94,9 +94,9 @@ export const DarkTheme: CleanTheme = {
     },
 
     radius: {
-        sm: 4,
-        md: 8,
-        lg: 12,
+        sm: 2,
+        md: 4,
+        lg: 8,
         default: "md",
     },
 
@@ -105,28 +105,28 @@ export const DarkTheme: CleanTheme = {
             font,
             weight: Enum.FontWeight.Bold,
             size: Enum.FontSize.Size48,
-            lineHeight: 1.1,
+            lineHeight: 1.05,
         },
         title: {
             font,
-            weight: Enum.FontWeight.Bold,
+            weight: Enum.FontWeight.SemiBold,
             size: Enum.FontSize.Size32,
-            lineHeight: 1.2,
+            lineHeight: 1.15,
         },
         heading: {
             font,
-            weight: Enum.FontWeight.Bold,
+            weight: Enum.FontWeight.SemiBold,
             size: Enum.FontSize.Size24,
-            lineHeight: 1.25,
+            lineHeight: 1.2,
         },
         body: {
             font,
             size: Enum.FontSize.Size18,
-            lineHeight: 1.4,
+            lineHeight: 1.45,
         },
         label: {
             font,
-            weight: Enum.FontWeight.Bold,
+            weight: Enum.FontWeight.SemiBold,
             size: Enum.FontSize.Size14,
             lineHeight: 1.2,
         },
@@ -147,91 +147,91 @@ export const DarkTheme: CleanTheme = {
 
     components: {
         scroller: {
-            barColor: Color3.fromHex("#697386"),
+            barColor: Color3.fromHex("#9B8B73"),
         },
 
         boxShadow: {
-            color: Color3.fromHex("#000000"),
-            transparency: 0.5,
+            color: Color3.fromHex("#4F4538"),
+            transparency: 0.82,
         },
 
         box: {
-            backgroundColor: Color3.fromHex("#1B1F27"),
+            backgroundColor: Color3.fromHex("#FFF9ED"),
             backgroundTransparency: 0,
-            borderColor: Color3.fromHex("#343B49"),
+            borderColor: Color3.fromHex("#D8CDBA"),
             borderThickness: 1,
-            cornerRadius: 8,
-            boxShadow: "2px 2px 8px 0px",
+            cornerRadius: 4,
+            boxShadow: "0px 3px 8px 0px",
         },
 
         button: {
             backgroundTransparency: 0,
             borderThickness: 1,
-            cornerRadius: 8,
+            cornerRadius: 4,
             intents: {
                 primary: {
                     default: {
-                        textColor: Color3.fromHex("#FFFFFF"),
+                        textColor: Color3.fromHex("#244F4A"),
                     },
                 },
                 success: {
                     default: {
-                        textColor: Color3.fromHex("#FFFFFF"),
+                        textColor: Color3.fromHex("#2E6245"),
                     },
                 },
                 info: {
                     default: {
-                        textColor: Color3.fromHex("#FFFFFF"),
+                        textColor: Color3.fromHex("#365F78"),
                     },
                 },
                 warning: {
                     default: {
-                        textColor: Color3.fromHex("#FFFFFF"),
+                        textColor: Color3.fromHex("#7A5721"),
                     },
                 },
                 danger: {
                     default: {
-                        textColor: Color3.fromHex("#FFFFFF"),
+                        textColor: Color3.fromHex("#8A3D3A"),
                     },
                 },
             },
         },
 
         input: {
-            borderColor: Color3.fromHex("#3A4352"),
+            borderColor: Color3.fromHex("#CDBFA8"),
             borderThickness: 1,
-            cornerRadius: 8,
+            cornerRadius: 4,
         },
 
         select: {
-            dropDownBackgroundColor: Color3.fromHex("#20252E"),
+            dropDownBackgroundColor: Color3.fromHex("#FFF9ED"),
             maxDropDownHeight: 200,
-            borderColor: Color3.fromHex("#3A4352"),
+            borderColor: Color3.fromHex("#CDBFA8"),
             borderThickness: 1,
-            cornerRadius: 8,
+            cornerRadius: 4,
             intents: {
                 primary: {
                     default: {
-                        textColor: Color3.fromHex("#E8EDF8"),
-                        backgroundColor: Color3.fromHex("#20252E"),
+                        textColor: Color3.fromHex("#4A4034"),
+                        backgroundColor: Color3.fromHex("#FFF9ED"),
                     },
                     hover: {
-                        textColor: Color3.fromHex("#FFFFFF"),
-                        backgroundColor: Color3.fromHex("#2B3340"),
+                        textColor: Color3.fromHex("#244F4A"),
+                        backgroundColor: Color3.fromHex("#E7F0EB"),
                     },
                     focus: {
                         textColor: Color3.fromHex("#FFFFFF"),
-                        backgroundColor: Color3.fromHex("#365FAF"),
-                        borderColor: Color3.fromHex("#6B96F0"),
+                        borderColor: Color3.fromHex("#376A63"),
+                        backgroundColor: Color3.fromHex("#4E8179"),
                     },
                 },
             },
         },
 
         checkbox: {
-            borderColor: Color3.fromHex("#3A4352"),
+            borderColor: Color3.fromHex("#CDBFA8"),
             borderThickness: 1,
-            cornerRadius: 8,
+            cornerRadius: 4,
             spacing: {
                 xs: 1,
                 sm: 2,
@@ -242,15 +242,15 @@ export const DarkTheme: CleanTheme = {
         },
 
         tabs: {
-            borderColor: Color3.fromHex("#343B49"),
-            backgroundColor: Color3.fromHex("#1B1F27"),
+            borderColor: Color3.fromHex("#D8CDBA"),
+            backgroundColor: Color3.fromHex("#FFF9ED"),
             borderThickness: 1,
             cornerRadius: 4,
 
             list: {
-                backgroundColor: Color3.fromHex("#14181F"),
+                backgroundColor: Color3.fromHex("#EFE5D3"),
                 borderThickness: 0,
-                cornerRadius: 8,
+                cornerRadius: 2,
                 spacing: {
                     xs: 2,
                     sm: 4,
@@ -262,7 +262,7 @@ export const DarkTheme: CleanTheme = {
 
             button: {
                 borderThickness: 0,
-                cornerRadius: 4,
+                cornerRadius: 2,
                 spacing: {
                     xs: 1,
                     sm: 2,
@@ -274,19 +274,19 @@ export const DarkTheme: CleanTheme = {
                     primary: {
                         default: {
                             backgroundTransparency: 1,
-                            textColor: Color3.fromHex("#AAB3C2"),
+                            textColor: Color3.fromHex("#746754"),
                         },
                         hover: {
                             backgroundTransparency: 1,
-                            textColor: Color3.fromHex("#FFFFFF"),
+                            textColor: Color3.fromHex("#244F4A"),
                         },
                         focus: {
-                            textColor: Color3.fromHex("#FFFFFF"),
-                            backgroundColor: Color3.fromHex("#2A303B"),
+                            textColor: Color3.fromHex("#244F4A"),
+                            backgroundColor: Color3.fromHex("#FFF9ED"),
                             backgroundTransparency: 0,
-                            boxShadow: "2px 2px 6px 0px",
+                            boxShadow: "0px 2px 5px 0px",
                             typography: {
-                                weight: Enum.FontWeight.Bold,
+                                weight: Enum.FontWeight.SemiBold,
                             },
                         },
                     },

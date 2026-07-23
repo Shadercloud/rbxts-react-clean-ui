@@ -7,10 +7,7 @@ end
 for _k, _v in TS.import(script, script, "DefaultIcons") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "themes", "dark.theme") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "themes", "default.theme") or {} do
+for _k, _v in TS.import(script, script, "themes") or {} do
 	exports[_k] = _v
 end
 return exports
