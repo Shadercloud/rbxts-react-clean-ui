@@ -48,14 +48,12 @@ function ButtonText(props: ButtonTextProps) {
                 theme.components.button.typography
             )}
             TextColor3={
-                ColorHelper.getIntentColor(
+                ColorHelper.getIntentColors(
                     theme,
                     props.intent,
-                    "text",
+                    "default",
                     theme.components.button.intents,
-                    undefined,
-                    theme.components.button.textColor
-                )
+                ).textColor
             } />
     );
 }
@@ -71,14 +69,12 @@ function ButtonIcon(props: ButtonIconProps) {
         spinning={props.spinning}
         speed={props.speed}
         color={
-            ColorHelper.getIntentColor(
+            ColorHelper.getIntentColors(
                 theme,
                 props.intent,
-                "text",
+                "default",
                 theme.components.button.intents,
-                undefined,
-                theme.components.button.textColor
-            )
+            ).textColor
 
         } />
 }
@@ -116,13 +112,12 @@ function ButtonRender(props: ButtonProps) {
                 props.BackgroundTransparency ??
                 theme.components.button.backgroundTransparency
             }
-            BackgroundColor3={ColorHelper.getIntentColor(
+            BackgroundColor3={ColorHelper.getIntentColors(
                 theme,
                 props.intent,
-                hover ? "hover" : "background",
+                hover ? "hover" : "default",
                 theme.components.button.intents,
-                props.BackgroundColor3,
-            )}
+            ).backgroundColor}
             AutoButtonColor={false}
             ZIndex={props.ZIndex}
         >
@@ -131,12 +126,12 @@ function ButtonRender(props: ButtonProps) {
             <uistroke
                 Thickness={theme.components.button.borderThickness}
                 BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-                Color={ColorHelper.getIntentColor(
+                Color={ColorHelper.getIntentColors(
                     theme,
                     props.intent,
-                    "border",
+                    "default",
                     theme.components.button.intents,
-                )}
+                ).borderColor}
             />
 
             <BoxShadow {...props} value={theme.components.button.boxShadow} />
@@ -148,6 +143,7 @@ function ButtonRender(props: ButtonProps) {
                         {props.icon !== undefined &&
                             <ButtonIcon
                                 scale={props.scale}
+                                intent={props.intent}
                                 icon={props.icon} />
                         }
                         {props.text !== undefined &&

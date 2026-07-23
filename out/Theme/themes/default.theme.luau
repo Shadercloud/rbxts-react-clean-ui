@@ -4,45 +4,64 @@ local DefaultTheme = {
 	colors = {
 		intents = {
 			primary = {
-				text = Color3.fromHex("#1D2433"),
-				textMuted = Color3.fromHex("#6F7785"),
-				background = Color3.fromHex("#FFFFFF"),
-				hover = Color3.fromHex("#477FE8"),
-				pressed = Color3.fromHex("#285BBE"),
-				foreground = Color3.fromHex("#FFFFFF"),
-				border = Color3.fromHex("#D9DEE8"),
+				default = {
+					textColor = Color3.fromHex("#1D2433"),
+					borderColor = Color3.fromHex("#D9DEE8"),
+					backgroundColor = Color3.fromHex("#FFFFFF"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#477FE8"),
+					borderColor = Color3.fromHex("#D9DEE8"),
+					backgroundColor = Color3.fromHex("F5F5F5"),
+				},
 			},
 			success = {
-				text = Color3.fromHex("#2E9D63"),
-				background = Color3.fromHex("#2E9D63"),
-				hover = Color3.fromHex("#38AC70"),
-				pressed = Color3.fromHex("#237D4D"),
-				foreground = Color3.fromHex("#FFFFFF"),
-				border = Color3.fromHex("#237D4D"),
+				default = {
+					textColor = Color3.fromHex("#2E9D63"),
+					borderColor = Color3.fromHex("#237D4D"),
+					backgroundColor = Color3.fromHex("#2E9D63"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#38AC70"),
+					borderColor = Color3.fromHex("#237D4D"),
+					backgroundColor = Color3.fromHex("#1f824e"),
+				},
 			},
 			danger = {
-				text = Color3.fromHex("#D64545"),
-				background = Color3.fromHex("#D64545"),
-				hover = Color3.fromHex("#E05252"),
-				pressed = Color3.fromHex("#B53535"),
-				foreground = Color3.fromHex("#FFFFFF"),
-				border = Color3.fromHex("#B53535"),
+				default = {
+					textColor = Color3.fromHex("#D64545"),
+					borderColor = Color3.fromHex("#B53535"),
+					backgroundColor = Color3.fromHex("#D64545"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#E05252"),
+					borderColor = Color3.fromHex("#D64545"),
+					backgroundColor = Color3.fromHex("#b03131"),
+				},
 			},
 			warning = {
-				text = Color3.fromHex("#E7A92F"),
-				background = Color3.fromHex("#E7A92F"),
-				hover = Color3.fromHex("#F0B640"),
-				pressed = Color3.fromHex("#C58B1D"),
-				foreground = Color3.fromHex("#1D2433"),
-				border = Color3.fromHex("#C58B1D"),
+				default = {
+					textColor = Color3.fromHex("#E7A92F"),
+					borderColor = Color3.fromHex("#C58B1D"),
+					backgroundColor = Color3.fromHex("#E7A92F"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#F0B640"),
+					borderColor = Color3.fromHex("#C58B1D"),
+					backgroundColor = Color3.fromHex("#bf8a22"),
+				},
 			},
 			info = {
-				text = Color3.fromHex("#3187C8"),
-				background = Color3.fromHex("#3187C8"),
-				hover = Color3.fromHex("#4097D8"),
-				pressed = Color3.fromHex("#266CA2"),
-				foreground = Color3.fromHex("#FFFFFF"),
-				border = Color3.fromHex("#266CA2"),
+				default = {
+					textColor = Color3.fromHex("#3187C8"),
+					borderColor = Color3.fromHex("#266CA2"),
+					backgroundColor = Color3.fromHex("#3187C8"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#4097D8"),
+					borderColor = Color3.fromHex("#266CA2"),
+					backgroundColor = Color3.fromHex("#2977b3"),
+				},
 			},
 		},
 	},
@@ -130,14 +149,34 @@ local DefaultTheme = {
 			boxShadow = "2px 2px 2px 2px",
 		},
 		button = {
-			textColor = Color3.fromHex("#FFFFFF"),
 			backgroundTransparency = 0,
 			borderThickness = 1,
 			cornerRadius = 8,
 			intents = {
 				primary = {
-					text = Color3.fromHex("#1D2433"),
-					hover = Color3.fromHex("#CCCCCC"),
+					default = {
+						textColor = Color3.fromHex("#1D2433"),
+					},
+				},
+				success = {
+					default = {
+						textColor = Color3.fromHex("#FFFFFF"),
+					},
+				},
+				info = {
+					default = {
+						textColor = Color3.fromHex("#FFFFFF"),
+					},
+				},
+				warning = {
+					default = {
+						textColor = Color3.fromHex("#FFFFFF"),
+					},
+				},
+				danger = {
+					default = {
+						textColor = Color3.fromHex("#FFFFFF"),
+					},
 				},
 			},
 		},
@@ -154,8 +193,17 @@ local DefaultTheme = {
 			cornerRadius = 8,
 			intents = {
 				primary = {
-					text = Color3.fromHex("#1D2433"),
-					hover = Color3.fromHex("#CCCCCC"),
+					default = {
+						textColor = Color3.fromHex("#1D2433"),
+					},
+					hover = {
+						textColor = Color3.fromHex("#000000"),
+						backgroundColor = Color3.fromHex("#CCCCCC"),
+					},
+					focus = {
+						textColor = Color3.fromHex("#FFFFFF"),
+						backgroundColor = Color3.fromHex("#3187C8"),
+					},
 				},
 			},
 		},
@@ -169,6 +217,56 @@ local DefaultTheme = {
 				md = 4,
 				lg = 6,
 				xl = 8,
+			},
+		},
+		tabs = {
+			borderColor = Color3.fromHex("#D9DEE8"),
+			backgroundColor = Color3.fromHex("#FFFFFF"),
+			borderThickness = 1,
+			cornerRadius = 4,
+			list = {
+				backgroundColor = Color3.fromHex("#F5F5F5"),
+				borderThickness = 0,
+				cornerRadius = 8,
+				spacing = {
+					xs = 2,
+					sm = 4,
+					md = 6,
+					lg = 8,
+					xl = 12,
+				},
+			},
+			button = {
+				borderThickness = 0,
+				cornerRadius = 4,
+				spacing = {
+					xs = 1,
+					sm = 2,
+					md = 4,
+					lg = 6,
+					xl = 8,
+				},
+				intents = {
+					primary = {
+						default = {
+							backgroundTransparency = 1,
+							textColor = Color3.fromHex("#4f4f4f"),
+						},
+						hover = {
+							backgroundTransparency = 1,
+							textColor = Color3.fromHex("#000000"),
+						},
+						focus = {
+							textColor = Color3.fromHex("#000000"),
+							backgroundColor = Color3.fromHex("#FFFFFF"),
+							backgroundTransparency = 0,
+							boxShadow = "2px 2px 2px 2px",
+							typography = {
+								weight = Enum.FontWeight.Bold,
+							},
+						},
+					},
+				},
 			},
 		},
 	},

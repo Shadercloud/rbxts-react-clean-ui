@@ -13,6 +13,9 @@ end
 for _k, _v in TS.import(script, script, "FlexItem") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "Group") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "HStack") or {} do
 	exports[_k] = _v
 end
@@ -22,10 +25,10 @@ end
 for _k, _v in TS.import(script, script, "Scroller") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "VStack") or {} do
+for _k, _v in TS.import(script, script, "Tabs") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "Group") or {} do
+for _k, _v in TS.import(script, script, "VStack") or {} do
 	exports[_k] = _v
 end
 return exports

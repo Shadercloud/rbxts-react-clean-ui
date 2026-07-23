@@ -31,7 +31,7 @@ export class Text extends Component<TextProps> {
             LineHeight={style.lineHeight}
             BackgroundTransparency={1}
             TextXAlignment={this.props.align ?? (this.props.TextXAlignment ?? Enum.TextXAlignment.Left)}
-            TextColor3={this.props.TextColor3 ?? this.context.colors.intents.primary.text}
+            TextColor3={this.props.TextColor3 ?? this.context.colors.intents.primary.default.textColor}
             Text={this.props.text}
             TextWrap={this.props.TextWrap === undefined || this.props.TextWrap === true}
             FontFace={Font.fromName(style.font.Name, weight)}

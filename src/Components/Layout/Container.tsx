@@ -9,6 +9,7 @@ interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexE
     group?: boolean;
     children?: React.ReactNode;
     Change?: React.InstanceChangeEvent<Frame> | undefined
+    ClipsDescendants?: boolean;
 }
 
 export function Container(props: ContainerProps) {
@@ -23,6 +24,7 @@ export function Container(props: ContainerProps) {
         BackgroundColor3={props.BackgroundColor3}
         ZIndex={props.ZIndex}
         Change={props.Change}
+        ClipsDescendants={props.ClipsDescendants}
     >
         <Group.Element enabled={props.group}>
             {props.children}

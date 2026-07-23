@@ -4,6 +4,12 @@ local exports = {}
 for _k, _v in TS.import(script, script, "Button") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "Checkbox") or {} do
+	exports[_k] = _v
+end
+for _k, _v in TS.import(script, script, "HoverButton") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "Input") or {} do
 	exports[_k] = _v
 end

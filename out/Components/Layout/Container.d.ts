@@ -6,6 +6,7 @@ interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexE
     group?: boolean;
     children?: React.ReactNode;
     Change?: React.InstanceChangeEvent<Frame> | undefined;
+    ClipsDescendants?: boolean;
 }
 export declare function Container(props: ContainerProps): React.JSX.Element;
 export {};

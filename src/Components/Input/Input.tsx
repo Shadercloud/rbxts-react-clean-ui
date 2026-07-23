@@ -72,7 +72,7 @@ export function Input(props: InputProps) {
                 TextScaled={props.TextScaled}
                 LineHeight={typography.lineHeight}
                 Text={value}
-                TextColor3={props.TextColor3 ?? theme.colors.intents.primary.text}
+                TextColor3={props.TextColor3 ?? theme.colors.intents.primary.default.textColor}
                 ClearTextOnFocus={false}
                 Event={props.Event}
                 Change={{

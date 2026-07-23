@@ -6,7 +6,7 @@ interface FlexItemProps {
     mode?: Enum.UIFlexMode | "Grow" | "None" | "Shrink" | "Fill" | "Custom" | Binding<Enum.UIFlexMode>
     GrowRatio?: number;
     ShrinkRatio?: number;
-    
+
 }
 
 export function FlexItem(props: FlexItemProps) {

@@ -64,7 +64,7 @@ local function Input(props)
 	_attributes_1.TextScaled = props.TextScaled
 	_attributes_1.LineHeight = typography.lineHeight
 	_attributes_1.Text = value
-	_attributes_1.TextColor3 = props.TextColor3 or theme.colors.intents.primary.text
+	_attributes_1.TextColor3 = props.TextColor3 or theme.colors.intents.primary.default.textColor
 	_attributes_1.ClearTextOnFocus = false
 	_attributes_1.Event = props.Event
 	_attributes_1.Change = {

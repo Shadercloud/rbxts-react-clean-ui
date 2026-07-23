@@ -98,17 +98,21 @@ function SelectOption(props: SelectOptionProps) {
             Size={new UDim2(1, 0, 0, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
             BackgroundTransparency={0}
-            BackgroundColor3={ColorHelper.getIntentColor(
+            BackgroundColor3={ColorHelper.getIntentColors(
                 theme,
-                context.selected === props.index ? "info" : "primary",
-                hover || context.selected === props.index ? "hover" : "background",
+                "primary",
+                context.selected === props.index ? "focus" : hover ? "hover" : "default",
                 theme.components.select.intents,
-                props.BackgroundColor3,
-            )}
+            ).backgroundColor}
             AutoButtonColor={false}
         >
             <Padding {...props} />
-            {props.text !== undefined && props.children === undefined && <Text text={props.text} />}
+            {props.text !== undefined && props.children === undefined && <Text text={props.text} TextColor3={ColorHelper.getIntentColors(
+                theme,
+                "primary",
+                context.selected === props.index ? "focus" : hover ? "hover" : "default",
+                theme.components.select.intents,
+            ).textColor} />}
             {props.children}
         </imagebutton>
 
@@ -224,7 +228,7 @@ function SelectRenderer(props: SelectProps) {
                         typography={typography}
                     />
                 </FlexItem>
-                <Icon icon="caret-down" color={theme.colors.intents.primary.text} />
+                <Icon icon="caret-down" color={theme.colors.intents.primary.default.textColor} />
             </HStack>
 
             {context.open &&

@@ -9,7 +9,7 @@ interface HStackProps extends SpacedElementProps {
     Wraps?: boolean;
     HorizontalFlex?: Enum.UIFlexAlignment;
     Event?: React.InstanceEvent<UIListLayout>;
-    Change?: React.InstanceChangeEvent<UIListLayout>;
+     Change?: React.InstanceChangeEvent<UIListLayout>;
 }
 
 export function HStack(props: HStackProps) {

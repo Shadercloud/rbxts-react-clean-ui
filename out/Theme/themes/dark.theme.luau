@@ -4,45 +4,64 @@ local DarkTheme = {
 	colors = {
 		intents = {
 			primary = {
-				text = Color3.fromHex("#E8EDF8"),
-				textMuted = Color3.fromHex("#A7B1C2"),
-				background = Color3.fromHex("#4B7BE5"),
-				hover = Color3.fromHex("#5B8AF0"),
-				pressed = Color3.fromHex("#3A69D0"),
-				foreground = Color3.fromHex("#FFFFFF"),
-				border = Color3.fromHex("#5A8BF0"),
+				default = {
+					textColor = Color3.fromHex("#E8EDF8"),
+					borderColor = Color3.fromHex("#5A8BF0"),
+					backgroundColor = Color3.fromHex("#4B7BE5"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#5B8AF0"),
+					borderColor = Color3.fromHex("#5A8BF0"),
+					backgroundColor = Color3.fromHex("#4B7BE5"),
+				},
 			},
 			success = {
-				text = Color3.fromHex("#52D98A"),
-				background = Color3.fromHex("#2FA96A"),
-				hover = Color3.fromHex("#3AB979"),
-				pressed = Color3.fromHex("#258A56"),
-				foreground = Color3.fromHex("#FFFFFF"),
-				border = Color3.fromHex("#258A56"),
+				default = {
+					textColor = Color3.fromHex("#52D98A"),
+					borderColor = Color3.fromHex("#258A56"),
+					backgroundColor = Color3.fromHex("#2FA96A"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#3AB979"),
+					borderColor = Color3.fromHex("#258A56"),
+					backgroundColor = Color3.fromHex("#2FA96A"),
+				},
 			},
 			danger = {
-				text = Color3.fromHex("#FF7A7A"),
-				background = Color3.fromHex("#D94B4B"),
-				hover = Color3.fromHex("#E55A5A"),
-				pressed = Color3.fromHex("#B93A3A"),
-				foreground = Color3.fromHex("#FFFFFF"),
-				border = Color3.fromHex("#B93A3A"),
+				default = {
+					textColor = Color3.fromHex("#FF7A7A"),
+					borderColor = Color3.fromHex("#B93A3A"),
+					backgroundColor = Color3.fromHex("#D94B4B"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#E55A5A"),
+					borderColor = Color3.fromHex("#B93A3A"),
+					backgroundColor = Color3.fromHex("#D94B4B"),
+				},
 			},
 			warning = {
-				text = Color3.fromHex("#FFD46B"),
-				background = Color3.fromHex("#D9A531"),
-				hover = Color3.fromHex("#E8B53F"),
-				pressed = Color3.fromHex("#B68522"),
-				foreground = Color3.fromHex("#1A1A1A"),
-				border = Color3.fromHex("#B68522"),
+				default = {
+					textColor = Color3.fromHex("#FFD46B"),
+					borderColor = Color3.fromHex("#B68522"),
+					backgroundColor = Color3.fromHex("#D9A531"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#E8B53F"),
+					borderColor = Color3.fromHex("#B68522"),
+					backgroundColor = Color3.fromHex("#D9A531"),
+				},
 			},
 			info = {
-				text = Color3.fromHex("#7CC6FF"),
-				background = Color3.fromHex("#3C92D6"),
-				hover = Color3.fromHex("#4EA2E4"),
-				pressed = Color3.fromHex("#2F79B4"),
-				foreground = Color3.fromHex("#FFFFFF"),
-				border = Color3.fromHex("#2F79B4"),
+				default = {
+					textColor = Color3.fromHex("#7CC6FF"),
+					borderColor = Color3.fromHex("#2F79B4"),
+					backgroundColor = Color3.fromHex("#3C92D6"),
+				},
+				hover = {
+					textColor = Color3.fromHex("#4EA2E4"),
+					borderColor = Color3.fromHex("#2F79B4"),
+					backgroundColor = Color3.fromHex("#3C92D6"),
+				},
 			},
 		},
 	},
@@ -130,7 +149,6 @@ local DarkTheme = {
 			boxShadow = "2px 2px 8px 0px",
 		},
 		button = {
-			textColor = Color3.fromHex("#FFFFFF"),
 			backgroundTransparency = 0,
 			borderThickness = 1,
 			cornerRadius = 8,
@@ -151,6 +169,36 @@ local DarkTheme = {
 			borderColor = Color3.fromHex("#353C49"),
 			borderThickness = 1,
 			cornerRadius = 8,
+		},
+		tabs = {
+			borderColor = Color3.fromHex("#D9DEE8"),
+			backgroundColor = Color3.fromHex("#FFFFFF"),
+			borderThickness = 0,
+			cornerRadius = 0,
+			list = {
+				backgroundColor = Color3.fromHex("#D9DEE8"),
+				borderThickness = 0,
+				cornerRadius = 8,
+			},
+			button = {
+				borderThickness = 0,
+				cornerRadius = 4,
+				intents = {
+					primary = {
+						default = {
+							backgroundColor = Color3.fromHex("#D9DEE8"),
+						},
+						hover = {
+							backgroundColor = Color3.fromHex("#FFFFFF"),
+							textColor = Color3.fromHex("#000000"),
+						},
+						focus = {
+							textColor = Color3.fromHex("#000000"),
+							backgroundColor = Color3.fromHex("#D9DEE8"),
+						},
+					},
+				},
+			},
 		},
 	},
 	icons = {},

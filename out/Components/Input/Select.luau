@@ -68,12 +68,13 @@ local function SelectOption(props)
 	_attributes.Size = UDim2.new(1, 0, 0, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes.BackgroundTransparency = 0
-	_attributes.BackgroundColor3 = ColorHelper:getIntentColor(theme, if context.selected == props.index then "info" else "primary", if hover or context.selected == props.index then "hover" else "background", theme.components.select.intents, props.BackgroundColor3)
+	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, "primary", if context.selected == props.index then "focus" elseif hover then "hover" else "default", theme.components.select.intents).backgroundColor
 	_attributes.AutoButtonColor = false
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	return React.createElement("imagebutton", _attributes, React.createElement(Padding, _attributes_1), props.text ~= nil and props.children == nil and React.createElement(Text, {
 		text = props.text,
+		TextColor3 = ColorHelper:getIntentColors(theme, "primary", if context.selected == props.index then "focus" elseif hover then "hover" else "default", theme.components.select.intents).textColor,
 	}), props.children)
 end
 local function ActivateSelect(context, overlay)
@@ -155,7 +156,7 @@ local function SelectRenderer(props)
 	_attributes_1.typography = typography
 	local _exp_3 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_1)), React.createElement(Icon, {
 		icon = "caret-down",
-		color = theme.colors.intents.primary.text,
+		color = theme.colors.intents.primary.default.textColor,
 	}))
 	local _condition_1 = context.open and overlay.overlay ~= nil
 	if _condition_1 then

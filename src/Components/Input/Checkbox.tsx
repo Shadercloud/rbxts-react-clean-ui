@@ -52,25 +52,24 @@ export function Checkbox(props: CheckboxProps) {
             props.BackgroundTransparency ??
             theme.components.button.backgroundTransparency
         }
-        BackgroundColor3={ColorHelper.getIntentColor(
+        BackgroundColor3={ColorHelper.getIntentColors(
             theme,
             props.intent,
-            "background",
+            "default",
             theme.components.button.intents,
-            props.BackgroundColor3,
-        )}
+        ).backgroundColor}
         AutoButtonColor={false}
     >
         <Corners radius={theme.components.checkbox.cornerRadius} />
         <uistroke
             Thickness={theme.components.button.borderThickness}
             BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-            Color={ColorHelper.getIntentColor(
+            Color={ColorHelper.getIntentColors(
                 theme,
                 checked ? props['intent-checked'] ?? "success" : props['intent-unchecked'] ?? "primary",
-                "border",
+                "default",
                 theme.components.checkbox.intents,
-            )}
+            ).borderColor}
         />
 
 
@@ -79,13 +78,12 @@ export function Checkbox(props: CheckboxProps) {
             scale={props.scale}
             icon={checked ? props['icon-checked'] ?? "check" : props['icon-unchecked']}
             color={
-                ColorHelper.getIntentColor(
+                ColorHelper.getIntentColors(
                     theme,
                     checked ? props['intent-checked'] ?? "success" : props['intent-unchecked'] ?? "primary",
-                    "text",
+                    "default",
                     theme.components.checkbox.intents,
-                    props.BackgroundColor3,
-                )
+                ).textColor
             } />
     </imagebutton>
 

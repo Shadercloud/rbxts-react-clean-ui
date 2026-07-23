@@ -24,7 +24,7 @@ local function ButtonText(props)
 	return React.createElement(Text, {
 		text = props.text,
 		typography = TypographyHelper:getTypography(theme, props.scale, theme.components.button.typography),
-		TextColor3 = ColorHelper:getIntentColor(theme, props.intent, "text", theme.components.button.intents, nil, theme.components.button.textColor),
+		TextColor3 = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).textColor,
 	})
 end
 local function ButtonIcon(props)
@@ -34,7 +34,7 @@ local function ButtonIcon(props)
 		icon = props.icon,
 		spinning = props.spinning,
 		speed = props.speed,
-		color = ColorHelper:getIntentColor(theme, props.intent, "text", theme.components.button.intents, nil, theme.components.button.textColor),
+		color = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).textColor,
 	})
 end
 local function ButtonRender(props)
@@ -95,7 +95,7 @@ local function ButtonRender(props)
 		_condition = theme.components.button.backgroundTransparency
 	end
 	_attributes.BackgroundTransparency = _condition
-	_attributes.BackgroundColor3 = ColorHelper:getIntentColor(theme, props.intent, if hover then "hover" else "background", theme.components.button.intents, props.BackgroundColor3)
+	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, props.intent, if hover then "hover" else "default", theme.components.button.intents).backgroundColor
 	_attributes.AutoButtonColor = false
 	_attributes.ZIndex = props.ZIndex
 	local _exp = React.createElement(Corners, {
@@ -104,7 +104,7 @@ local function ButtonRender(props)
 	local _exp_1 = React.createElement("uistroke", {
 		Thickness = theme.components.button.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-		Color = ColorHelper:getIntentColor(theme, props.intent, "border", theme.components.button.intents),
+		Color = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).borderColor,
 	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
@@ -120,6 +120,7 @@ local function ButtonRender(props)
 		spacing = props.spacing,
 	}, props.icon ~= nil and React.createElement(ButtonIcon, {
 		scale = props.scale,
+		intent = props.intent,
 		icon = props.icon,
 	}), props.text ~= nil and React.createElement(ButtonText, {
 		text = props.text,

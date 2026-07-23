@@ -45,6 +45,7 @@ export function Scroller(props: ScrollerProps) {
     const spacing = SpacingHelper.GetPadding(theme, props.spacing)
 
     return (
+
         <scrollingframe
             ref={ref}
             AnchorPoint={SizeHelper.GetAnchor(props)}
@@ -60,6 +61,8 @@ export function Scroller(props: ScrollerProps) {
             VerticalScrollBarInset={Enum.ScrollBarInset.ScrollBar}
             AutomaticCanvasSize={Enum.AutomaticSize.Y}
         >
+            { /* Need this for the automaticSize of the parent to work (weird Roblox thing) */}
+            <uilistlayout FillDirection={Enum.FillDirection.Horizontal} />
             <frame
                 Size={new UDim2(1, isScrolling ? -thickness - (spacing) : 0, 0, 0)}
                 AutomaticSize={Enum.AutomaticSize.Y}

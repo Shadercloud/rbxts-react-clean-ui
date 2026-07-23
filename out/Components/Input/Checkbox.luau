@@ -58,20 +58,20 @@ local function Checkbox(props)
 		_condition_1 = theme.components.button.backgroundTransparency
 	end
 	_attributes.BackgroundTransparency = _condition_1
-	_attributes.BackgroundColor3 = ColorHelper:getIntentColor(theme, props.intent, "background", theme.components.button.intents, props.BackgroundColor3)
+	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).backgroundColor
 	_attributes.AutoButtonColor = false
 	return React.createElement("imagebutton", _attributes, React.createElement(Corners, {
 		radius = theme.components.checkbox.cornerRadius,
 	}), React.createElement("uistroke", {
 		Thickness = theme.components.button.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-		Color = ColorHelper:getIntentColor(theme, if checked then props["intent-checked"] or "success" else props["intent-unchecked"] or "primary", "border", theme.components.checkbox.intents),
+		Color = ColorHelper:getIntentColors(theme, if checked then props["intent-checked"] or "success" else props["intent-unchecked"] or "primary", "default", theme.components.checkbox.intents).borderColor,
 	}), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.checkbox.spacing),
 	}), React.createElement(Icon, {
 		scale = props.scale,
 		icon = if checked then props["icon-checked"] or "check" else props["icon-unchecked"],
-		color = ColorHelper:getIntentColor(theme, if checked then props["intent-checked"] or "success" else props["intent-unchecked"] or "primary", "text", theme.components.checkbox.intents, props.BackgroundColor3),
+		color = ColorHelper:getIntentColors(theme, if checked then props["intent-checked"] or "success" else props["intent-unchecked"] or "primary", "default", theme.components.checkbox.intents).textColor,
 	}))
 end
 return {

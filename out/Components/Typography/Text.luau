@@ -31,7 +31,7 @@ do
 			LineHeight = style.lineHeight,
 			BackgroundTransparency = 1,
 			TextXAlignment = self.props.align or (self.props.TextXAlignment or Enum.TextXAlignment.Left),
-			TextColor3 = self.props.TextColor3 or self.context.colors.intents.primary.text,
+			TextColor3 = self.props.TextColor3 or self.context.colors.intents.primary.default.textColor,
 			Text = self.props.text,
 			TextWrap = self.props.TextWrap == nil or self.props.TextWrap == true,
 			FontFace = Font.fromName(style.font.Name, weight),

@@ -1,4 +1,4 @@
-import { CssShadow, CssSize, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant } from "../Interfaces/";
+import { CssShadow, CssSize, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, ButtonFlag } from "../Interfaces/";
 export interface TypographyStyle {
     font: Enum.Font;
     size: Enum.FontSize;
@@ -6,16 +6,22 @@ export interface TypographyStyle {
     lineHeight?: number;
 }
 export type ScaledTypographyStyle = Partial<Record<ScaleSize, Partial<TypographyStyle>>>;
-export interface IntentColors {
-    text: Color3;
-    textMuted?: Color3;
-    background: Color3;
-    hover: Color3;
-    pressed: Color3;
-    foreground: Color3;
-    border: Color3;
+export interface IntentScheme {
+    textColor: Color3;
+    backgroundColor: Color3;
+    borderColor: Color3;
+    backgroundTransparency?: number;
+    boxShadow?: CssShadow;
+    typography?: Partial<TypographyStyle>;
 }
-export type InlineIntentColors = Partial<IntentColors>;
+export interface IntentColors extends Partial<Record<ButtonFlag, IntentScheme>> {
+    default: IntentScheme;
+    hover?: IntentScheme;
+    focus?: IntentScheme;
+}
+export type InlineIntentColors = {
+    [State in keyof IntentColors]?: Partial<NonNullable<IntentColors[State]>>;
+};
 export interface CleanTheme {
     colors: {
         intents: Record<Intent, IntentColors>;
@@ -59,7 +65,6 @@ export interface CleanTheme {
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
         button: {
-            textColor?: Color3;
             backgroundTransparency: number;
             cornerRadius: CssSize;
             boxShadow?: CssShadow;
@@ -88,6 +93,28 @@ export interface CleanTheme {
             cornerRadius: CssSize;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
             spacing?: ScaleSizeValue<number>;
+        };
+        tabs: {
+            borderColor: Color3;
+            backgroundColor: Color3;
+            borderThickness: number;
+            cornerRadius: CssSize;
+            spacing?: ScaleSizeValue<number>;
+            list: {
+                borderColor?: Color3;
+                backgroundColor?: Color3;
+                borderThickness: number;
+                cornerRadius: CssSize;
+                spacing?: ScaleSizeValue<number>;
+            };
+            button: {
+                borderThickness: number;
+                cornerRadius: CssSize;
+                spacing?: ScaleSizeValue<number>;
+                boxShadow?: CssShadow;
+                typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+            };
         };
     };
     icons: Partial<IconSet>;

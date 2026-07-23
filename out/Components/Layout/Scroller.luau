@@ -41,7 +41,9 @@ local function Scroller(props)
 		ScrollBarThickness = thickness,
 		VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
 		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-	}, React.createElement("frame", {
+	}, React.createElement("uilistlayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+	}), React.createElement("frame", {
 		Size = UDim2.new(1, if isScrolling then -thickness - spacing else 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,

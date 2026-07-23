@@ -1,5 +1,6 @@
 import { Binding } from "@rbxts/react";
 import { IconName } from "./icon";
+export type ButtonFlag = "default" | "hover" | "focus";
 export type CssUnit = "px" | "%";
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl";
 export declare const ScaleSizes: readonly ["xs", "sm", "md", "lg", "xl"];

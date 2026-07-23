@@ -38,6 +38,7 @@ local function Container(props)
 	_attributes.BackgroundColor3 = props.BackgroundColor3
 	_attributes.ZIndex = props.ZIndex
 	_attributes.Change = props.Change
+	_attributes.ClipsDescendants = props.ClipsDescendants
 	return React.createElement("frame", _attributes, React.createElement(Group.Element, {
 		enabled = props.group,
 	}, props.children))
