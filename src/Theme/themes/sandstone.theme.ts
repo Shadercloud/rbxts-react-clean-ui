@@ -293,6 +293,15 @@ export const SandstoneTheme: CleanTheme = {
                 },
             },
         },
+        draggable: {
+            placeholder: {
+                backgroundColor: Color3.fromHex("#D9DEE8"),
+                backgroundTransparency: 0.5,
+                borderColor: Color3.fromHex("#D9DEE8"),
+                borderThickness: 1,
+                cornerRadius: 8,
+            }
+        }
     },
 
     icons: {

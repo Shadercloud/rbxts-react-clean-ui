@@ -3,6 +3,7 @@ import ReactRoblox from "@rbxts/react-roblox";
 import { DarkTheme, DefaultTheme, SandstoneTheme } from "../Theme";
 import { InferProps, Choose } from "@rbxts/ui-labs";
 import { OverlayProvider, ThemeProvider } from "../Providers/";
+import { RegistryProvider } from "../Providers/registry.provider";
 
 const controls = {
     Theme: Choose(["Default", "Dark", "Sandstone"]),
@@ -27,11 +28,13 @@ export function createStory(
 
 
             return (
-                <ThemeProvider theme={theme}>
-                    <OverlayProvider>
-                        {render(props)}
-                    </OverlayProvider>
-                </ThemeProvider>
+                <RegistryProvider>
+                    <ThemeProvider theme={theme}>
+                        <OverlayProvider>
+                            {render(props)}
+                        </OverlayProvider>
+                    </ThemeProvider>
+                </RegistryProvider>
             );
         },
     };

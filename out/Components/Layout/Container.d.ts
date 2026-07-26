@@ -1,12 +1,6 @@
 import React from "@rbxts/react";
 import { PositionElementProps, SizeElementProps, ZIndexElementProps } from "../../Interfaces/";
-interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexElementProps {
-    BackgroundTransparency?: number;
-    BackgroundColor3?: Color3;
+export interface ContainerProps extends SizeElementProps, PositionElementProps, ZIndexElementProps, React.InstanceProps<Frame> {
     group?: boolean;
-    children?: React.ReactNode;
-    Change?: React.InstanceChangeEvent<Frame> | undefined;
-    ClipsDescendants?: boolean;
 }
-export declare function Container(props: ContainerProps): React.JSX.Element;
-export {};
+export declare const Container: React.ForwardRefExoticComponent<Omit<ContainerProps, "ref"> & React.RefAttributes<Frame>>;

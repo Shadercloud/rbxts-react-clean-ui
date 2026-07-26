@@ -51,7 +51,7 @@ export function Icon(props: IconProps) {
                     : `rbxassetid://${iconId}`
             }
             BackgroundTransparency={1}
-            ImageColor3={props.color ?? Color3.fromHex("#FFFFFF")}
+            ImageColor3={props.color ?? theme.colors.intents.primary.default.textColor}
         />
     );
 }

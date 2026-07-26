@@ -1,44 +1,47 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import { BackgroundElementProps, ShadowElementProps, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
 import { Padding, Corners, BoxShadow } from "../Decorator";
 import { Container } from "../Layout";
 import { SizeHelper } from "../../Helpers";
 
-interface BoxProps extends SpacedElementProps, ShadowElementProps, BackgroundElementProps, ZIndexElementProps, SizeElementProps { }
+interface BoxProps extends SpacedElementProps, ShadowElementProps, BackgroundElementProps, ZIndexElementProps, SizeElementProps, React.InstanceProps<Frame> {
 
-@ReactComponent
-export class Box extends Component<BoxProps> {
-    static contextType = CleanThemeContext;
+}
 
-    declare context: React.ContextType<typeof CleanThemeContext>;
-    render() {
+export const Box = React.forwardRef<Frame, BoxProps>(
+    (props, ref) => {
+        const theme = React.useContext(CleanThemeContext);
+
         return (
             <Container
-                Size={SizeHelper.GetSize(this.props, UDim2.fromScale(1, 1))}
+                ref={ref}
+                {...props}
+                Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 1))}
                 AutomaticSize={Enum.AutomaticSize.XY}
                 BackgroundTransparency={
-                    this.props.BackgroundTransparency ??
-                    this.context.components.box.backgroundTransparency
+                    props.BackgroundTransparency ??
+                    theme.components.box.backgroundTransparency
                 }
                 BackgroundColor3={
-                    this.props.BackgroundColor3 ??
-                    this.context.components.box.backgroundColor
+                    props.BackgroundColor3 ??
+                    theme.components.box.backgroundColor
                 }
-                ZIndex={this.props.ZIndex}
+                ZIndex={props.ZIndex}
+                Event={props.Event}
             >
-                <Corners radius={this.context.components.box.cornerRadius} />
+                <Corners radius={theme.components.box.cornerRadius} />
 
                 <uistroke
-                    Thickness={this.context.components.box.borderThickness}
+                    Thickness={theme.components.box.borderThickness}
                     BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-                    Color={this.context.components.box.borderColor}
+                    Color={theme.components.box.borderColor}
                 />
-                <BoxShadow {...this.props} value={this.context.components.box.boxShadow} />
-                <Padding {...this.props} />
+                <BoxShadow {...props} value={theme.components.box.boxShadow} />
+                <Padding {...props} />
 
-                {this.props.children}
+                {props.children}
             </Container>
         );
     }
-}
+)

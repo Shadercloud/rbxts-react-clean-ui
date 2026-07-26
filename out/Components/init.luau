@@ -19,34 +19,7 @@ end
 for _k, _v in TS.import(script, script, "Surface", "Panel") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "Layout", "Column") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "Container") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "Fieldset") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "FlexItem") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "Group") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "HStack") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "Row") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "Scroller") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "Tabs") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Layout", "VStack") or {} do
+for _k, _v in TS.import(script, script, "Layout") or {} do
 	exports[_k] = _v
 end
 for _k, _v in TS.import(script, script, "Input", "Button") or {} do

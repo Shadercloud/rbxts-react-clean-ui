@@ -56,7 +56,7 @@ function Icon(props)
 		Size = props.Size or UDim2.fromOffset(size, size),
 		Image = if iconId == nil then nil else `rbxassetid://{iconId}`,
 		BackgroundTransparency = 1,
-		ImageColor3 = props.color or Color3.fromHex("#FFFFFF"),
+		ImageColor3 = props.color or theme.colors.intents.primary.default.textColor,
 	})
 end
 return {

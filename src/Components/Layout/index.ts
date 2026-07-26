@@ -1,5 +1,7 @@
 export * from './Column';
 export * from './Container';
+export * from './Draggable';
+export * from './Droppable';
 export * from './Fieldset';
 export * from './FlexItem';
 export * from './Group';

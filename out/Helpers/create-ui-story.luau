@@ -10,6 +10,7 @@ local Choose = TS.import(script, TS.getModule(script, "@rbxts", "ui-labs").src).
 local _ = TS.import(script, script.Parent.Parent, "Providers")
 local OverlayProvider = _.OverlayProvider
 local ThemeProvider = _.ThemeProvider
+local RegistryProvider = TS.import(script, script.Parent.Parent, "Providers", "registry.provider").RegistryProvider
 local controls = {
 	Theme = Choose({ "Default", "Dark", "Sandstone" }),
 }
@@ -26,9 +27,9 @@ local function createStory(render)
 			if props.controls.Theme == "Sandstone" then
 				theme = SandstoneTheme
 			end
-			return React.createElement(ThemeProvider, {
+			return React.createElement(RegistryProvider, nil, React.createElement(ThemeProvider, {
 				theme = theme,
-			}, React.createElement(OverlayProvider, nil, render(props)))
+			}, React.createElement(OverlayProvider, nil, render(props))))
 		end,
 	}
 end

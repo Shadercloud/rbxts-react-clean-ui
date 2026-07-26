@@ -19,6 +19,7 @@ export function VStack(props: VStackProps) {
                 FillDirection={Enum.FillDirection.Vertical}
                 HorizontalFlex={props.HorizontalFlex ?? Enum.UIFlexAlignment.Fill}
                 Padding={padding}
+                SortOrder={Enum.SortOrder.LayoutOrder}
                 Change={props.Change}
                 Event={props.Event}
             />

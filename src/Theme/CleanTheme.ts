@@ -60,6 +60,15 @@ export interface CleanTheme {
     typeScaleMap: Record<ScaleSize, TextVariant>;
 
     components: {
+        draggable: {
+            placeholder: {
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                borderColor: Color3;
+                borderThickness: number;
+                cornerRadius: CssSize;
+            }
+        },
         scroller: {
             barColor: Color3;
         },

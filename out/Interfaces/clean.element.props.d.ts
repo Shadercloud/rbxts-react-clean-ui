@@ -50,24 +50,24 @@ export type CssShadow = CssQuad;
 export type CssPadding = CssQuad;
 export type ResponsiveCssSize = CssSize | CssBreakpointSize;
 export interface ZIndexElementProps {
-    ZIndex?: number;
+    ZIndex?: number | Binding<number> | undefined;
 }
 export interface BackgroundElementProps {
-    BackgroundTransparency?: number;
-    BackgroundColor3?: Color3;
+    BackgroundTransparency?: number | Binding<number> | undefined;
+    BackgroundColor3?: Color3 | Binding<Color3> | undefined;
 }
 export interface SizeElementProps {
     Size?: UDim2 | Binding<UDim2>;
     width?: ResponsiveCssSize;
     height?: CssSize;
-    AutomaticSize?: Enum.AutomaticSize;
+    AutomaticSize?: Enum.AutomaticSize | Binding<Enum.AutomaticSize> | "None" | "X" | "Y" | "XY" | undefined;
 }
 export interface ScalableElementProps {
     scale?: ScaleSize;
 }
 export interface PositionElementProps {
-    Position?: UDim2;
-    AnchorPoint?: Vector2;
+    Position?: UDim2 | Binding<UDim2>;
+    AnchorPoint?: Vector2 | Binding<Vector2> | undefined;
     center?: CssSize | boolean;
     top?: CssSize;
     left?: CssSize;
