@@ -63,34 +63,16 @@ local function Input(props)
 	_attributes_1.PlaceholderColor3 = props.PlaceholderColor3
 	_attributes_1.TextScaled = props.TextScaled
 	_attributes_1.LineHeight = typography.lineHeight
-	_attributes_1.Text = value
+	_attributes_1.Text = if props.controlled then props.value else value
 	_attributes_1.TextColor3 = props.TextColor3 or theme.colors.intents.primary.default.textColor
 	_attributes_1.ClearTextOnFocus = false
 	_attributes_1.Event = props.Event
 	_attributes_1.Change = {
 		Text = function(rbx)
-			if props.validation == "Number" or props.validation == "Int" then
-				if not ref.current then
-					return nil
-				end
-				local _value = tonumber(rbx.Text)
-				local _condition_1 = not (_value ~= 0 and _value == _value and _value)
-				if _condition_1 then
-					_condition_1 = rbx.Text ~= "" and rbx.Text ~= "-"
-				end
-				if _condition_1 then
-					ref.current.Text = props.value
-					return nil
-				end
-				if props.validation == "Int" and rbx.Text ~= "" and rbx.Text ~= "-" then
-					local _condition_2 = tonumber(rbx.Text)
-					if _condition_2 == nil then
-						_condition_2 = 0
-					end
-					if math.round(_condition_2) ~= tonumber(rbx.Text) then
-						return nil
-					end
-				end
+			local number = tonumber(rbx.Text)
+			if (props.validation == "Number" or props.validation == "Int") and number == nil and rbx.Text ~= "" and rbx.Text ~= "-" then
+				ref.current.Text = props.value
+				return nil
 			end
 			setValue(rbx.Text)
 			local _result = props.onChange

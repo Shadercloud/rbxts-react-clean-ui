@@ -12,6 +12,7 @@ interface InputProps extends ScalableElementProps, SpacedElementProps, React.Ins
     validation?: "Number" | "String" | "None" | "Int";
     onChange?: (value: string) => void;
     Event?: React.InstanceEvent<TextBox>;
+    controlled?: boolean;
 }
 
 export function Input(props: InputProps) {
@@ -71,22 +72,23 @@ export function Input(props: InputProps) {
                 PlaceholderColor3={props.PlaceholderColor3}
                 TextScaled={props.TextScaled}
                 LineHeight={typography.lineHeight}
-                Text={value}
+                Text={props.controlled ? props.value : value}
                 TextColor3={props.TextColor3 ?? theme.colors.intents.primary.default.textColor}
                 ClearTextOnFocus={false}
                 Event={props.Event}
                 Change={{
                     Text: (rbx) => {
-                        if (props.validation === "Number" || props.validation === "Int") {
-                            if (!ref.current) return
-                            if (!tonumber(rbx.Text) && rbx.Text !== "" && rbx.Text !== "-") {
-                                ref.current.Text = props.value
-                                return
-                            }
-                            if (props.validation === "Int" && rbx.Text !== "" && rbx.Text !== "-") {
-                                if (math.round(tonumber(rbx.Text) ?? 0) !== tonumber(rbx.Text))
-                                    return
-                            }
+
+                        const number = tonumber(rbx.Text);
+
+                        if (
+                            (props.validation === "Number" || props.validation === "Int") &&
+                            number === undefined &&
+                            rbx.Text !== "" &&
+                            rbx.Text !== "-"
+                        ) {
+                            ref.current!.Text = props.value;
+                            return;
                         }
                         setValue(rbx.Text)
                         props.onChange?.(rbx.Text)

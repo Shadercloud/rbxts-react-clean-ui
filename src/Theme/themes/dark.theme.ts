@@ -296,12 +296,12 @@ export const DarkTheme: CleanTheme = {
         },
         draggable: {
             placeholder: {
-                backgroundColor: Color3.fromHex("#D9DEE8"),
-                backgroundTransparency: 0.5,
-                borderColor: Color3.fromHex("#D9DEE8"),
+                backgroundColor: Color3.fromHex("#2A303B"),
+                backgroundTransparency: 0.35,
+                borderColor: Color3.fromHex("#4B74C7"),
                 borderThickness: 1,
                 cornerRadius: 8,
-            }
+            },
         },
         card: {
             borderThickness: 1,
@@ -310,7 +310,7 @@ export const DarkTheme: CleanTheme = {
                 intents: {
                     primary: {
                         default: {
-                            backgroundColor: Color3.fromHex("#F5F5F5"),
+                            backgroundColor: Color3.fromHex("#20252E"),
                             backgroundTransparency: 0,
                         }
                     }
@@ -320,11 +320,35 @@ export const DarkTheme: CleanTheme = {
                 intents: {
                     primary: {
                         default: {
-                            backgroundColor: Color3.fromHex("#F5F5F5"),
+                            backgroundColor: Color3.fromHex("#20252E"),
                             backgroundTransparency: 0,
                         }
                     }
                 }
+            }
+        },
+        slider: {
+            height: 20,
+            bar: {
+                height: "50%",
+                padding: 10,
+                backgroundColor: Color3.fromHex("#2A303B"),
+                borderThickness: 1,
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#3A4352"),
+                cornerRadius: 8,
+                highlight: {
+                    backgroundColor: Color3.fromHex("#3d57ff"),
+                    backgroundTransparency: 0.7,
+                    borderColor: Color3.fromHex("#3A4352")
+                }
+            },
+            handle: {
+                backgroundColor: Color3.fromHex("#365FAF"),
+                borderThickness: 1,
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#6B96F0"),
+                cornerRadius: "100%",
             }
         }
     },

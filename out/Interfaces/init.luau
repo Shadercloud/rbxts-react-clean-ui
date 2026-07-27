@@ -7,4 +7,7 @@ end
 for _k, _v in TS.import(script, script, "icon") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "userinput") or {} do
+	exports[_k] = _v
+end
 return exports

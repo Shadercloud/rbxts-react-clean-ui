@@ -4,32 +4,13 @@ import { DraggableRegistration, DraggableRegistryKey, DroppableRegistration, Dro
 import { CleanThemeContext, DraggableContext, DraggableContextValue, OverlayConsumer } from "../../Contexts";
 import { createPortal } from "@rbxts/react-roblox";
 import { Corners } from "../Decorator";
-import { UserInputService } from "@rbxts/services";
-import { Environment } from "@rbxts/ui-labs";
+import { CustomInputService } from "../../Interfaces";
 
 
 type GuiObjectProps = React.InstanceProps<GuiObject>;
 type GuiElement = React.ReactElement<GuiObjectProps>;
 
-interface ConnectableSignal<TArgs extends unknown[]> {
-    Connect(callback: (...args: TArgs) => void): {
-        Disconnect(): void;
-    };
-}
 
-interface InputSignalsLike {
-    InputBegan: ConnectableSignal<
-        [input: InputObject, gameProcessed: boolean]
-    >;
-
-    InputChanged: ConnectableSignal<
-        [input: InputObject, gameProcessed: boolean]
-    >;
-
-    InputEnded: ConnectableSignal<
-        [input: InputObject, gameProcessed: boolean]
-    >;
-}
 interface DragInformation {
     input: InputObject;
     inputStart: Vector2;
@@ -52,16 +33,10 @@ function DragHandle({ children }: DragHandleProps) {
 
     const childEvents = children.props.Event;
 
-    const useUserInputService = !Environment.IsStory();
-
-    const inputSignals: InputSignalsLike = Environment.IsStory()
-        ? Environment.InputListener
-        : UserInputService;
-
     React.useEffect(() => {
 
         const inputChangedListener =
-            inputSignals.InputChanged.Connect((input) => {
+            CustomInputService.InputChanged.Connect((input) => {
                 if (
                     input.UserInputType ===
                     Enum.UserInputType.MouseMovement ||
@@ -73,7 +48,7 @@ function DragHandle({ children }: DragHandleProps) {
             });
 
         const inputEndedListener =
-            inputSignals.InputEnded.Connect((input) => {
+            CustomInputService.InputEnded.Connect((input) => {
                 if (
                     input.UserInputType ===
                     Enum.UserInputType.MouseButton1 ||
@@ -88,7 +63,7 @@ function DragHandle({ children }: DragHandleProps) {
             inputChangedListener.Disconnect();
             inputEndedListener.Disconnect();
         };
-    }, [draggable, useUserInputService]);
+    }, [draggable]);
 
     return React.cloneElement(children, {
         Active: true,

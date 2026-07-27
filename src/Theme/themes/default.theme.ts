@@ -375,6 +375,33 @@ export const DefaultTheme: CleanTheme = {
                         }
                     }
                 }
+            },
+
+        },
+        slider: {
+            height: 20,
+            bar: {
+                backgroundColor: Color3.fromHex("#F5F5F5"),
+                height: "30%",
+                padding: 25,
+                borderThickness: 1,
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#D9DEE8"),
+                cornerRadius: 8,
+                highlight: {
+                    backgroundColor: Color3.fromHex("#333333"),
+                    backgroundTransparency: 0.3,
+                    borderColor: Color3.fromHex("#000000")
+                }
+            },
+            handle: {
+                boxShadow: "0px 0px 5px 5px",
+                backgroundColor: Color3.fromHex("#F5F5F5"),
+                borderThickness: 1,
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#D9DEE8"),
+                cornerRadius: 8,
+                aspectRation: 1
             }
         }
     },

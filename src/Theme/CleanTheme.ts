@@ -116,7 +116,7 @@ export interface CleanTheme {
             cornerRadius: CssSize;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
             spacing?: ScaleSizeValue<number>;
-        },
+        };
         tabs: {
             borderColor: Color3;
             backgroundColor: Color3;
@@ -139,7 +139,7 @@ export interface CleanTheme {
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
             },
 
-        }
+        };
         card: {
             borderThickness: number;
             cornerRadius: CssSize;
@@ -152,7 +152,34 @@ export interface CleanTheme {
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
             }
 
-        }
+        };
+        slider: {
+            height: CssSize;
+
+            bar: {
+                height: CssSize;
+                padding: CssSize;
+                borderColor: Color3;
+                borderThickness: number;
+                cornerRadius: CssSize;
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                highlight: {
+                    borderColor: Color3;
+                    backgroundColor: Color3;
+                    backgroundTransparency: number;
+                }
+            },
+            handle: {
+                boxShadow?: CssShadow;
+                borderColor: Color3;
+                borderThickness: number;
+                cornerRadius: CssSize;
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                aspectRation?: number;
+            }
+        };
     };
 
     icons: Partial<IconSet>;

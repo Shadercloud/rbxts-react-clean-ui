@@ -16,23 +16,20 @@ local DraggableContext = _Contexts.DraggableContext
 local OverlayConsumer = _Contexts.OverlayConsumer
 local createPortal = TS.import(script, TS.getModule(script, "@rbxts", "react-roblox")).createPortal
 local Corners = TS.import(script, script.Parent.Parent, "Decorator").Corners
-local UserInputService = TS.import(script, TS.getModule(script, "@rbxts", "services")).UserInputService
-local Environment = TS.import(script, TS.getModule(script, "@rbxts", "ui-labs").src).Environment
+local CustomInputService = TS.import(script, script.Parent.Parent.Parent, "Interfaces").CustomInputService
 local function DragHandle(_param)
 	local children = _param.children
 	local draggable = React.useContext(DraggableContext)
 	local _arg0 = draggable ~= nil
 	assert(_arg0, "Draggable.Handle must be used inside a Draggable component")
 	local childEvents = children.props.Event
-	local useUserInputService = not Environment.IsStory()
-	local inputSignals = if Environment.IsStory() then Environment.InputListener else UserInputService
 	React.useEffect(function()
-		local inputChangedListener = inputSignals.InputChanged:Connect(function(input)
+		local inputChangedListener = CustomInputService.InputChanged:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 				draggable.updateDrag(input)
 			end
 		end)
-		local inputEndedListener = inputSignals.InputEnded:Connect(function(input)
+		local inputEndedListener = CustomInputService.InputEnded:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 				draggable.endDrag(input)
 			end
@@ -41,7 +38,7 @@ local function DragHandle(_param)
 			inputChangedListener:Disconnect()
 			inputEndedListener:Disconnect()
 		end
-	end, { draggable, useUserInputService })
+	end, { draggable })
 	local _object = {
 		Active = true,
 	}

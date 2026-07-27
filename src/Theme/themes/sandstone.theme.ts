@@ -295,37 +295,63 @@ export const SandstoneTheme: CleanTheme = {
         },
         draggable: {
             placeholder: {
-                backgroundColor: Color3.fromHex("#D9DEE8"),
-                backgroundTransparency: 0.5,
-                borderColor: Color3.fromHex("#D9DEE8"),
+                backgroundColor: Color3.fromHex("#EFE5D3"),
+                backgroundTransparency: 0.35,
+                borderColor: Color3.fromHex("#CDBFA8"),
                 borderThickness: 1,
-                cornerRadius: 8,
-            }
+                cornerRadius: 4,
+            },
         },
+
         card: {
             borderThickness: 1,
-            cornerRadius: 8,
+            cornerRadius: 4,
             header: {
                 intents: {
                     primary: {
                         default: {
-                            backgroundColor: Color3.fromHex("#F5F5F5"),
+                            backgroundColor: Color3.fromHex("#EFE5D3"),
                             backgroundTransparency: 0,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             },
             footer: {
                 intents: {
                     primary: {
                         default: {
-                            backgroundColor: Color3.fromHex("#F5F5F5"),
+                            backgroundColor: Color3.fromHex("#EFE5D3"),
                             backgroundTransparency: 0,
-                        }
-                    }
+                        },
+                    },
+                },
+            },
+        },
+
+        slider: {
+            height: 20,
+            bar: {
+                height: "50%",
+                padding: 10,
+                backgroundColor: Color3.fromHex("#EFE5D3"),
+                borderThickness: 1,
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#CDBFA8"),
+                cornerRadius: 4,
+                highlight: {
+                    backgroundColor: Color3.fromHex("#CDBFA8"),
+                    backgroundTransparency: 0.3,
+                    borderColor: Color3.fromHex("#CDBFA8")
                 }
-            }
-        }
+            },
+            handle: {
+                backgroundColor: Color3.fromHex("#D9E9E5"),
+                borderThickness: 1,
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#4E8179"),
+                cornerRadius: 4,
+            },
+        },
     },
 
     icons: {

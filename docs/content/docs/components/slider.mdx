@@ -1,0 +1,144 @@
+---
+title: Slider
+description: Select a single value or a range by dragging one or two handles.
+icon: Settings2
+---
+
+<Image alt="Slider demonstration" src="/images/slider_preview.gif"  />
+
+The `<Slider>` component lets users select a numeric value within a defined range. It supports step snapping, controlled and uncontrolled state, range selection, and highlighted sections of the track.
+
+## Basic usage
+
+```tsx
+import React from "@rbxts/react";
+import { Fieldset, Slider, Text } from "@rbxts/react-clean-ui";
+
+export function Example() {
+    const [value, setValue] = React.useState(10);
+
+    return (
+        <Fieldset>
+            <Fieldset.Label>
+                <Text text={`Value: ${value}`} />
+            </Fieldset.Label>
+
+            <Fieldset.Control>
+                <Slider
+                    min-value={5}
+                    max-value={20}
+                    value={value}
+                    onChanged={(newValue) => {
+                        if (typeIs(newValue, "number")) {
+                            setValue(newValue);
+                        }
+                    }}
+                />
+            </Fieldset.Control>
+        </Fieldset>
+    );
+}
+```
+
+`onDragged` is called continuously while the handle is moving. `onChanged` is called once when the drag finishes.
+
+## Step values
+
+Use `step` to snap the slider to fixed increments. Steps are calculated relative to `min-value`.
+
+```tsx
+<Slider
+    min-value={5}
+    max-value={20}
+    step={2}
+/>
+```
+
+The example above produces values such as `5`, `7`, `9`, and `11`.
+
+## Controlled slider
+
+Set `controlled` when the rendered value should always come from the `value` prop.
+
+```tsx
+const [value, setValue] = React.useState(10);
+
+<Slider
+    controlled
+    min-value={0}
+    max-value={100}
+    step={5}
+    value={value}
+    onDragged={(newValue) => {
+        if (typeIs(newValue, "number")) {
+            setValue(newValue);
+        }
+    }}
+/>
+```
+
+Without `controlled`, `value` is used as the initial value and the slider manages subsequent changes internally.
+
+## Range slider
+
+Enable `range` and provide a `Vector2` value to display two handles. `X` is the lower value and `Y` is the upper value.
+
+```tsx
+const [range, setRange] = React.useState(
+    new Vector2(2, 8),
+);
+
+<Slider
+    controlled
+    range
+    min-value={0}
+    max-value={10}
+    step={1}
+    value={range}
+    highlight="middle"
+    onDragged={(newValue) => {
+        if (typeIs(newValue, "Vector2")) {
+            setRange(newValue);
+        }
+    }}
+/>
+```
+
+The handles cannot cross each other. Moving the first handle is clamped to the second handle, and moving the second handle is clamped to the first.
+
+## Track highlighting
+
+The `highlight` prop controls which part of the slider track is highlighted.
+
+```tsx
+<Slider
+    min-value={0}
+    max-value={10}
+    value={4}
+    highlight="start"
+/>
+```
+
+| Value | Highlighted section |
+| --- | --- |
+| `"start"` | From the beginning of the track to the handle |
+| `"end"` | From the handle to the end of the track |
+| `"middle"` | Between the two range handles |
+
+`"middle"` is primarily intended for range sliders.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `max-value` | `number` | Required | Maximum slider value. |
+| `min-value` | `number` | `0` | Minimum slider value. |
+| `value` | `number \| Vector2` | Minimum value | Current or initial slider value. |
+| `step` | `number` | — | Increment used when snapping values. |
+| `controlled` | `boolean` | `false` | Reads the rendered value directly from `value`. |
+| `range` | `boolean` | `false` | Enables two-handle range selection using a `Vector2`. |
+| `highlight` | `"start" \| "end" \| "middle"` | — | Selects the highlighted section of the track. |
+| `onDragged` | `(value: number \| Vector2) => void` | — | Called while a handle is dragged. |
+| `onChanged` | `(value: number \| Vector2) => void` | — | Called when dragging finishes. |
+
+The component also accepts the standard container props supported by the library.

@@ -137,6 +137,32 @@ export interface CleanTheme {
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
             };
         };
+        slider: {
+            height: CssSize;
+            bar: {
+                height: CssSize;
+                padding: CssSize;
+                borderColor: Color3;
+                borderThickness: number;
+                cornerRadius: CssSize;
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                highlight: {
+                    borderColor: Color3;
+                    backgroundColor: Color3;
+                    backgroundTransparency: number;
+                };
+            };
+            handle: {
+                boxShadow?: CssShadow;
+                borderColor: Color3;
+                borderThickness: number;
+                cornerRadius: CssSize;
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                aspectRation?: number;
+            };
+        };
     };
     icons: Partial<IconSet>;
     iconSize: ScaleSizeValue<number>;

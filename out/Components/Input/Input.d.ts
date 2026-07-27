@@ -6,6 +6,7 @@ interface InputProps extends ScalableElementProps, SpacedElementProps, React.Ins
     validation?: "Number" | "String" | "None" | "Int";
     onChange?: (value: string) => void;
     Event?: React.InstanceEvent<TextBox>;
+    controlled?: boolean;
 }
 export declare function Input(props: InputProps): React.JSX.Element;
 export {};
