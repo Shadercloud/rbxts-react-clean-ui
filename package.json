@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/react-clean-ui",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "out/init.lua",
   "scripts": {
@@ -39,5 +39,13 @@
     "@rbxts/react-roblox": "^17.3.7-ts.2",
     "@rbxts/services": "^1.6.0",
     "@rbxts/ui-labs": "^2.4.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shadercloud/rbxts-react-clean-ui.git"
+  },
+  "homepage": "https://shadercloud.github.io/rbxts-react-clean-ui/",
+  "bugs": {
+    "url": "https://github.com/Shadercloud/rbxts-react-clean-ui/issues"
   }
 }
