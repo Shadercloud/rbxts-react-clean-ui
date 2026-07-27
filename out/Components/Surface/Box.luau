@@ -26,18 +26,22 @@ local Box = React.forwardRef(function(props, ref)
 	_attributes.BackgroundColor3 = props.BackgroundColor3 or theme.components.box.backgroundColor
 	_attributes.ZIndex = props.ZIndex
 	_attributes.Event = props.Event
-	local _exp = React.createElement("uistroke", {
-		Thickness = theme.components.box.borderThickness,
-		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-		Color = theme.components.box.borderColor,
-	})
-	local _attributes_1 = table.clone(props)
-	setmetatable(_attributes_1, nil)
-	_attributes_1.value = theme.components.box.boxShadow
-	local _exp_1 = React.createElement(BoxShadow, _attributes_1)
+	local _attributes_1 = {}
+	local _condition_1 = props["border-thickness"]
+	if _condition_1 == nil then
+		_condition_1 = theme.components.box.borderThickness
+	end
+	_attributes_1.Thickness = _condition_1
+	_attributes_1.BorderStrokePosition = Enum.BorderStrokePosition.Inner
+	_attributes_1.Color = props["border-color"] or theme.components.box.borderColor
+	local _exp = React.createElement("uistroke", _attributes_1)
 	local _attributes_2 = table.clone(props)
 	setmetatable(_attributes_2, nil)
-	return React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(Padding, _attributes_2), React.createElement(Corners, {
+	_attributes_2.value = theme.components.box.boxShadow
+	local _exp_1 = React.createElement(BoxShadow, _attributes_2)
+	local _attributes_3 = table.clone(props)
+	setmetatable(_attributes_3, nil)
+	return React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(Padding, _attributes_3), React.createElement(Corners, {
 		radius = theme.components.box.cornerRadius,
 	}), props.children)
 end)

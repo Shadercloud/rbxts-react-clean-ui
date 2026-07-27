@@ -278,9 +278,7 @@ do
 		setmetatable(_attributes, nil)
 		return React.createElement(SelectContext.Provider, {
 			value = context,
-		}, React.createElement(SelectRenderer, _attributes), React.createElement(Text, {
-			text = `{self.state.selected}`,
-		}))
+		}, React.createElement(SelectRenderer, _attributes))
 	end
 	Select.Option = SelectOption
 	Select = ReactComponent(Select) or Select

@@ -1,0 +1,96 @@
+---
+title: Card
+description: Display related content inside a structured container with optional header, body, and footer sections.
+icon: CreditCard
+---
+
+<Image alt="Card demonstration" src="/images/card_preview.png" style={{width: "100%", marginBottom: "1rem",}} />
+
+The `<Card>` component groups related content inside a bordered container. Cards can contain a header, body, and footer, with each section automatically using the configured card spacing and theme styles.
+
+## Usage
+
+```tsx
+import { Card, Text, Button, HStack } from "@rbxts/react-clean-ui";
+
+<Card intent="primary">
+    <Card.Header>
+        <Text variant="heading">Player Profile</Text>
+    </Card.Header>
+
+    <Card.Body>
+        <Text>
+            View player information, statistics, and recent activity.
+        </Text>
+    </Card.Body>
+
+    <Card.Footer>
+        <HStack>
+            <Button text="Cancel" />
+            <Button text="Save" intent="success" />
+        </HStack>
+    </Card.Footer>
+</Card>
+```
+
+## Sections
+
+### `Card.Header`
+
+Displays content at the top of the card. It includes themed background, border, padding, and rounded top corners.
+
+The header inherits the card's `intent`, but it can be overridden:
+
+```tsx
+<Card intent="primary">
+    <Card.Header intent="success">
+        <Text>Completed</Text>
+    </Card.Header>
+</Card>
+```
+
+### `Card.Body`
+
+Displays the main card content. The body automatically fills the card width and grows vertically to fit its children.
+
+```tsx
+<Card>
+    <Card.Body>
+        <Text>This is the main card content.</Text>
+    </Card.Body>
+</Card>
+```
+
+### `Card.Footer`
+
+Displays content at the bottom of the card. It includes themed background, border, padding, and rounded bottom corners.
+
+```tsx
+<Card>
+    <Card.Footer>
+        <Button text="Continue" />
+    </Card.Footer>
+</Card>
+```
+
+## Intent
+
+Set `intent` on the card to apply a shared visual intent to its header and footer.
+
+```tsx
+<Card intent="danger">
+    <Card.Header>
+        <Text>Delete Item</Text>
+    </Card.Header>
+
+    <Card.Body>
+        <Text>This action cannot be undone.</Text>
+    </Card.Body>
+
+    <Card.Footer>
+        <Button text="Delete" intent="danger" />
+    </Card.Footer>
+</Card>
+```
+
+An `intent` set directly on `Card.Header` or `Card.Footer` takes priority over the card-level intent.

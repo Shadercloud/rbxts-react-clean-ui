@@ -6,7 +6,8 @@ import { Container } from "../Layout";
 import { SizeHelper } from "../../Helpers";
 
 export interface BoxProps extends SpacedElementProps, ShadowElementProps, BackgroundElementProps, ZIndexElementProps, SizeElementProps, React.InstanceProps<Frame> {
-
+    'border-thickness'?: number;
+    'border-color'?: Color3;
 }
 
 export const Box = React.forwardRef<Frame, BoxProps>(
@@ -31,9 +32,9 @@ export const Box = React.forwardRef<Frame, BoxProps>(
                 Event={props.Event}
             >
                 <uistroke
-                    Thickness={theme.components.box.borderThickness}
+                    Thickness={props['border-thickness'] ?? theme.components.box.borderThickness}
                     BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-                    Color={theme.components.box.borderColor}
+                    Color={props['border-color'] ?? theme.components.box.borderColor}
                 />
                 <BoxShadow {...props} value={theme.components.box.boxShadow} />
                 <Padding {...props} />

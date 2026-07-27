@@ -297,6 +297,27 @@ local DefaultTheme = {
 							borderColor = Color3.fromHex("#237D4D"),
 						},
 					},
+					info = {
+						default = {
+							borderColor = Color3.fromHex("#266CA2"),
+							backgroundColor = Color3.fromHex("#3187C8"),
+							backgroundTransparency = 0.7,
+						},
+					},
+					warning = {
+						default = {
+							borderColor = Color3.fromHex("#C58B1D"),
+							backgroundColor = Color3.fromHex("#E7A92F"),
+							backgroundTransparency = 0.7,
+						},
+					},
+					danger = {
+						default = {
+							borderColor = Color3.fromHex("#B53535"),
+							backgroundColor = Color3.fromHex("#D64545"),
+							backgroundTransparency = 0.7,
+						},
+					},
 				},
 			},
 			footer = {
@@ -313,6 +334,27 @@ local DefaultTheme = {
 							backgroundColor = Color3.fromHex("#2E9D63"),
 							backgroundTransparency = 0.7,
 							borderColor = Color3.fromHex("#237D4D"),
+						},
+					},
+					info = {
+						default = {
+							borderColor = Color3.fromHex("#266CA2"),
+							backgroundColor = Color3.fromHex("#3187C8"),
+							backgroundTransparency = 0.7,
+						},
+					},
+					warning = {
+						default = {
+							borderColor = Color3.fromHex("#C58B1D"),
+							backgroundColor = Color3.fromHex("#E7A92F"),
+							backgroundTransparency = 0.7,
+						},
+					},
+					danger = {
+						default = {
+							borderColor = Color3.fromHex("#B53535"),
+							backgroundColor = Color3.fromHex("#D64545"),
+							backgroundTransparency = 0.7,
 						},
 					},
 				},

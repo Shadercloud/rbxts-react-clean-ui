@@ -326,7 +326,6 @@ export class Select extends Component<SelectProps, SelectState> {
         return (
             <SelectContext.Provider value={context}>
                 <SelectRenderer {...this.props} />
-                <Text text={`${this.state.selected}`} />
             </SelectContext.Provider>
         );
     }

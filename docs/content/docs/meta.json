@@ -8,10 +8,12 @@
         "---Layout Components---",
         "components/container",
         "components/row",
+        "components/dragdrop",
 
         "---Surface Components---",
         "components/icon",
         "components/box",
+        "components/card",
 
         "---Form Components---",
         "components/fieldset",

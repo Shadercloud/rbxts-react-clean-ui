@@ -104,9 +104,10 @@ export class Card extends Component<CardProps> {
         const contextValue: CardContextValue = {
             intent: this.props.intent,
         };
+        const intent = ColorHelper.getIntentColors(this.context, this.props.intent ?? "primary", "default", this.context.components.card.header.intents);
         return (
             <CardContext.Provider value={contextValue}>
-                <Box {...this.props} ref={this.props.ref} spacing="None">
+                <Box {...this.props} ref={this.props.ref} spacing="None" border-color={intent.borderColor}>
                     <VStack spacing="None">
                         {this.props.children}
                     </VStack>

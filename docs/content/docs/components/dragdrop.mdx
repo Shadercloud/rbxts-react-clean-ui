@@ -1,0 +1,100 @@
+---
+title: Drag / Drop
+summary: Add drag-and-drop behaviour to Roblox GUI elements.
+icon: Move
+---
+
+<Image alt="Drag Drop demonstration" src="/images/draggable_preview.gif" style={{width: "100%", marginBottom: "1rem",}} />
+
+The `<Draggable>` and `<Droppable>` components provide a simple way to move GUI elements and detect valid drop targets.
+
+You can wrap a component such as a `<Container>` in the `<Draggable>` tag to make it draggable.  It must also have a `<Draggable.Handle>` within the draggable component which is used to drag the element around.
+
+A component can be wrapped with `<Droppable>` to assign it as a drop zone to receive draggable elements.
+
+Set the `retainPosition` prop on the `<Draggable>` if you want to use it without a drop zone.
+
+## Basic usage
+
+```tsx
+import React from "@rbxts/react";
+import {
+    Box,
+    Container,
+    Draggable,
+    Droppable,
+    Text,
+} from "@rbxts/react-clean-ui";
+
+export function DragAndDropExample() {
+    return (
+        <>
+            <Droppable onDrop={(draggedObject) => {
+                print("Draggable object entered: ", draggedObject)
+            }}>
+                <Container width="300" height="300">
+                    <Box>
+                        <Text text="Drop Zone" />
+                    </Box>
+                </Container>
+            </Droppable>
+            <Draggable onDropped={(droppable) => {
+                print("Dropped onto: ", droppable)
+            }}>
+                <Container width="300" height="300" right="0">
+                    <Draggable.Handle>
+                        <Box>
+                            <Text text="Draggable Element" />
+                        </Box>
+                    </Draggable.Handle>
+                </Container>
+            </Draggable>
+        </>
+    );
+}
+```
+
+## Draggable props
+
+| Prop             | Type                                          | Default | Description                                                             |
+| ---------------- | --------------------------------------------- | ------- | ----------------------------------------------------------------------- |
+| `id`             | `string`                                      | —       | Optional identifier exposed through the draggable registry.             |
+| `children`       | `ReactElement<GuiObjectProps>`                | —       | The GUI element that will be dragged.                                   |
+| `placeholder`    | `boolean`                                     | `true`  | Keeps a themed placeholder in the original layout while dragging.       |
+| `retainPosition` | `boolean`                                     | `false` | Moves the original GUI object to the final drag position after release. |
+| `onStartDrag`    | `() => void`                                  | —       | Called when dragging begins.                                            |
+| `onDragged`      | `(droppable?: DroppableRegistration) => void` | —       | Called while dragging with the droppable currently under the pointer.   |
+| `onDropped`      | `(droppable?: DroppableRegistration) => void` | —       | Called when the drag ends.                                              |
+
+## Droppable props
+
+| Prop       | Type                                 | Description                                                 |
+| ---------- | ------------------------------------ | ----------------------------------------------------------- |
+| `id`       | `string`                             | Optional identifier returned in the droppable registration. |
+| `children` | `ReactElement<GuiObjectProps>`       | The GUI element that defines the drop area.                 |
+| `onDrop`   | `(draggedObject: GuiObject) => void` | Called when a draggable is released over this target.       |
+
+## Drop information
+
+The two components expose drop information in different forms:
+
+- `Droppable.onDrop` receives the dragged `GuiObject`.
+- `Draggable.onDragged` and `Draggable.onDropped` receive the matching `DroppableRegistration`.
+
+This allows the draggable to inspect the target `id`, while the droppable can work directly with the dragged Roblox instance.
+
+```tsx
+<Droppable id="delete-zone" onDrop={(object) => object.Destroy()}>
+    <Box Size={UDim2.fromOffset(180, 80)}>
+        <Text text="Delete" />
+    </Box>
+</Droppable>
+```
+
+## Behaviour
+
+Only one registered draggable can be active at a time. The component uses the shared registry to prevent overlapping draggable elements from starting simultaneous drags.
+
+The drag preview is positioned using absolute screen coordinates and rendered through the nearest overlay provider. When `retainPosition` is enabled, the final absolute position is converted back into an offset relative to the original parent.
+
+Both components require the library registry provider, and `Draggable` additionally requires an overlay provider above it in the React tree.

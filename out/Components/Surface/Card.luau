@@ -112,10 +112,12 @@ do
 		local contextValue = {
 			intent = self.props.intent,
 		}
+		local intent = ColorHelper:getIntentColors(self.context, self.props.intent or "primary", "default", self.context.components.card.header.intents)
 		local _attributes = table.clone(self.props)
 		setmetatable(_attributes, nil)
 		_attributes.ref = self.props.ref
 		_attributes.spacing = "None"
+		_attributes["border-color"] = intent.borderColor
 		return React.createElement(CardContext.Provider, {
 			value = contextValue,
 		}, React.createElement(Box, _attributes, React.createElement(VStack, {
