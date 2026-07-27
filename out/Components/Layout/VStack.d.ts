@@ -3,6 +3,7 @@ import { SpacedElementProps } from "../../Interfaces";
 interface VStackProps extends SpacedElementProps {
     children?: React.ReactNode;
     HorizontalFlex?: Enum.UIFlexAlignment;
+    VerticalFlex?: Enum.UIFlexAlignment;
     Event?: React.InstanceEvent<UIListLayout>;
     Change?: React.InstanceChangeEvent<UIListLayout>;
 }

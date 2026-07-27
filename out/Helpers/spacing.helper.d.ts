@@ -3,4 +3,5 @@ import { CleanTheme } from "../Theme";
 export declare class SpacingHelper {
     static GetResolvedPadding(theme: CleanTheme, props: PaddingProps, component?: ScaleSizeValue<number>): ResolvedPadding;
     static GetPadding(theme: CleanTheme, spacing?: ScaleSize | "None", component?: ScaleSizeValue<number>): number;
+    static ResolveNumberPadding(value: number): ResolvedPadding;
 }

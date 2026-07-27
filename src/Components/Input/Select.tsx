@@ -23,7 +23,7 @@ interface SelectProps
     React.InstanceProps<TextBox> {
     selected?: number;
     'max-height'?: CssSize;
-    onChange?: (value: number) => void;
+    onChange?: (selected: number, value?: string) => void;
     Event?: React.InstanceEvent<TextBox>;
 }
 
@@ -41,7 +41,7 @@ interface SelectContextValue {
     dropdownSize: UDim2;
     dropdownPosition: UDim2;
     buttonRef: React.RefObject<ImageButton>;
-    setSelected: (selected: number) => void;
+    setSelected: (selected: number, value?: string) => void;
     openDropdown: (size: UDim2, position: UDim2) => void;
     closeDropdown: () => void;
     toggleOpen: () => void;
@@ -57,6 +57,7 @@ interface SelectOptionProps {
     children?: React.ReactNode;
     Event?: React.InstanceEvent<ImageButton>;
     index?: number;
+    value?: string;
     BackgroundColor3?: Color3;
 }
 
@@ -89,7 +90,7 @@ function SelectOption(props: SelectOptionProps) {
                     props.Event?.MouseLeave?.(button, x, y);
                 },
                 Activated: () => {
-                    context.setSelected(props.index!);
+                    context.setSelected(props.index!, props.value);
                     context.closeDropdown();
                 },
 
@@ -273,7 +274,7 @@ function SelectRenderer(props: SelectProps) {
 }
 
 @ReactComponent
-class Select extends Component<SelectProps, SelectState> {
+export class Select extends Component<SelectProps, SelectState> {
     public static Option = SelectOption;
 
     state: SelectState = {
@@ -294,8 +295,8 @@ class Select extends Component<SelectProps, SelectState> {
             dropdownPosition: this.state.dropdownPosition,
             buttonRef: this.buttonRef,
 
-            setSelected: (selected) => {
-                this.props.onChange?.(selected);
+            setSelected: (selected, value?: string) => {
+                this.props.onChange?.(selected, value);
                 this.setState({
                     selected,
                 });
@@ -325,10 +326,9 @@ class Select extends Component<SelectProps, SelectState> {
         return (
             <SelectContext.Provider value={context}>
                 <SelectRenderer {...this.props} />
+                <Text text={`${this.state.selected}`} />
             </SelectContext.Provider>
         );
     }
 }
-
-export { Select };
 

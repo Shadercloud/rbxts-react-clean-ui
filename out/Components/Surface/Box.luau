@@ -26,10 +26,7 @@ local Box = React.forwardRef(function(props, ref)
 	_attributes.BackgroundColor3 = props.BackgroundColor3 or theme.components.box.backgroundColor
 	_attributes.ZIndex = props.ZIndex
 	_attributes.Event = props.Event
-	local _exp = React.createElement(Corners, {
-		radius = theme.components.box.cornerRadius,
-	})
-	local _exp_1 = React.createElement("uistroke", {
+	local _exp = React.createElement("uistroke", {
 		Thickness = theme.components.box.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.box.borderColor,
@@ -37,10 +34,12 @@ local Box = React.forwardRef(function(props, ref)
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	_attributes_1.value = theme.components.box.boxShadow
-	local _exp_2 = React.createElement(BoxShadow, _attributes_1)
+	local _exp_1 = React.createElement(BoxShadow, _attributes_1)
 	local _attributes_2 = table.clone(props)
 	setmetatable(_attributes_2, nil)
-	return React.createElement(Container, _attributes, _exp, _exp_1, _exp_2, React.createElement(Padding, _attributes_2), props.children)
+	return React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(Padding, _attributes_2), React.createElement(Corners, {
+		radius = theme.components.box.cornerRadius,
+	}), props.children)
 end)
 return {
 	Box = Box,

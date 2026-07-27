@@ -302,6 +302,30 @@ export const DarkTheme: CleanTheme = {
                 borderThickness: 1,
                 cornerRadius: 8,
             }
+        },
+        card: {
+            borderThickness: 1,
+            cornerRadius: 8,
+            header: {
+                intents: {
+                    primary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#F5F5F5"),
+                            backgroundTransparency: 0,
+                        }
+                    }
+                }
+            },
+            footer: {
+                intents: {
+                    primary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#F5F5F5"),
+                            backgroundTransparency: 0,
+                        }
+                    }
+                }
+            }
         }
     },
 

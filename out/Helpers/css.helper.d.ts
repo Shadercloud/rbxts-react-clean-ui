@@ -1,4 +1,4 @@
-import { CssShadow } from "../Interfaces/clean.element.props";
+import { CssShadow, CssSize } from "../Interfaces/clean.element.props";
 interface ParsedShadow {
     offset: UDim2;
     blurRadius: UDim;
@@ -7,6 +7,6 @@ interface ParsedShadow {
 export declare class CssHelper {
     static parseCssShadow(value: CssShadow): ParsedShadow | undefined;
     private static isZero;
-    private static parseCssSize;
+    static parseCssSize(value: CssSize): UDim;
 }
 export {};

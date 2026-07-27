@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "@rbxts/react";
-import { Box, Container, createStory, Draggable, Droppable, FlexItem, HStack, Icon, Text, VStack, CleanThemeContext, Button, IconName, DroppableRegistration, DroppableContext } from "@rbxts/react-clean-ui";
+import React, { useState } from "@rbxts/react";
+import { Box, Card, Container, createStory, Draggable, Droppable, FlexItem, HStack, Icon, Text, VStack, CleanThemeContext, Button, IconName, DroppableRegistration, DroppableContext, Fieldset, Select, Intent } from "@rbxts/react-clean-ui";
 
 
 interface DemoItem {
@@ -52,6 +52,8 @@ function dragAndDrop() {
     const [basket, setBasket] = useState<DemoItem[]>([]);
 
     const [hovered, setHovered] = useState<DroppableRegistration | undefined>(undefined);
+
+    const [windowIntent, setWindowIntent] = useState<Intent>("primary")
 
     return <>
         <Container width="300" height="400" top="5" left="5">
@@ -166,11 +168,40 @@ function dragAndDrop() {
                 width="300"
                 height="300"
                 center>
-                <Draggable.Handle>
-                    <Box>
 
-                    </Box>
-                </Draggable.Handle>
+                <Card intent={windowIntent}>
+                    <Draggable.Handle>
+                        <Card.Header>
+                            <HStack>
+                                <Text text="Draggable Window" variant="heading" />
+                                <FlexItem align="Right">
+                                    <Icon icon="arrows" />
+                                </FlexItem>
+                            </HStack>
+                        </Card.Header>
+                    </Draggable.Handle>
+                    <Card.Body>
+                        <Fieldset >
+                            <Fieldset.Label>
+                                <Text text="Select Window Intent:" />
+                            </Fieldset.Label>
+                            <Fieldset.Control>
+                                <Select onChange={(selected, value) => {
+                                    setWindowIntent(value as Intent);
+                                }}>
+                                    <Select.Option text="Primary" value="primary" />
+                                    <Select.Option text="Success" value="success" />
+                                    <Select.Option text="Info" value="info" />
+                                    <Select.Option text="Warning" value="warning" />
+                                    <Select.Option text="Danger" value="danger" />
+                                </Select>
+                            </Fieldset.Control>
+                        </Fieldset>
+                    </Card.Body>
+                    <Card.Footer>
+                        <Button text="Click Me" intent={windowIntent} />
+                    </Card.Footer>
+                </Card>
             </Container>
 
         </Draggable>

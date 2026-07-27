@@ -9,6 +9,7 @@ local function VStack(props)
 	return React.createElement(React.Fragment, nil, React.createElement("uilistlayout", {
 		FillDirection = Enum.FillDirection.Vertical,
 		HorizontalFlex = props.HorizontalFlex or Enum.UIFlexAlignment.Fill,
+		VerticalFlex = props.VerticalFlex,
 		Padding = padding,
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		Change = props.Change,

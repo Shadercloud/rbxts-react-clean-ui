@@ -278,6 +278,46 @@ local DefaultTheme = {
 				cornerRadius = 8,
 			},
 		},
+		card = {
+			borderThickness = 1,
+			cornerRadius = 8,
+			header = {
+				intents = {
+					primary = {
+						default = {
+							backgroundColor = Color3.fromHex("#F5F5F5"),
+							backgroundTransparency = 0,
+							borderColor = Color3.fromHex("#D9DEE8"),
+						},
+					},
+					success = {
+						default = {
+							backgroundColor = Color3.fromHex("#2E9D63"),
+							backgroundTransparency = 0.7,
+							borderColor = Color3.fromHex("#237D4D"),
+						},
+					},
+				},
+			},
+			footer = {
+				intents = {
+					primary = {
+						default = {
+							backgroundColor = Color3.fromHex("#F5F5F5"),
+							backgroundTransparency = 0,
+							borderColor = Color3.fromHex("#D9DEE8"),
+						},
+					},
+					success = {
+						default = {
+							backgroundColor = Color3.fromHex("#2E9D63"),
+							backgroundTransparency = 0.7,
+							borderColor = Color3.fromHex("#237D4D"),
+						},
+					},
+				},
+			},
+		},
 	},
 	icons = {
 		["shopping-cart"] = 112388431913339,

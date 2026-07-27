@@ -6,6 +6,7 @@ import { SpacingHelper } from "../../Helpers";
 interface VStackProps extends SpacedElementProps {
     children?: React.ReactNode;
     HorizontalFlex?: Enum.UIFlexAlignment;
+    VerticalFlex?: Enum.UIFlexAlignment;
     Event?: React.InstanceEvent<UIListLayout>;
     Change?: React.InstanceChangeEvent<UIListLayout>;
 }
@@ -18,6 +19,7 @@ export function VStack(props: VStackProps) {
             <uilistlayout
                 FillDirection={Enum.FillDirection.Vertical}
                 HorizontalFlex={props.HorizontalFlex ?? Enum.UIFlexAlignment.Fill}
+                VerticalFlex={props.VerticalFlex}
                 Padding={padding}
                 SortOrder={Enum.SortOrder.LayoutOrder}
                 Change={props.Change}

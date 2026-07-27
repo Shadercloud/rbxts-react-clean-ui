@@ -125,6 +125,18 @@ export interface CleanTheme {
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
             };
         };
+        card: {
+            borderThickness: number;
+            cornerRadius: CssSize;
+            header: {
+                spacing?: ScaleSizeValue<number>;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+            };
+            footer: {
+                spacing?: ScaleSizeValue<number>;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+            };
+        };
     };
     icons: Partial<IconSet>;
     iconSize: ScaleSizeValue<number>;

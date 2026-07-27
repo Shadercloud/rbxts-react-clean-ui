@@ -43,6 +43,14 @@ do
 		end
 		return _result
 	end
+	function SpacingHelper:ResolveNumberPadding(value)
+		return {
+			top = value,
+			bottom = value,
+			left = value,
+			right = value,
+		}
+	end
 end
 return {
 	SpacingHelper = SpacingHelper,

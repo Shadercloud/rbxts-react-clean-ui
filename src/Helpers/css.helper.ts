@@ -52,7 +52,7 @@ export class CssHelper {
         return value.Scale === 0 && value.Offset === 0;
     }
 
-    private static parseCssSize(value: CssSize): UDim {
+    public static parseCssSize(value: CssSize): UDim {
         if (typeIs(value, "number")) {
             return new UDim(0, value);
         }

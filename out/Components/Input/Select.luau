@@ -61,7 +61,7 @@ local function SelectOption(props)
 		end
 	end
 	_object.Activated = function()
-		context.setSelected(props.index)
+		context.setSelected(props.index, props.value)
 		context.closeDropdown()
 	end
 	_attributes.Event = _object
@@ -245,10 +245,10 @@ do
 			dropdownSize = self.state.dropdownSize,
 			dropdownPosition = self.state.dropdownPosition,
 			buttonRef = self.buttonRef,
-			setSelected = function(selected)
+			setSelected = function(selected, value)
 				local _result = self.props.onChange
 				if _result ~= nil then
-					_result(selected)
+					_result(selected, value)
 				end
 				self:setState({
 					selected = selected,
@@ -278,7 +278,9 @@ do
 		setmetatable(_attributes, nil)
 		return React.createElement(SelectContext.Provider, {
 			value = context,
-		}, React.createElement(SelectRenderer, _attributes))
+		}, React.createElement(SelectRenderer, _attributes), React.createElement(Text, {
+			text = `{self.state.selected}`,
+		}))
 	end
 	Select.Option = SelectOption
 	Select = ReactComponent(Select) or Select

@@ -5,7 +5,7 @@ import { Padding, Corners, BoxShadow } from "../Decorator";
 import { Container } from "../Layout";
 import { SizeHelper } from "../../Helpers";
 
-interface BoxProps extends SpacedElementProps, ShadowElementProps, BackgroundElementProps, ZIndexElementProps, SizeElementProps, React.InstanceProps<Frame> {
+export interface BoxProps extends SpacedElementProps, ShadowElementProps, BackgroundElementProps, ZIndexElementProps, SizeElementProps, React.InstanceProps<Frame> {
 
 }
 
@@ -30,8 +30,6 @@ export const Box = React.forwardRef<Frame, BoxProps>(
                 ZIndex={props.ZIndex}
                 Event={props.Event}
             >
-                <Corners radius={theme.components.box.cornerRadius} />
-
                 <uistroke
                     Thickness={theme.components.box.borderThickness}
                     BorderStrokePosition={Enum.BorderStrokePosition.Inner}
@@ -39,6 +37,10 @@ export const Box = React.forwardRef<Frame, BoxProps>(
                 />
                 <BoxShadow {...props} value={theme.components.box.boxShadow} />
                 <Padding {...props} />
+
+                <Corners radius={theme.components.box.cornerRadius} />
+
+
 
                 {props.children}
             </Container>

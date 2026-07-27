@@ -140,6 +140,19 @@ export interface CleanTheme {
             },
 
         }
+        card: {
+            borderThickness: number;
+            cornerRadius: CssSize;
+            header: {
+                spacing?: ScaleSizeValue<number>;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+            },
+            footer: {
+                spacing?: ScaleSizeValue<number>;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+            }
+
+        }
     };
 
     icons: Partial<IconSet>;

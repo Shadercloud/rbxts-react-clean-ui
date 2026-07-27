@@ -10,13 +10,7 @@ end
 for _k, _v in TS.import(script, script, "Decorator", "Padding") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "Surface", "Box") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Surface", "Icon") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Surface", "Panel") or {} do
+for _k, _v in TS.import(script, script, "Surface") or {} do
 	exports[_k] = _v
 end
 for _k, _v in TS.import(script, script, "Layout") or {} do
