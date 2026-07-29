@@ -5,12 +5,16 @@ import {
 } from "../Theme";
 import { ButtonFlag, Intent } from "../Interfaces";
 
+type ComponentIntentColors =
+    | Partial<Record<Intent, InlineIntentColors>>
+    | Partial<Record<Intent, Partial<IntentScheme>>>;
+
 export class ColorHelper {
     public static getIntentColors(
         theme: CleanTheme,
         intent: Intent | undefined,
         state: ButtonFlag = "default",
-        componentColors?: Partial<Record<Intent, InlineIntentColors>>,
+        componentColors?: ComponentIntentColors,
     ): IntentScheme {
         const selectedIntent = intent ?? "primary";
 
@@ -30,12 +34,42 @@ export class ColorHelper {
             ...(defaultMatching[state] ?? {}),
 
             // 2. Component theme, primary intent
-            ...(componentPrimary?.default ?? {}),
-            ...(componentPrimary?.[state] ?? {}),
+            ...this.resolveComponentColors(componentPrimary, state),
 
             // 1. Component theme, matching intent
-            ...(componentMatching?.default ?? {}),
-            ...(componentMatching?.[state] ?? {}),
+            ...this.resolveComponentColors(componentMatching, state),
         };
+    }
+
+    private static resolveComponentColors(
+        colors: InlineIntentColors | Partial<IntentScheme> | undefined,
+        state: ButtonFlag,
+    ): Partial<IntentScheme> {
+        if (colors === undefined) {
+            return {};
+        }
+
+        if (this.isInlineIntentColors(colors)) {
+            return {
+                ...(colors.default ?? {}),
+                ...(colors[state] ?? {}),
+            };
+        }
+
+        // A direct Partial<IntentScheme> has no state variants,
+        // so the requested state is ignored.
+        return colors;
+    }
+
+    private static isInlineIntentColors(
+        colors: InlineIntentColors | Partial<IntentScheme>,
+    ): colors is InlineIntentColors {
+        const statefulColors = colors as InlineIntentColors;
+
+        return (
+            statefulColors.default !== undefined ||
+            statefulColors.hover !== undefined ||
+            statefulColors.focus !== undefined
+        );
     }
 }

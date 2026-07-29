@@ -5,7 +5,7 @@ declare const controls: {
     Theme: import("@rbxts/ui-labs/src/ControlTypings/Advanced").AdvancedTypes.Choose<"Default" | "Dark" | "Sandstone">;
 };
 type StoryProps = InferProps<typeof controls>;
-export declare function createStory(render: (props: StoryProps) => React.ReactNode): {
+export declare function createStory(StoryComponent: (props: StoryProps) => React.ReactNode): {
     react: typeof React;
     reactRoblox: typeof ReactRoblox;
     controls: {

@@ -49,51 +49,33 @@ do
 		for _k, _v in _condition_1 do
 			_object[_k] = _v
 		end
-		local _result = componentPrimary
-		if _result ~= nil then
-			_result = _result.default
-		end
-		local _condition_2 = _result
-		if _condition_2 == nil then
-			_condition_2 = {}
-		end
-		for _k, _v in _condition_2 do
+		for _k, _v in self:resolveComponentColors(componentPrimary, state) do
 			_object[_k] = _v
 		end
-		local _result_1 = componentPrimary
-		if _result_1 ~= nil then
-			_result_1 = _result_1[state]
-		end
-		local _condition_3 = _result_1
-		if _condition_3 == nil then
-			_condition_3 = {}
-		end
-		for _k, _v in _condition_3 do
-			_object[_k] = _v
-		end
-		local _result_2 = componentMatching
-		if _result_2 ~= nil then
-			_result_2 = _result_2.default
-		end
-		local _condition_4 = _result_2
-		if _condition_4 == nil then
-			_condition_4 = {}
-		end
-		for _k, _v in _condition_4 do
-			_object[_k] = _v
-		end
-		local _result_3 = componentMatching
-		if _result_3 ~= nil then
-			_result_3 = _result_3[state]
-		end
-		local _condition_5 = _result_3
-		if _condition_5 == nil then
-			_condition_5 = {}
-		end
-		for _k, _v in _condition_5 do
+		for _k, _v in self:resolveComponentColors(componentMatching, state) do
 			_object[_k] = _v
 		end
 		return _object
+	end
+	function ColorHelper:resolveComponentColors(colors, state)
+		if colors == nil then
+			return {}
+		end
+		if self:isInlineIntentColors(colors) then
+			local _object = table.clone((colors.default or {}))
+			setmetatable(_object, nil)
+			for _k, _v in (colors[state] or {}) do
+				_object[_k] = _v
+			end
+			return _object
+		end
+		-- A direct Partial<IntentScheme> has no state variants,
+		-- so the requested state is ignored.
+		return colors
+	end
+	function ColorHelper:isInlineIntentColors(colors)
+		local statefulColors = colors
+		return statefulColors.default ~= nil or statefulColors.hover ~= nil or statefulColors.focus ~= nil
 	end
 end
 return {

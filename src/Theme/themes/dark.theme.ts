@@ -350,6 +350,14 @@ export const DarkTheme: CleanTheme = {
                 borderColor: Color3.fromHex("#6B96F0"),
                 cornerRadius: "100%",
             }
+        },
+        toast: {
+            width: 300,
+            fadeDuration: 0.5,
+            header: {
+
+            },
+            body: {}
         }
     },
 

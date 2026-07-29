@@ -1,0 +1,145 @@
+---
+title: Toast
+description: Display temporary notifications to provide feedback to the user.
+icon: Volume2
+---
+
+<Image alt="Toast demonstration" src="/images/toast_preview.gif" style={{float: "right", width: "60%", marginLeft: "2rem", marginBottom: "1rem",}} />
+
+Toasts are small notification messages that appear on top of your interface. They are useful for showing success messages, warnings, errors, or general information without interrupting the user.
+
+<Callout type="info">
+    Wrap your application with `CleanUiProvider` (or `ToastProvider` and `ToastContainer`) before using `useToast()`.
+</Callout>
+
+<br />
+## Basic Example
+
+```tsx
+import React from "@rbxts/react";
+import { Button, useToast } from "@rbxts/react-clean-ui";
+
+export function ToastExample() {
+    const toast = useToast();
+
+    return (
+        <Button
+            text="Show Toast"
+            Event={{
+                Activated: () => {
+                    toast.show({
+                        title: "Saved",
+                        description: "Your settings have been saved.",
+                    });
+                },
+            }}
+        />
+    );
+}
+```
+
+## Different Intents
+
+```tsx
+toast.show({
+    title: "Success",
+    description: "Everything completed successfully.",
+    intent: "success",
+});
+
+toast.show({
+    title: "Warning",
+    description: "Please review your changes.",
+    intent: "warning",
+});
+
+toast.show({
+    title: "Error",
+    description: "Something went wrong.",
+    intent: "danger",
+});
+```
+
+## Custom Icon
+
+```tsx
+toast.show({
+    title: "Upload Complete",
+    description: "Your file has finished uploading.",
+    icon: "check",
+    intent: "success",
+});
+```
+
+## Persistent Toast
+
+A toast can remain on screen until it is dismissed.
+
+```tsx
+toast.show({
+    title: "Downloading...",
+    duration: math.huge,
+});
+```
+
+## Updating a Toast
+
+`show()` returns the toast ID, allowing it to be updated later.
+
+```tsx
+const id = toast.show({
+    title: "Uploading...",
+    duration: math.huge,
+});
+
+task.delay(3, () => {
+    toast.update(id, {
+        title: "Upload Complete",
+        description: "Your file has been uploaded.",
+        intent: "success",
+        duration: 3,
+    });
+});
+```
+
+## Dismissing Toasts
+
+```tsx
+const id = toast.show({
+    title: "Example",
+});
+
+toast.dismiss(id);
+```
+
+Dismiss every active toast:
+
+```tsx
+toast.dismissAll();
+```
+
+## API
+
+### `toast.show(options)`
+
+| Property      | Type              | Default     | Description                                                                                         |
+| ------------- | ----------------- | ----------- | --------------------------------------------------------------------------------------------------- |
+| `title`       | `string`          | —           | Toast title.                                                                                        |
+| `description` | `string`          | —           | Additional text shown below the title.                                                              |
+| `icon`        | `IconName`        | —           | Optional icon.                                                                                      |
+| `intent`      | `Intent`          | `"primary"` | Color theme.                                                                                        |
+| `duration`    | `number`          | `3`         | Time in seconds before automatically dismissing. Use `math.huge` for a persistent toast.            |
+| `dismissible` | `boolean`         | `true`      | Shows a close button.                                                                               |
+| `children`    | `React.ReactNode` | —           | Completely replaces the default toast content with custom UI.                                       |
+
+### `toast.update(id, options)`
+
+Updates an existing toast.
+
+### `toast.dismiss(id)`
+
+Dismisses a single toast.
+
+### `toast.dismissAll()`
+
+Dismisses every active toast.

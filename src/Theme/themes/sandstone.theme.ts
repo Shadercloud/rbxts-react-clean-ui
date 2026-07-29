@@ -352,6 +352,14 @@ export const SandstoneTheme: CleanTheme = {
                 cornerRadius: 4,
             },
         },
+        toast: {
+            width: 300,
+            fadeDuration: 0.5,
+            header: {
+
+            },
+            body: {}
+        }
     },
 
     icons: {

@@ -15,17 +15,15 @@ Then install **React Clean UI** within your roblox-ts project.
 
 ## Installation
 
-<del>
-    ```bash
-    npm install @rbxts/react-clean-ui
-    ```
-</del>
+```bash
+npm install @rbxts/react-clean-ui
+```
 
 <Callout type="warn" title="Development status">
-    React Clean UI is currently under active development and has not yet been published to NPM. APIs, component props, and installation details may change before the first stable public release.
+	React Clean UI is currently under active development and has not yet been published to NPM. APIs, component props, and installation details may change before the first stable public release.
 </Callout>
 
-Until the package is published, you can clone the repository into your project or install it directly from GitHub.
+You can also clone the repository into your project or install it directly from GitHub.
 
 ```bash
 npm install github:Shadercloud/rbxts-react-clean-ui
@@ -60,21 +58,7 @@ Create a file `/src/client/demo.client.tsx`.
 ```tsx
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
-import {
-	ThemeProvider,
-	OverlayProvider,
-	Container,
-	Box,
-	VStack,
-	HStack,
-	FlexItem,
-	Text,
-	Button,
-	Fieldset,
-	Input,
-	Select,
-	DefaultTheme,
-} from "@rbxts/react-clean-ui";
+import {CleanUiProvider, DefaultTheme, Container, Box, VStack, HStack, FlexItem, Text, Button, Fieldset, Input, Select} from "@rbxts/react-clean-ui";
 
 const playerGui = game.GetService("Players").LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
 
@@ -86,60 +70,56 @@ screenGui.Parent = playerGui;
 const root = ReactRoblox.createRoot(screenGui);
 
 root.render(
-	<ThemeProvider theme={DefaultTheme}>
-		<OverlayProvider>
-			<Container width="90%" center>
-				<Box>
-					<VStack>
-						<Container>
-							<HStack>
-								<FlexItem>
-									<Text text="Basic Form" variant="title" />
-								</FlexItem>
-								<Button icon="times" />
-							</HStack>
-						</Container>
-						<Fieldset>
-							<Fieldset.Label>
-								<Text text="Enter Name:" />
-							</Fieldset.Label>
-							<Fieldset.Control>
-								<Input placeholder="John Doe" value="" />
-							</Fieldset.Control>
-						</Fieldset>
-						<Fieldset>
-							<Fieldset.Label>
-								<Text text="Country:" />
-							</Fieldset.Label>
+ <CleanUiProvider theme={DefaultTheme}>
+   <Container width="90%" center>
+    <Box>
+     <VStack>
+      <Container>
+       <HStack>
+        <FlexItem>
+         <Text text="Basic Form" variant="title" />
+        </FlexItem>
+        <Button icon="times" />
+       </HStack>
+      </Container>
+      <Fieldset>
+       <Fieldset.Label>
+        <Text text="Enter Name:" />
+       </Fieldset.Label>
+       <Fieldset.Control>
+        <Input placeholder="John Doe" value="" />
+       </Fieldset.Control>
+      </Fieldset>
+      <Fieldset>
+       <Fieldset.Label>
+        <Text text="Country:" />
+       </Fieldset.Label>
 
-							<Fieldset.Control>
-								<Select>
-									<Select.Option text="United Kingdom" />
-									<Select.Option text="United States" />
-									<Select.Option text="Canada" />
-									<Select.Option text="Germany" />
-									<Select.Option text="France" />
-									<Select.Option text="Australia" />
-									<Select.Option text="New Zealand" />
-									<Select.Option text="Japan" />
-									<Select.Option text="South Africa" />
-								</Select>
-							</Fieldset.Control>
-						</Fieldset>
-						<Container>
-							<Button text="Submit Form" intent="info" icon="arrow-circle-right"></Button>
-						</Container>
-					</VStack>
-				</Box>
-			</Container>
-		</OverlayProvider>
-	</ThemeProvider>,
+       <Fieldset.Control>
+        <Select>
+         <Select.Option text="United Kingdom" />
+         <Select.Option text="United States" />
+         <Select.Option text="Canada" />
+         <Select.Option text="Germany" />
+         <Select.Option text="France" />
+         <Select.Option text="Australia" />
+         <Select.Option text="New Zealand" />
+         <Select.Option text="Japan" />
+         <Select.Option text="South Africa" />
+        </Select>
+       </Fieldset.Control>
+      </Fieldset>
+      <Container>
+       <Button text="Submit Form" intent="info" icon="arrow-circle-right"></Button>
+      </Container>
+     </VStack>
+    </Box>
+   </Container>
+ </CleanUiProvider>
 );
 
 ```
 
 ### Notes
 
-You do not need to include the `<ThemeProvider>` if you plan to use only the default theme.
-
-`<OverlayProvider>` is only required if you plan to use certain components that popup, such as `<Select>`
+`<CleanUiProvider>` wraps are number of 

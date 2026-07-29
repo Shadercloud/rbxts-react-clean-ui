@@ -1,4 +1,4 @@
-import { CssShadow, CssSize, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, ButtonFlag } from "../Interfaces/";
+import { CssShadow, CssSize, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, ButtonFlag, PositionElementProps } from "../Interfaces/";
 export interface TypographyStyle {
     font: Enum.Font;
     size: Enum.FontSize;
@@ -161,6 +161,23 @@ export interface CleanTheme {
                 backgroundColor: Color3;
                 backgroundTransparency: number;
                 aspectRation?: number;
+            };
+        };
+        toast: {
+            width: CssSize;
+            fadeDuration: number;
+            position?: PositionElementProps;
+            intents?: Partial<Record<Intent, Partial<IntentScheme>>>;
+            header: {
+                typography?: Partial<TypographyStyle>;
+            };
+            body: {
+                typography?: Partial<TypographyStyle>;
+            };
+            statusBar?: {
+                position: "Top" | "Bottom";
+                height: CssSize;
+                intents?: Partial<Record<Intent, Partial<IntentScheme>>>;
             };
         };
     };

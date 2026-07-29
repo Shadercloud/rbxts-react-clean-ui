@@ -386,6 +386,61 @@ local DefaultTheme = {
 				aspectRation = 1,
 			},
 		},
+		toast = {
+			fadeDuration = 0.5,
+			width = 300,
+			position = {
+				right = 5,
+				top = 5,
+			},
+			header = {
+				typography = {
+					weight = Enum.FontWeight.Bold,
+				},
+			},
+			body = {},
+			intents = {
+				primary = {
+					backgroundTransparency = 0,
+				},
+				success = {
+					backgroundColor = Color3.fromHex("#dcf5e8"),
+				},
+				info = {
+					backgroundColor = Color3.fromHex("#b3d7f2"),
+				},
+				warning = {
+					backgroundColor = Color3.fromHex("#f7e1b5"),
+					textColor = Color3.fromHex("#75520f"),
+				},
+				danger = {
+					backgroundColor = Color3.fromHex("#edafaf"),
+					textColor = Color3.fromHex("#731717"),
+				},
+			},
+			statusBar = {
+				height = 4,
+				position = "Bottom",
+				intents = {
+					primary = {
+						backgroundColor = Color3.fromHex("#000000"),
+						backgroundTransparency = 0.5,
+					},
+					success = {
+						backgroundColor = Color3.fromHex("#237D4D"),
+					},
+					info = {
+						backgroundColor = Color3.fromHex("#3187C8"),
+					},
+					warning = {
+						backgroundColor = Color3.fromHex("#C58B1D"),
+					},
+					danger = {
+						backgroundColor = Color3.fromHex("#D64545"),
+					},
+				},
+			},
+		},
 	},
 	icons = {
 		["shopping-cart"] = 112388431913339,

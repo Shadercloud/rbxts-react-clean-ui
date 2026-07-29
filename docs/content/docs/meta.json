@@ -1,29 +1,17 @@
 {
     "pages": [
         "index",
+
         "---Getting Started---",
         "quickstart",
         "development",
 
-        "---Layout Components---",
-        "components/container",
-        "components/row",
-        "components/dragdrop",
-
-        "---Surface Components---",
-        "components/icon",
-        "components/box",
-        "components/card",
-
-        "---Form Components---",
-        "components/fieldset",
-        "components/input",
-        "components/select",
-        "components/checkbox",
-        "components/slider",
-
-        "---Navigation Components---",
-        "components/menu",
+        "---[Puzzle]Components---",
+        "components/layout",
+        "components/surface",
+        "components/form",
+        "components/navigation",
+        "components/interaction",
 
         "---More---",
         "known_issues"

@@ -328,6 +328,12 @@ local DarkTheme = {
 				cornerRadius = "100%",
 			},
 		},
+		toast = {
+			width = 300,
+			fadeDuration = 0.5,
+			header = {},
+			body = {},
+		},
 	},
 	icons = {
 		["shopping-cart"] = 112388431913339,

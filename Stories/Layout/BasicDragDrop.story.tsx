@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Intent, Button, Card, Container, createStory, HStack, Text, Droppable, Box, Draggable } from "@rbxts/react-clean-ui";
+import { Container, createStory, Text, Droppable, Box, Draggable } from "@rbxts/react-clean-ui";
 
 export = createStory((props) => (
     <>

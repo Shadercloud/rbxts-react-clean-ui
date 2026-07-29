@@ -7,9 +7,6 @@ end
 for _k, _v in TS.import(script, script, "color.helper") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "create-ui-story") or {} do
-	exports[_k] = _v
-end
 for _k, _v in TS.import(script, script, "css.helper") or {} do
 	exports[_k] = _v
 end

@@ -7,14 +7,11 @@ local DarkTheme = _Theme.DarkTheme
 local DefaultTheme = _Theme.DefaultTheme
 local SandstoneTheme = _Theme.SandstoneTheme
 local Choose = TS.import(script, TS.getModule(script, "@rbxts", "ui-labs").src).Choose
-local _ = TS.import(script, script.Parent.Parent, "Providers")
-local OverlayProvider = _.OverlayProvider
-local ThemeProvider = _.ThemeProvider
-local RegistryProvider = TS.import(script, script.Parent.Parent, "Providers", "registry.provider").RegistryProvider
+local CleanUiProvider = TS.import(script, script.Parent.Parent, "Providers", "app.provider").CleanUiProvider
 local controls = {
 	Theme = Choose({ "Default", "Dark", "Sandstone" }),
 }
-local function createStory(render)
+local function createStory(StoryComponent)
 	return {
 		react = React,
 		reactRoblox = ReactRoblox,
@@ -27,9 +24,11 @@ local function createStory(render)
 			if props.controls.Theme == "Sandstone" then
 				theme = SandstoneTheme
 			end
-			return React.createElement(RegistryProvider, nil, React.createElement(ThemeProvider, {
+			local _attributes = table.clone(props)
+			setmetatable(_attributes, nil)
+			return React.createElement(CleanUiProvider, {
 				theme = theme,
-			}, React.createElement(OverlayProvider, nil, render(props))))
+			}, React.createElement(StoryComponent, _attributes))
 		end,
 	}
 end
