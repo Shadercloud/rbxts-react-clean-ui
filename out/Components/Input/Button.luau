@@ -1,9 +1,6 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
-local _react = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local React = _react
-local Component = _react.Component
-local ReactComponent = _react.ReactComponent
+local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local BoxShadow = _Decorator.BoxShadow
@@ -37,12 +34,14 @@ local function ButtonIcon(props)
 		color = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).textColor,
 	})
 end
-local function ButtonRender(props)
+local Button = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local hover, setHover = React.useState(false)
 	local group = React.useContext(GroupContext)
 	local padding = SpacingHelper:GetResolvedPadding(theme, props)
-	local _attributes = {}
+	local _attributes = {
+		ref = ref,
+	}
 	local _object = {}
 	local _spread = props.Event
 	if _spread then
@@ -127,33 +126,9 @@ local function ButtonRender(props)
 		intent = props.intent,
 		scale = props.scale,
 	})), props.children))
-end
-local Button
-do
-	local super = Component
-	Button = setmetatable({}, {
-		__tostring = function()
-			return "Button"
-		end,
-		__index = super,
-	})
-	Button.__index = Button
-	function Button.new(...)
-		local self = setmetatable({}, Button)
-		return self:constructor(...) or self
-	end
-	function Button:constructor(...)
-		super.constructor(self, ...)
-	end
-	function Button:render()
-		local _attributes = table.clone(self.props)
-		setmetatable(_attributes, nil)
-		return React.createElement(ButtonRender, _attributes)
-	end
-	Button.Text = ButtonText
-	Button.Icon = ButtonIcon
-	Button = ReactComponent(Button) or Button
-end
+end)
+Button.Text = ButtonText
+Button.Icon = ButtonIcon
 return {
 	Button = Button,
 }

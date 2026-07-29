@@ -198,6 +198,12 @@ export interface CleanTheme {
             }
 
         };
+        tooltip: {
+            spacing?: ScaleSizeValue<number>;
+            boxShadow?: CssShadow;
+            cornerRadius: CssSize;
+            intents?: Partial<Record<Intent, Partial<IntentScheme>>>;
+        }
     };
 
     icons: Partial<IconSet>;

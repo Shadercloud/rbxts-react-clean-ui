@@ -458,6 +458,32 @@ export const DefaultTheme: CleanTheme = {
                     }
                 }
             }
+        },
+        tooltip: {
+            spacing: {
+                xs: 2,
+                sm: 6,
+                md: 10,
+                lg: 12,
+                xl: 20,
+            },
+            cornerRadius: 8,
+            boxShadow: "2px 2px 2px 2px",
+            intents: {
+                success: {
+                    textColor: Color3.fromHex("#FFFFFF")
+                },
+                warning: {
+                    textColor: Color3.fromHex("#75520f")
+                },
+                danger: {
+                    textColor: Color3.fromHex("#731717")
+                },
+                info: {
+                    textColor: Color3.fromHex("#FFFFFF")
+                }
+            }
+
         }
     },
 

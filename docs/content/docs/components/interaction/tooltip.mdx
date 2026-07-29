@@ -1,0 +1,89 @@
+---
+title: Tooltip
+description: Display helpful information when users hover over an element.
+icon: MessageCircle
+---
+
+<Image alt="Tooltip demonstration" src="/images/tooltip_preview.gif" style={{marginBottom: "1rem",}} />
+
+Tooltips provide additional context for buttons, text, and other interface elements without taking up permanent space. They appear when the user hovers over the wrapped element. The tooltip can display either simple text or custom React content.
+
+## Basic Usage
+
+Wrap any single UI element with a `Tooltip` and provide the tooltip content.
+
+```tsx
+<Tooltip content="Save your changes">
+    <Button text="Save" />
+</Tooltip>
+```
+
+## Placement
+
+Use the `placement` prop to control where the tooltip appears relative to its target.
+
+```tsx
+<Tooltip content="Above" placement="Top">
+    <Button text="Top" />
+</Tooltip>
+
+<Tooltip content="Below" placement="Bottom">
+    <Button text="Bottom" />
+</Tooltip>
+
+<Tooltip content="Left" placement="Left">
+    <Button text="Left" />
+</Tooltip>
+
+<Tooltip content="Right" placement="Right">
+    <Button text="Right" />
+</Tooltip>
+```
+
+## Intent
+
+Tooltips support the standard intent colors.
+
+```tsx
+<Tooltip
+    content="Operation completed successfully!"
+    intent="success"
+>
+    <Button intent="success" text="Success" />
+</Tooltip>
+```
+
+## Custom Content
+
+The `content` prop can contain any React element, allowing you to build richer tooltips.
+
+```tsx
+<Tooltip
+    placement="Right"
+    intent="warning"
+    content={
+        <Container>
+            <VStack spacing="None">
+                <HStack>
+                    <Icon icon="hand-peace-o" />
+                    <Text text="With an Icon!" variant="heading" />
+                </HStack>
+
+                <Text text="You can place any React UI inside a tooltip." />
+            </VStack>
+        </Container>
+    }
+>
+    <Button text="Custom Tooltip" />
+</Tooltip>
+```
+
+## Props
+
+| Prop        | Type           | Description                                         |
+| ----------- | -------------- | --------------------------------------------------- |
+| `content`   | `string`       | `React.ReactNode`                                    | The content displayed inside the tooltip. |
+| `placement` | `"Top"`        | "Bottom"                                            | `"Left"`  | `"Right"` | Controls where the tooltip appears. Defaults to `"Top"`. |
+| `intent`    | `Intent`       | Applies one of the standard intent color schemes.   |
+| `spacing`   | `Spacing`      | Controls the internal padding of the tooltip.       |
+| `children`  | `ReactElement` | The element that triggers the tooltip when hovered. |

@@ -180,6 +180,12 @@ export interface CleanTheme {
                 intents?: Partial<Record<Intent, Partial<IntentScheme>>>;
             };
         };
+        tooltip: {
+            spacing?: ScaleSizeValue<number>;
+            boxShadow?: CssShadow;
+            cornerRadius: CssSize;
+            intents?: Partial<Record<Intent, Partial<IntentScheme>>>;
+        };
     };
     icons: Partial<IconSet>;
     iconSize: ScaleSizeValue<number>;

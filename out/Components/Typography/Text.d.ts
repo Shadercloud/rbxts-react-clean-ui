@@ -1,5 +1,4 @@
-import React, { Component } from "@rbxts/react";
-import { CleanThemeContext } from "../../Contexts";
+import React from "@rbxts/react";
 import { TypographyStyle } from "../../Theme";
 import { TextVariant } from "../../Interfaces/";
 interface TextProps extends React.InstanceProps<TextLabel> {
@@ -10,9 +9,5 @@ interface TextProps extends React.InstanceProps<TextLabel> {
     align?: "Left" | "Right" | "Center";
     TextWrap?: boolean;
 }
-export declare class Text extends Component<TextProps> {
-    static contextType: React.Context<import("../../Theme").CleanTheme>;
-    context: React.ContextType<typeof CleanThemeContext>;
-    render(): React.ReactNode;
-}
+export declare const Text: React.ForwardRefExoticComponent<Omit<TextProps, "ref"> & React.RefAttributes<TextLabel>>;
 export {};

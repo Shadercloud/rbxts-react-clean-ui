@@ -1,4 +1,4 @@
-import React, { Component } from "@rbxts/react";
+import React from "@rbxts/react";
 import { BackgroundElementProps, IconElementProps, IntentElementProps, ScalableElementProps, ShadowElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { IconProps } from "../Surface";
 export interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIndexElementProps, BackgroundElementProps, IntentElementProps, ScalableElementProps, IconElementProps {
@@ -16,9 +16,9 @@ declare function ButtonText(props: ButtonTextProps): React.JSX.Element;
 export interface ButtonIconProps extends IconProps, IntentElementProps {
 }
 declare function ButtonIcon(props: ButtonIconProps): React.JSX.Element;
-export declare class Button extends Component<ButtonProps> {
-    static Text: typeof ButtonText;
-    static Icon: typeof ButtonIcon;
-    render(): React.ReactNode;
-}
-export {};
+type ButtonComponent = React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<ImageButton>> & {
+    Text: typeof ButtonText;
+    Icon: typeof ButtonIcon;
+};
+declare const Button: ButtonComponent;
+export { Button };

@@ -1,13 +1,7 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local exports = {}
-for _k, _v in TS.import(script, script, "Decorator", "BoxShadow") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Decorator", "Corners") or {} do
-	exports[_k] = _v
-end
-for _k, _v in TS.import(script, script, "Decorator", "Padding") or {} do
+for _k, _v in TS.import(script, script, "Decorator") or {} do
 	exports[_k] = _v
 end
 for _k, _v in TS.import(script, script, "Surface") or {} do
@@ -23,6 +17,9 @@ for _k, _v in TS.import(script, script, "Typography", "Text") or {} do
 	exports[_k] = _v
 end
 for _k, _v in TS.import(script, script, "Navigation", "Menu") or {} do
+	exports[_k] = _v
+end
+for _k, _v in TS.import(script, script, "Interaction") or {} do
 	exports[_k] = _v
 end
 return exports

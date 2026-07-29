@@ -1,4 +1,4 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import {
     BackgroundElementProps,
     IconElementProps,
@@ -79,93 +79,98 @@ function ButtonIcon(props: ButtonIconProps) {
         } />
 }
 
-function ButtonRender(props: ButtonProps) {
-    const theme = React.useContext(CleanThemeContext);
-    const [hover, setHover] = React.useState(false);
+type ButtonComponent = React.ForwardRefExoticComponent<
+    ButtonProps & React.RefAttributes<ImageButton>
+> & {
+    Text: typeof ButtonText;
+    Icon: typeof ButtonIcon;
+};
 
-    const group = React.useContext(GroupContext)
+const Button = React.forwardRef<ImageButton, ButtonProps>(
+    (props, ref) => {
+        const theme = React.useContext(CleanThemeContext);
+        const [hover, setHover] = React.useState(false);
 
-    const padding = SpacingHelper.GetResolvedPadding(theme, props);
+        const group = React.useContext(GroupContext)
 
-    return (
-        <imagebutton
-            Event={{
-                ...props.Event,
+        const padding = SpacingHelper.GetResolvedPadding(theme, props);
 
-                MouseEnter: (button, x, y) => {
-                    setHover(true);
+        return (
+            <imagebutton
+                ref={ref}
+                Event={{
+                    ...props.Event,
 
-                    props.Event?.MouseEnter?.(button, x, y);
-                },
+                    MouseEnter: (button, x, y) => {
+                        setHover(true);
 
-                MouseLeave: (button, x, y) => {
-                    setHover(false);
+                        props.Event?.MouseEnter?.(button, x, y);
+                    },
 
-                    props.Event?.MouseLeave?.(button, x, y);
-                },
+                    MouseLeave: (button, x, y) => {
+                        setHover(false);
 
-            }}
+                        props.Event?.MouseLeave?.(button, x, y);
+                    },
 
-            Size={UDim2.fromOffset(props.group ? group?.size?.X ?? 0 : 0, 0)}
-            AutomaticSize={Enum.AutomaticSize.XY}
-            BackgroundTransparency={
-                props.BackgroundTransparency ??
-                theme.components.button.backgroundTransparency
-            }
-            BackgroundColor3={ColorHelper.getIntentColors(
-                theme,
-                props.intent,
-                hover ? "hover" : "default",
-                theme.components.button.intents,
-            ).backgroundColor}
-            AutoButtonColor={false}
-            ZIndex={props.ZIndex}
-        >
-            <Corners radius={theme.components.button.cornerRadius} />
+                }}
 
-            <uistroke
-                Thickness={theme.components.button.borderThickness}
-                BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-                Color={ColorHelper.getIntentColors(
+                Size={UDim2.fromOffset(props.group ? group?.size?.X ?? 0 : 0, 0)}
+                AutomaticSize={Enum.AutomaticSize.XY}
+                BackgroundTransparency={
+                    props.BackgroundTransparency ??
+                    theme.components.button.backgroundTransparency
+                }
+                BackgroundColor3={ColorHelper.getIntentColors(
                     theme,
                     props.intent,
-                    "default",
+                    hover ? "hover" : "default",
                     theme.components.button.intents,
-                ).borderColor}
-            />
+                ).backgroundColor}
+                AutoButtonColor={false}
+                ZIndex={props.ZIndex}
+            >
+                <Corners radius={theme.components.button.cornerRadius} />
 
-            <BoxShadow {...props} value={theme.components.button.boxShadow} />
-            <Padding {...props} />
-            <Group.Element enabled={props.group} padding={padding}>
+                <uistroke
+                    Thickness={theme.components.button.borderThickness}
+                    BorderStrokePosition={Enum.BorderStrokePosition.Inner}
+                    Color={ColorHelper.getIntentColors(
+                        theme,
+                        props.intent,
+                        "default",
+                        theme.components.button.intents,
+                    ).borderColor}
+                />
 
-                {(props.icon !== undefined || props.text !== undefined) &&
-                    <HStack valign="Center" spacing={props.spacing}>
-                        {props.icon !== undefined &&
-                            <ButtonIcon
-                                scale={props.scale}
-                                intent={props.intent}
-                                icon={props.icon} />
-                        }
-                        {props.text !== undefined &&
-                            <ButtonText
-                                text={props.text}
-                                intent={props.intent}
-                                scale={props.scale} />
-                        }
-                    </HStack>
-                }
+                <BoxShadow {...props} value={theme.components.button.boxShadow} />
+                <Padding {...props} />
+                <Group.Element enabled={props.group} padding={padding}>
 
-                {props.children}
-            </Group.Element>
-        </imagebutton>
-    );
-}
+                    {(props.icon !== undefined || props.text !== undefined) &&
+                        <HStack valign="Center" spacing={props.spacing}>
+                            {props.icon !== undefined &&
+                                <ButtonIcon
+                                    scale={props.scale}
+                                    intent={props.intent}
+                                    icon={props.icon} />
+                            }
+                            {props.text !== undefined &&
+                                <ButtonText
+                                    text={props.text}
+                                    intent={props.intent}
+                                    scale={props.scale} />
+                            }
+                        </HStack>
+                    }
 
-@ReactComponent
-export class Button extends Component<ButtonProps> {
-    static Text = ButtonText
-    static Icon = ButtonIcon
-    render(): React.ReactNode {
-        return <ButtonRender  {...this.props} />
-    }
-}
+                    {props.children}
+                </Group.Element>
+            </imagebutton>
+        );
+    }) as ButtonComponent
+
+Button.Text = ButtonText;
+Button.Icon = ButtonIcon;
+
+export { Button }

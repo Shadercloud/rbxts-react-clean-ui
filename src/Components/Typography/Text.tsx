@@ -1,4 +1,4 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
 import { TypographyStyle } from "../../Theme";
 import { TextVariant } from "../../Interfaces/";
@@ -11,34 +11,34 @@ interface TextProps extends React.InstanceProps<TextLabel> {
     align?: "Left" | "Right" | "Center";
     TextWrap?: boolean
 }
-@ReactComponent
-export class Text extends Component<TextProps> {
-    static contextType = CleanThemeContext;
+export const Text = React.forwardRef<TextLabel, TextProps>(
+    (props, ref) => {
+        const theme = React.useContext(CleanThemeContext);
 
-    declare context: React.ContextType<typeof CleanThemeContext>;
 
-    render(): React.ReactNode {
-        const style = this.props.typography ?? this.context.typography[this.props.variant ?? "body"]
+        const style = props.typography ?? theme.typography[props.variant ?? "body"]
 
         const weight =
-            this.props.weight === "bold"
+            props.weight === "bold"
                 ? Enum.FontWeight.Bold
-                : this.props.weight ?? style.weight ?? Enum.FontWeight.Regular;
+                : props.weight ?? style.weight ?? Enum.FontWeight.Regular;
 
         return <textlabel
+            ref={ref}
             Size={UDim2.fromScale(0, 0)}
             AutomaticSize={Enum.AutomaticSize.XY}
             LineHeight={style.lineHeight}
             BackgroundTransparency={1}
-            TextXAlignment={this.props.align ?? (this.props.TextXAlignment ?? Enum.TextXAlignment.Left)}
-            TextColor3={this.props.TextColor3 ?? this.context.colors.intents.primary.default.textColor}
-            Text={this.props.text}
-            TextWrap={this.props.TextWrap === undefined || this.props.TextWrap === true}
+            TextXAlignment={props.align ?? (props.TextXAlignment ?? Enum.TextXAlignment.Left)}
+            TextColor3={props.TextColor3 ?? theme.colors.intents.primary.default.textColor}
+            Text={props.text}
+            TextWrap={props.TextWrap === undefined || props.TextWrap === true}
             FontFace={Font.fromName(style.font.Name, weight)}
             FontSize={style.size}
             RichText
+            Event={props.Event}
             TextScaled={false} >
-            {this.props.children}
+            {props.children}
         </textlabel>
     }
-}
+);
