@@ -1,0 +1,85 @@
+---
+title: Tabs
+description: Display content in switchable tab panels.
+icon: AppWindow
+---
+
+The `Tabs` component groups related content into separate panels. Selecting a tab displays its associated content.
+
+## Basic usage
+
+```tsx
+import React from "@rbxts/react";
+import { Tabs, Text } from "@rbxts/react-clean-ui";
+
+export function TabsExample() {
+    return (
+        <Tabs>
+            <Tabs.Tab>
+                <Tabs.Title text="First Tab" />
+                <Tabs.Content>
+                    <Text text="Content for the first tab." />
+                </Tabs.Content>
+            </Tabs.Tab>
+
+            <Tabs.Tab>
+                <Tabs.Title text="Second Tab" />
+                <Tabs.Content>
+                    <Text text="Content for the second tab." />
+                </Tabs.Content>
+            </Tabs.Tab>
+        </Tabs>
+    );
+}
+```
+
+## With a scroller
+
+Use a `Scroller` inside `Tabs.Content` when the panel contains more content than the available space.
+
+```tsx
+import React from "@rbxts/react";
+import { Scroller, Tabs, Text } from "@rbxts/react-clean-ui";
+
+export function ScrollableTabsExample() {
+    return (
+        <Tabs>
+            <Tabs.Tab>
+                <Tabs.Title text="Scrollable" />
+                <Tabs.Content>
+                    <Scroller height="200">
+                        <Text text="Long scrollable content..." />
+                    </Scroller>
+                </Tabs.Content>
+            </Tabs.Tab>
+        </Tabs>
+    );
+}
+```
+
+## Structure
+
+A `Tabs` component is made from the following child components:
+
+- `Tabs.Tab` defines a single tab.
+- `Tabs.Title` defines the tab button text.
+- `Tabs.Content` defines the content displayed when the tab is selected.
+
+Only `Tabs.Tab` children are read directly by `Tabs`. Each tab must contain a `Tabs.Title` to be included.
+
+## Tabs.Title
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `text` | `string` | Text displayed in the tab button. |
+| `children` | `React.ReactNode` | Optional children. |
+
+## Tabs.Content
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `React.ReactNode` | Content displayed while the tab is selected. |
+
+## Default selection
+
+The first tab is selected by default.
