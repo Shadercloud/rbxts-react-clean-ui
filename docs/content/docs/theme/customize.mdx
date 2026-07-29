@@ -1,0 +1,86 @@
+---
+title: Customize / Extend
+description: Learn how to customize existing themes or create your own.
+icon: Paintbrush
+---
+
+React Clean UI themes are fully customizable.
+
+The easiest way to create your own theme is to start from an existing one and override only the values you want to change.
+
+## Extending an Existing Theme
+
+Use `extendTheme()` to create a new theme from any existing theme.
+
+```tsx
+import {
+    DefaultTheme,
+    extendTheme,
+} from "@rbxts/react-clean-ui";
+
+const MyTheme = extendTheme(DefaultTheme, {
+    colors: {
+        intents: {
+            primary: {
+                default: {
+                    backgroundColor: Color3.fromRGB(82, 113, 255),
+                },
+            },
+        },
+    },
+});
+```
+
+Only the properties you specify are changed. Everything else continues to use the values from the original theme.
+
+## Creating a Theme
+
+If you'd rather start from the default theme, use `createTheme()`.
+
+```tsx
+import { createTheme } from "@rbxts/react-clean-ui";
+
+const MyTheme = createTheme({
+    spacing: {
+        md: 16,
+    },
+
+    radius: {
+        md: 12,
+    },
+});
+```
+
+This works the same way as `extendTheme()`, except it always starts from the library's default theme.
+
+## Deep Merging
+
+Themes are merged recursively.
+
+That means you only need to override the settings you care about.
+
+For example, changing a single color will not replace the rest of the theme—it simply updates that one value while leaving everything else unchanged.
+
+```tsx
+const MyTheme = extendTheme(DefaultTheme, {
+    typography: {
+        heading: {
+            weight: Enum.FontWeight.Bold,
+        },
+    },
+});
+```
+
+## Using Your Theme
+
+Once you've created your theme, pass it to the `ThemeProvider`.
+
+```tsx
+import { CleanUiProvider } from "@rbxts/react-clean-ui";
+
+<CleanUiProvider theme={MyTheme}>
+    <App />
+</CleanUiProvider>;
+```
+
+Every React Clean UI component will automatically use your customized theme.

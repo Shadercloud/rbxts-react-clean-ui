@@ -1,8 +1,8 @@
-import { CleanTheme } from "../CleanTheme";
+import { createTheme } from "../theme.factory";
 
 const font = Enum.Font.Jura;
 
-export const DarkTheme: CleanTheme = {
+export const DarkTheme = createTheme({
     colors: {
         intents: {
             primary: {
@@ -372,4 +372,5 @@ export const DarkTheme: CleanTheme = {
         lg: 24,
         xl: 30,
     },
-};
+});
+

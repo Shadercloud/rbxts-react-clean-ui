@@ -1,3 +1,4 @@
-export * from './CleanTheme';
-export * from './DefaultIcons';
+export * from './theme.template';
+export * from './theme.factory';
+export * from './icons.default';
 export * from './themes/';

@@ -1,3 +1,3 @@
 import React from "@rbxts/react";
-import { CleanTheme } from "../Theme/CleanTheme";
+import { CleanTheme } from "../Theme/theme.template";
 export declare const CleanThemeContext: React.Context<CleanTheme>;

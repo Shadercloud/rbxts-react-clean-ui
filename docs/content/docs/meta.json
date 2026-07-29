@@ -13,6 +13,10 @@
         "components/navigation",
         "components/interaction",
 
+        "---Theming---",
+        "theme/default",
+        "theme/customize",
+
         "---More---",
         "known_issues"
     ]

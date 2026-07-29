@@ -1,8 +1,8 @@
-import { CleanTheme } from "../CleanTheme";
+import { createTheme } from "../theme.factory";
 
 const font = Enum.Font.SourceSans;
 
-export const SandstoneTheme: CleanTheme = {
+export const SandstoneTheme = createTheme({
     colors: {
         intents: {
             primary: {
@@ -373,4 +373,4 @@ export const SandstoneTheme: CleanTheme = {
         lg: 24,
         xl: 30,
     },
-};
+});

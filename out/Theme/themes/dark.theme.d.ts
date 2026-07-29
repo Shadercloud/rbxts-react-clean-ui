@@ -1,2 +1,1 @@
-import { CleanTheme } from "../CleanTheme";
-export declare const DarkTheme: CleanTheme;
+export declare const DarkTheme: import("..").CleanTheme;

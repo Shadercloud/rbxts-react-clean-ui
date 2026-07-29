@@ -1,4 +1,4 @@
-import { CleanTheme } from "../CleanTheme"
+import { CleanTheme } from "../theme.template"
 
 const font = Enum.Font.Gotham
 export const DefaultTheme: CleanTheme = {

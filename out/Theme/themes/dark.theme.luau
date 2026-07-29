@@ -1,6 +1,8 @@
 -- Compiled with roblox-ts v3.0.0
+local TS = _G[script]
+local createTheme = TS.import(script, script.Parent.Parent, "theme.factory").createTheme
 local font = Enum.Font.Jura
-local DarkTheme = {
+local DarkTheme = createTheme({
 	colors = {
 		intents = {
 			primary = {
@@ -345,7 +347,7 @@ local DarkTheme = {
 		lg = 24,
 		xl = 30,
 	},
-}
+})
 return {
 	DarkTheme = DarkTheme,
 }

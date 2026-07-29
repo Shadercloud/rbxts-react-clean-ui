@@ -13,17 +13,10 @@ It provides reusable, theme-aware components for common interface patterns, allo
 
 ```tsx
 import React from "@rbxts/react";
-import {
-    Box,
-    Button,
-    Container,
-    HStack,
-    Text,
-    VStack,
-} from "@rbxts/react-clean-ui";
+import { Box, Button, Container, HStack, Text, VStack } from "@rbxts/react-clean-ui";
 export function WelcomePanel() {
     return (
-        <Container width="100%" height="100%" center="50%">
+        <Container width="80%" height="300px" center>
             <Box spacing="lg">
                 <VStack>
                     <Text text="Welcome" variant="title" />

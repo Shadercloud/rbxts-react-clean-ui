@@ -1,0 +1,50 @@
+---
+title: Out of the Box
+description: Learn about the built-in themes included with React Clean UI.
+icon: Palette
+---
+
+# Themes
+
+Every component in React Clean UI gets its appearance from a **theme**.
+
+Rather than configuring each component individually, you provide a theme to the `ThemeProvider`, and every component automatically uses the colors, spacing, typography, sizing, and other design tokens defined by that theme.
+
+```tsx
+import { CleanUiProvider, DefaultTheme } from "@rbxts/react-clean-ui";
+
+<CleanUiProvider theme={DefaultTheme}>
+    <App />
+</CleanUiProvider>;
+```
+
+## Included Themes
+
+React Clean UI ships with several ready-to-use themes:
+
+- `DefaultTheme`
+- `DarkTheme`
+- `SandstoneTheme`
+
+Each theme provides a complete set of styling values while sharing the same underlying theme structure, making it easy to switch between themes without changing your components.
+
+## Why Themes?
+
+Using themes keeps your UI consistent across your entire application.
+
+A single theme controls things like:
+
+- Colors
+- Typography
+- Spacing
+- Border radius
+- Icons
+- Component styling
+
+Because every component reads from the active theme, changing the theme instantly updates the appearance of your entire interface.
+
+## Next Steps
+
+The built-in themes are designed to work well out of the box, but you can also customize or extend them to match your own game's visual style.
+
+See the **Customize / Extend** guide to learn how.

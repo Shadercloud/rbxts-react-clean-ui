@@ -1,6 +1,8 @@
 -- Compiled with roblox-ts v3.0.0
+local TS = _G[script]
+local createTheme = TS.import(script, script.Parent.Parent, "theme.factory").createTheme
 local font = Enum.Font.SourceSans
-local SandstoneTheme = {
+local SandstoneTheme = createTheme({
 	colors = {
 		intents = {
 			primary = {
@@ -345,7 +347,7 @@ local SandstoneTheme = {
 		lg = 24,
 		xl = 30,
 	},
-}
+})
 return {
 	SandstoneTheme = SandstoneTheme,
 }
