@@ -3,8 +3,8 @@ const basePath = process.env.NODE_ENV === "production"
   ? "/rbxts-react-clean-ui"
   : "";
 
-export const docsRoute =  `${basePath}/`;
-export const docsImageRoute =  `${basePath}/og/docs`;
+export const docsRoute =  `/`;
+export const docsImageRoute =  `/og/docs`;
 export const docsContentRoute = `${basePath}/llms.mdx/docs`;
 
 // fill this with your actual GitHub info, for example:
