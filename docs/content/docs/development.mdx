@@ -4,13 +4,13 @@ description: Set up a local development environment and contribute to React Clea
 icon: SquareTerminal
 ---
 
-This guide explains how to set up a local environment for developing **React Clean UI** or contributing to the documentation.
+This guide explains how to set up a local environment for developing **React Clean UI**.
+
+Follow the guide directions careful, as this step method will allow you to preview your work using **Stories** in the [UI Labs plugin](https://ui-labs.luau.page/docs/installation).
 
 <Callout type="info">
     This guide assumes you're already familiar with **roblox-ts**, **Rojo**, and **Roblox Studio**.
 </Callout>
-
-# Developing React Clean UI
 
 ## 1. Create a development project
 
@@ -99,12 +99,12 @@ Replace your root project's `tsconfig.json` with the following:
             "@rbxts/ui-labs": [
                 "../node_modules/@rbxts/ui-labs"
             ],
-            "ripple": {
-                "$path": "node_modules/@rbxts/ripple"
-            },
-            "react-ripple": {
-                "$path": "node_modules/@rbxts/react-ripple"
-            },
+            "ripple": [
+                "../node_modules/@rbxts/ripple"
+            ],
+            "react-ripple": [
+                "../node_modules/@rbxts/react-ripple"
+            ],
             "@rbxts/services": [
                 "../node_modules/@rbxts/services"
             ],
@@ -125,111 +125,120 @@ Replace your root project's `tsconfig.json` with the following:
 
 ## 5. Configure Rojo
 
+You must install [Rojo](https://rojo.space/docs/v7/getting-started/installation/) (easier method is by using the Rojo Extension for `VS Studio Code``)
+
 Create a `default.project.json` file in the root of your development project.
 
 ```json
 {
-    "name": "React Clean UI Dev Environment",
-    "globIgnorePaths": [
-        "**/package.json",
-        "**/tsconfig.json"
-    ],
-    "tree": {
-        "$className": "DataModel",
-        "ServerScriptService": {
-            "$className": "ServerScriptService",
-            "TS": {
-                "$path": "out/server"
-            }
-        },
-        "ReplicatedStorage": {
-            "$className": "ReplicatedStorage",
-            "rbxts_include": {
-                "$path": "include",
-                "node_modules": {
-                    "$className": "Folder",
-                    "@rbxts": {
-                        "$className": "Folder",
-                        "compiler-types": {
-                            "$path": "node_modules/@rbxts/compiler-types"
-                        },
-                        "react": {
-                            "$path": "node_modules/@rbxts/react"
-                        },
-                        "react-roblox": {
-                            "$path": "node_modules/@rbxts/react-roblox"
-                        },
-                        "ui-labs": {
-                            "$path": "node_modules/@rbxts/ui-labs"
-                        },
-                        "services": {
-                            "$path": "node_modules/@rbxts/services"
-                        },
-                        "types": {
-                            "$path": "node_modules/@rbxts/types"
-                        },
-                        "rbxts-react-clean-ui": {
-                            "$path": "out/Packages/rbxts-react-clean-ui/out"
-                        }
-                    },
-                    "@rbxts-js": {
-                        "$path": "node_modules/@rbxts-js"
-                    }
-                }
-            },
-            "TS": {
-                "$path": "out/shared"
-            },
-            "PackageStories": {
-                "$path": "out/Packages/rbxts-react-clean-ui/Stories"
-            }
-        },
-        "StarterPlayer": {
-            "$className": "StarterPlayer",
-            "StarterPlayerScripts": {
-                "$className": "StarterPlayerScripts",
-                "TS": {
-                    "$path": "out/client"
-                }
-            }
-        },
-        "Workspace": {
-            "$className": "Workspace",
-            "$properties": {
-                "FilteringEnabled": true
-            }
-        },
-        "HttpService": {
-            "$className": "HttpService",
-            "$properties": {
-                "HttpEnabled": true
-            }
-        },
-        "SoundService": {
-            "$className": "SoundService",
-            "$properties": {
-                "RespectFilteringEnabled": true
-            }
-        }
-    }
+	"name": "React Clean UI Dev Environment",
+	"globIgnorePaths": [
+		"**/package.json",
+		"**/tsconfig.json"
+	],
+	"tree": {
+		"$className": "DataModel",
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"TS": {
+				"$path": "out/server"
+			}
+		},
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"rbxts_include": {
+				"$path": "include",
+				"node_modules": {
+					"$className": "Folder",
+					"@rbxts": {
+						"$className": "Folder",
+						"compiler-types": {
+							"$path": "node_modules/@rbxts/compiler-types"
+						},
+						"react": {
+							"$path": "node_modules/@rbxts/react"
+						},
+						"react-roblox": {
+							"$path": "node_modules/@rbxts/react-roblox"
+						},
+						"services": {
+							"$path": "node_modules/@rbxts/services"
+						},
+						"ui-labs": {
+							"$path": "node_modules/@rbxts/ui-labs"
+						},
+						"ripple": {
+							"$path": "node_modules/@rbxts/ripple"
+						},
+						"react-ripple": {
+							"$path": "node_modules/@rbxts/react-ripple"
+						},
+						"types": {
+							"$path": "node_modules/@rbxts/types"
+						},
+						"rbxts-react-clean-ui": {
+							"$path": "out/Packages/rbxts-react-clean-ui/out"
+						}
+					},
+					"@rbxts-js": {
+						"$path": "node_modules/@rbxts-js"
+					}
+				}
+			},
+			"TS": {
+				"$path": "out/shared"
+			},
+			"PackageStories": {
+				"$path": "out/Packages/rbxts-react-clean-ui/Stories"
+			}
+		},
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"TS": {
+					"$path": "out/client"
+				}
+			}
+		},
+		"Workspace": {
+			"$className": "Workspace",
+			"$properties": {
+				"FilteringEnabled": true
+			}
+		},
+		"HttpService": {
+			"$className": "HttpService",
+			"$properties": {
+				"HttpEnabled": true
+			}
+		},
+		"SoundService": {
+			"$className": "SoundService",
+			"$properties": {
+				"RespectFilteringEnabled": true
+			}
+		}
+	}
 }
 ```
 
 ## 6. Start the development environment
 
-You'll need **three terminals** running simultaneously.
+You'll need **three terminals** running simultaneously (start them in the specific order listed below).
 
-### Terminal 1 — Compile your game
-
-```bash
-cd C:\Users\username\Documents\dev-game
-npx rbxtsc -w
-```
-
-### Terminal 2 — Compile React Clean UI
+### Terminal 1 — Compile React Clean UI
 
 ```bash
 cd C:\Users\username\Documents\dev-game\src\Packages\rbxts-react-clean-ui
+npm install
+npx rbxtsc -w
+```
+
+### Terminal 2 — Compile your game
+
+```bash
+cd C:\Users\username\Documents\dev-game
 npx rbxtsc -w
 ```
 
@@ -251,46 +260,3 @@ Install the UI Labs plugin:
 https://ui-labs.luau.page/docs/installation
 
 Once installed, open **Plugins → UI Labs**. You should see the React Clean UI component stories, allowing you to preview components while you develop.
-
----
-
-# Writing the Documentation
-
-The documentation is built using **Fumadocs**.
-
-## 1. Clone the repository
-
-```bash
-git clone https://github.com/Shadercloud/rbxts-react-clean-ui.git
-```
-
-## 2. Install dependencies
-
-```bash
-cd rbxts-react-clean-ui/docs
-npm install
-```
-
-## 3. Start the development server
-
-```bash
-npm run dev
-```
-
-## 4. Open the documentation
-
-Open the following URL in your browser:
-
-```text
-http://localhost:3000
-```
-
-## 5. Start editing
-
-Documentation pages are located in:
-
-```text
-docs/content/docs/
-```
-
-Any changes you make will automatically reload in your browser while the development server is running.
