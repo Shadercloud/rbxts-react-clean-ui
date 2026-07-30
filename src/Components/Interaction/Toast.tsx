@@ -56,10 +56,6 @@ export function Toast({
     });
 
     React.useEffect(() => {
-
-    })
-
-    React.useEffect(() => {
         dismissRef.current = onDismiss;
     }, [onDismiss]);
 

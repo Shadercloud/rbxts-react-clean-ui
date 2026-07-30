@@ -442,6 +442,8 @@ local DefaultTheme = {
 			},
 		},
 		tooltip = {
+			fadeDuration = 0.25,
+			pointerSize = 10,
 			spacing = {
 				xs = 2,
 				sm = 6,

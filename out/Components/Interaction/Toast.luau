@@ -70,7 +70,6 @@ local function Toast(_param)
 		duration = TOAST_FADE_DURATION,
 		easing = "quadOut",
 	})
-	React.useEffect(function() end)
 	React.useEffect(function()
 		dismissRef.current = onDismiss
 	end, { onDismiss })

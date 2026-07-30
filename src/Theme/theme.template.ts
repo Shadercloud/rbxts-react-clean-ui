@@ -199,6 +199,8 @@ export interface CleanTheme {
 
         };
         tooltip: {
+            fadeDuration: number;
+            pointerSize: number;
             spacing?: ScaleSizeValue<number>;
             boxShadow?: CssShadow;
             cornerRadius: CssSize;

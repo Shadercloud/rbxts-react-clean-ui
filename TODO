@@ -1,0 +1,11 @@
+[ ] Test NPM package on fresh rbxts project
+[ ] Test Development environment setup
+[x] Add Fade in/out to Tooltips
+[ ] Add Accordion component
+[ ] Add incremented input
+[ ] Add search select
+[ ] Add Charts
+[ ] Add Tables / Pagination
+[ ] Add Toggle Switch
+[ ] Improve themes
+[ ] Make sure all components can pass all raw props

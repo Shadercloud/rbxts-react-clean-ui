@@ -14,12 +14,41 @@ local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
 local SpacingHelper = _Helpers.SpacingHelper
+local useTween = TS.import(script, TS.getModule(script, "@rbxts", "react-ripple").src).useTween
 local function TooltipPopup(props)
 	local theme = React.useContext(CleanThemeContext)
+	local groupTransparency, transparencyTween = useTween(1, {
+		duration = props.fadeDuration,
+		easing = "quadOut",
+	})
+	React.useEffect(function()
+		transparencyTween:setGoal(if props.visible then 0 else 1)
+	end, { props.visible, transparencyTween })
+	local resolvedPadding = {
+		top = 0,
+		bottom = 0,
+		left = 0,
+		right = 0,
+	}
+	local _value = theme.components.tooltip.boxShadow
+	local shadow = if _value ~= 0 and _value == _value and _value ~= "" and _value then CssHelper:parseCssShadow(theme.components.tooltip.boxShadow) else nil
+	if shadow ~= nil then
+		resolvedPadding.top += shadow.blurRadius.Offset + shadow.spread.Y.Offset - shadow.offset.Y.Offset
+		resolvedPadding.bottom += shadow.blurRadius.Offset + shadow.spread.Y.Offset + shadow.offset.Y.Offset
+		resolvedPadding.left += shadow.blurRadius.Offset + shadow.spread.X.Offset - shadow.offset.X.Offset
+		resolvedPadding.right += shadow.blurRadius.Offset + shadow.spread.X.Offset + shadow.offset.X.Offset
+	end
+	local pointerSize = theme.components.tooltip.pointerSize
 	local anchor = Vector2.zero
 	local _position = props.target.position
 	local _absolutePosition = props.overlay.AbsolutePosition
 	local position = _position - _absolutePosition
+	local pointerRotation = 45
+	local pointerAnchor = Vector2.new(0.5, 1)
+	local pointerPosition = UDim2.new(0.5, 0, 1, 0)
+	local factor = 1.41421356
+	local pointerHeight = (factor * pointerSize) / 2
+	local pointerDiff = pointerHeight - (pointerSize / 2)
 	local _exp = props.placement or "Top"
 	repeat
 		if _exp == "Top" then
@@ -27,6 +56,8 @@ local function TooltipPopup(props)
 			local _position_1 = position
 			local _vector2 = Vector2.new(props.target.size.X / 2, 0)
 			position = _position_1 + _vector2
+			pointerPosition = UDim2.new(0.5, (resolvedPadding.left - resolvedPadding.right) / 2, 1, -math.max(math.ceil(pointerDiff), resolvedPadding.bottom - pointerDiff))
+			resolvedPadding.bottom = math.max(math.floor(pointerHeight), resolvedPadding.bottom)
 			break
 		end
 		if _exp == "Bottom" then
@@ -34,6 +65,10 @@ local function TooltipPopup(props)
 			local _position_1 = position
 			local _vector2 = Vector2.new(props.target.size.X / 2, props.target.size.Y)
 			position = _position_1 + _vector2
+			pointerAnchor = Vector2.new(0.5, 0)
+			pointerRotation = -135
+			pointerPosition = UDim2.new(0.5, (resolvedPadding.left - resolvedPadding.right) / 2, 0, math.max(math.ceil(pointerDiff), resolvedPadding.top - pointerDiff))
+			resolvedPadding.top = math.max(math.floor(pointerHeight), resolvedPadding.top)
 			break
 		end
 		if _exp == "Left" then
@@ -41,6 +76,10 @@ local function TooltipPopup(props)
 			local _position_1 = position
 			local _vector2 = Vector2.new(0, props.target.size.Y / 2)
 			position = _position_1 + _vector2
+			pointerRotation = -45
+			pointerAnchor = Vector2.new(1, 0.5)
+			pointerPosition = UDim2.new(1, -math.max(math.ceil(pointerDiff), resolvedPadding.right - pointerDiff), 0.5, 0)
+			resolvedPadding.right = math.max(math.floor(pointerHeight), resolvedPadding.right)
 			break
 		end
 		if _exp == "Right" then
@@ -48,24 +87,21 @@ local function TooltipPopup(props)
 			local _position_1 = position
 			local _vector2 = Vector2.new(props.target.size.X, props.target.size.Y / 2)
 			position = _position_1 + _vector2
+			pointerRotation = 135
+			pointerAnchor = Vector2.new(0, 0.5)
+			pointerPosition = UDim2.new(0, math.max(math.ceil(pointerDiff), resolvedPadding.left - pointerDiff), 0.5, 0)
+			resolvedPadding.left = math.max(math.floor(pointerHeight), resolvedPadding.left)
 			break
 		end
 	until true
 	local intent = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.tooltip.intents)
-	local _value = theme.components.tooltip.boxShadow
-	local shadow = if _value ~= 0 and _value == _value and _value ~= "" and _value then CssHelper:parseCssShadow(theme.components.tooltip.boxShadow) else nil
 	local padding = SpacingHelper:ResolveNumberPadding(SpacingHelper:GetPadding(theme, props.spacing, theme.components.tooltip.spacing))
-	local _exp_1 = shadow ~= nil and React.createElement(Padding, {
-		resolvedPadding = {
-			top = shadow.blurRadius.Offset + shadow.spread.Y.Offset - shadow.offset.Y.Offset,
-			bottom = shadow.blurRadius.Offset + shadow.spread.Y.Offset + shadow.offset.Y.Offset,
-			left = shadow.blurRadius.Offset + shadow.spread.X.Offset - shadow.offset.X.Offset,
-			right = shadow.blurRadius.Offset + shadow.spread.X.Offset + shadow.offset.X.Offset,
-		},
+	local _exp_1 = React.createElement(Padding, {
+		resolvedPadding = resolvedPadding,
 	})
 	local _attributes = table.clone(props)
 	setmetatable(_attributes, nil)
-	_attributes.value = theme.components.box.boxShadow
+	_attributes.value = theme.components.tooltip.boxShadow
 	local _exp_2 = React.createElement(BoxShadow, _attributes)
 	local _exp_3 = React.createElement(Corners, {
 		radius = theme.components.button.cornerRadius,
@@ -89,6 +125,11 @@ local function TooltipPopup(props)
 		AnchorPoint = anchor,
 		Size = UDim2.fromOffset(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
+		GroupTransparency = groupTransparency,
+		BackgroundTransparency = 1,
+	}, React.createElement("frame", {
+		Size = UDim2.fromOffset(0, 0),
+		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
 	}, _exp_1, React.createElement("frame", {
 		Size = UDim2.fromOffset(0, 0),
@@ -98,12 +139,29 @@ local function TooltipPopup(props)
 	}, _exp_2, _exp_3, _exp_4, _exp_5, if type(_content) == "string" then React.createElement(Text, {
 		text = props.content,
 		TextColor3 = intent.textColor,
-	}) else props.content))
+	}) else props.content)), pointerSize > 0 and React.createElement("frame", {
+		Size = UDim2.fromOffset(pointerSize, pointerSize),
+		AnchorPoint = pointerAnchor,
+		Position = pointerPosition,
+		BorderSizePixel = 1,
+		BackgroundColor3 = intent.backgroundColor,
+		BorderColor3 = props["border-color"] or intent.borderColor,
+		BackgroundTransparency = intent.backgroundTransparency,
+		Rotation = 45,
+	}, React.createElement("uigradient", {
+		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.4999, 1), NumberSequenceKeypoint.new(0.5, 0), NumberSequenceKeypoint.new(1, 0) }),
+		Rotation = pointerRotation,
+	})))
 end
 local function Tooltip(props)
 	local targetRef = React.useRef()
+	local hideRequest = React.useRef(0)
 	local target, setTarget = React.useState()
+	local visible, setVisible = React.useState(false)
+	local theme = React.useContext(CleanThemeContext)
+	local fadeDuration = theme.components.tooltip.fadeDuration
 	local show = function()
+		hideRequest.current += 1
 		local _result = targetRef.current
 		if _result ~= nil then
 			_result = _result.AbsolutePosition
@@ -124,9 +182,22 @@ local function Tooltip(props)
 			_object[_left_1] = _result_2
 			setTarget(_object)
 		end
+		setVisible(true)
 	end
 	local hide = function()
-		setTarget(nil)
+		setVisible(false)
+		local request = hideRequest.current + 1
+		hideRequest.current = request
+		if fadeDuration <= 0 then
+			setTarget(nil)
+			return nil
+		end
+		task.delay(fadeDuration, function()
+			-- Do not remove it if the tooltip was shown again.
+			if hideRequest.current == request then
+				setTarget(nil)
+			end
+		end)
 	end
 	local _exp = props.children
 	local _object = {
@@ -167,10 +238,15 @@ local function Tooltip(props)
 			if overlay == nil then
 				return nil
 			end
-			local _attributes = table.clone(props)
-			setmetatable(_attributes, nil)
+			local _attributes = {
+				fadeDuration = fadeDuration,
+			}
+			for _k, _v in props do
+				_attributes[_k] = _v
+			end
 			_attributes.overlay = overlay
 			_attributes.target = target
+			_attributes.visible = visible
 			return ReactRoblox.createPortal(React.createElement(TooltipPopup, _attributes), overlay)
 		end,
 	})))
