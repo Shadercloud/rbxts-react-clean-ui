@@ -1,4 +1,4 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import { Box, BoxProps } from "./Box";
 import { Container, FlexItem, VStack } from "../Layout";
 import { ColorHelper, CssHelper, SpacingHelper } from "../../Helpers";
@@ -27,8 +27,8 @@ export const CardHeader = React.forwardRef<Frame, CardHeaderProps>(
         return <Container
             ref={ref}
             {...props}
-            Size={UDim2.fromScale(1, 0)}
-            AutomaticSize={Enum.AutomaticSize.Y}
+            Size={UDim2.fromScale(0, 0)}
+            AutomaticSize={Enum.AutomaticSize.XY}
             BackgroundTransparency={intent.backgroundTransparency}
             BackgroundColor3={intent.backgroundColor}
             BorderSizePixel={0}
@@ -51,8 +51,8 @@ export const CardBody = React.forwardRef<Frame, CardBodyProps>(
             <Container
                 ref={ref}
                 {...props}
-                Size={UDim2.fromScale(1, 0)}
-                AutomaticSize={Enum.AutomaticSize.Y}>
+                Size={UDim2.fromScale(0, 0)}
+                AutomaticSize={Enum.AutomaticSize.XY}>
                 <Padding resolvedPadding={padding} />
                 {props.children}
             </Container>
@@ -73,8 +73,8 @@ export const CardFooter = React.forwardRef<Frame, CardFooterProps>(
         return <Container
             ref={ref}
             {...props}
-            Size={UDim2.fromScale(1, 0)}
-            AutomaticSize={Enum.AutomaticSize.Y}
+            Size={UDim2.fromScale(0, 0)}
+            AutomaticSize={Enum.AutomaticSize.XY}
             BackgroundTransparency={intent.backgroundTransparency}
             BackgroundColor3={intent.backgroundColor}
             BorderSizePixel={0}
@@ -90,29 +90,41 @@ interface CardProps extends BoxProps, IntentElementProps {
 
 }
 
-@ReactComponent
-export class Card extends Component<CardProps> {
-    static Header = CardHeader;
-    static Footer = CardFooter;
-    static Body = CardBody;
 
-    static contextType = CleanThemeContext;
+type CardComponent = React.ForwardRefExoticComponent<
+    CardProps & React.RefAttributes<Frame>
+> & {
+    Header: typeof CardHeader;
+    Footer: typeof CardFooter;
+    Body: typeof CardBody;
+};
 
-    declare context: React.ContextType<typeof CleanThemeContext>;
+const Card = React.forwardRef<Frame, CardProps>(
+    (props, ref) => {
 
-    render() {
-        const contextValue: CardContextValue = {
-            intent: this.props.intent,
-        };
-        const intent = ColorHelper.getIntentColors(this.context, this.props.intent ?? "primary", "default", this.context.components.card.header.intents);
+        const theme = React.useContext(CleanThemeContext);
+
+        const contextValue = React.useMemo<CardContextValue>(
+            () => ({
+                intent: props.intent,
+            }),
+            [props.intent],
+        );
+
+        const intent = ColorHelper.getIntentColors(theme, props.intent ?? "primary", "default", theme.components.card.header.intents);
         return (
             <CardContext.Provider value={contextValue}>
-                <Box {...this.props} ref={this.props.ref} spacing="None" border-color={intent.borderColor}>
+                <Box {...props} ref={ref} spacing="None" border-color={intent.borderColor}>
                     <VStack spacing="None">
-                        {this.props.children}
+                        {props.children}
                     </VStack>
                 </Box>
             </CardContext.Provider>
         );
-    }
-}
+    }) as CardComponent;
+
+Card.Header = CardHeader;
+Card.Footer = CardFooter;
+Card.Body = CardBody;
+
+export { Card };

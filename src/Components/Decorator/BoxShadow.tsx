@@ -1,38 +1,49 @@
 import React from "@rbxts/react";
-import { CssShadow, ShadowElementProps } from "../../Interfaces/";
+import { CssBoxShadow, CssShadow, ShadowElementProps } from "../../Interfaces/";
 import { CssHelper } from "../../Helpers/";
 import { CleanThemeContext } from "../../Contexts/";
 
 interface BoxShadowProps extends ShadowElementProps {
     value?: CssShadow;
+    completeShadow?: CssBoxShadow;
     color?: Color3;
     transparency?: number;
     zindex?: number;
 }
 
 export function BoxShadow(props: BoxShadowProps) {
-    const theme = React.useContext(CleanThemeContext);
+    let shadowProps: React.InstanceProps<UIShadow>;
 
-    const shadowTheme = theme.components.boxShadow;
-    const shadowValue = props["box-shadow"] ?? props.value;
+    if (props.completeShadow) {
+        shadowProps = CssHelper.ResolveShadow(props.completeShadow);
+    } else {
+        const theme = React.useContext(CleanThemeContext);
 
-    if (shadowValue === undefined) {
-        return undefined;
-    }
+        const shadowTheme = theme.components.boxShadow;
+        const shadowValue = props["box-shadow"] ?? props.value;
 
-    const shadow = CssHelper.parseCssShadow(shadowValue);
+        if (shadowValue === undefined) {
+            return undefined;
+        }
 
-    if (shadow === undefined) {
-        return undefined;
+        const shadow = CssHelper.parseCssShadow(shadowValue);
+
+        if (shadow === undefined) {
+            return undefined;
+        }
+
+        shadowProps = {
+            Offset: shadow?.offset,
+            BlurRadius: shadow?.blurRadius,
+            Spread: shadow?.spread,
+            Color: props.color ?? shadowTheme.color,
+            Transparency: props.transparency ?? shadowTheme.transparency
+        }
     }
 
     return (
         <uishadow
-            Offset={shadow.offset}
-            BlurRadius={shadow.blurRadius}
-            Spread={shadow.spread}
-            Color={props.color ?? shadowTheme.color}
-            Transparency={props.transparency ?? shadowTheme.transparency}
+            {...shadowProps}
             ZIndex={props.zindex ?? -1}
         />
     );

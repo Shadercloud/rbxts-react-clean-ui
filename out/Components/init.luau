@@ -22,4 +22,7 @@ end
 for _k, _v in TS.import(script, script, "Interaction") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "Chart") or {} do
+	exports[_k] = _v
+end
 return exports

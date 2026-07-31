@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@orama/orama": "^3.1.18",
+    "@rbxts/ui-labs": "^2.4.2",
     "cnfast": "^0.0.8",
     "fumadocs-core": "16.11.5",
     "fumadocs-mdx": "15.2.0",
@@ -19,6 +20,7 @@
     "next": "16.2.10",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-icons": "^5.7.0",
     "react-medium-image-zoom": "^5.4.8"
   },
   "devDependencies": {
@@ -27,6 +29,7 @@
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "loom-dev": "^0.5.1",
     "postcss": "^8.5.17",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3"

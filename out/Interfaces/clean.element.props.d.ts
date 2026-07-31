@@ -47,6 +47,11 @@ export type CssBreakpointSize = {
 };
 export type CssQuad = CssSize | `${CssSize} ${CssSize}` | `${CssSize} ${CssSize} ${CssSize}` | `${CssSize} ${CssSize} ${CssSize} ${CssSize}`;
 export type CssShadow = CssQuad;
+export type CssBoxShadow = {
+    shadow: CssShadow;
+    color: Color3;
+    transparency: number;
+};
 export type CssPadding = CssQuad;
 export type ResponsiveCssSize = CssSize | CssBreakpointSize;
 export interface ZIndexElementProps {

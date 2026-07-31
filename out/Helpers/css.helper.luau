@@ -108,6 +108,31 @@ do
 		end
 		return UDim.new(0, _condition)
 	end
+	function CssHelper:ResolveShadow(shadow)
+		local offset = self:parseCssShadow(shadow.shadow)
+		local _object = {}
+		local _left = "Offset"
+		local _result = offset
+		if _result ~= nil then
+			_result = _result.offset
+		end
+		_object[_left] = _result
+		local _left_1 = "BlurRadius"
+		local _result_1 = offset
+		if _result_1 ~= nil then
+			_result_1 = _result_1.blurRadius
+		end
+		_object[_left_1] = _result_1
+		local _left_2 = "Spread"
+		local _result_2 = offset
+		if _result_2 ~= nil then
+			_result_2 = _result_2.spread
+		end
+		_object[_left_2] = _result_2
+		_object.Color = shadow.color
+		_object.Transparency = shadow.transparency
+		return _object
+	end
 end
 return {
 	CssHelper = CssHelper,

@@ -1,4 +1,4 @@
-import React, { Component } from "@rbxts/react";
+import React from "@rbxts/react";
 import { ButtonProps } from "../Input";
 interface MenuItemProps extends ButtonProps {
     title: string;
@@ -8,12 +8,8 @@ interface MenuProps {
     title: string;
     collapsed?: boolean;
 }
-interface MenuState {
-    collapsed: boolean;
-}
-export declare class Menu extends Component<MenuProps, MenuState> {
-    static Item: typeof MenuItem;
-    state: MenuState;
-    render(): React.ReactNode;
-}
-export {};
+type MenuComponent = React.ForwardRefExoticComponent<MenuProps & React.RefAttributes<Frame>> & {
+    Item: typeof MenuItem;
+};
+declare const Menu: MenuComponent;
+export { Menu };

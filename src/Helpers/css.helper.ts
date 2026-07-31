@@ -1,4 +1,4 @@
-import { CssShadow, CssSize } from "../Interfaces/clean.element.props";
+import { CssBoxShadow, CssShadow, CssSize } from "../Interfaces/clean.element.props";
 
 interface ParsedShadow {
     offset: UDim2;
@@ -68,5 +68,16 @@ export class CssHelper {
         }
 
         return new UDim(0, tonumber(value) ?? 0);
+    }
+
+    public static ResolveShadow(shadow: CssBoxShadow): React.InstanceProps<UIShadow> {
+        const offset = this.parseCssShadow(shadow.shadow);
+        return {
+            Offset: offset?.offset,
+            BlurRadius: offset?.blurRadius,
+            Spread: offset?.spread,
+            Color: shadow.color,
+            Transparency: shadow.transparency
+        }
     }
 }

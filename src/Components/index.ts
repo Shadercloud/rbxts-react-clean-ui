@@ -5,3 +5,4 @@ export * from './Input/';
 export * from './Typography/Text';
 export * from './Navigation/Menu';
 export * from './Interaction';
+export * from './Chart/';

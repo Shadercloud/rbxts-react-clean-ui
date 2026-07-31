@@ -100,6 +100,12 @@ export type CssQuad =
 
 export type CssShadow = CssQuad;
 
+export type CssBoxShadow = {
+    shadow: CssShadow;
+    color: Color3;
+    transparency: number;
+}
+
 export type CssPadding = CssQuad;
 
 export type ResponsiveCssSize = CssSize | CssBreakpointSize;

@@ -13,6 +13,7 @@
         "components/form",
         "components/navigation",
         "components/interaction",
+        "components/chart",
 
         "---Theming---",
         "theme/default",

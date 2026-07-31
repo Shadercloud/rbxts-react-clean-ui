@@ -1,7 +1,8 @@
 import React from "@rbxts/react";
-import { CssShadow, ShadowElementProps } from "../../Interfaces/";
+import { CssBoxShadow, CssShadow, ShadowElementProps } from "../../Interfaces/";
 interface BoxShadowProps extends ShadowElementProps {
     value?: CssShadow;
+    completeShadow?: CssBoxShadow;
     color?: Color3;
     transparency?: number;
     zindex?: number;

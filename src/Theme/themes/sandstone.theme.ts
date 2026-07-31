@@ -359,6 +359,31 @@ export const SandstoneTheme = createTheme({
 
             },
             body: {}
+        },
+        pie: {
+            boxShadow: {
+                shadow: "0px 0px",
+                color: Color3.fromHex("#FFFFFF"),
+                transparency: 1,
+            },
+            colors: [
+                Color3.fromHex("#7A9E7E"), // Sage (Green)
+                Color3.fromHex("#A66C5D"), // Clay Rose (Red)
+                Color3.fromHex("#B89A5A"), // Sandstone Gold (Amber)
+                Color3.fromHex("#6E97A8"), // Dusty Blue (Blue)
+
+                Color3.fromHex("#8A729E"), // Dusty Lavender (Purple)
+                Color3.fromHex("#6F9A90"), // Desert Teal (Teal)
+                Color3.fromHex("#C97A4A"), // Terracotta (Orange)
+                Color3.fromHex("#C58A9A"), // Desert Pink (Pink)
+                Color3.fromHex("#8F7B5E"), // Taupe (Slate)
+                Color3.fromHex("#8C9B5E"), // Olive (Lime)
+            ],
+            labels: {
+                backgroundColor: Color3.fromHex("#FFF9ED"),
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#D8CDBA"),
+            }
         }
     },
 

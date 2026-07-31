@@ -1,9 +1,8 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import {
     CleanThemeContext,
     OverlayContext,
-    OverlayContextValue,
 } from "../../Contexts";
 import { ColorHelper, SizeHelper, TypographyHelper } from "../../Helpers";
 import {
@@ -11,9 +10,8 @@ import {
     ScalableElementProps,
     SpacedElementProps,
 } from "../../Interfaces";
-import { TypographyStyle } from "../../Theme";
 import { Corners, Padding } from "../Decorator";
-import { FieldsetContext, FlexItem, HStack, Scroller, VStack } from "../Layout";
+import { Container, FieldsetContext, FlexItem, HStack, Scroller, VStack } from "../Layout";
 import { Text } from "../Typography";
 import { Icon } from "../Surface";
 
@@ -27,15 +25,8 @@ interface SelectProps
     Event?: React.InstanceEvent<TextBox>;
 }
 
-interface SelectState {
-    selected: number;
-    open: boolean;
-    dropdownSize: UDim2;
-    dropdownPosition: UDim2;
-}
 
 interface SelectContextValue {
-    props: SelectProps;
     selected: number;
     open: boolean;
     dropdownSize: UDim2;
@@ -120,214 +111,208 @@ function SelectOption(props: SelectOptionProps) {
     );
 }
 
-function ActivateSelect(context: SelectContextValue, overlay: OverlayContextValue) {
-    const button = context.buttonRef.current;
+type SelectComponent = React.ForwardRefExoticComponent<
+    SelectProps & React.RefAttributes<Frame>
+> & {
+    Option: typeof SelectOption;
+};
 
-    if (button && overlay.overlay) {
-        if (context.open) {
-            context.closeDropdown();
-            return;
-        }
-        const buttonPosition =
-            button.AbsolutePosition;
 
-        const overlayPosition =
-            overlay.overlay.AbsolutePosition;
-
-        const localPosition =
-            buttonPosition.sub(
-                overlayPosition,
-            );
-
-        context.openDropdown(
-            UDim2.fromOffset(button.AbsoluteSize.X, button.AbsoluteSize.Y),
-            UDim2.fromOffset(
-                localPosition.X,
-                localPosition.Y,
-            ),
-        );
-    }
-
-}
-
-function SelectRenderer(props: SelectProps) {
-    const context = React.useContext(SelectContext);
+const Select = React.forwardRef<Frame, SelectProps>((props, ref) => {
     const theme = React.useContext(CleanThemeContext);
     const overlay = React.useContext(OverlayContext);
     const fieldset = React.useContext(FieldsetContext);
+
+    const [selected, setSelected] = React.useState(props.selected ?? 0);
+    const [open, setOpen] = React.useState(false);
+    const [dropdownSize, setDropdownSize] = React.useState(
+        UDim2.fromOffset(0, 0),
+    );
+    const [dropdownPosition, setDropdownPosition] = React.useState(
+        UDim2.fromOffset(0, 0),
+    );
     const [contentHeight, setContentHeight] = React.useState(0);
 
-    const labelActivated = fieldset?.labelActivated;
-    const overlayInstance = overlay.overlay;
-    const buttonRef = context?.buttonRef;
-    const openDropdown = context?.openDropdown;
+    const buttonRef = React.useRef<ImageButton>();
 
-    assert(
-        context !== undefined,
-        "SelectRenderer must be used inside a Select",
+    const context = React.useMemo<SelectContextValue>(() => ({
+        selected,
+        open,
+        dropdownSize,
+        dropdownPosition,
+        buttonRef,
+
+        setSelected: (index, value) => {
+            props.onChange?.(index, value);
+            setSelected(index);
+        },
+
+        openDropdown: (size, position) => {
+            setDropdownPosition(position);
+            setDropdownSize(size);
+            setOpen(true);
+        },
+
+        closeDropdown: () => {
+            setOpen(false);
+        },
+
+        toggleOpen: () => {
+            setOpen(current => !current);
+        },
+    }), [
+        props.onChange,
+        selected,
+        open,
+        dropdownSize,
+        dropdownPosition,
+    ]);
+
+    const typography = TypographyHelper.getTypography(
+        theme,
+        props.scale,
+        theme.components.select.typography,
     );
 
-    if (context.open && overlay.overlay === undefined)
-        warn("You have used a Select component without using the Overlay Provider");
-
-    const typography: TypographyStyle =
-        TypographyHelper.getTypography(
-            theme,
-            context.props.scale,
-            theme.components.select.typography,
-        );
-
-
-    const children = React.Children.toArray(
-        context.props.children,
-    );
+    const children = React.Children.toArray(props.children);
 
     const selectedOption = (
-        children[context.selected] ??
-        children[0]
+        children[selected] ?? children[0]
     ) as React.ReactElement<SelectOptionProps> | undefined;
 
-    const dropdownHeight = math.min(contentHeight, props['max-height'] !== undefined ? SizeHelper.toUDim(props['max-height']).Offset : theme.components.select.maxDropDownHeight);
+    const dropdownHeight = math.min(
+        contentHeight,
+        props["max-height"] !== undefined
+            ? SizeHelper.toUDim(props["max-height"]).Offset
+            : theme.components.select.maxDropDownHeight,
+    );
+
+    const activateSelect = React.useCallback(() => {
+        const button = buttonRef.current;
+        const overlayInstance = overlay.overlay;
+
+        if (!button || !overlayInstance) {
+            return;
+        }
+
+        if (open) {
+            setOpen(false);
+            return;
+        }
+
+        const localPosition = button.AbsolutePosition.sub(
+            overlayInstance.AbsolutePosition,
+        );
+
+        setDropdownPosition(UDim2.fromOffset(
+            localPosition.X,
+            localPosition.Y,
+        ));
+
+        setDropdownSize(UDim2.fromOffset(
+            button.AbsoluteSize.X,
+            button.AbsoluteSize.Y,
+        ));
+
+        setOpen(true);
+    }, [open, overlay.overlay]);
 
     React.useEffect(() => {
+        const labelActivated = fieldset?.labelActivated;
+
         if (!labelActivated) {
             return;
         }
 
-        const connection = labelActivated.Event.Connect(() => {
-            ActivateSelect(context, overlay);
-        });
-
+        const connection = labelActivated.Event.Connect(activateSelect);
         return () => connection.Disconnect();
-    }, [
-        labelActivated,
-        overlayInstance,
-        buttonRef,
-        openDropdown,
-    ]);
-    return (
-        <imagebutton
-            ref={context.buttonRef}
-            Size={UDim2.fromScale(1, 0)}
-            AutomaticSize={Enum.AutomaticSize.Y}
-            BackgroundTransparency={1}
-            Event={{
-                Activated: () => {
-                    ActivateSelect(context, overlay);
-                },
-            }}
-        >
-            <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Inner} Color={theme.components.select.borderColor} />
+    }, [fieldset?.labelActivated, activateSelect]);
 
-            <Corners radius={theme.components.select.cornerRadius} />
-
-            <Padding {...context.props} />
-            <HStack>
-                <FlexItem>
-                    <Text
-                        text={selectedOption?.props.text ?? "No Options"}
-                        typography={typography}
-                    />
-                </FlexItem>
-                <Icon icon="caret-down" color={theme.colors.intents.primary.default.textColor} />
-            </HStack>
-
-            {context.open &&
-                overlay.overlay !== undefined &&
-                ReactRoblox.createPortal(
-                    <frame
-                        BackgroundTransparency={0}
-                        BackgroundColor3={
-                            theme.components.select.dropDownBackgroundColor
-                        }
-                        AnchorPoint={Vector2.zero}
-                        Position={context.dropdownPosition.add(new UDim2(0, 0, 0, context.dropdownSize.Y.Offset))}
-                        Size={UDim2.fromOffset(context.dropdownSize.X.Offset, 0)}
-                        AutomaticSize={Enum.AutomaticSize.Y}
-                        ClipsDescendants={true}
-                    >
-                        <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={theme.components.select.borderColor} />
-
-                        <Corners radius={theme.components.select.cornerRadius} />
-                        <Scroller Size={new UDim2(1, 0, 0, dropdownHeight)} spacing="None">
-
-                            <VStack
-                                spacing="None"
-                                Change={{
-                                    AbsoluteContentSize: (layout) => {
-                                        setContentHeight(layout.AbsoluteContentSize.Y);
-                                    },
-                                }}>
-                                {React.Children.map(context.props.children, (child, index) => {
-                                    if (!React.isValidElement<SelectOptionProps>(child)) {
-                                        return child;
-                                    }
-                                    return React.cloneElement(child, { index: index - 1, });
-                                })}
-                            </VStack>
-                        </Scroller>
-                    </frame>,
-                    overlay.overlay,
-                )}
-        </imagebutton>
-    );
-}
-
-@ReactComponent
-export class Select extends Component<SelectProps, SelectState> {
-    public static Option = SelectOption;
-
-    state: SelectState = {
-        selected: this.props.selected ?? 0,
-        open: false,
-        dropdownSize: UDim2.fromOffset(0, 0),
-        dropdownPosition: UDim2.fromOffset(0, 0),
-    }
-
-    private buttonRef = React.createRef<ImageButton>();
-
-    public render() {
-        const context: SelectContextValue = {
-            props: this.props,
-            selected: this.state.selected,
-            open: this.state.open,
-            dropdownSize: this.state.dropdownSize,
-            dropdownPosition: this.state.dropdownPosition,
-            buttonRef: this.buttonRef,
-
-            setSelected: (selected, value?: string) => {
-                this.props.onChange?.(selected, value);
-                this.setState({
-                    selected,
-                });
-            },
-
-            openDropdown: (size, position) => {
-                this.setState({
-                    dropdownSize: size,
-                    dropdownPosition: position,
-                    open: true,
-                });
-            },
-
-            closeDropdown: () => {
-                this.setState({
-                    open: false,
-                });
-            },
-
-            toggleOpen: () => {
-                this.setState((state) => ({
-                    open: !state.open,
-                }));
-            },
-        };
-
-        return (
-            <SelectContext.Provider value={context}>
-                <SelectRenderer {...this.props} />
-            </SelectContext.Provider>
+    if (open && overlay.overlay === undefined) {
+        warn(
+            "You have used a Select component without using the Overlay Provider",
         );
     }
-}
 
+    return (
+        <Container
+            ref={ref}
+            Size={UDim2.fromScale(1, 0)}
+            AutomaticSize={Enum.AutomaticSize.Y}
+        >
+            <SelectContext.Provider value={context}>
+                <imagebutton
+                    ref={buttonRef}
+                    Size={UDim2.fromScale(1, 0)}
+                    AutomaticSize={Enum.AutomaticSize.Y}
+                    BackgroundTransparency={1}
+                    Event={{
+                        Activated: activateSelect,
+                    }}
+                >
+                    <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Inner} Color={theme.components.select.borderColor} />
+
+                    <Corners radius={theme.components.select.cornerRadius} />
+
+                    <Padding {...props} />
+                    <HStack>
+                        <FlexItem>
+                            <Text
+                                text={selectedOption?.props.text ?? "No Options"}
+                                typography={typography}
+                            />
+                        </FlexItem>
+                        <Icon icon="caret-down" color={theme.colors.intents.primary.default.textColor} />
+                    </HStack>
+
+                    {open &&
+                        overlay.overlay !== undefined &&
+                        ReactRoblox.createPortal(
+                            <frame
+                                BackgroundTransparency={0}
+                                BackgroundColor3={
+                                    theme.components.select.dropDownBackgroundColor
+                                }
+                                AnchorPoint={Vector2.zero}
+                                Position={dropdownPosition.add(new UDim2(0, 0, 0, dropdownSize.Y.Offset))}
+                                Size={UDim2.fromOffset(dropdownSize.X.Offset, 0)}
+                                AutomaticSize={Enum.AutomaticSize.Y}
+                                ClipsDescendants={true}
+                            >
+                                <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={theme.components.select.borderColor} />
+
+                                <Corners radius={theme.components.select.cornerRadius} />
+                                <Scroller Size={new UDim2(1, 0, 0, dropdownHeight)} spacing="None">
+
+                                    <VStack
+                                        spacing="None"
+                                        Change={{
+                                            AbsoluteContentSize: (layout) => {
+                                                setContentHeight(layout.AbsoluteContentSize.Y);
+                                            },
+                                        }}>
+                                        {React.Children.map(props.children, (child, childIndex) => {
+                                            if (!React.isValidElement<SelectOptionProps>(child)) {
+                                                return child;
+                                            }
+
+                                            // React.Children.map uses a 1-based index in roblox-ts.
+                                            const optionIndex = childIndex - 1;
+
+                                            return React.cloneElement(child, {
+                                                index: optionIndex,
+                                            });
+                                        })}
+                                    </VStack>
+                                </Scroller>
+                            </frame>,
+                            overlay.overlay,
+                        )}
+                </imagebutton>
+            </SelectContext.Provider>
+        </Container>
+    );
+}) as SelectComponent;
+
+Select.Option = SelectOption;
+export { Select }

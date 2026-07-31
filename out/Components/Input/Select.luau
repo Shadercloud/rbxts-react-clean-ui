@@ -1,9 +1,6 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
-local _react = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local React = _react
-local Component = _react.Component
-local ReactComponent = _react.ReactComponent
+local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local ReactRoblox = TS.import(script, TS.getModule(script, "@rbxts", "react-roblox"))
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local CleanThemeContext = _Contexts.CleanThemeContext
@@ -16,6 +13,7 @@ local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
 local _Layout = TS.import(script, script.Parent.Parent, "Layout")
+local Container = _Layout.Container
 local FieldsetContext = _Layout.FieldsetContext
 local FlexItem = _Layout.FlexItem
 local HStack = _Layout.HStack
@@ -77,101 +75,131 @@ local function SelectOption(props)
 		TextColor3 = ColorHelper:getIntentColors(theme, "primary", if context.selected == props.index then "focus" elseif hover then "hover" else "default", theme.components.select.intents).textColor,
 	}), props.children)
 end
-local function ActivateSelect(context, overlay)
-	local button = context.buttonRef.current
-	if button and overlay.overlay then
-		if context.open then
-			context.closeDropdown()
-			return nil
-		end
-		local buttonPosition = button.AbsolutePosition
-		local overlayPosition = overlay.overlay.AbsolutePosition
-		local localPosition = buttonPosition - overlayPosition
-		context.openDropdown(UDim2.fromOffset(button.AbsoluteSize.X, button.AbsoluteSize.Y), UDim2.fromOffset(localPosition.X, localPosition.Y))
-	end
-end
-local function SelectRenderer(props)
-	local context = React.useContext(SelectContext)
+local Select = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local overlay = React.useContext(OverlayContext)
 	local fieldset = React.useContext(FieldsetContext)
+	local _condition = props.selected
+	if _condition == nil then
+		_condition = 0
+	end
+	local selected, setSelected = React.useState(_condition)
+	local open, setOpen = React.useState(false)
+	local dropdownSize, setDropdownSize = React.useState(UDim2.fromOffset(0, 0))
+	local dropdownPosition, setDropdownPosition = React.useState(UDim2.fromOffset(0, 0))
 	local contentHeight, setContentHeight = React.useState(0)
-	local _labelActivated = fieldset
-	if _labelActivated ~= nil then
-		_labelActivated = _labelActivated.labelActivated
-	end
-	local labelActivated = _labelActivated
-	local overlayInstance = overlay.overlay
-	local _buttonRef = context
-	if _buttonRef ~= nil then
-		_buttonRef = _buttonRef.buttonRef
-	end
-	local buttonRef = _buttonRef
-	local _openDropdown = context
-	if _openDropdown ~= nil then
-		_openDropdown = _openDropdown.openDropdown
-	end
-	local openDropdown = _openDropdown
-	local _arg0 = context ~= nil
-	assert(_arg0, "SelectRenderer must be used inside a Select")
-	if context.open and overlay.overlay == nil then
-		warn("You have used a Select component without using the Overlay Provider")
-	end
-	local typography = TypographyHelper:getTypography(theme, context.props.scale, theme.components.select.typography)
-	local children = React.Children.toArray(context.props.children)
-	local selectedOption = (children[context.selected + 1] or children[1])
+	local buttonRef = React.useRef()
+	local context = React.useMemo(function()
+		return {
+			selected = selected,
+			open = open,
+			dropdownSize = dropdownSize,
+			dropdownPosition = dropdownPosition,
+			buttonRef = buttonRef,
+			setSelected = function(index, value)
+				local _result = props.onChange
+				if _result ~= nil then
+					_result(index, value)
+				end
+				setSelected(index)
+			end,
+			openDropdown = function(size, position)
+				setDropdownPosition(position)
+				setDropdownSize(size)
+				setOpen(true)
+			end,
+			closeDropdown = function()
+				setOpen(false)
+			end,
+			toggleOpen = function()
+				setOpen(function(current)
+					return not current
+				end)
+			end,
+		}
+	end, { props.onChange, selected, open, dropdownSize, dropdownPosition })
+	local typography = TypographyHelper:getTypography(theme, props.scale, theme.components.select.typography)
+	local children = React.Children.toArray(props.children)
+	local selectedOption = (children[selected + 1] or children[1])
 	local dropdownHeight = math.min(contentHeight, if props["max-height"] ~= nil then SizeHelper:toUDim(props["max-height"]).Offset else theme.components.select.maxDropDownHeight)
-	React.useEffect(function()
+	local activateSelect = React.useCallback(function()
+		local button = buttonRef.current
+		local overlayInstance = overlay.overlay
+		if not button or not overlayInstance then
+			return nil
+		end
+		if open then
+			setOpen(false)
+			return nil
+		end
+		local _absolutePosition = button.AbsolutePosition
+		local _absolutePosition_1 = overlayInstance.AbsolutePosition
+		local localPosition = _absolutePosition - _absolutePosition_1
+		setDropdownPosition(UDim2.fromOffset(localPosition.X, localPosition.Y))
+		setDropdownSize(UDim2.fromOffset(button.AbsoluteSize.X, button.AbsoluteSize.Y))
+		setOpen(true)
+	end, { open, overlay.overlay })
+	local _exp = function()
+		local _labelActivated = fieldset
+		if _labelActivated ~= nil then
+			_labelActivated = _labelActivated.labelActivated
+		end
+		local labelActivated = _labelActivated
 		if not labelActivated then
 			return nil
 		end
-		local connection = labelActivated.Event:Connect(function()
-			ActivateSelect(context, overlay)
-		end)
+		local connection = labelActivated.Event:Connect(activateSelect)
 		return function()
 			return connection:Disconnect()
 		end
-	end, { labelActivated, overlayInstance, buttonRef, openDropdown })
-	local _exp = React.createElement("uistroke", {
+	end
+	local _result = fieldset
+	if _result ~= nil then
+		_result = _result.labelActivated
+	end
+	React.useEffect(_exp, { _result, activateSelect })
+	if open and overlay.overlay == nil then
+		warn("You have used a Select component without using the Overlay Provider")
+	end
+	local _exp_1 = React.createElement("uistroke", {
 		Thickness = theme.components.select.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.select.borderColor,
 	})
-	local _exp_1 = React.createElement(Corners, {
+	local _exp_2 = React.createElement(Corners, {
 		radius = theme.components.select.cornerRadius,
 	})
-	local _attributes = table.clone(context.props)
+	local _attributes = table.clone(props)
 	setmetatable(_attributes, nil)
-	local _exp_2 = React.createElement(Padding, _attributes)
+	local _exp_3 = React.createElement(Padding, _attributes)
 	local _attributes_1 = {}
-	local _result = selectedOption
-	if _result ~= nil then
-		_result = _result.props.text
+	local _result_1 = selectedOption
+	if _result_1 ~= nil then
+		_result_1 = _result_1.props.text
 	end
-	local _condition = _result
-	if _condition == nil then
-		_condition = "No Options"
+	local _condition_1 = _result_1
+	if _condition_1 == nil then
+		_condition_1 = "No Options"
 	end
-	_attributes_1.text = _condition
+	_attributes_1.text = _condition_1
 	_attributes_1.typography = typography
-	local _exp_3 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_1)), React.createElement(Icon, {
+	local _exp_4 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_1)), React.createElement(Icon, {
 		icon = "caret-down",
 		color = theme.colors.intents.primary.default.textColor,
 	}))
-	local _condition_1 = context.open and overlay.overlay ~= nil
-	if _condition_1 then
+	local _condition_2 = open and overlay.overlay ~= nil
+	if _condition_2 then
 		local _attributes_2 = {
 			BackgroundTransparency = 0,
 			BackgroundColor3 = theme.components.select.dropDownBackgroundColor,
 			AnchorPoint = Vector2.zero,
 		}
-		local _dropdownPosition = context.dropdownPosition
-		local _uDim2 = UDim2.new(0, 0, 0, context.dropdownSize.Y.Offset)
-		_attributes_2.Position = _dropdownPosition + _uDim2
-		_attributes_2.Size = UDim2.fromOffset(context.dropdownSize.X.Offset, 0)
+		local _uDim2 = UDim2.new(0, 0, 0, dropdownSize.Y.Offset)
+		_attributes_2.Position = dropdownPosition + _uDim2
+		_attributes_2.Size = UDim2.fromOffset(dropdownSize.X.Offset, 0)
 		_attributes_2.AutomaticSize = Enum.AutomaticSize.Y
 		_attributes_2.ClipsDescendants = true
-		_condition_1 = ReactRoblox.createPortal(React.createElement("frame", _attributes_2, React.createElement("uistroke", {
+		_condition_2 = ReactRoblox.createPortal(React.createElement("frame", _attributes_2, React.createElement("uistroke", {
 			Thickness = theme.components.select.borderThickness,
 			BorderStrokePosition = Enum.BorderStrokePosition.Outer,
 			Color = theme.components.select.borderColor,
@@ -187,102 +215,34 @@ local function SelectRenderer(props)
 					setContentHeight(layout.AbsoluteContentSize.Y)
 				end,
 			},
-		}, React.Children.map(context.props.children, function(child, index)
+		}, React.Children.map(props.children, function(child, childIndex)
 			if not React.isValidElement(child) then
 				return child
 			end
+			-- React.Children.map uses a 1-based index in roblox-ts.
+			local optionIndex = childIndex - 1
 			return React.cloneElement(child, {
-				index = index - 1,
+				index = optionIndex,
 			})
 		end)))), overlay.overlay)
 	end
-	return React.createElement("imagebutton", {
-		ref = context.buttonRef,
+	return React.createElement(Container, {
+		ref = ref,
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+	}, React.createElement(SelectContext.Provider, {
+		value = context,
+	}, React.createElement("imagebutton", {
+		ref = buttonRef,
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		Event = {
-			Activated = function()
-				ActivateSelect(context, overlay)
-			end,
+			Activated = activateSelect,
 		},
-	}, _exp, _exp_1, _exp_2, _exp_3, _condition_1)
-end
-local Select
-do
-	local super = Component
-	Select = setmetatable({}, {
-		__tostring = function()
-			return "Select"
-		end,
-		__index = super,
-	})
-	Select.__index = Select
-	function Select.new(...)
-		local self = setmetatable({}, Select)
-		return self:constructor(...) or self
-	end
-	function Select:constructor(...)
-		super.constructor(self, ...)
-		local _object = {}
-		local _left = "selected"
-		local _condition = self.props.selected
-		if _condition == nil then
-			_condition = 0
-		end
-		_object[_left] = _condition
-		_object.open = false
-		_object.dropdownSize = UDim2.fromOffset(0, 0)
-		_object.dropdownPosition = UDim2.fromOffset(0, 0)
-		self.state = _object
-		self.buttonRef = React.createRef()
-	end
-	function Select:render()
-		local context = {
-			props = self.props,
-			selected = self.state.selected,
-			open = self.state.open,
-			dropdownSize = self.state.dropdownSize,
-			dropdownPosition = self.state.dropdownPosition,
-			buttonRef = self.buttonRef,
-			setSelected = function(selected, value)
-				local _result = self.props.onChange
-				if _result ~= nil then
-					_result(selected, value)
-				end
-				self:setState({
-					selected = selected,
-				})
-			end,
-			openDropdown = function(size, position)
-				self:setState({
-					dropdownSize = size,
-					dropdownPosition = position,
-					open = true,
-				})
-			end,
-			closeDropdown = function()
-				self:setState({
-					open = false,
-				})
-			end,
-			toggleOpen = function()
-				self:setState(function(state)
-					return {
-						open = not state.open,
-					}
-				end)
-			end,
-		}
-		local _attributes = table.clone(self.props)
-		setmetatable(_attributes, nil)
-		return React.createElement(SelectContext.Provider, {
-			value = context,
-		}, React.createElement(SelectRenderer, _attributes))
-	end
-	Select.Option = SelectOption
-	Select = ReactComponent(Select) or Select
-end
+	}, _exp_1, _exp_2, _exp_3, _exp_4, _condition_2)))
+end)
+Select.Option = SelectOption
 return {
 	Select = Select,
 }

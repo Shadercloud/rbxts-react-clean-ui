@@ -15,17 +15,17 @@ Then install **React Clean UI** within your roblox-ts project.
 
 ## Installation
 
-```bash
+```bash title="Terminal"
 npm install @rbxts/react-clean-ui
 ```
 
 <Callout type="warn" title="Development status">
-	React Clean UI is currently under active development. APIs, component props, and installation details may change before the first stable public release.
+    React Clean UI is currently under active development. APIs, component props, and installation details may change before the first stable public release.
 </Callout>
 
 You can also clone the repository into your project or install it directly from GitHub.
 
-```bash
+```bash title="Terminal"
 npm install github:Shadercloud/rbxts-react-clean-ui
 ```
 
@@ -34,14 +34,14 @@ npm install github:Shadercloud/rbxts-react-clean-ui
 If this is a new project and you have not yet configured React, then open `default.project.json` in your project root.
 
 Find this section:
-```json
+```json title="default.project.json"
 "@rbxts": {
     "$path": "node_modules/@rbxts"
 },
 ```
 
 Then add the `@rbxts-js` path below it so that it looks like this:
-```json
+```json title="default.project.json"
 "@rbxts": {
     "$path": "node_modules/@rbxts"
 },
@@ -55,7 +55,7 @@ Then add the `@rbxts-js` path below it so that it looks like this:
 
 Create a file `/src/client/demo.client.tsx`.
 
-```tsx
+```tsx title="/src/client/demo.client.tsx"
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import {CleanUiProvider, DefaultTheme, Container, Box, VStack, HStack, FlexItem, Text, Button, Fieldset, Input, Select} from "@rbxts/react-clean-ui";

@@ -486,6 +486,33 @@ export const DefaultTheme: CleanTheme = {
                 }
             }
 
+        },
+        pie: {
+            hoverDarken: 0.2,
+            boxShadow: {
+                shadow: "0px 0px 8px 3px",
+                color: Color3.fromHex("#000000"),
+                transparency: 0.6,
+            },
+            colors: [
+                Color3.fromHex("#2E9D63"), // Green
+                Color3.fromHex("#D64545"), // Red
+                Color3.fromHex("#E7A92F"), // Amber
+                Color3.fromHex("#3187C8"), // Blue
+
+                Color3.fromHex("#8E5AD7"), // Purple
+                Color3.fromHex("#2FA7A1"), // Teal
+                Color3.fromHex("#F26D4F"), // Orange
+                Color3.fromHex("#D94F9D"), // Pink
+                Color3.fromHex("#6B7C93"), // Slate
+                Color3.fromHex("#7CB342"), // Lime
+            ],
+            labels: {
+                cornerRadius: 4,
+                typography: {
+                    weight: Enum.FontWeight.Bold
+                }
+            }
         }
     },
 

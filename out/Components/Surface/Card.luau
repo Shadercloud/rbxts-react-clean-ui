@@ -1,9 +1,6 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
-local _react = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local React = _react
-local Component = _react.Component
-local ReactComponent = _react.ReactComponent
+local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local Box = TS.import(script, script.Parent, "Box").Box
 local _Layout = TS.import(script, script.Parent.Parent, "Layout")
 local Container = _Layout.Container
@@ -28,8 +25,8 @@ local CardHeader = React.forwardRef(function(props, ref)
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
-	_attributes.Size = UDim2.fromScale(1, 0)
-	_attributes.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes.Size = UDim2.fromScale(0, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	_attributes.BackgroundTransparency = intent.backgroundTransparency
 	_attributes.BackgroundColor3 = intent.backgroundColor
 	_attributes.BorderSizePixel = 0
@@ -55,8 +52,8 @@ local CardBody = React.forwardRef(function(props, ref)
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
-	_attributes.Size = UDim2.fromScale(1, 0)
-	_attributes.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes.Size = UDim2.fromScale(0, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	return React.createElement(FlexItem, nil, React.createElement(Container, _attributes, React.createElement(Padding, {
 		resolvedPadding = padding,
 	}), props.children))
@@ -73,8 +70,8 @@ local CardFooter = React.forwardRef(function(props, ref)
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
-	_attributes.Size = UDim2.fromScale(1, 0)
-	_attributes.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes.Size = UDim2.fromScale(0, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	_attributes.BackgroundTransparency = intent.backgroundTransparency
 	_attributes.BackgroundColor3 = intent.backgroundColor
 	_attributes.BorderSizePixel = 0
@@ -91,45 +88,28 @@ local CardFooter = React.forwardRef(function(props, ref)
 		BottomRightRadius = corners,
 	}), props.children)
 end)
-local Card
-do
-	local super = Component
-	Card = setmetatable({}, {
-		__tostring = function()
-			return "Card"
-		end,
-		__index = super,
-	})
-	Card.__index = Card
-	function Card.new(...)
-		local self = setmetatable({}, Card)
-		return self:constructor(...) or self
-	end
-	function Card:constructor(...)
-		super.constructor(self, ...)
-	end
-	function Card:render()
-		local contextValue = {
-			intent = self.props.intent,
+local Card = React.forwardRef(function(props, ref)
+	local theme = React.useContext(CleanThemeContext)
+	local contextValue = React.useMemo(function()
+		return {
+			intent = props.intent,
 		}
-		local intent = ColorHelper:getIntentColors(self.context, self.props.intent or "primary", "default", self.context.components.card.header.intents)
-		local _attributes = table.clone(self.props)
-		setmetatable(_attributes, nil)
-		_attributes.ref = self.props.ref
-		_attributes.spacing = "None"
-		_attributes["border-color"] = intent.borderColor
-		return React.createElement(CardContext.Provider, {
-			value = contextValue,
-		}, React.createElement(Box, _attributes, React.createElement(VStack, {
-			spacing = "None",
-		}, self.props.children)))
-	end
-	Card.Header = CardHeader
-	Card.Footer = CardFooter
-	Card.Body = CardBody
-	Card.contextType = CleanThemeContext
-	Card = ReactComponent(Card) or Card
-end
+	end, { props.intent })
+	local intent = ColorHelper:getIntentColors(theme, props.intent or "primary", "default", theme.components.card.header.intents)
+	local _attributes = table.clone(props)
+	setmetatable(_attributes, nil)
+	_attributes.ref = ref
+	_attributes.spacing = "None"
+	_attributes["border-color"] = intent.borderColor
+	return React.createElement(CardContext.Provider, {
+		value = contextValue,
+	}, React.createElement(Box, _attributes, React.createElement(VStack, {
+		spacing = "None",
+	}, props.children)))
+end)
+Card.Header = CardHeader
+Card.Footer = CardFooter
+Card.Body = CardBody
 return {
 	CardHeader = CardHeader,
 	CardBody = CardBody,

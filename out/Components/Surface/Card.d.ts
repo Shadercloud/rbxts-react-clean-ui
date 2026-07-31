@@ -1,6 +1,5 @@
-import React, { Component } from "@rbxts/react";
+import React from "@rbxts/react";
 import { BoxProps } from "./Box";
-import { CleanThemeContext } from "../../Contexts";
 import { IntentElementProps } from "../../Interfaces";
 interface CardHeaderProps extends IntentElementProps {
     children?: React.ReactNode;
@@ -14,12 +13,10 @@ interface CardFooterProps extends BoxProps, IntentElementProps {
 export declare const CardFooter: React.ForwardRefExoticComponent<Omit<CardFooterProps, "ref"> & React.RefAttributes<Frame>>;
 interface CardProps extends BoxProps, IntentElementProps {
 }
-export declare class Card extends Component<CardProps> {
-    static Header: React.ForwardRefExoticComponent<CardHeaderProps & React.RefAttributes<Frame>>;
-    static Footer: React.ForwardRefExoticComponent<Omit<CardFooterProps, "ref"> & React.RefAttributes<Frame>>;
-    static Body: React.ForwardRefExoticComponent<Omit<CardBodyProps, "ref"> & React.RefAttributes<Frame>>;
-    static contextType: React.Context<import("../..").CleanTheme>;
-    context: React.ContextType<typeof CleanThemeContext>;
-    render(): React.JSX.Element;
-}
-export {};
+type CardComponent = React.ForwardRefExoticComponent<CardProps & React.RefAttributes<Frame>> & {
+    Header: typeof CardHeader;
+    Footer: typeof CardFooter;
+    Body: typeof CardBody;
+};
+declare const Card: CardComponent;
+export { Card };

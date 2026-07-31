@@ -1,4 +1,4 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import { Button, ButtonProps } from "../Input";
 import { Container, FlexItem, Group, HStack, Scroller, VStack } from "../Layout";
 import { Text } from "../Typography";
@@ -20,47 +20,48 @@ interface MenuProps {
     collapsed?: boolean;
 }
 
-interface MenuState {
-    collapsed: boolean;
-}
+type MenuComponent = React.ForwardRefExoticComponent<
+    MenuProps & React.RefAttributes<Frame>
+> & {
+    Item: typeof MenuItem;
+};
 
-@ReactComponent
-export class Menu extends Component<MenuProps, MenuState> {
-    static Item = MenuItem;
+const Menu = React.forwardRef<Frame, MenuProps>(
+    (props, ref) => {
 
-    state: MenuState = {
-        collapsed: this.props.collapsed ?? false
-    }
-    render(): React.ReactNode {
+        const [collapsed, setCollapsed] = React.useState<boolean>(props.collapsed ?? false)
+
+
         return <NavigationContext.Provider value={{
-            collapsed: this.state.collapsed
+            collapsed: collapsed
         }}>
 
-            <Group>
-                <VStack spacing="sm">
-                    <Container group>
-                        <HStack valign="Center">
-                            <Button icon="bars" Event={{
-                                Activated: () => {
-                                    this.setState((state) => {
-                                        return {
-                                            collapsed: !state.collapsed
-                                        }
-                                    })
-                                }
-                            }} />
-                            {!this.state.collapsed && <Text text={this.props.title} variant="heading" />}
-                        </HStack>
-                    </Container>
-                    <FlexItem mode="Fill">
-                        <Scroller height="100%">
-                            <VStack spacing="sm" HorizontalFlex={Enum.UIFlexAlignment.None}>
-                                {this.props.children}
-                            </VStack>
-                        </Scroller>
-                    </FlexItem>
-                </VStack>
-            </Group>
+            <Container ref={ref}>
+                <Group>
+                    <VStack spacing="sm">
+                        <Container group >
+                            <HStack valign="Center">
+                                <Button icon="bars" Event={{
+                                    Activated: () => {
+                                        setCollapsed(!collapsed);
+                                    }
+                                }} />
+                                {!collapsed && <Text text={props.title} variant="heading" />}
+                            </HStack>
+                        </Container>
+                        <FlexItem mode="Fill">
+                            <Scroller height="100%">
+                                <VStack spacing="sm" HorizontalFlex={Enum.UIFlexAlignment.None}>
+                                    {props.children}
+                                </VStack>
+                            </Scroller>
+                        </FlexItem>
+                    </VStack>
+                </Group>
+            </Container>
         </NavigationContext.Provider>
-    }
-}
+
+    }) as MenuComponent;
+
+Menu.Item = MenuItem;
+export { Menu }

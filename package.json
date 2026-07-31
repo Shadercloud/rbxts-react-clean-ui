@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/react-clean-ui",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "",
   "main": "out/init.lua",
   "scripts": {
