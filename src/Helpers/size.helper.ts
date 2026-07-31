@@ -82,7 +82,7 @@ export class SizeHelper {
         if (props.width === "Auto")
             return Enum.AutomaticSize.X
 
-        if (props.Size || (props.width && props.height))
+        if (props.Size !== undefined || (props.width && props.height))
             return Enum.AutomaticSize.None
         if (props.width === undefined && props.height === undefined && defaultValue === undefined)
             return Enum.AutomaticSize.XY

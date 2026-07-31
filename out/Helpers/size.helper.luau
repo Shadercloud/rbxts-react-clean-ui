@@ -65,7 +65,7 @@ do
 		if props.width == "Auto" then
 			return Enum.AutomaticSize.X
 		end
-		local _condition = props.Size
+		local _condition = props.Size ~= nil
 		if not _condition then
 			local _condition_1 = props.width
 			if _condition_1 ~= 0 and _condition_1 == _condition_1 and _condition_1 ~= "" and _condition_1 then
