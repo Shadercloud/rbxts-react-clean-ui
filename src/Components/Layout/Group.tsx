@@ -1,6 +1,7 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import { ResolvedPadding } from "../../Interfaces";
-import { HttpService } from "@rbxts/services";
+// import { HttpService } from "@rbxts/services";
+import { RegistryContext } from "../../Providers";
 
 interface GroupContextValue {
     size: Vector2;
@@ -20,45 +21,59 @@ interface GroupElementProps {
 }
 
 function GroupElement(props: GroupElementProps) {
+    const registry = React.useContext(RegistryContext);
     const context = React.useContext(GroupContext);
+    const id = React.useRef(registry?.GetNextId() ?? "").current;
 
-    const id = React.useRef(HttpService.GenerateGUID(false)).current;
-
-    const removeElementRef = React.useRef(context?.removeElement);
-    removeElementRef.current = context?.removeElement;
+    const enabled = props.enabled === true && context !== undefined;
 
     React.useEffect(() => {
-        return () => {
-            removeElementRef.current?.(id);
-        };
-    }, []);
+        if (!enabled) {
+            context?.removeElement(id);
+            return;
+        }
 
-    if (!props.enabled || context === undefined) {
+        return () => {
+            context.removeElement(id);
+        };
+    }, [enabled, context?.removeElement]);
+
+    if (!enabled) {
         return props.children;
     }
 
-    return <frame
-        BackgroundTransparency={1}
-        AutomaticSize={Enum.AutomaticSize.XY}
-        Change={{
-            AbsoluteSize: (instance) => {
-                context.reportSize(id, new Vector2(
-                    instance.AbsoluteSize.X + (props.padding?.left ?? 0) + (props.padding?.right ?? 0),
-                    instance.AbsoluteSize.Y + (props.padding?.top ?? 0) + (props.padding?.bottom ?? 0),
-                ),)
-            },
-        }}>{props.children}</frame>
+    const horizontalPadding =
+        (props.padding?.left ?? 0) +
+        (props.padding?.right ?? 0);
 
+    const verticalPadding =
+        (props.padding?.top ?? 0) +
+        (props.padding?.bottom ?? 0);
+
+    return (
+        <frame
+            BackgroundTransparency={1}
+            AutomaticSize={Enum.AutomaticSize.XY}
+            Change={{
+                AbsoluteSize: (instance) => {
+                    context.reportSize(
+                        id,
+                        new Vector2(
+                            instance.AbsoluteSize.X + horizontalPadding,
+                            instance.AbsoluteSize.Y + verticalPadding,
+                        ),
+                    );
+                },
+            }}
+        >
+            {props.children}
+        </frame>
+    );
 }
 
-interface Group2Props {
+interface GroupProps {
     children?: React.ReactNode;
     BackgroundTransparency?: number;
-}
-
-interface GroupState {
-    size: Vector2;
-    sizes: Map<string, Vector2>;
 }
 
 function getMaxVector2(
@@ -80,74 +95,84 @@ function getMaxVector2(
     return max;
 }
 
-@ReactComponent
-export class Group extends Component<Group2Props, GroupState> {
-    static Element = GroupElement;
-    static contextType = GroupContext;
 
-    state: GroupState = {
-        size: new Vector2(0, 0),
-        sizes: new Map<string, Vector2>()
-    }
+type GroupComponent = React.ForwardRefExoticComponent<
+    GroupProps & React.RefAttributes<Frame>
+> & {
+    Element: typeof GroupElement;
+};
 
-    declare context: React.ContextType<typeof GroupContext>;
 
-    render(): React.ReactNode {
-        const context: GroupContextValue = {
-            size: this.state.size,
-            sizes: this.state.sizes,
-            reportSize: (id, size) => {
-                const current = this.state.sizes.get(id);
+const Group = React.forwardRef<Frame, GroupProps>(
+    (props, _ref) => {
 
-                if (
-                    current !== undefined &&
-                    current.X === size.X &&
-                    current.Y === size.Y
-                ) {
-                    return;
-                }
+        const [sizes, setSizes] = React.useState<Map<string, Vector2>>(new Map<string, Vector2>())
+        const size = React.useMemo(
+            () => getMaxVector2(sizes) ?? Vector2.zero,
+            [sizes],
+        );
 
-                this.setState((state) => {
-                    const sizes = new Map<string, Vector2>();
+        const reportSize = React.useCallback(
+            (id: string, reportedSize: Vector2) => {
+                setSizes((currentSizes) => {
+                    const current = currentSizes.get(id);
 
-                    for (const [elementId, elementSize] of state.sizes) {
-                        sizes.set(elementId, elementSize);
+                    if (
+                        current !== undefined &&
+                        current.X === reportedSize.X &&
+                        current.Y === reportedSize.Y
+                    ) {
+                        return currentSizes;
                     }
 
-                    sizes.set(id, size);
+                    const newSizes = new Map<string, Vector2>();
 
-                    return {
-                        sizes,
-                        size: getMaxVector2(sizes) ?? new Vector2(0, 0),
-                    };
-                });
-            },
-            removeElement: (id) => {
-                if (!this.state.sizes.has(id)) {
-                    return;
-                }
-
-                this.setState((state) => {
-                    const sizes = new Map<string, Vector2>();
-
-                    for (const [elementId, elementSize] of state.sizes) {
-                        if (elementId !== id) {
-                            sizes.set(elementId, elementSize);
-                        }
+                    for (const [elementId, elementSize] of currentSizes) {
+                        newSizes.set(elementId, elementSize);
                     }
 
-                    return {
-                        sizes,
-                        size: getMaxVector2(sizes) ?? new Vector2(0, 0),
-                    };
+                    newSizes.set(id, reportedSize);
+
+                    return newSizes;
                 });
             },
-        }
+            [],
+        );
+
+        const removeElement = React.useCallback((id: string) => {
+            setSizes((currentSizes) => {
+                if (!currentSizes.has(id)) {
+                    return currentSizes;
+                }
+
+                const newSizes = new Map<string, Vector2>();
+
+                for (const [elementId, elementSize] of currentSizes) {
+                    if (elementId !== id) {
+                        newSizes.set(elementId, elementSize);
+                    }
+                }
+
+                return newSizes;
+            });
+        }, []);
+
+        const context = React.useMemo<GroupContextValue>(
+            () => ({
+                size,
+                sizes,
+                reportSize,
+                removeElement,
+            }),
+            [size, sizes, reportSize, removeElement],
+        );
         return (
             <GroupContext.Provider value={context} >
-                {this.props.children}
+                {props.children}
             </GroupContext.Provider >
         );
-    }
-}
+    }) as GroupComponent;
 
+Group.Element = GroupElement;
+
+export { Group };

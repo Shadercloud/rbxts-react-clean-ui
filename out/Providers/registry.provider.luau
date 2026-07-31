@@ -72,11 +72,15 @@ local function RegistryProvider(props)
 		end
 		return result
 	end
+	local GetNextId = function()
+		return "1"
+	end
 	local contextValue = {
 		register = register,
 		unregister = unregister,
 		get = get,
 		getAll = getAll,
+		GetNextId = GetNextId,
 	}
 	return React.createElement(RegistryContext.Provider, {
 		value = contextValue,

@@ -20,6 +20,7 @@ export interface RegistryContextValue {
     unregister: <T extends defined>(guiObject: GuiObject, key: RegistryKey<T>) => void;
     get: <T extends defined>(guiObject: GuiObject, key: RegistryKey<T>) => T | undefined;
     getAll: <T extends defined>(key: RegistryKey<T>) => T[];
+    GetNextId: () => string;
 }
 export declare const RegistryContext: React.Context<RegistryContextValue | undefined>;
 export interface RegistryProviderProps {

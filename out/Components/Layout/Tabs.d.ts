@@ -1,31 +1,23 @@
-import React, { Component } from "@rbxts/react";
-import { CleanThemeContext } from "../../Contexts";
+import React from "@rbxts/react";
 import { ScalableElementProps } from "../../Interfaces";
 interface TabProps {
     children?: React.ReactNode;
 }
-declare function Tab(props: TabProps): undefined;
+declare function Tab(_props: TabProps): undefined;
 interface TabTitleProps {
     text: string;
-    children?: React.ReactNode;
 }
-declare function TabTitle(props: TabTitleProps): undefined;
+declare function TabTitle(_props: TabTitleProps): undefined;
 interface TabContentProps {
     children?: React.ReactNode;
 }
 declare function TabContent(props: TabContentProps): undefined;
 interface TabsProps extends ScalableElementProps {
 }
-interface TabsState {
-    selected: number;
-}
-export declare class Tabs extends Component<TabsProps, TabsState> {
-    static Tab: typeof Tab;
-    static Title: typeof TabTitle;
-    static Content: typeof TabContent;
-    static contextType: React.Context<import("../..").CleanTheme>;
-    context: React.ContextType<typeof CleanThemeContext>;
-    state: TabsState;
-    render(): React.ReactNode;
-}
-export {};
+type TabsComponent = React.ForwardRefExoticComponent<TabsProps & React.RefAttributes<Frame>> & {
+    Tab: typeof Tab;
+    Title: typeof TabTitle;
+    Content: typeof TabContent;
+};
+declare const Tabs: TabsComponent;
+export { Tabs };

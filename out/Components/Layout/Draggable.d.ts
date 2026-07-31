@@ -1,5 +1,5 @@
-import React, { Component, ReactNode } from "@rbxts/react";
-import { DroppableRegistration, RegistryContext } from "../../Providers";
+import React from "@rbxts/react";
+import { DroppableRegistration } from "../../Providers";
 type GuiObjectProps = React.InstanceProps<GuiObject>;
 type GuiElement = React.ReactElement<GuiObjectProps>;
 interface DragHandleProps {
@@ -15,32 +15,8 @@ interface DraggableProps {
     children: GuiElement;
     id?: string;
 }
-interface DraggableState {
-    dragging: boolean;
-    overlayPosition: Vector2;
-    overlaySize: Vector2;
-    placeholderPosition: UDim2;
-    placeholderAnchorPoint: Vector2;
-    placeholderLayoutOrder: number;
-    placeholderZIndex: number;
-}
-export declare class Draggable extends Component<DraggableProps, DraggableState> {
-    static Handle: typeof DragHandle;
-    readonly state: DraggableState;
-    static contextType: React.Context<import("../../Providers").RegistryContextValue | undefined>;
-    context: React.ContextType<typeof RegistryContext>;
-    rootRef: React.RefObject<GuiObject>;
-    private readonly placeholderRef;
-    private dragInformation;
-    private usePlaceholder;
-    private registration;
-    componentDidMount(): void;
-    componentWillUnmount(): void;
-    private beginDrag;
-    private updateDrag;
-    private endDrag;
-    private findDroppable;
-    private readonly contextValue;
-    render(): ReactNode;
-}
-export {};
+type DraggableComponent = React.ForwardRefExoticComponent<DraggableProps & React.RefAttributes<Frame>> & {
+    Handle: typeof DragHandle;
+};
+declare const Draggable: DraggableComponent;
+export { Draggable };

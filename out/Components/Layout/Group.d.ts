@@ -1,4 +1,4 @@
-import React, { Component } from "@rbxts/react";
+import React from "@rbxts/react";
 import { ResolvedPadding } from "../../Interfaces";
 interface GroupContextValue {
     size: Vector2;
@@ -16,19 +16,12 @@ declare function GroupElement(props: GroupElementProps): boolean | ReadonlyMap<R
     readonly [key: string]: React.ReactNode;
     readonly [key: number]: React.ReactNode;
 } | readonly React.ReactNode[] | React.JSX.Element | undefined;
-interface Group2Props {
+interface GroupProps {
     children?: React.ReactNode;
     BackgroundTransparency?: number;
 }
-interface GroupState {
-    size: Vector2;
-    sizes: Map<string, Vector2>;
-}
-export declare class Group extends Component<Group2Props, GroupState> {
-    static Element: typeof GroupElement;
-    static contextType: React.Context<GroupContextValue | undefined>;
-    state: GroupState;
-    context: React.ContextType<typeof GroupContext>;
-    render(): React.ReactNode;
-}
-export {};
+type GroupComponent = React.ForwardRefExoticComponent<GroupProps & React.RefAttributes<Frame>> & {
+    Element: typeof GroupElement;
+};
+declare const Group: GroupComponent;
+export { Group };

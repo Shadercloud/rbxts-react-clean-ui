@@ -50,7 +50,7 @@ function SliderDemo() {
                     <Text text="Controlled State Sliders" variant="heading" />
                 </Container>
                 <Container>
-                    <Text text={`The below two sliders have state controlled by this story instead of internal, so can both be driven from the same value: ${controlledValue}`} />
+                    <Text text={`The below two sliders have state controlled by this story instead of internal, \nso can both be driven from the same value: ${controlledValue}`} />
                 </Container>
                 <Fieldset>
                     <Fieldset.Label>

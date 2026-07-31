@@ -1,9 +1,6 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import { ContainerProps } from "../Layout";
-import {
-    CustomInputService,
-    DisconnectableSignal,
-} from "../../Interfaces";
+import { CustomInputService } from "../../Interfaces";
 import { CleanThemeContext } from "../../Contexts";
 import { SizeHelper } from "../../Helpers";
 import { BoxShadow } from "../Decorator";
@@ -13,7 +10,7 @@ type SliderHandleIndex = 0 | 1;
 
 type HighlightOption = "start" | "end" | "middle";
 
-interface SliderProps extends ContainerProps {
+export interface SliderProps extends ContainerProps {
     "max-value": number;
     "min-value"?: number;
 
@@ -28,312 +25,309 @@ interface SliderProps extends ContainerProps {
     highlight?: HighlightOption;
 }
 
-interface SliderState {
-    value: SliderValue;
-    dragging: boolean;
-    hoveredHandle?: SliderHandleIndex;
-}
+export const Slider = React.forwardRef<Frame, SliderProps>(
+    (props, ref) => {
+        const theme =
+            React.useContext(CleanThemeContext).components.slider;
 
-@ReactComponent
-export class Slider extends Component<SliderProps, SliderState> {
-    private inputChangedListener?: DisconnectableSignal;
-    private inputEndedListener?: DisconnectableSignal;
+        const containerRef = React.useRef<Frame>();
 
-    private isDragging = false;
-    private activeHandle?: SliderHandleIndex;
+        const isDraggingRef = React.useRef(false);
 
-    public containerRef = React.createRef<Frame>();
+        const activeHandleRef =
+            React.useRef<SliderHandleIndex>();
 
-    static contextType = CleanThemeContext;
+        const getInitialValue = (): SliderValue => {
+            const minValue = props["min-value"] ?? 0;
+            const maxValue = props["max-value"];
 
-    declare context: React.ContextType<typeof CleanThemeContext>;
-
-    state: SliderState = {
-        value: this.getInitialValue(),
-        dragging: false,
-        hoveredHandle: undefined,
-    };
-
-    private getInitialValue(): SliderValue {
-        const minValue = this.props["min-value"] ?? 0;
-        const maxValue = this.props["max-value"];
-
-        if (this.props.range) {
-            return typeIs(this.props.value, "Vector2")
-                ? this.props.value
-                : new Vector2(minValue, maxValue);
-        }
-
-        return typeIs(this.props.value, "number")
-            ? this.props.value
-            : minValue;
-    }
-
-    /**
-     * Returns the value currently used to render the slider.
-     */
-    private getCurrentValue(): SliderValue {
-        if (this.props.controlled) {
-            const value = this.props.value;
-
-            if (this.props.range) {
-                return typeIs(value, "Vector2")
-                    ? value
-                    : new Vector2(
-                        this.props["min-value"] ?? 0,
-                        this.props["max-value"],
-                    );
+            if (props.range) {
+                return typeIs(props.value, "Vector2")
+                    ? props.value
+                    : new Vector2(minValue, maxValue);
             }
 
-            return typeIs(value, "number")
-                ? value
-                : this.props["min-value"] ?? 0;
-        }
+            return typeIs(props.value, "number")
+                ? props.value
+                : minValue;
+        };
 
-        return this.state.value;
-    }
+        const [value, setValue] = React.useState<SliderValue>(getInitialValue);
 
-    /**
-     * Converts an input position into a single slider value.
-     */
-    private getNumberFromInput(
-        input: InputObject,
-    ): number | undefined {
-        const container = this.containerRef.current;
-        if (!container) return;
+        const [dragging, setDragging] = React.useState(false);
 
-        const containerWidth = container.AbsoluteSize.X;
-        if (containerWidth <= 0) return;
+        const [hoveredHandle, setHoveredHandle] = React.useState<SliderHandleIndex>();
 
-        const inputX = input.Position.X;
-        const containerStart = container.AbsolutePosition.X;
+        const propsRef = React.useRef(props);
+        propsRef.current = props;
 
-        const percentage = math.clamp(
-            (inputX - containerStart) / containerWidth,
-            0,
-            1,
-        );
+        const currentValue = React.useMemo((): SliderValue => {
+            if (props.controlled) {
+                if (props.range) {
+                    return typeIs(props.value, "Vector2")
+                        ? props.value
+                        : new Vector2(props["min-value"] ?? 0, props["max-value"]);
+                }
 
-        const minValue = this.props["min-value"] ?? 0;
-        const maxValue = this.props["max-value"];
+                return typeIs(props.value, "number") ? props.value : props["min-value"] ?? 0;
+            }
 
-        let value =
-            minValue +
-            percentage * (maxValue - minValue);
-
-        const step = this.props.step;
-
-        if (step !== undefined && step > 0) {
-            /*
-             * Offset snapping from minValue so ranges such as
-             * min=5, step=2 produce 5, 7, 9, etc.
-             */
-            value =
-                minValue +
-                math.round((value - minValue) / step) * step;
-
-            // Remove floating-point artifacts.
-            const parts = tostring(step).split(".");
-            const decimals =
-                parts.size() > 1
-                    ? parts[1].size()
-                    : 0;
-
-            const scale = 10 ** decimals;
-
-            value =
-                math.round(value * scale) /
-                scale;
-        }
-
-        return math.clamp(
+            return value;
+        }, [
+            props.controlled,
+            props.range,
+            props.value,
+            props["min-value"],
+            props["max-value"],
             value,
-            minValue,
-            maxValue,
-        );
-    }
+        ]);
 
-    /**
-     * Converts a single input value into either a number or Vector2,
-     * depending on whether range mode is enabled.
-     */
-    private getValueFromInput(
-        input: InputObject,
-    ): SliderValue | undefined {
-        const inputValue = this.getNumberFromInput(input);
-        if (inputValue === undefined) return;
+        const currentValueRef = React.useRef(currentValue);
+        currentValueRef.current = currentValue;
 
-        if (!this.props.range) {
-            return inputValue;
-        }
+        const updateValue = React.useCallback((nextValue: SliderValue) => {
+            if (!propsRef.current.controlled) {
+                currentValueRef.current = nextValue;
+            }
 
-        const currentValue = this.getCurrentValue();
+            setValue(nextValue);
+        }, []);
 
-        const rangeValue = typeIs(currentValue, "Vector2")
-            ? currentValue
-            : new Vector2(
-                this.props["min-value"] ?? 0,
-                this.props["max-value"],
-            );
+        /**
+         * Converts an input position into a single slider value.
+         */
+        const getNumberFromInput = React.useCallback(
+            (input: InputObject): number | undefined => {
+                const container = containerRef.current;
 
-        if (this.activeHandle === 0) {
-            return new Vector2(
-                math.min(inputValue, rangeValue.Y),
-                rangeValue.Y,
-            );
-        }
+                if (!container)
+                    return undefined;
 
-        if (this.activeHandle === 1) {
-            return new Vector2(
-                rangeValue.X,
-                math.max(inputValue, rangeValue.X),
-            );
-        }
+                const containerWidth = container.AbsoluteSize.X;
 
-        return rangeValue;
-    }
+                if (containerWidth <= 0)
+                    return undefined;
 
-    private beginDragging(
-        handle: SliderHandleIndex,
-        input: InputObject,
-    ): void {
-        if (input.UserInputType !== Enum.UserInputType.MouseButton1 &&
-            input.UserInputType !== Enum.UserInputType.Touch
-        ) return;
+                const inputX = input.Position.X;
 
-        this.activeHandle = handle;
-        this.isDragging = true;
+                const containerStart = container.AbsolutePosition.X;
 
-        const value = this.getValueFromInput(input);
+                const percentage = math.clamp(
+                    (inputX - containerStart) / containerWidth,
+                    0,
+                    1,
+                );
 
-        this.setState({
-            dragging: true,
-            value: value ?? this.state.value,
-        });
+                const currentProps = propsRef.current;
 
-        if (value !== undefined) {
-            this.props.onDragged?.(value);
-        }
-    }
+                const minValue = currentProps["min-value"] ?? 0;
+                const maxValue = currentProps["max-value"];
 
-    componentDidMount(): void {
-        this.inputChangedListener =
-            CustomInputService.InputChanged.Connect(
-                (input: InputObject) => {
-                    if (input.UserInputType !== Enum.UserInputType.MouseMovement &&
-                        input.UserInputType !== Enum.UserInputType.Touch
-                    ) return;
+                let nextValue = minValue + percentage * (maxValue - minValue);
 
-                    if (!this.isDragging) return;
+                const step = currentProps.step;
 
-                    const value = this.getValueFromInput(input);
-
-                    if (value === undefined) return;
-
-                    this.setState({ value });
-                    this.props.onDragged?.(value);
-                },
-            );
-
-        this.inputEndedListener =
-            CustomInputService.InputEnded.Connect(
-                (input: InputObject) => {
-                    if (input.UserInputType !== Enum.UserInputType.MouseButton1 &&
-                        input.UserInputType !== Enum.UserInputType.Touch
-                    ) return;
-
-                    if (!this.isDragging) return;
-
+                if (step !== undefined && step > 0) {
                     /*
-                     * Stop processing movement immediately, before
-                     * React gets around to updating the state.
+                     * Offset snapping from minValue so ranges such as
+                     * min=5, step=2 produce 5, 7, 9, etc.
                      */
-                    this.isDragging = false;
+                    nextValue =
+                        minValue +
+                        math.round((nextValue - minValue) / step) * step;
 
-                    const value = this.getValueFromInput(input);
+                    // Remove floating-point artifacts.
+                    const parts = tostring(step).split(".");
 
-                    this.activeHandle = undefined;
+                    const decimals = parts.size() > 1 ? parts[1].size() : 0;
 
-                    this.setState({
-                        value: value ?? this.state.value,
-                        dragging: false,
-                        hoveredHandle: React.None,
-                    });
+                    const scale = 10 ** decimals;
 
-                    if (value !== undefined) this.props.onChanged?.(value);
-                },
-            );
-    }
+                    nextValue = math.round(nextValue * scale) / scale;
+                }
 
-    componentWillUnmount(): void {
-        this.isDragging = false;
-        this.activeHandle = undefined;
-
-        this.inputChangedListener?.Disconnect();
-        this.inputEndedListener?.Disconnect();
-    }
-
-    render(): React.ReactNode {
-        const theme = this.context.components.slider;
-
-        const height = SizeHelper.toUDim(
-            theme.height,
+                return math.clamp(nextValue, minValue, maxValue);
+            },
+            [],
         );
 
-        const minValue = this.props["min-value"] ?? 0;
+        /**
+         * Converts a single input value into either a number or Vector2,
+         * depending on whether range mode is enabled.
+         */
+        const getValueFromInput = React.useCallback(
+            (input: InputObject): SliderValue | undefined => {
+                const inputValue = getNumberFromInput(input);
 
-        const maxValue = this.props["max-value"];
+                if (inputValue === undefined)
+                    return undefined;
+
+                const currentProps = propsRef.current;
+
+                if (!currentProps.range)
+                    return inputValue;
+
+                const rangeValue = typeIs(currentValueRef.current, "Vector2")
+                    ? currentValueRef.current
+                    : new Vector2(
+                        currentProps["min-value"] ?? 0,
+                        currentProps["max-value"],
+                    );
+
+                if (activeHandleRef.current === 0) {
+                    return new Vector2(
+                        math.min(inputValue, rangeValue.Y),
+                        rangeValue.Y,
+                    );
+                }
+
+                if (activeHandleRef.current === 1) {
+                    return new Vector2(
+                        rangeValue.X,
+                        math.max(inputValue, rangeValue.X),
+                    );
+                }
+
+                return rangeValue;
+            },
+            [getNumberFromInput],
+        );
+
+        const beginDragging = React.useCallback(
+            (handle: SliderHandleIndex, input: InputObject): void => {
+                if (
+                    input.UserInputType !== Enum.UserInputType.MouseButton1 &&
+                    input.UserInputType !== Enum.UserInputType.Touch
+                )
+                    return;
+
+                activeHandleRef.current = handle;
+                isDraggingRef.current = true;
+
+                const nextValue = getValueFromInput(input);
+
+                setDragging(true);
+
+                if (nextValue !== undefined) {
+                    updateValue(nextValue);
+
+                    propsRef.current.onDragged?.(nextValue);
+                }
+            },
+            [getValueFromInput, updateValue],
+        );
+
+        React.useEffect(() => {
+            const inputChangedListener =
+                CustomInputService.InputChanged.Connect(
+                    (input: InputObject) => {
+                        if (
+                            input.UserInputType !== Enum.UserInputType.MouseMovement &&
+                            input.UserInputType !== Enum.UserInputType.Touch
+                        )
+                            return;
+
+                        if (!isDraggingRef.current)
+                            return;
+
+                        const nextValue = getValueFromInput(input);
+
+                        if (nextValue === undefined)
+                            return;
+
+                        updateValue(nextValue);
+
+                        propsRef.current.onDragged?.(nextValue);
+                    },
+                );
+
+            const inputEndedListener =
+                CustomInputService.InputEnded.Connect(
+                    (input: InputObject) => {
+                        if (
+                            input.UserInputType !== Enum.UserInputType.MouseButton1 &&
+                            input.UserInputType !== Enum.UserInputType.Touch
+                        )
+                            return;
+
+                        if (!isDraggingRef.current)
+                            return;
+
+                        /*
+                         * Stop processing movement immediately, before
+                         * React gets around to updating the state.
+                         */
+                        isDraggingRef.current = false;
+
+                        const nextValue = getValueFromInput(input);
+
+                        activeHandleRef.current = undefined;
+
+                        setDragging(false);
+                        setHoveredHandle(undefined);
+
+                        if (nextValue !== undefined) {
+                            updateValue(nextValue);
+
+                            propsRef.current.onChanged?.(nextValue);
+                        }
+                    },
+                );
+
+            return () => {
+                isDraggingRef.current = false;
+                activeHandleRef.current = undefined;
+
+                inputChangedListener.Disconnect();
+                inputEndedListener.Disconnect();
+            };
+        }, [getValueFromInput, updateValue]);
+
+        const height = SizeHelper.toUDim(theme.height);
+
+        const minValue = props["min-value"] ?? 0;
+        const maxValue = props["max-value"];
 
         const valueRange = maxValue - minValue;
-
-        const currentValue = this.getCurrentValue();
 
         let firstValue: number;
         let secondValue: number | undefined;
 
-        if (this.props.range && typeIs(currentValue, "Vector2")) {
+        if (props.range && typeIs(currentValue, "Vector2")) {
             firstValue = currentValue.X;
             secondValue = currentValue.Y;
         } else {
-            firstValue = typeIs(currentValue, "number") ? currentValue : currentValue.X;
+            firstValue = typeIs(currentValue, "number")
+                ? currentValue
+                : currentValue.X;
         }
 
-        const getPosition = (value: number) => {
-            if (valueRange <= 0) return 0;
+        const getPosition = (sliderValue: number): number => {
+            if (valueRange <= 0)
+                return 0;
 
             return math.clamp(
-                (value - minValue) / valueRange,
+                (sliderValue - minValue) / valueRange,
                 0,
                 1,
             );
         };
 
-        const firstPosition =
-            getPosition(firstValue);
+        const firstPosition = getPosition(firstValue);
 
         const secondPosition =
             secondValue !== undefined
                 ? getPosition(secondValue)
                 : undefined;
 
-        const padding = SizeHelper.toUDim(
-            theme.bar.padding,
-        );
+        const padding = SizeHelper.toUDim(theme.bar.padding);
 
-        const handles: Array<{
-            index: SliderHandleIndex;
-            position: number;
-        }> = [
-                {
-                    index: 0,
-                    position: firstPosition,
-                },
-            ];
+        const handles: Array<{ index: SliderHandleIndex; position: number; }> = [{
+            index: 0,
+            position: firstPosition,
+        }];
 
-        if (
-            this.props.range &&
-            secondPosition !== undefined
-        ) {
+        if (props.range && secondPosition !== undefined) {
             handles.push({
                 index: 1,
                 position: secondPosition,
@@ -342,6 +336,7 @@ export class Slider extends Component<SliderProps, SliderState> {
 
         return (
             <frame
+                ref={ref}
                 Size={new UDim2(new UDim(1, 0), height)}
                 BackgroundTransparency={1}
             >
@@ -354,49 +349,49 @@ export class Slider extends Component<SliderProps, SliderState> {
                 >
                     <uistroke
                         Thickness={theme.bar.borderThickness}
-                        Color={theme.bar.borderColor} />
+                        Color={theme.bar.borderColor}
+                    />
 
-                    <uicorner CornerRadius={SizeHelper.toUDim(theme.bar.cornerRadius)} />
-
+                    <uicorner
+                        CornerRadius={SizeHelper.toUDim(theme.bar.cornerRadius)}
+                    />
                 </frame>
 
                 <frame
-                    ref={this.containerRef}
+                    ref={containerRef}
                     Size={UDim2.fromScale(1, 1).sub(new UDim2(padding.add(padding), new UDim(0, 0)))}
                     BackgroundTransparency={1}
                     Position={UDim2.fromScale(0.5, 0.5)}
                     AnchorPoint={new Vector2(0.5, 0.5)}
                 >
-                    {this.props.highlight !== undefined &&
+                    {props.highlight !== undefined && (
                         <frame
                             BackgroundColor3={theme.bar.highlight.backgroundColor}
                             BackgroundTransparency={theme.bar.highlight.backgroundTransparency}
                             Position={
-                                this.props.highlight === "start" ?
-                                    UDim2.fromScale(0, 0.5).sub(new UDim2(padding, new UDim(0, 0))) :
-                                    this.props.highlight === "end" ?
-                                        UDim2.fromScale(1, 0.5).add(new UDim2(padding, new UDim(0, 0))) :
-                                        UDim2.fromScale(firstPosition, 0.5)
+                                props.highlight === "start"
+                                    ? UDim2.fromScale(0, 0.5).sub(new UDim2(padding, new UDim(0, 0)))
+                                    : props.highlight === "end"
+                                        ? UDim2.fromScale(1, 0.5).add(new UDim2(padding, new UDim(0, 0)))
+                                        : UDim2.fromScale(firstPosition, 0.5)
                             }
-                            AnchorPoint={
-                                this.props.highlight === "end" ?
-                                    new Vector2(1, 0.5) :
-                                    new Vector2(0, 0.5)
-                            }
-                            Size={
-                                this.props.highlight === "start" ?
-                                    new UDim2(new UDim(firstPosition, 0), SizeHelper.toUDim(theme.bar.height)).add(new UDim2(padding, new UDim(0, 0))) :
-                                    this.props.highlight === "end" ?
-                                        new UDim2(new UDim(1 - (secondPosition ?? firstPosition), 0), SizeHelper.toUDim(theme.bar.height)).add(new UDim2(padding, new UDim(0, 0))) :
-                                        new UDim2(new UDim((secondPosition ?? 0) - firstPosition, 0), SizeHelper.toUDim(theme.bar.height))
+                            AnchorPoint={props.highlight === "end" ? new Vector2(1, 0.5) : new Vector2(0, 0.5)}
+                            Size={props.highlight === "start"
+                                ? new UDim2(new UDim(firstPosition, 0), SizeHelper.toUDim(theme.bar.height)).add(new UDim2(padding, new UDim(0, 0)))
+                                : props.highlight === "end"
+                                    ? new UDim2(new UDim(1 - (secondPosition ?? firstPosition), 0), SizeHelper.toUDim(theme.bar.height)).add(new UDim2(padding, new UDim(0, 0)))
+                                    : new UDim2(new UDim((secondPosition ?? 0) - firstPosition, 0), SizeHelper.toUDim(theme.bar.height))
                             }
                         >
                             <uistroke
                                 Thickness={theme.bar.borderThickness}
-                                Color={theme.bar.highlight.borderColor} />
+                                Color={theme.bar.highlight.borderColor}
+                            />
+
                             <uicorner CornerRadius={SizeHelper.toUDim(theme.bar.cornerRadius)} />
                         </frame>
-                    }
+                    )}
+
                     {handles.map(({ index, position }) => (
                         <frame
                             key={index}
@@ -408,43 +403,41 @@ export class Slider extends Component<SliderProps, SliderState> {
                             BorderSizePixel={0}
                             Event={{
                                 InputBegan: (_instance: Instance, input: InputObject) => {
-                                    this.beginDragging(index, input);
+                                    beginDragging(index, input);
                                 },
                                 MouseEnter: () => {
-                                    this.setState({
-                                        hoveredHandle: index,
-                                    });
+                                    setHoveredHandle(index);
                                 },
-
                                 MouseLeave: () => {
-                                    this.setState((state) => ({
-                                        hoveredHandle: state.hoveredHandle === index
-                                            ? React.None
-                                            : (state.hoveredHandle === undefined ? React.None : state.hoveredHandle),
-                                    }));
+                                    setHoveredHandle((currentHoveredHandle) =>
+                                        currentHoveredHandle === index
+                                            ? undefined
+                                            : currentHoveredHandle,
+                                    );
                                 },
                             }}
                         >
                             <uistroke
                                 Thickness={theme.handle.borderThickness}
-                                Color={theme.handle.borderColor} />
+                                Color={theme.handle.borderColor}
+                            />
 
                             <uicorner CornerRadius={SizeHelper.toUDim(theme.handle.cornerRadius)} />
 
-                            {(this.state.hoveredHandle === index || (this.state.dragging && this.activeHandle === index)) && (
+                            {(hoveredHandle === index || (dragging && activeHandleRef.current === index)) && (
                                 <BoxShadow box-shadow={theme.handle.boxShadow} />
                             )}
 
                             <uiaspectratioconstraint
                                 AspectRatio={theme.handle.aspectRation ?? 1}
                                 DominantAxis={Enum.DominantAxis.Height}
-                                AspectType={Enum.AspectType.ScaleWithParentSize}
+                                AspectType={
+                                    Enum.AspectType.ScaleWithParentSize
+                                }
                             />
                         </frame>
-                    )
-                    )}
+                    ))}
                 </frame>
-            </frame >
+            </frame>
         );
-    }
-}
+    });

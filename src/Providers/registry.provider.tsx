@@ -49,6 +49,7 @@ export interface RegistryContextValue {
     getAll: <T extends defined>(
         key: RegistryKey<T>,
     ) => T[];
+    GetNextId: () => string;
 }
 
 export const RegistryContext = React.createContext<
@@ -123,11 +124,16 @@ export function RegistryProvider(props: RegistryProviderProps) {
         return result;
     };
 
+    const GetNextId = (): string => {
+        return "1";
+    }
+
     const contextValue: RegistryContextValue = {
         register,
         unregister,
         get,
         getAll,
+        GetNextId
     };
 
     return (

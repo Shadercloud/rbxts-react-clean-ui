@@ -1,16 +1,16 @@
-import React, { Component, ReactComponent } from "@rbxts/react";
+import React from "@rbxts/react";
 import { FlexItem } from "./FlexItem";
 import { Container } from "./Container";
 import { HStack } from "./HStack";
 import { CleanThemeContext } from "../../Contexts";
-import { Breakpoint, BreakPointElementProps, BreakpointValue } from "../../Interfaces";
+import { Breakpoint, BreakPointElementProps } from "../../Interfaces";
 import { BreakpointHelper } from "../../Helpers";
 
 
 export interface FieldsetContextValue {
     disabled: boolean;
     checkbox: boolean;
-    labelActivated?: BindableEvent;
+    labelActivated: BindableEvent;
 }
 
 export const FieldsetContext = React.createContext<FieldsetContextValue | undefined>(
@@ -42,11 +42,11 @@ function FieldsetLabel(props: FieldsetSlotProps) {
             GrowRatio={0}
         >
             <imagebutton Size={UDim2.fromOffset(0, 0)} BackgroundTransparency={1} AutomaticSize={Enum.AutomaticSize.XY}
-            Event={{
-                Activated: () => {
-                    context.labelActivated?.Fire();
-                }
-            }}>
+                Event={{
+                    Activated: () => {
+                        context.labelActivated.Fire();
+                    }
+                }}>
                 {props.children}
             </imagebutton>
         </FlexItem>
@@ -72,82 +72,63 @@ function FieldsetControl(props: FieldsetSlotProps) {
     );
 }
 
-interface FieldsetState {
-    width: number;
-}
 
-@ReactComponent
-export class Fieldset extends Component<FieldsetProps, FieldsetState> {
-    public static Label = FieldsetLabel;
-    public static Control = FieldsetControl;
+type FieldsetComponent = React.ForwardRefExoticComponent<
+    FieldsetProps & React.RefAttributes<Frame>
+> & {
+    Label: typeof FieldsetLabel;
+    Control: typeof FieldsetControl;
+};
 
-    static contextType = CleanThemeContext;
+const Fieldset = React.forwardRef<Frame, FieldsetProps>(
+    (props, ref) => {
 
-    declare context: React.ContextType<typeof CleanThemeContext>;
+        const theme = React.useContext(CleanThemeContext);
 
-    private readonly labelActivated = new Instance("BindableEvent");
+        const [width, setWidth] = React.useState<number>(0);
 
-    private fieldsetContext: FieldsetContextValue = {
-        disabled: false,
-        checkbox: false,
-        labelActivated: this.labelActivated,
-    };
+        const labelActivated = React.useRef(new Instance("BindableEvent")).current;
 
-    private getFieldsetContext(): FieldsetContextValue {
-        const disabled = this.props.disabled ?? false;
-        const checkbox = this.props.checkbox ?? false;
-
-        if (
-            this.fieldsetContext.disabled !== disabled ||
-            this.fieldsetContext.checkbox !== checkbox
-        ) {
-            this.fieldsetContext = {
-                disabled,
-                checkbox,
-                labelActivated: this.labelActivated,
+        React.useEffect(() => {
+            return () => {
+                labelActivated.Destroy();
             };
-        }
+        }, []);
 
-        return this.fieldsetContext;
-    }
+        const fieldsetContext = React.useMemo<FieldsetContextValue>(() => {
+            return {
+                disabled: props.disabled ?? false,
+                checkbox: props.checkbox ?? false,
+                labelActivated,
+            };
+        }, [props.disabled, props.checkbox]);
 
-    public componentWillUnmount() {
-        this.labelActivated.Destroy();
-    }
-
-    public render() {
-        const context = this.getFieldsetContext();
-
-        let wrap = false;
-
-        const breakpoints: BreakpointValue<number> = (this.props.breakpoints !== undefined ? this.props.breakpoints : this.context.breakpoints);
-        const breakpoint = BreakpointHelper.getBreakpoint(this.state.width ?? 0, breakpoints)
-        if (BreakpointHelper.compare(breakpoint, "<=", this.props.wrap ?? "lg"))
-            wrap = true;
-
-
-
+        const breakpoints = props.breakpoints ?? theme.breakpoints;
+        const breakpoint = BreakpointHelper.getBreakpoint(width, breakpoints)
+        const wrap = BreakpointHelper.compare(breakpoint, "<=", props.wrap ?? "lg");
 
         return (
-            <FieldsetContext.Provider value={context}>
-                <Container Change={{
-                    AbsoluteSize: (instance) => {
-                        const width = instance.AbsoluteSize.X;
-
-                        if (width !== this.state.width) {
-                            this.setState({ width });
-                        }
-                    },
-                }}>
+            <FieldsetContext.Provider value={fieldsetContext}>
+                <Container
+                    ref={ref}
+                    Change={{
+                        AbsoluteSize: (instance) => {
+                            setWidth(instance.AbsoluteSize.X);
+                        },
+                    }}>
                     <HStack
                         Wraps={wrap}
                         valign="Center"
                         HorizontalFlex={Enum.UIFlexAlignment.Fill}
                     >
-                        {this.props.children}
+                        {props.children}
                     </HStack>
                 </Container>
             </FieldsetContext.Provider>
         );
-    }
-}
+    }) as FieldsetComponent;
+
+Fieldset.Label = FieldsetLabel;
+Fieldset.Control = FieldsetControl;
+
+export { Fieldset };
