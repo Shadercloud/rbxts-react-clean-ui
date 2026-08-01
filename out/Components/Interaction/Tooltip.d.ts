@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { IntentElementProps } from "../../Interfaces";
 import { BoxProps } from "../Surface";
-type TooltipPlacement = "Top" | "Bottom" | "Left" | "Right";
+type TooltipPlacement = "Top" | "Bottom" | "Left" | "Right" | "Center";
 interface TooltipProps extends BoxProps, IntentElementProps {
     content: React.ReactNode | string;
     children: React.ReactElement<React.InstanceProps<GuiObject>>;

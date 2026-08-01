@@ -8,7 +8,7 @@ import { IntentElementProps } from "../../Interfaces";
 import { BoxProps } from "../Surface";
 import { useTween } from "@rbxts/react-ripple";
 
-type TooltipPlacement = "Top" | "Bottom" | "Left" | "Right"
+type TooltipPlacement = "Top" | "Bottom" | "Left" | "Right" | "Center"
 
 interface TooltipTarget {
     position: Vector2;
@@ -51,7 +51,7 @@ function TooltipPopup(props: TooltipPopup) {
     }
 
 
-    const pointerSize = theme.components.tooltip.pointerSize;
+    const pointerSize = props.placement === "Center" ? 0 : theme.components.tooltip.pointerSize;
 
     let anchor = Vector2.zero;
     let position = props.target.position.sub(props.overlay.AbsolutePosition); // Top Left Corner
@@ -93,6 +93,10 @@ function TooltipPopup(props: TooltipPopup) {
             pointerAnchor = new Vector2(0, 0.5);
             pointerPosition = new UDim2(0, math.max(math.ceil(pointerDiff), resolvedPadding.left - pointerDiff), 0.5, 0);
             resolvedPadding.left = math.max(math.floor(pointerHeight), resolvedPadding.left);
+            break;
+        case "Center":
+            anchor = new Vector2(0.5, 0.5)
+            position = position.add(new Vector2(props.target.size.X / 2, props.target.size.Y / 2));
             break;
     }
 

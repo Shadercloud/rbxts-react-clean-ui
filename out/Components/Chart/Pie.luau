@@ -101,7 +101,7 @@ local function Pie(props)
 		local percent = v.value / totalValue
 		totalPercent += (percent / 2)
 		local fill = percent * 2
-		local color = v.color or theme.components.pie.colors[index % #theme.components.pie.colors + 1]
+		local color = v.color or theme.components.charts.colors[index % #theme.components.charts.colors + 1]
 		if index == state.hover then
 			local _condition = props["hover-darken"]
 			if _condition == nil then
@@ -143,8 +143,8 @@ local function Pie(props)
 			if isTextLabel then
 				local text = if type(label) == "string" then label else (label.text)
 				local spacing = if type(label) == "string" then props["label-spacing"] else label.spacing
-				local background = if not (type(label) == "string") and label.BackgroundColor3 ~= nil then label.BackgroundColor3 else theme.components.pie.labels.backgroundColor or theme.components.box.backgroundColor
-				local border = if not (type(label) == "string") and label.BorderColor3 ~= nil then label.BorderColor3 else theme.components.pie.labels.borderColor or theme.components.box.borderColor
+				local background = if not (type(label) == "string") and label.BackgroundColor3 ~= nil then label.BackgroundColor3 else theme.components.charts.pie.labels.backgroundColor or theme.components.box.backgroundColor
+				local border = if not (type(label) == "string") and label.BorderColor3 ~= nil then label.BorderColor3 else theme.components.charts.pie.labels.borderColor or theme.components.box.borderColor
 				local _attributes = {
 					Size = UDim2.fromScale(0, 0),
 					AutomaticSize = Enum.AutomaticSize.XY,
@@ -152,24 +152,24 @@ local function Pie(props)
 					Position = position,
 					BackgroundColor3 = background,
 				}
-				local _condition_1 = theme.components.pie.labels.backgroundTransparency
+				local _condition_1 = theme.components.charts.pie.labels.backgroundTransparency
 				if _condition_1 == nil then
 					_condition_1 = theme.components.box.backgroundTransparency
 				end
 				_attributes.BackgroundTransparency = _condition_1
 				local _exp_2 = React.createElement(Text, {
 					text = text,
-					typography = TypographyHelper:getTypography(theme, "md", theme.components.pie.labels.typography),
+					typography = TypographyHelper:getTypography(theme, "md", theme.components.charts.pie.labels.typography),
 				})
 				local _attributes_1 = {}
-				local _condition_2 = theme.components.pie.labels.cornerRadius
+				local _condition_2 = theme.components.charts.pie.labels.cornerRadius
 				if _condition_2 == nil then
 					_condition_2 = theme.components.box.cornerRadius
 				end
 				_attributes_1.radius = _condition_2
 				local _exp_3 = React.createElement(Corners, _attributes_1)
 				local _attributes_2 = {}
-				local _condition_3 = theme.components.pie.labels.borderThickness
+				local _condition_3 = theme.components.charts.pie.labels.borderThickness
 				if _condition_3 == nil then
 					_condition_3 = theme.components.box.borderThickness
 				end
@@ -177,7 +177,7 @@ local function Pie(props)
 				_attributes_2.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 				_attributes_2.Color = border
 				local _arg0_1 = React.createElement("frame", _attributes, _exp_2, _exp_3, React.createElement("uistroke", _attributes_2), React.createElement(Padding, {
-					resolvedPadding = SpacingHelper:ResolveNumberPadding(SpacingHelper:GetPadding(theme, spacing, theme.components.pie.labels.spacing)),
+					resolvedPadding = SpacingHelper:ResolveNumberPadding(SpacingHelper:GetPadding(theme, spacing, theme.components.charts.pie.labels.spacing)),
 				}), React.createElement(BoxShadow))
 				table.insert(labels, _arg0_1)
 			elseif label.content ~= nil then
@@ -198,8 +198,8 @@ local function Pie(props)
 	end
 	-- ▲ ReadonlyArray.forEach ▲
 	local shadowPadding
-	if theme.components.pie.boxShadow ~= nil then
-		local shadowParsed = CssHelper:parseCssShadow(theme.components.pie.boxShadow.shadow)
+	if theme.components.charts.pie.boxShadow ~= nil then
+		local shadowParsed = CssHelper:parseCssShadow(theme.components.charts.pie.boxShadow.shadow)
 		if shadowParsed ~= nil then
 			local shadowValue = shadowParsed.spread.X.Offset + shadowParsed.blurRadius.Offset
 			if shadowValue > 0 then
@@ -270,8 +270,8 @@ local function Pie(props)
 				changeHover(-1)
 			end,
 		},
-	}, segments, labels, theme.components.pie.boxShadow ~= nil and React.createElement(BoxShadow, {
-		completeShadow = theme.components.pie.boxShadow,
+	}, segments, labels, theme.components.charts.pie.boxShadow ~= nil and React.createElement(BoxShadow, {
+		completeShadow = theme.components.charts.pie.boxShadow,
 	}), React.createElement("uicorner", {
 		CornerRadius = UDim.new(1, 0),
 	})))

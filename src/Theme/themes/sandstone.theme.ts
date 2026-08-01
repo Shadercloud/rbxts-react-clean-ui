@@ -360,12 +360,7 @@ export const SandstoneTheme = createTheme({
             },
             body: {}
         },
-        pie: {
-            boxShadow: {
-                shadow: "0px 0px",
-                color: Color3.fromHex("#FFFFFF"),
-                transparency: 1,
-            },
+        charts: {
             colors: [
                 Color3.fromHex("#7A9E7E"), // Sage (Green)
                 Color3.fromHex("#A66C5D"), // Clay Rose (Red)
@@ -379,10 +374,18 @@ export const SandstoneTheme = createTheme({
                 Color3.fromHex("#8F7B5E"), // Taupe (Slate)
                 Color3.fromHex("#8C9B5E"), // Olive (Lime)
             ],
-            labels: {
-                backgroundColor: Color3.fromHex("#FFF9ED"),
-                backgroundTransparency: 0,
-                borderColor: Color3.fromHex("#D8CDBA"),
+            pie: {
+                boxShadow: {
+                    shadow: "0px 0px",
+                    color: Color3.fromHex("#FFFFFF"),
+                    transparency: 1,
+                },
+
+                labels: {
+                    backgroundColor: Color3.fromHex("#FFF9ED"),
+                    backgroundTransparency: 0,
+                    borderColor: Color3.fromHex("#D8CDBA"),
+                }
             }
         }
     },

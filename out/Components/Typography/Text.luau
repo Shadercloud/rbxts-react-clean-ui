@@ -16,6 +16,7 @@ local Text = React.forwardRef(function(props, ref)
 		TextColor3 = props.TextColor3 or theme.colors.intents.primary.default.textColor,
 		Text = props.text,
 		TextWrap = props.TextWrap == nil or props.TextWrap == true,
+		TextWrapped = props.TextWrap == nil or props.TextWrap == true,
 		FontFace = Font.fromName(style.font.Name, weight),
 		FontSize = style.size,
 		RichText = true,

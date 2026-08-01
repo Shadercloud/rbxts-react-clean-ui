@@ -38,7 +38,7 @@ local function TooltipPopup(props)
 		resolvedPadding.left += shadow.blurRadius.Offset + shadow.spread.X.Offset - shadow.offset.X.Offset
 		resolvedPadding.right += shadow.blurRadius.Offset + shadow.spread.X.Offset + shadow.offset.X.Offset
 	end
-	local pointerSize = theme.components.tooltip.pointerSize
+	local pointerSize = if props.placement == "Center" then 0 else theme.components.tooltip.pointerSize
 	local anchor = Vector2.zero
 	local _position = props.target.position
 	local _absolutePosition = props.overlay.AbsolutePosition
@@ -91,6 +91,13 @@ local function TooltipPopup(props)
 			pointerAnchor = Vector2.new(0, 0.5)
 			pointerPosition = UDim2.new(0, math.max(math.ceil(pointerDiff), resolvedPadding.left - pointerDiff), 0.5, 0)
 			resolvedPadding.left = math.max(math.floor(pointerHeight), resolvedPadding.left)
+			break
+		end
+		if _exp == "Center" then
+			anchor = Vector2.new(0.5, 0.5)
+			local _position_1 = position
+			local _vector2 = Vector2.new(props.target.size.X / 2, props.target.size.Y / 2)
+			position = _position_1 + _vector2
 			break
 		end
 	until true

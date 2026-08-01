@@ -4,11 +4,59 @@ description: Display related content inside a structured container with optional
 icon: CreditCard
 ---
 
-<Image alt="Card demonstration" src="/images/card_preview.png" style={{width: "100%", marginBottom: "1rem",}} />
+
+<Tabs defaultValue="preview">
+    <TabsList>
+        <TabsTrigger value="preview"><Eye className="h-4 w-4" /> Loom Preview</TabsTrigger>
+        <TabsTrigger value="screenshot"><ImageIcon className="h-4 w-4" /> Screenshot</TabsTrigger>
+        <TabsTrigger value="code"><Code className="h-4 w-4" /> Code</TabsTrigger>
+    </TabsList>
+    <TabsContent value="preview">
+        <LoomPreview target="Scenes/Cards.loom.tsx" height={600} />
+    </TabsContent>
+    <TabsContent value="screenshot">
+        <Image alt="Card demonstration" src="/images/card_preview.png"style={{ width: "100%"}}/>
+    </TabsContent>
+    <TabsContent value="code">
+        ```tsx
+        import { Card, Text, Button, HStack } from "@rbxts/react-clean-ui";
+
+        <Container width="90%" center>
+                <HStack>
+                    {[
+                        "primary",
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                    ].map((intent) => {
+                        return <Container width="45%">
+                            <Card intent={intent as Intent}>
+                                <Card.Header>
+                                    <Text variant="heading" text="Player Profile" />
+                                </Card.Header>
+                                <Card.Body>
+                                    <Text text="View player information, statistics, and recent activity." />
+                                </Card.Body>
+                                <Card.Footer>
+                                    <HStack>
+                                        <Button text="Cancel" />
+                                        <Button text="Save" intent="success" />
+                                    </HStack>
+                                </Card.Footer>
+                            </Card>
+                        </Container>
+                    })}
+                </HStack>
+            </Container>
+        ```
+    </TabsContent>
+</Tabs>
 
 The `<Card>` component groups related content inside a bordered container. Cards can contain a header, body, and footer, with each section automatically using the configured card spacing and theme styles.
 
 ## Usage
+
 
 ```tsx
 import { Card, Text, Button, HStack } from "@rbxts/react-clean-ui";

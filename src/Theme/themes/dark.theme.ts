@@ -359,7 +359,7 @@ export const DarkTheme = createTheme({
             },
             body: {}
         },
-        pie: {
+        charts: {
             colors: [
                 Color3.fromHex("#4CC47A"), // Green
                 Color3.fromHex("#E35B5B"), // Red

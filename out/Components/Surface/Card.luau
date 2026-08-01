@@ -9,6 +9,7 @@ local VStack = _Layout.VStack
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
+local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local Padding = TS.import(script, script.Parent.Parent, "Decorator").Padding
@@ -48,11 +49,11 @@ local CardBody = React.forwardRef(function(props, ref)
 	local padding = SpacingHelper:ResolveNumberPadding(SpacingHelper:GetPadding(theme, "md", theme.components.card.header.spacing))
 	local _attributes = {
 		ref = ref,
+		Size = SizeHelper:GetSize(props, UDim2.fromScale(0, 0)),
 	}
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
-	_attributes.Size = UDim2.fromScale(0, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	return React.createElement(FlexItem, nil, React.createElement(Container, _attributes, React.createElement(Padding, {
 		resolvedPadding = padding,

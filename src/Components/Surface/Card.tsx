@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { Box, BoxProps } from "./Box";
 import { Container, FlexItem, VStack } from "../Layout";
-import { ColorHelper, CssHelper, SpacingHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper } from "../../Helpers";
 import { CleanThemeContext } from "../../Contexts";
 import { Padding } from "../Decorator";
 import { Intent, IntentElementProps } from "../../Interfaces";
@@ -50,8 +50,8 @@ export const CardBody = React.forwardRef<Frame, CardBodyProps>(
         return <FlexItem>
             <Container
                 ref={ref}
+                Size={SizeHelper.GetSize(props, UDim2.fromScale(0, 0))}
                 {...props}
-                Size={UDim2.fromScale(0, 0)}
                 AutomaticSize={Enum.AutomaticSize.XY}>
                 <Padding resolvedPadding={padding} />
                 {props.children}

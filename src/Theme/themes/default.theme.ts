@@ -487,13 +487,7 @@ export const DefaultTheme: CleanTheme = {
             }
 
         },
-        pie: {
-            hoverDarken: 0.2,
-            boxShadow: {
-                shadow: "0px 0px 8px 3px",
-                color: Color3.fromHex("#000000"),
-                transparency: 0.6,
-            },
+        charts: {
             colors: [
                 Color3.fromHex("#2E9D63"), // Green
                 Color3.fromHex("#D64545"), // Red
@@ -507,10 +501,19 @@ export const DefaultTheme: CleanTheme = {
                 Color3.fromHex("#6B7C93"), // Slate
                 Color3.fromHex("#7CB342"), // Lime
             ],
-            labels: {
-                cornerRadius: 4,
-                typography: {
-                    weight: Enum.FontWeight.Bold
+            pie: {
+                hoverDarken: 0.2,
+                boxShadow: {
+                    shadow: "0px 0px 8px 3px",
+                    color: Color3.fromHex("#000000"),
+                    transparency: 0.6,
+                },
+
+                labels: {
+                    cornerRadius: 4,
+                    typography: {
+                        weight: Enum.FontWeight.Bold
+                    }
                 }
             }
         }

@@ -3,9 +3,9 @@ import { useTween } from "@rbxts/react-ripple";
 import { SizeElementProps } from "../../Interfaces";
 import { Box, Icon } from "../Surface";
 import { Container, FlexItem, HStack, VStack } from "../Layout";
-import { Button } from "../Input";
+import { Button } from "../Input/Button";
 import { Text } from "../Typography";
-import { CleanThemeContext, ToastOptions, useToast } from "../../Contexts/";
+import { CleanThemeContext, ToastOptions, useToast } from "../../Contexts";
 import { ColorHelper, SizeHelper, TypographyHelper } from "../../Helpers";
 import { Corners } from "../Decorator";
 

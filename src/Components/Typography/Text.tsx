@@ -33,6 +33,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
             TextColor3={props.TextColor3 ?? theme.colors.intents.primary.default.textColor}
             Text={props.text}
             TextWrap={props.TextWrap === undefined || props.TextWrap === true}
+            TextWrapped={props.TextWrap === undefined || props.TextWrap === true}
             FontFace={Font.fromName(style.font.Name, weight)}
             FontSize={style.size}
             RichText

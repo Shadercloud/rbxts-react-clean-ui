@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { SizeElementProps } from "../../Interfaces";
-import { ToastOptions } from "../../Contexts/";
+import { ToastOptions } from "../../Contexts";
 interface ToastProps extends ToastOptions {
     onDismiss: () => void;
 }

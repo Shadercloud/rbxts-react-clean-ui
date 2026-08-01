@@ -336,17 +336,19 @@ local SandstoneTheme = createTheme({
 			header = {},
 			body = {},
 		},
-		pie = {
-			boxShadow = {
-				shadow = "0px 0px",
-				color = Color3.fromHex("#FFFFFF"),
-				transparency = 1,
-			},
+		charts = {
 			colors = { Color3.fromHex("#7A9E7E"), Color3.fromHex("#A66C5D"), Color3.fromHex("#B89A5A"), Color3.fromHex("#6E97A8"), Color3.fromHex("#8A729E"), Color3.fromHex("#6F9A90"), Color3.fromHex("#C97A4A"), Color3.fromHex("#C58A9A"), Color3.fromHex("#8F7B5E"), Color3.fromHex("#8C9B5E") },
-			labels = {
-				backgroundColor = Color3.fromHex("#FFF9ED"),
-				backgroundTransparency = 0,
-				borderColor = Color3.fromHex("#D8CDBA"),
+			pie = {
+				boxShadow = {
+					shadow = "0px 0px",
+					color = Color3.fromHex("#FFFFFF"),
+					transparency = 1,
+				},
+				labels = {
+					backgroundColor = Color3.fromHex("#FFF9ED"),
+					backgroundTransparency = 0,
+					borderColor = Color3.fromHex("#D8CDBA"),
+				},
 			},
 		},
 	},

@@ -123,7 +123,7 @@ export function Pie(props: PieProps) {
         totalPercent += (percent / 2)
 
         const fill = percent * 2;
-        let color = v.color ?? theme.components.pie.colors[index % theme.components.pie.colors.size()]
+        let color = v.color ?? theme.components.charts.colors[index % theme.components.charts.colors.size()]
         if (index === state.hover) {
             const d = props['hover-darken'] ?? 0.2
             color = color.Lerp((d < 0 ? new Color3(1, 1, 1) : new Color3(0, 0, 0)), math.abs(d))
@@ -150,9 +150,9 @@ export function Pie(props: PieProps) {
                 const text = typeIs(label, "string") ? label : (label.text as string);
                 const spacing = typeIs(label, "string") ? props["label-spacing"] : label.spacing;
                 const background = !typeIs(label, "string") && label.BackgroundColor3 !== undefined ? label.BackgroundColor3 :
-                    theme.components.pie.labels.backgroundColor ?? theme.components.box.backgroundColor;
+                    theme.components.charts.pie.labels.backgroundColor ?? theme.components.box.backgroundColor;
                 const border = !typeIs(label, "string") && label.BorderColor3 !== undefined ? label.BorderColor3 :
-                    theme.components.pie.labels.borderColor ?? theme.components.box.borderColor;
+                    theme.components.charts.pie.labels.borderColor ?? theme.components.box.borderColor;
 
                 labels.push(
                     <frame
@@ -162,7 +162,7 @@ export function Pie(props: PieProps) {
                         Position={position}
                         BackgroundColor3={background}
                         BackgroundTransparency={
-                            theme.components.pie.labels.backgroundTransparency ??
+                            theme.components.charts.pie.labels.backgroundTransparency ??
                             theme.components.box.backgroundTransparency
                         }
                     >
@@ -171,20 +171,20 @@ export function Pie(props: PieProps) {
                             typography={TypographyHelper.getTypography(
                                 theme,
                                 "md",
-                                theme.components.pie.labels.typography,
+                                theme.components.charts.pie.labels.typography,
                             )}
                         />
 
                         <Corners
                             radius={
-                                theme.components.pie.labels.cornerRadius ??
+                                theme.components.charts.pie.labels.cornerRadius ??
                                 theme.components.box.cornerRadius
                             }
                         />
 
                         <uistroke
                             Thickness={
-                                theme.components.pie.labels.borderThickness ??
+                                theme.components.charts.pie.labels.borderThickness ??
                                 theme.components.box.borderThickness
                             }
                             BorderStrokePosition={Enum.BorderStrokePosition.Inner}
@@ -196,7 +196,7 @@ export function Pie(props: PieProps) {
                                 SpacingHelper.GetPadding(
                                     theme,
                                     spacing,
-                                    theme.components.pie.labels.spacing,
+                                    theme.components.charts.pie.labels.spacing,
                                 ),
                             )}
                         />
@@ -223,8 +223,8 @@ export function Pie(props: PieProps) {
     });
 
     let shadowPadding: React.ReactElement | undefined;
-    if (theme.components.pie.boxShadow !== undefined) {
-        const shadowParsed = CssHelper.parseCssShadow(theme.components.pie.boxShadow.shadow);
+    if (theme.components.charts.pie.boxShadow !== undefined) {
+        const shadowParsed = CssHelper.parseCssShadow(theme.components.charts.pie.boxShadow.shadow);
         if (shadowParsed !== undefined) {
             const shadowValue = shadowParsed.spread.X.Offset + shadowParsed.blurRadius.Offset;
             if (shadowValue > 0) {
@@ -311,8 +311,8 @@ export function Pie(props: PieProps) {
                 {segments}
                 {labels}
 
-                {theme.components.pie.boxShadow !== undefined &&
-                    <BoxShadow completeShadow={theme.components.pie.boxShadow} />
+                {theme.components.charts.pie.boxShadow !== undefined &&
+                    <BoxShadow completeShadow={theme.components.charts.pie.boxShadow} />
                 }
                 <uicorner CornerRadius={new UDim(1, 0)} />
             </frame>

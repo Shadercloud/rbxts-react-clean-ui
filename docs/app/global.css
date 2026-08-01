@@ -10,3 +10,17 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+
+.loom-chromeless {
+  background-color: white !important;
+}
+
+/* Entire Loom preview page */
+[data-loom-gallery] {
+    background: white !important;
+}
+
+/* Canvas surrounding the Roblox viewport */
+[data-loom-gallery] .loom-preview {
+    background: white !important;
+}

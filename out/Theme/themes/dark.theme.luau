@@ -336,7 +336,7 @@ local DarkTheme = createTheme({
 			header = {},
 			body = {},
 		},
-		pie = {
+		charts = {
 			colors = { Color3.fromHex("#4CC47A"), Color3.fromHex("#E35B5B"), Color3.fromHex("#F0B74A"), Color3.fromHex("#4D9EEA"), Color3.fromHex("#A676F0"), Color3.fromHex("#43C2BA"), Color3.fromHex("#F48A52"), Color3.fromHex("#E06AAE"), Color3.fromHex("#6FA8DC"), Color3.fromHex("#9CCC4A") },
 		},
 	},

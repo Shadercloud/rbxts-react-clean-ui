@@ -188,18 +188,20 @@ export interface CleanTheme {
             cornerRadius: CssSize;
             intents?: Partial<Record<Intent, Partial<IntentScheme>>>;
         };
-        pie: {
+        charts: {
             colors: Color3[];
-            boxShadow?: CssBoxShadow;
-            hoverDarken: number;
-            labels: {
-                spacing?: ScaleSizeValue<number>;
-                backgroundColor?: Color3;
-                backgroundTransparency?: number;
-                typography?: Partial<TypographyStyle>;
-                borderColor?: Color3;
-                borderThickness?: number;
-                cornerRadius?: CssSize;
+            pie: {
+                boxShadow?: CssBoxShadow;
+                hoverDarken: number;
+                labels: {
+                    spacing?: ScaleSizeValue<number>;
+                    backgroundColor?: Color3;
+                    backgroundTransparency?: number;
+                    typography?: Partial<TypographyStyle>;
+                    borderColor?: Color3;
+                    borderThickness?: number;
+                    cornerRadius?: CssSize;
+                };
             };
         };
     };
