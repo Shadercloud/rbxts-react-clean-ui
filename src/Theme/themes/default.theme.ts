@@ -1,6 +1,6 @@
 import { CleanTheme } from "../theme.template"
 
-const font = Enum.Font.Gotham
+const font = Enum.Font.Roboto;
 export const DefaultTheme: CleanTheme = {
     colors: {
         intents: {

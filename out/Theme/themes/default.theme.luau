@@ -1,5 +1,5 @@
 -- Compiled with roblox-ts v3.0.0
-local font = Enum.Font.Gotham
+local font = Enum.Font.Roboto
 local DefaultTheme = {
 	colors = {
 		intents = {
