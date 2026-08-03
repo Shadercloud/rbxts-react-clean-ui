@@ -6,12 +6,14 @@ import { Text } from "../src/Components/Typography/Text";
 import { LoomScene } from "./LoomScene";
 import { Intent } from "../src/Interfaces/clean.element.props";
 import { Card } from "../src/Components/Surface/Card";
+import { Row } from "../src/Components/Layout/Row";
+import { Column } from "../src/Components/Layout/Column";
 
 export const preview = {
     render: () => (
         <LoomScene>
-            <Container width="90%" center>
-                <HStack>
+            <Container width="100%" center>
+                <Row>
                     {[
                         "primary",
                         "success",
@@ -19,7 +21,7 @@ export const preview = {
                         "danger",
                         "info",
                     ].map((intent) => {
-                        return <Container width="45%">
+                        return <Column span={6}>
                             <Card intent={intent as Intent}>
                                 <Card.Header>
                                     <Text variant="heading" text="Player Profile" />
@@ -34,12 +36,12 @@ export const preview = {
                                     </HStack>
                                 </Card.Footer>
                             </Card>
-                        </Container>
+                        </Column>
                     })}
-                </HStack>
+                </Row>
             </Container>
         </LoomScene>
     ),
 
-    title: "Button",
+    title: "Cards",
 } as const;

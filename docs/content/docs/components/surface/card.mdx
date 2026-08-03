@@ -5,6 +5,10 @@ icon: CreditCard
 ---
 
 
+The `<Card>` component groups related content inside a bordered container. Cards can contain a header, body, and footer, with each section automatically using the configured card spacing and theme styles.
+
+## Usage
+
 <Tabs defaultValue="preview">
     <TabsList>
         <TabsTrigger value="preview"><Eye className="h-4 w-4" /> Loom Preview</TabsTrigger>
@@ -12,74 +16,33 @@ icon: CreditCard
         <TabsTrigger value="code"><Code className="h-4 w-4" /> Code</TabsTrigger>
     </TabsList>
     <TabsContent value="preview">
-        <LoomPreview target="Scenes/Cards.loom.tsx" height={600} />
+        <LoomPreview target="Scenes/Card.loom.tsx" height={300} />
     </TabsContent>
     <TabsContent value="screenshot">
-        <Image alt="Card demonstration" src="/images/card_preview.png"style={{ width: "100%"}}/>
+        <Image alt="Card demonstration" src="/images/single_card_preview.png"style={{ width: "100%"}}/>
     </TabsContent>
     <TabsContent value="code">
         ```tsx
-        import { Card, Text, Button, HStack } from "@rbxts/react-clean-ui";
+        import { Card, Text, Button, HStack} from "@rbxts/react-clean-ui";
 
-        <Container width="90%" center>
+        <Card intent="primary">
+            <Card.Header>
+                <Text variant="heading" text="Player Profile" />
+            </Card.Header>
+            <Card.Body>
+                <Text text="Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts." />
+            </Card.Body>
+            <Card.Footer>
                 <HStack>
-                    {[
-                        "primary",
-                        "success",
-                        "warning",
-                        "danger",
-                        "info",
-                    ].map((intent) => {
-                        return <Container width="45%">
-                            <Card intent={intent as Intent}>
-                                <Card.Header>
-                                    <Text variant="heading" text="Player Profile" />
-                                </Card.Header>
-                                <Card.Body>
-                                    <Text text="View player information, statistics, and recent activity." />
-                                </Card.Body>
-                                <Card.Footer>
-                                    <HStack>
-                                        <Button text="Cancel" />
-                                        <Button text="Save" intent="success" />
-                                    </HStack>
-                                </Card.Footer>
-                            </Card>
-                        </Container>
-                    })}
+                    <Button text="Cancel" />
+                    <Button text="Save" intent="success" />
                 </HStack>
-            </Container>
+            </Card.Footer>
+        </Card>
         ```
     </TabsContent>
 </Tabs>
 
-The `<Card>` component groups related content inside a bordered container. Cards can contain a header, body, and footer, with each section automatically using the configured card spacing and theme styles.
-
-## Usage
-
-
-```tsx
-import { Card, Text, Button, HStack } from "@rbxts/react-clean-ui";
-
-<Card intent="primary">
-    <Card.Header>
-        <Text variant="heading">Player Profile</Text>
-    </Card.Header>
-
-    <Card.Body>
-        <Text>
-            View player information, statistics, and recent activity.
-        </Text>
-    </Card.Body>
-
-    <Card.Footer>
-        <HStack>
-            <Button text="Cancel" />
-            <Button text="Save" intent="success" />
-        </HStack>
-    </Card.Footer>
-</Card>
-```
 
 ## Sections
 
@@ -125,20 +88,53 @@ Displays content at the bottom of the card. It includes themed background, borde
 
 Set `intent` on the card to apply a shared visual intent to its header and footer.
 
-```tsx
-<Card intent="danger">
-    <Card.Header>
-        <Text>Delete Item</Text>
-    </Card.Header>
+<Tabs defaultValue="preview">
+    <TabsList>
+        <TabsTrigger value="preview"><Eye className="h-4 w-4" /> Loom Preview</TabsTrigger>
+        <TabsTrigger value="screenshot"><ImageIcon className="h-4 w-4" /> Screenshot</TabsTrigger>
+        <TabsTrigger value="code"><Code className="h-4 w-4" /> Code</TabsTrigger>
+    </TabsList>
+    <TabsContent value="preview">
+        <LoomPreview target="Scenes/Cards.loom.tsx" height={650} />
+    </TabsContent>
+    <TabsContent value="screenshot">
+        <Image alt="Card demonstration" src="/images/card_preview.png"style={{ width: "100%"}}/>
+    </TabsContent>
+    <TabsContent value="code">
+        ```tsx
+        import { Card, Text, Button, Column, Row, HStack } from "@rbxts/react-clean-ui";
 
-    <Card.Body>
-        <Text>This action cannot be undone.</Text>
-    </Card.Body>
+        <Container width="100%" center>
+                <Row>
+                    {[
+                        "primary",
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                    ].map((intent) => {
+                        return <Column span={6}>
+                            <Card intent={intent as Intent}>
+                                <Card.Header>
+                                    <Text variant="heading" text="Player Profile" />
+                                </Card.Header>
+                                <Card.Body>
+                                    <Text text="View player information, statistics, and recent activity." />
+                                </Card.Body>
+                                <Card.Footer>
+                                    <HStack>
+                                        <Button text="Cancel" />
+                                        <Button text="Save" intent="success" />
+                                    </HStack>
+                                </Card.Footer>
+                            </Card>
+                        </Column>
+                    })}
+                </Row>
+            </Container>
+        ```
+    </TabsContent>
+</Tabs>
 
-    <Card.Footer>
-        <Button text="Delete" intent="danger" />
-    </Card.Footer>
-</Card>
-```
 
 An `intent` set directly on `Card.Header` or `Card.Footer` takes priority over the card-level intent.
