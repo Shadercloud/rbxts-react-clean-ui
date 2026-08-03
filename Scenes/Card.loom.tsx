@@ -15,7 +15,7 @@ export const preview = {
                         <Text variant="heading" text="Player Profile" />
                     </Card.Header>
                     <Card.Body>
-                        <Text text="Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts." />
+                            <Text text="Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts." />
                     </Card.Body>
                     <Card.Footer>
                         <HStack>

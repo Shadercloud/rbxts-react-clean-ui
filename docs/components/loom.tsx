@@ -48,6 +48,8 @@ export function LoomPreview({
         return () => observer.disconnect();
     }, []);
 
+    const loomVersion = process.env.NEXT_PUBLIC_LOOM_VERSION;
+
     const params = new URLSearchParams({
         chrome,
         target,
@@ -115,6 +117,27 @@ export function LoomPreview({
                     <option value="sandstone">Sandstone Theme</option>
                     <option value="dark">Dark Theme</option>
                 </select>
+                <a
+                    className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+                    href="https://docs.astra-void.xyz/loom/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                        marginLeft: "auto",
+                        textDecoration: "none",
+                    }}
+                >
+                    Loom Preview
+                    {loomVersion && (
+                        <span
+                            style={{
+                                opacity: 0.7,
+                            }}
+                        >
+                            v{loomVersion}
+                        </span>
+                    )}
+                </a>
             </div>
             <div style={{
                 flex: 1,
