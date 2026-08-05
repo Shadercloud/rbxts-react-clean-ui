@@ -56,4 +56,5 @@ const config = {
 
 export default withLoomGallery(withMDX(config), {
   root: "..",       // the roblox-ts project, relative to the app dir
+  assets: false,    // whether to include the assets folder in the gallery
 });
