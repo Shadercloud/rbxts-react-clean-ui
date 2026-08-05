@@ -1,6 +1,6 @@
 import React, { Binding } from "@rbxts/react";
 import { IconElementProps, ScalableElementProps } from "../../Interfaces/";
-export interface IconProps extends IconElementProps, ScalableElementProps {
+export interface IconProps extends IconElementProps, ScalableElementProps, React.InstanceProps<ImageLabel> {
     color?: Color3;
     Size?: UDim2;
     spinning?: boolean;

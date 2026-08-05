@@ -23,17 +23,21 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                 ? Enum.FontWeight.Bold
                 : props.weight ?? style.weight ?? Enum.FontWeight.Regular;
 
+        const textwrapped = props.TextWrap !== false && props.TextWrapped !== false;
+
         return <textlabel
             ref={ref}
             Size={UDim2.fromScale(0, 0)}
             AutomaticSize={Enum.AutomaticSize.XY}
-            LineHeight={style.lineHeight}
-            BackgroundTransparency={1}
+            AnchorPoint={props.AnchorPoint}
+            LineHeight={props.LineHeight ?? style.lineHeight}
+            BackgroundTransparency={props.BackgroundTransparency ?? 1}
             TextXAlignment={props.align ?? (props.TextXAlignment ?? Enum.TextXAlignment.Left)}
             TextColor3={props.TextColor3 ?? theme.colors.intents.primary.default.textColor}
             Text={props.text}
-            TextWrap={props.TextWrap === undefined || props.TextWrap === true}
-            TextWrapped={props.TextWrap === undefined || props.TextWrap === true}
+            Position={props.Position}
+            TextWrap={textwrapped}
+            TextWrapped={textwrapped}
             FontFace={Font.fromName(style.font.Name, weight)}
             FontSize={style.size}
             RichText

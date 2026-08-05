@@ -203,6 +203,13 @@ export interface CleanTheme {
                     cornerRadius?: CssSize;
                 };
             };
+            bar: {
+                axis: {
+                    color: Color3;
+                    transparency: number;
+                    thickness: number;
+                };
+            };
         };
     };
     icons: Partial<IconSet>;

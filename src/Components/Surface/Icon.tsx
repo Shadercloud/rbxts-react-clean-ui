@@ -4,7 +4,7 @@ import { IconElementProps, ScalableElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
 import { DefaultIconSet } from "../../Theme";
 
-export interface IconProps extends IconElementProps, ScalableElementProps {
+export interface IconProps extends IconElementProps, ScalableElementProps, React.InstanceProps<ImageLabel> {
     color?: Color3;
     Size?: UDim2;
     spinning?: boolean;
@@ -45,6 +45,7 @@ export function Icon(props: IconProps) {
         <imagelabel
             Rotation={props.Rotation}
             Size={props.Size ?? UDim2.fromOffset(size, size)}
+            LayoutOrder={props.LayoutOrder}
             Image={
                 iconId === undefined
                     ? undefined

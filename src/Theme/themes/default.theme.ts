@@ -515,6 +515,13 @@ export const DefaultTheme: CleanTheme = {
                         weight: Enum.FontWeight.Bold
                     }
                 }
+            },
+            bar: {
+                axis: {
+                    color: Color3.fromHex("#000000"),
+                    transparency: 0.5,
+                    thickness: 2,
+                }
             }
         }
     },

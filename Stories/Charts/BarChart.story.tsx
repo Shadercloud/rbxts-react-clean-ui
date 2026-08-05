@@ -11,9 +11,13 @@ export = createStory((props) => (
             <Card.Body width="100%" height="100%">
                 <BarChart data={
                     {
-                        labels: ["A", "B", "C", "D"],
+                        labels: ["some really long label", "B", "something else", "D"],
+                        yAxis: {
+                            ticks: 5,
+                        },
                         datasets: [
-                            { values: [7, 1, 4, 5] }
+                            { values: [7, 1, 4, 5] },
+                            { values: [1, 3, 2, 1] }
                         ]
                     }
                 } />

@@ -220,7 +220,14 @@ export interface CleanTheme {
                     borderThickness?: number;
                     cornerRadius?: CssSize;
                 }
-            }
+            };
+            bar: {
+                axis: {
+                    color: Color3;
+                    transparency: number;
+                    thickness: number;
+                }
+            };
         };
     };
 

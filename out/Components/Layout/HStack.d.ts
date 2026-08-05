@@ -1,4 +1,4 @@
-import React from "@rbxts/react";
+import React, { Binding } from "@rbxts/react";
 import { SpacedElementProps } from "../../Interfaces";
 interface HStackProps extends SpacedElementProps {
     children?: React.ReactNode;
@@ -7,6 +7,7 @@ interface HStackProps extends SpacedElementProps {
     HorizontalFlex?: Enum.UIFlexAlignment;
     Event?: React.InstanceEvent<UIListLayout>;
     Change?: React.InstanceChangeEvent<UIListLayout>;
+    Padding?: UDim | Binding<UDim>;
 }
 export declare function HStack(props: HStackProps): React.JSX.Element;
 export {};

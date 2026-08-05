@@ -484,6 +484,13 @@ local DefaultTheme = {
 					},
 				},
 			},
+			bar = {
+				axis = {
+					color = Color3.fromHex("#000000"),
+					transparency = 0.5,
+					thickness = 2,
+				},
+			},
 		},
 	},
 	icons = {

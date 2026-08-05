@@ -5,7 +5,42 @@ description: Build responsive layouts using a flexible 12-column grid.
 icon: Columns3Cog
 ---
 
-<Image alt="Responsive Row and Column grid demonstration" src="/images/rowcolumn_preview.gif" style={{float: "right",width: "40%",marginLeft: "2rem",marginBottom: "1rem",}} />
+<Demo preview="Scenes/Grid.loom.tsx" previewHeight={300} screenshot="/images/rowcolumn_preview.gif" screenshotAlt="Responsive Row and Column grid demonstration">
+```tsx
+import { Container, Box, Row, Column } from "@rbxts/react-clean-ui";
+
+<Container width="75%" center="50%">
+    <Box>
+        <Row>
+            <Column span={{
+                md: 6,
+                lg: 3
+            }}>
+                <frame Size={new UDim2(1, 0, 0, 100)} BackgroundColor3={Color3.fromHex("#FF0000")} />
+            </Column>
+            <Column span={{
+                md: 6,
+                lg: 3
+            }}>
+                <frame Size={new UDim2(1, 0, 0, 100)} BackgroundColor3={Color3.fromHex("#FFFF00")} />
+            </Column>
+            <Column span={{
+                md: 6,
+                lg: 3
+            }}>
+                <frame Size={new UDim2(1, 0, 0, 100)} BackgroundColor3={Color3.fromHex("#FF00FF")} />
+            </Column>
+            <Column span={{
+                md: 6,
+                lg: 3
+            }}>
+                <frame Size={new UDim2(1, 0, 0, 100)} BackgroundColor3={Color3.fromHex("#0000FF")} />
+            </Column>
+        </Row>
+    </Box>
+</Container>
+```
+</Demo>
 
 ## Grid System
 

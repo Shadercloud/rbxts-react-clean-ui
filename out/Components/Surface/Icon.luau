@@ -54,6 +54,7 @@ function Icon(props)
 	return React.createElement("imagelabel", {
 		Rotation = props.Rotation,
 		Size = props.Size or UDim2.fromOffset(size, size),
+		LayoutOrder = props.LayoutOrder,
 		Image = if iconId == nil then nil else `rbxassetid://{iconId}`,
 		BackgroundTransparency = 1,
 		ImageColor3 = props.color or theme.colors.intents.primary.default.textColor,
