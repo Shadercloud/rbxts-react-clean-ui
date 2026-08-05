@@ -1,0 +1,243 @@
+---
+title: Bar Chart
+description: Compare values across categories with stacked vertical bars.
+icon: ChartColumn
+---
+
+The `BarChart` component displays numeric data as vertical bars. Each entry in `data.labels` creates one category, and values from multiple datasets are stacked within that category.
+
+## Demo
+
+<Demo preview="Scenes/Charts/BarChart.loom.tsx" previewHeight={400}>
+```tsx
+import { BarChart, Container } from "@rbxts/react-clean-ui";
+
+<Container center width="80%" height="70%">
+    <BarChart
+        data={{
+            labels: ["Alpha", "Beta", "Gamma", "Delta"],
+            datasets: [
+                { values: [7, 4, 6, 5] },
+                { values: [2, 3, 1, 2] },
+            ],
+        }}
+    />
+</Container>
+```
+</Demo>
+
+## Import
+
+```tsx
+import { BarChart } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+Give the chart a label for each category and a corresponding value in each dataset.
+
+```tsx
+<BarChart
+    data={{
+        labels: ["Monday", "Tuesday", "Wednesday", "Thursday"],
+        datasets: [
+            { values: [7, 4, 6, 5] },
+        ],
+    }}
+/>
+```
+
+`BarChart` fills the size of its parent, so place it inside a container with a defined width and height.
+
+```tsx
+<Container width="80%" height="60%">
+    <BarChart data={data} />
+</Container>
+```
+
+## Stacked datasets
+
+Add more datasets to divide each bar into stacked segments. Dataset values are matched to categories by their array index.
+
+```tsx
+<BarChart
+    data={{
+        labels: ["Q1", "Q2", "Q3", "Q4"],
+        datasets: [
+            { values: [7, 4, 6, 5] },
+            { values: [2, 3, 1, 4] },
+            { values: [1, 2, 3, 2] },
+        ],
+    }}
+/>
+```
+
+Segments use colors from `theme.components.charts.colors`. When the number of datasets exceeds the number of configured colors, the palette repeats. Set `data.colors` to replace the theme palette for this chart.
+
+Set `color` on a dataset to override its palette color for the entire dataset, or use `colors` to assign colors to individual values. Optional dataset `labels` replace the category text in that dataset's tooltips.
+
+Hovering a segment displays a tooltip containing its category label and value.
+
+Set `tooltips.combined` to `true` to show all dataset values for a category in one tooltip. In unstacked mode, separate tooltips only activate over each bar's visible section.
+
+Set `stacked` to `false` to overlap datasets instead. Shorter bars render in front of taller bars, and `unstackedTransparency` overrides the theme's overlap transparency.
+
+## Y-axis ticks
+
+Use `yAxis.ticks` to set the target number of intervals on the y-axis.
+
+```tsx
+<BarChart
+    data={{
+        labels: ["Apples", "Bananas", "Oranges"],
+        datasets: [
+            { values: [12, 8, 15] },
+            { values: [3, 5, 2] },
+        ],
+        yAxis: {
+            ticks: 5,
+        },
+    }}
+/>
+```
+
+The component rounds the interval to a readable value, so the rendered number of intervals can differ from the requested target. When omitted, the target is `5`.
+
+Provide exact grid-line values when automatic placement is not appropriate. Grid-line styling in `data` overrides the active theme.
+
+```tsx
+yAxis: {
+    gridLines: {
+        values: [0, 25, 50, 75, 100],
+        color: Color3.fromHex("#808080"),
+        transparency: 0.6,
+        thickness: 1,
+    },
+}
+```
+
+## Axis configuration
+
+Set either axis to `false` to hide it completely. Use `size` to reserve a different amount of space for its labels, and override line or tick styling as needed.
+
+```tsx
+data={{
+    labels,
+    datasets,
+    xAxis: {
+        size: 36,
+        color: Color3.fromHex("#404040"),
+        tickColor: Color3.fromHex("#606060"),
+        tickSize: 8,
+    },
+    yAxis: false,
+}}
+```
+
+## Missing values
+
+Each dataset should normally contain one value for every label. If a dataset has no value at a category's index, the chart treats it as `0`.
+
+```tsx
+<BarChart
+    data={{
+        labels: ["A", "B", "C"],
+        datasets: [
+            { values: [8, 4] }, // "C" is treated as 0
+            { values: [2, 3, 5] },
+        ],
+    }}
+/>
+```
+
+Negative values extend the scale below zero. In stacked charts, positive and negative values form separate stacks around the zero origin.
+
+## Complete example
+
+```tsx
+import React from "@rbxts/react";
+import {
+    BarChart,
+    Card,
+    Container,
+    Text,
+} from "@rbxts/react-clean-ui";
+
+export function SalesChart() {
+    return (
+        <Container center width="80%" height="90%">
+            <Card>
+                <Card.Header>
+                    <Text text="Quarterly sales" variant="heading" />
+                </Card.Header>
+
+                <Card.Body width="100%" height="100%">
+                    <BarChart
+                        data={{
+                            labels: ["Q1", "Q2", "Q3", "Q4"],
+                            yAxis: {
+                                ticks: 5,
+                            },
+                            datasets: [
+                                { values: [7, 4, 6, 5] },
+                                { values: [2, 3, 1, 4] },
+                            ],
+                        }}
+                    />
+                </Card.Body>
+            </Card>
+        </Container>
+    );
+}
+```
+
+## Props
+
+### BarChart props
+
+| Prop   | Type           | Default | Description                                      |
+| ------ | -------------- | ------- | ------------------------------------------------ |
+| `data` | `BarChartData` | —       | Labels, datasets, and optional y-axis settings.  |
+
+### BarChartData
+
+| Property   | Type                | Required | Description                                             |
+| ---------- | ------------------- | -------- | ------------------------------------------------------- |
+| `labels`   | `string[]`          | Yes      | Category labels shown beneath the bars.                 |
+| `datasets` | `BarChartDataset[]` | Yes      | Series whose values form the stacked bars.              |
+| `colors`   | `Color3[]`          | No       | Palette override for this chart, repeated by dataset index. |
+| `stacked`  | `boolean`           | No       | Stacks datasets by default; set to `false` to overlap them. |
+| `unstackedTransparency` | `number` | No | Overrides the theme transparency for overlapping bars. |
+| `tooltips` | `BarChartTooltips` | No | Tooltip behavior; set `combined` to `true` to aggregate a category's values. |
+| `xAxis`    | `BarChartAxis \| false` | No    | X-axis visibility, size, line, and tick configuration. |
+| `yAxis`    | `BarChartYAxis \| false` | No   | Y-axis visibility, size, ticks, line, and grid configuration. |
+
+Both axes accept `size`, `spacing`, `color`, `transparency`, `thickness`, `tickColor`, `tickTransparency`, `tickThickness`, and `tickSize`. The x-axis also accepts a pixel `gap` between category bars. The y-axis also accepts `ticks` and `gridLines`; `gridLines.values` supplies exact positions, while its other fields style the lines.
+
+### BarChartDataset
+
+| Property | Type       | Required | Description                                                     |
+| -------- | ---------- | -------- | --------------------------------------------------------------- |
+| `values` | `number[]` | Yes      | Values matched to `data.labels` by index.                       |
+| `labels` | `string[]` | No       | Labels used by this dataset's segment tooltips.                  |
+| `color`  | `Color3`   | No       | Color used for every segment in this dataset.                    |
+| `colors` | `Color3[]` | No       | Colors assigned to individual values by index.                  |
+
+## Theme values
+
+The bar chart uses the active theme's chart settings:
+
+* `theme.components.charts.colors` controls dataset segment colors.
+* `theme.components.charts.bar.spacing` controls the default gap between category bars.
+* `theme.components.charts.bar.unstackedTransparency` controls overlapping bar transparency.
+* `theme.components.charts.bar.borderColor` controls bar outlines.
+* `theme.components.charts.bar.borderThickness` controls bar outline thickness.
+* `theme.components.charts.bar.cornerRadius` rounds the topmost stacked segments and unstacked bars.
+* `theme.components.charts.bar.tweenTime` controls the initial growth animation; set it to `0` to disable animation.
+* `theme.components.charts.bar.axis.color` controls both axis lines.
+* `theme.components.charts.bar.axis.thickness` controls axis line thickness.
+* `theme.components.charts.bar.axis.transparency` controls axis and tick transparency.
+* `theme.components.charts.bar.xAxis` and `.yAxis` control axis size and tick defaults.
+* `theme.components.charts.bar.gridLines` controls grid-line color, transparency, and thickness.
+
+Values supplied in `data.xAxis` or `data.yAxis` take precedence over theme values.

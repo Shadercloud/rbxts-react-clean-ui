@@ -11,17 +11,28 @@ local CleanUiProvider = TS.import(script, script.Parent.Parent, "Providers", "ap
 local controls = {
 	Theme = Choose({ "Default", "Dark", "Sandstone" }),
 }
-local function createStory(StoryComponent)
+local function createStory(StoryComponent, additionalControls)
+	local _object = {}
+	if additionalControls then
+		for _k, _v in additionalControls do
+			_object[_k] = _v
+		end
+	end
+	for _k, _v in controls do
+		_object[_k] = _v
+	end
+	local storyControls = _object
 	return {
 		react = React,
 		reactRoblox = ReactRoblox,
-		controls = controls,
+		controls = storyControls,
 		story = function(props)
+			local baseProps = props
 			local theme = DefaultTheme
-			if props.controls.Theme == "Dark" then
+			if baseProps.controls.Theme == "Dark" then
 				theme = DarkTheme
 			end
-			if props.controls.Theme == "Sandstone" then
+			if baseProps.controls.Theme == "Sandstone" then
 				theme = SandstoneTheme
 			end
 			local _attributes = table.clone(props)

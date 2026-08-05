@@ -372,6 +372,21 @@ export const DarkTheme = createTheme({
                 Color3.fromHex("#6FA8DC"), // Sky
                 Color3.fromHex("#9CCC4A"), // Lime
             ],
+            bar: {
+                borderColor: Color3.fromHex("#111827"),
+                axis: {
+                    color: Color3.fromHex("#AAB4C3"),
+                },
+                xAxis: {
+                    tickColor: Color3.fromHex("#AAB4C3"),
+                },
+                yAxis: {
+                    tickColor: Color3.fromHex("#AAB4C3"),
+                },
+                gridLines: {
+                    color: Color3.fromHex("#6B7688"),
+                },
+            },
         }
     },
 
@@ -387,4 +402,3 @@ export const DarkTheme = createTheme({
         xl: 30,
     },
 });
-

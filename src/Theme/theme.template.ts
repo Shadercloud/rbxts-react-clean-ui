@@ -222,11 +222,38 @@ export interface CleanTheme {
                 }
             };
             bar: {
+                spacing?: ScaleSizeValue<number>;
+                unstackedTransparency: number;
+                borderColor: Color3;
+                borderThickness: number;
+                cornerRadius: CssSize;
+                tweenTime: number;
                 axis: {
                     color: Color3;
                     transparency: number;
                     thickness: number;
-                }
+                };
+                xAxis: {
+                    size: number;
+                    spacing: number;
+                    tickColor: Color3;
+                    tickTransparency: number;
+                    tickThickness: number;
+                    tickSize: number;
+                };
+                yAxis: {
+                    size: number;
+                    spacing: number;
+                    tickColor: Color3;
+                    tickTransparency: number;
+                    tickThickness: number;
+                    tickSize: number;
+                };
+                gridLines: {
+                    color: Color3;
+                    transparency: number;
+                    thickness: number;
+                };
             };
         };
     };

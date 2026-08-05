@@ -517,9 +517,42 @@ export const DefaultTheme: CleanTheme = {
                 }
             },
             bar: {
+                spacing: {
+                    xs: 4,
+                    sm: 8,
+                    md: 12,
+                    lg: 16,
+                    xl: 20,
+                },
+                unstackedTransparency: 0,
+                borderColor: Color3.fromHex("#3A4352"),
+                borderThickness: 1,
+                cornerRadius: 4,
+                tweenTime: 0.5,
                 axis: {
-                    color: Color3.fromHex("#000000"),
+                    color: Color3.fromHex("#3A4352"),
                     transparency: 0.5,
+                    thickness: 2,
+                },
+                xAxis: {
+                    size: 50,
+                    spacing: 4,
+                    tickColor: Color3.fromHex("#3A4352"),
+                    tickTransparency: 0.5,
+                    tickThickness: 2,
+                    tickSize: 10,
+                },
+                yAxis: {
+                    size: 50,
+                    spacing: 4,
+                    tickColor: Color3.fromHex("#3A4352"),
+                    tickTransparency: 0.5,
+                    tickThickness: 2,
+                    tickSize: 10,
+                },
+                gridLines: {
+                    color: Color3.fromHex("#6B7C93"),
+                    transparency: 0.8,
                     thickness: 2,
                 }
             }

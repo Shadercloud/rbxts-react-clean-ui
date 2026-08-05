@@ -350,6 +350,21 @@ local SandstoneTheme = createTheme({
 					borderColor = Color3.fromHex("#D8CDBA"),
 				},
 			},
+			bar = {
+				borderColor = Color3.fromHex("#5F5547"),
+				axis = {
+					color = Color3.fromHex("#5F5547"),
+				},
+				xAxis = {
+					tickColor = Color3.fromHex("#786B59"),
+				},
+				yAxis = {
+					tickColor = Color3.fromHex("#786B59"),
+				},
+				gridLines = {
+					color = Color3.fromHex("#8F7B5E"),
+				},
+			},
 		},
 	},
 	icons = {

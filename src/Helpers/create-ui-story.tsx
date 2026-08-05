@@ -8,21 +8,30 @@ const controls = {
     Theme: Choose(["Default", "Dark", "Sandstone"]),
 };
 
-type StoryProps = InferProps<typeof controls>;
+type StoryControl = Parameters<typeof import("@rbxts/ui-labs").Ordered>[0];
+type StoryControls = Record<string, StoryControl>;
+type StoryProps<T extends StoryControls> = InferProps<typeof controls & T>;
 
-export function createStory(
-    StoryComponent: (props: StoryProps) => React.ReactNode,
+export function createStory<T extends StoryControls = {}>(
+    StoryComponent: (props: StoryProps<T>) => React.ReactNode,
+    additionalControls?: T,
 ) {
+    const storyControls = {
+        ...additionalControls,
+        ...controls,
+    } as typeof controls & T;
+
     return {
         react: React,
         reactRoblox: ReactRoblox,
-        controls,
+        controls: storyControls,
 
-        story: (props: StoryProps) => {
+        story: (props: StoryProps<T>) => {
+            const baseProps = props as unknown as InferProps<typeof controls>;
             let theme = DefaultTheme;
-            if (props.controls.Theme === "Dark")
+            if (baseProps.controls.Theme === "Dark")
                 theme = DarkTheme
-            if (props.controls.Theme === 'Sandstone')
+            if (baseProps.controls.Theme === 'Sandstone')
                 theme = SandstoneTheme
 
 
