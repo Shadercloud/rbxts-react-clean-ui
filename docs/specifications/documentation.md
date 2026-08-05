@@ -3,7 +3,7 @@
 When creating .mdx documentation files under `/docs/content/docs/components/`, if a component has an associated Loom demo file, then embed the demonstration and code using the `<Demo>` Fumadocs component, such as this:
 
 ```md
-    <Demo previewHeight={300}>
+    <Demo preview="Scenes/Grid.loom.tsx" previewHeight={300}>
     ```tsx
     import { Container, Box, Row, Column } from "@rbxts/react-clean-ui";
 

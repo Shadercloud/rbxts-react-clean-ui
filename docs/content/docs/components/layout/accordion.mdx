@@ -1,0 +1,77 @@
+---
+title: Accordion
+description: Organize content into expandable sections.
+icon: ListCollapse
+---
+
+`Accordion` displays vertically stacked sections that can be expanded and collapsed. It fills the available height of its parent.
+
+## Basic usage
+
+<Demo preview="Scenes/Layout/Accordion.loom.tsx" previewHeight={300}>
+```tsx
+import React from "@rbxts/react";
+import { Accordion, Container, Text } from "@rbxts/react-clean-ui";
+
+export function AccordionExample() {
+    return (
+        <Container width="75%" height="300">
+            <Accordion defaultValue="overview">
+                <Accordion.Item value="overview">
+                    <Accordion.Header><Text text="Overview" /></Accordion.Header>
+                    <Accordion.Content>
+                        <Text text="Accordion sections reveal related information on demand." />
+                    </Accordion.Content>
+                </Accordion.Item>
+                <Accordion.Item value="features">
+                    <Accordion.Header icon="info-circle"><Text text="Features" /></Accordion.Header>
+                    <Accordion.Content>
+                        <Text text="Headers may include a leading icon." />
+                    </Accordion.Content>
+                </Accordion.Item>
+            </Accordion>
+        </Container>
+    );
+}
+```
+</Demo>
+
+## Collapsible behavior
+
+Opening an item closes the previously open item. By default, activating the open item does nothing. Set `collapsible` to allow it to close.
+
+```tsx
+<Accordion defaultValue="first" collapsible>
+    {/* items */}
+</Accordion>
+```
+
+## Accordion
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `defaultValue` | `string` | — | Initially open item for an uncontrolled accordion. |
+| `value` | `string` | — | Currently open item for a controlled accordion. |
+| `onValueChange` | `(value: string \| undefined) => void` | — | Called with the next open item. |
+| `collapsible` | `boolean` | `false` | Allows the open item to close. |
+| `animationDuration` | `number` | Theme value | Overrides the transition duration in seconds. |
+
+## Child components
+
+- `Accordion.Item` requires a unique `value` and accepts `disabled`.
+- `Accordion.Header` is the activation target and accepts an optional `icon`.
+- `Accordion.Content` is mounted while its item is expanded and unmounted after closing.
+
+Only direct `Accordion.Item` children are used. Within each item, the first direct header and content are used; an item without a header is omitted.
+
+## Controlled usage
+
+Supplying `value` makes the accordion controlled. Interactions call `onValueChange`, while the visible state changes only after the supplied value changes.
+
+```tsx
+const [value, setValue] = React.useState<string>();
+
+<Accordion value={value} onValueChange={setValue} collapsible>
+    {/* items */}
+</Accordion>
+```

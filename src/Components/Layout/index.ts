@@ -1,4 +1,5 @@
 export * from './Column';
+export * from './Accordion';
 export * from './Container';
 export * from './Draggable';
 export * from './Droppable';

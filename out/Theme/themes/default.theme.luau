@@ -269,6 +269,64 @@ local DefaultTheme = {
 				},
 			},
 		},
+		accordion = {
+			borderColor = Color3.fromHex("#D9DEE8"),
+			borderThickness = 1,
+			cornerRadius = 8,
+			spacing = {
+				xs = 0,
+				sm = 0,
+				md = 0,
+				lg = 0,
+				xl = 0,
+			},
+			header = {
+				spacing = {
+					xs = 4,
+					sm = 8,
+					md = 12,
+					lg = 16,
+					xl = 24,
+				},
+				indicatorSize = 14,
+				indicatorColor = Color3.fromHex("#4F4F4F"),
+				intents = {
+					primary = {
+						default = {
+							backgroundColor = Color3.fromHex("#F2F4F8"),
+							textColor = Color3.fromHex("#1D2433"),
+						},
+						hover = {
+							backgroundColor = Color3.fromHex("#E7EBF2"),
+							textColor = Color3.fromHex("#000000"),
+						},
+						focus = {
+							backgroundColor = Color3.fromHex("#E1E3E7"),
+							textColor = Color3.fromHex("#000000"),
+						},
+						disabled = {
+							backgroundColor = Color3.fromHex("#F5F5F5"),
+							backgroundTransparency = 0.35,
+							textColor = Color3.fromHex("#8A8A8A"),
+						},
+					},
+				},
+			},
+			content = {
+				spacing = {
+					xs = 4,
+					sm = 8,
+					md = 12,
+					lg = 16,
+					xl = 24,
+				},
+				backgroundColor = Color3.fromHex("#FFFFFF"),
+				backgroundTransparency = 0,
+			},
+			animation = {
+				duration = 0.2,
+			},
+		},
 		draggable = {
 			placeholder = {
 				backgroundColor = Color3.fromHex("#D9DEE8"),

@@ -293,6 +293,35 @@ export const SandstoneTheme = createTheme({
                 },
             },
         },
+        accordion: {
+            borderColor: Color3.fromHex("#B9A98F"),
+            header: {
+                indicatorColor: Color3.fromHex("#496E68"),
+                intents: {
+                    primary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#EFE5D3"),
+                            textColor: Color3.fromHex("#4A4034"),
+                        },
+                        hover: {
+                            backgroundColor: Color3.fromHex("#DFE8DC"),
+                            textColor: Color3.fromHex("#244F4A"),
+                        },
+                        focus: {
+                            backgroundColor: Color3.fromHex("#CFE1DC"),
+                            textColor: Color3.fromHex("#183B37"),
+                        },
+                        disabled: {
+                            backgroundColor: Color3.fromHex("#E8DFCF"),
+                            textColor: Color3.fromHex("#9B8B73"),
+                        },
+                    },
+                },
+            },
+            content: {
+                backgroundColor: Color3.fromHex("#FFF9ED"),
+            },
+        },
         draggable: {
             placeholder: {
                 backgroundColor: Color3.fromHex("#EFE5D3"),

@@ -2,13 +2,30 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 		<title>loom gallery</title>
 		<style>
-			html, body { margin: 0; height: 100%; background: #14161a; }
+			html, body { margin: 0; height: 100%; overscroll-behavior: none; }
+			html { background: #14161a; color-scheme: dark; }
+			html.loom-theme-light { background: #f6f9fc; color-scheme: light; }
 		</style>
-		<script type="module" crossorigin src="/rbxts-react-clean-ui/loom-preview/assets/index-8lL6dZ47.js"></script>
-		<link rel="stylesheet" crossorigin href="/rbxts-react-clean-ui/loom-preview/assets/index-CVgDnnih.css">
+		<!-- The backdrop is settled from the URL here, before the first paint;
+		     see gallery/boot.ts. -->
+		<script>
+			(function () {
+				try {
+					var params = new URLSearchParams(location.search);
+					if (params.get("theme") === "light")
+						document.documentElement.classList.add("loom-theme-light");
+					var raw = (params.get("background") || "").trim();
+					if (new RegExp("^(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$", "i").test(raw)) raw = "#" + raw;
+					if (raw && new RegExp("^(?:#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|[a-z]+|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|light-dark)\\([#0-9a-z%.,+/\\s-]*\\))$", "i").test(raw))
+						document.documentElement.style.background = raw;
+				} catch (error) {}
+			})();
+		</script>
+		<script type="module" crossorigin src="/rbxts-react-clean-ui/loom-preview/assets/index-CNeKJdIY.js"></script>
+		<link rel="stylesheet" crossorigin href="/rbxts-react-clean-ui/loom-preview/assets/index-kG45E7am.css">
 	</head>
 	<body>
 		<aside id="loom-gallery-sidebar"></aside>

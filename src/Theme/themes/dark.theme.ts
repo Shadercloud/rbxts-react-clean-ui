@@ -294,6 +294,35 @@ export const DarkTheme = createTheme({
             },
 
         },
+        accordion: {
+            borderColor: Color3.fromHex("#4B5568"),
+            header: {
+                indicatorColor: Color3.fromHex("#C9CDD5"),
+                intents: {
+                    primary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#252B36"),
+                            textColor: Color3.fromHex("#E8EDF8"),
+                        },
+                        hover: {
+                            backgroundColor: Color3.fromHex("#303949"),
+                            textColor: Color3.fromHex("#FFFFFF"),
+                        },
+                        focus: {
+                            backgroundColor: Color3.fromHex("#3A414D"),
+                            textColor: Color3.fromHex("#FFFFFF"),
+                        },
+                        disabled: {
+                            backgroundColor: Color3.fromHex("#1D222B"),
+                            textColor: Color3.fromHex("#697386"),
+                        },
+                    },
+                },
+            },
+            content: {
+                backgroundColor: Color3.fromHex("#171B22"),
+            },
+        },
         draggable: {
             placeholder: {
                 backgroundColor: Color3.fromHex("#2A303B"),

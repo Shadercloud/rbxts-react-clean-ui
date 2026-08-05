@@ -125,6 +125,27 @@ export interface CleanTheme {
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
             };
         };
+        accordion: {
+            borderColor: Color3;
+            borderThickness: number;
+            cornerRadius: CssSize;
+            spacing?: ScaleSizeValue<number>;
+            header: {
+                spacing?: ScaleSizeValue<number>;
+                typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+                indicatorSize: number;
+                indicatorColor: Color3;
+            };
+            content: {
+                spacing?: ScaleSizeValue<number>;
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+            };
+            animation: {
+                duration: number;
+            };
+        };
         card: {
             borderThickness: number;
             cornerRadius: CssSize;

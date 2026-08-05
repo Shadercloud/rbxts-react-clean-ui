@@ -4,6 +4,9 @@ local exports = {}
 for _k, _v in TS.import(script, script, "Column") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "Accordion") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "Container") or {} do
 	exports[_k] = _v
 end
