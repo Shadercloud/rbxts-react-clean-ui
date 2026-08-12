@@ -7,13 +7,16 @@ local Group = _Group.Group
 local GroupContext = _Group.GroupContext
 local Container = React.forwardRef(function(props, ref)
 	local group = React.useContext(GroupContext)
+	local autoSize = SizeHelper:GetAutoSize(props)
+	local isAutoSizeActive = autoSize ~= Enum.AutomaticSize.None and autoSize ~= "None"
+	local centerViaLayout = props.center == true and props.Position == nil and props.AnchorPoint == nil and isAutoSizeActive
 	local _attributes = {
 		ref = ref,
 		Archivable = props.Archivable,
 		Tag = props.Tag,
 		Active = props.Active,
-		AnchorPoint = SizeHelper:GetAnchor(props),
-		AutomaticSize = SizeHelper:GetAutoSize(props),
+		AnchorPoint = if centerViaLayout then Vector2.zero else SizeHelper:GetAnchor(props),
+		AutomaticSize = autoSize,
 		BackgroundColor3 = props.BackgroundColor3,
 	}
 	local _condition = props.BackgroundTransparency
@@ -31,7 +34,7 @@ local Container = React.forwardRef(function(props, ref)
 	_attributes.NextSelectionLeft = props.NextSelectionLeft
 	_attributes.NextSelectionRight = props.NextSelectionRight
 	_attributes.NextSelectionUp = props.NextSelectionUp
-	_attributes.Position = SizeHelper:GetPosition(props)
+	_attributes.Position = if centerViaLayout then UDim2.fromOffset(0, 0) else SizeHelper:GetPosition(props)
 	_attributes.Rotation = props.Rotation
 	_attributes.Selectable = props.Selectable
 	_attributes.SelectionGroup = props.SelectionGroup
@@ -64,9 +67,22 @@ local Container = React.forwardRef(function(props, ref)
 	_attributes.Style = props.Style
 	_attributes.Change = props.Change
 	_attributes.Event = props.Event
-	return React.createElement("frame", _attributes, React.createElement(Group.Element, {
+	local content = (React.createElement("frame", _attributes, React.createElement(Group.Element, {
 		enabled = props.group,
-	}, props.children))
+	}, props.children)))
+	if not centerViaLayout then
+		return content
+	end
+	return React.createElement("frame", {
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		ZIndex = props.ZIndex,
+		LayoutOrder = props.LayoutOrder,
+	}, React.createElement("uilistlayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+	}), content)
 end)
 return {
 	Container = Container,

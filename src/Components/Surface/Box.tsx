@@ -1,11 +1,17 @@
 import React from "@rbxts/react";
-import { BackgroundElementProps, ShadowElementProps, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
+import { BackgroundElementProps, PaddingProps, PositionElementProps, ShadowElementProps, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
 import { Padding, Corners, BoxShadow } from "../Decorator";
 import { Container } from "../Layout";
 import { SizeHelper } from "../../Helpers";
 
-export interface BoxProps extends SpacedElementProps, ShadowElementProps, BackgroundElementProps, ZIndexElementProps, SizeElementProps, React.InstanceProps<Frame> {
+export interface BoxProps extends SpacedElementProps,
+    ShadowElementProps,
+    BackgroundElementProps,
+    ZIndexElementProps,
+    SizeElementProps,
+    PositionElementProps,
+    React.InstanceProps<Frame> {
     'border-thickness'?: number;
     'border-color'?: Color3;
 }
@@ -37,7 +43,7 @@ export const Box = React.forwardRef<Frame, BoxProps>(
                     Color={props['border-color'] ?? theme.components.box.borderColor}
                 />
                 <BoxShadow {...props} value={theme.components.box.boxShadow} />
-                <Padding {...props} />
+                <Padding {...props as PaddingProps} />
 
                 <Corners radius={theme.components.box.cornerRadius} />
 

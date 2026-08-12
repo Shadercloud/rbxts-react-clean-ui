@@ -8,7 +8,7 @@ import { Box } from "../src/Components/Surface/Box";
 export const preview = {
     render: () => (
         <LoomScene>
-            <Container width="75%" center="50%">
+            <Container width="75%" center>
                 <Box>
                     <Row>
                         <Column span={{

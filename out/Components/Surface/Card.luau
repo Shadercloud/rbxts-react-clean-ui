@@ -100,13 +100,24 @@ local Card = React.forwardRef(function(props, ref)
 	local _attributes = table.clone(props)
 	setmetatable(_attributes, nil)
 	_attributes.ref = ref
+	_attributes.center = nil
 	_attributes.spacing = "None"
 	_attributes["border-color"] = intent.borderColor
-	return React.createElement(CardContext.Provider, {
-		value = contextValue,
-	}, React.createElement(Box, _attributes, React.createElement(VStack, {
+	local cardBox = (React.createElement(Box, _attributes, React.createElement(VStack, {
 		spacing = "None",
 	}, props.children)))
+	local isCentered = props.center == true and props.Position == nil and props.AnchorPoint == nil
+	return React.createElement(CardContext.Provider, {
+		value = contextValue,
+	}, if isCentered then (React.createElement(Container, {
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = props.ZIndex,
+		LayoutOrder = props.LayoutOrder,
+	}, React.createElement("uilistlayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+	}), cardBox)) else cardBox)
 end)
 Card.Header = CardHeader
 Card.Footer = CardFooter

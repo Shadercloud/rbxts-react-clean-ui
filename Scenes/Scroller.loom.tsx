@@ -14,7 +14,7 @@ export const preview = {
         <LoomScene>
             <Container
                 width="75%"
-                center="50%"
+                center
             >
                 <Box>
                     <VStack>

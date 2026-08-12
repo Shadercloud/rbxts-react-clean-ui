@@ -19,7 +19,7 @@ export = createStory((props) => (
     <Container
         width="90%"
         height="90%"
-        center="50%"
+        center
     >
         <Box>
             <Scroller>

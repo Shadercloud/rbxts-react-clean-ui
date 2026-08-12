@@ -4,7 +4,7 @@ import { Text } from "../Typography";
 import ReactRoblox from "@rbxts/react-roblox";
 import { BoxShadow, Corners, Padding } from "../Decorator";
 import { ColorHelper, CssHelper, SpacingHelper } from "../../Helpers";
-import { IntentElementProps } from "../../Interfaces";
+import { IntentElementProps, PaddingProps } from "../../Interfaces";
 import { BoxProps } from "../Surface";
 import { useTween } from "@rbxts/react-ripple";
 
@@ -127,7 +127,7 @@ function TooltipPopup(props: TooltipPopup) {
                 >
                     <BoxShadow {...props} value={theme.components.tooltip.boxShadow} />
                     <Corners radius={theme.components.button.cornerRadius} />
-                    <Padding {...props} resolvedPadding={padding} />
+                    <Padding {...props as PaddingProps} resolvedPadding={padding} />
                     <uistroke
                         Thickness={props['border-thickness'] ?? theme.components.box.borderThickness}
                         BorderStrokePosition={Enum.BorderStrokePosition.Inner}

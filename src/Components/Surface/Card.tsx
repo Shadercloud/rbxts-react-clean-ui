@@ -112,13 +112,35 @@ const Card = React.forwardRef<Frame, CardProps>(
         );
 
         const intent = ColorHelper.getIntentColors(theme, props.intent ?? "primary", "default", theme.components.card.header.intents);
+
+        const cardBox = (
+            <Box {...props}
+                ref={ref}
+                center={undefined}
+                spacing="None"
+                border-color={intent.borderColor}>
+                <VStack spacing="None">
+                    {props.children}
+                </VStack>
+            </Box>
+        );
+        
+        const isCentered = props.center === true
+            && props.Position === undefined
+            && props.AnchorPoint === undefined;
+
         return (
             <CardContext.Provider value={contextValue}>
-                <Box {...props} ref={ref} spacing="None" border-color={intent.borderColor}>
-                    <VStack spacing="None">
-                        {props.children}
-                    </VStack>
-                </Box>
+                {isCentered ? (
+                    <Container Size={UDim2.fromScale(1, 1)} ZIndex={props.ZIndex} LayoutOrder={props.LayoutOrder}>
+                        <uilistlayout
+                            FillDirection={Enum.FillDirection.Horizontal}
+                            HorizontalAlignment={Enum.HorizontalAlignment.Center}
+                            VerticalAlignment={Enum.VerticalAlignment.Center}
+                        />
+                        {cardBox}
+                    </Container>
+                ) : cardBox}
             </CardContext.Provider>
         );
     }) as CardComponent;

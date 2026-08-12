@@ -1,0 +1,183 @@
+---
+title: Button
+description: A clickable button with icons, intents, scaling, and grouped children.
+icon: MousePointerClick
+---
+
+`Button` is a themed, clickable surface built on Roblox's native [`ImageButton`](https://create.roblox.com/docs/reference/engine/classes/ImageButton). It automatically applies the current Clean UI theme, including background, border, corner radius, and hover styling based on `intent`.
+
+## Import
+
+```tsx
+import { Button } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Form/Buttons.loom.tsx" previewHeight={320} screenshot="/images/screenshots/Forms/Buttons.png">
+```tsx
+import React from "@rbxts/react";
+import { Button, Container, VStack } from "@rbxts/react-clean-ui";
+
+export function ButtonExample() {
+    return (
+        <Container>
+            <VStack>
+                <Button icon="smile-o" text="Primary" intent="primary" />
+                <Button icon="check" text="Success" intent="success" />
+                <Button icon="info" text="Info" intent="info" />
+                <Button icon="exclamation" text="Warning" intent="warning" />
+                <Button icon="times" text="Danger" intent="danger" />
+            </VStack>
+        </Container>
+    );
+}
+```
+</Demo>
+
+The `text` prop renders a label, and `icon` renders a leading icon. Either can be used on its own.
+
+```tsx
+<Button text="Save" />
+<Button icon="save" />
+```
+
+## Responding to clicks
+
+`Button` renders an `ImageButton`, so click handling is done through the native `Event` prop.
+
+```tsx
+<Button
+    text="Submit"
+    intent="primary"
+    Event={{
+        Activated: () => {
+            print("Submitted");
+        },
+    }}
+/>
+```
+
+## Intents
+
+Set `intent` to control the button's background, border, and text/icon colors.
+
+```tsx
+<Button text="Primary" intent="primary" />
+<Button text="Success" intent="success" />
+<Button text="Info" intent="info" />
+<Button text="Warning" intent="warning" />
+<Button text="Danger" intent="danger" />
+```
+
+Hovering a button switches its colors to the intent's `hover` state.
+
+## Custom content
+
+For layouts beyond an icon and a label, pass `children` instead of `icon`/`text`. `Button.Icon` and `Button.Text` are exposed so custom content can still pick up the button's intent and scale.
+
+```tsx
+<Button intent="info">
+    <HStack valign="Center" spacing="sm">
+        <Button.Icon icon="download" intent="info" />
+        <Button.Text text="Download report" intent="info" />
+    </HStack>
+</Button>
+```
+
+When both `icon`/`text` and `children` are provided, the automatic icon/label row renders first, followed by `children`.
+
+## Scaling
+
+`Button` supports the shared `scale` prop, which resolves the button's typography and icon size from the active theme.
+
+```tsx
+<Button text="Small" scale="sm" />
+<Button text="Large" scale="lg" />
+```
+
+Available scales are `xs`, `sm`, `md`, `lg`, and `xl`.
+
+## Spacing
+
+The shared `spacing` prop controls the gap between the icon and text, as well as the button's internal padding.
+
+```tsx
+<Button icon="star" text="Spacious" spacing="lg" />
+```
+
+Individual padding sides can also be set directly.
+
+```tsx
+<Button
+    text="Custom padding"
+    left="lg"
+    right="lg"
+    top="sm"
+    bottom="sm"
+/>
+```
+
+## Grouped buttons
+
+Set `group` on a `Button` and wrap the group in a [`Group`](/components/layout) to make every grouped button match the width of the widest one. This keeps a stack of buttons with icons or labels of differing lengths visually aligned.
+
+```tsx
+import { Button, Group, VStack } from "@rbxts/react-clean-ui";
+
+<Group>
+    <VStack>
+        <Button group text="Save" intent="primary" />
+        <Button group text="Save and continue" intent="primary" />
+        <Button group icon="times" text="Cancel" />
+    </VStack>
+</Group>
+```
+
+## Props
+
+### Button-specific props
+
+| Prop         | Type                            | Default     | Description                                                     |
+| ------------ | -------------------------------- | ----------- | ----------------------------------------------------------------- |
+| `text`       | `string`                         | `undefined` | Renders a label using the button's typography and intent color. |
+| `icon`       | `IconName`                       | `undefined` | Renders a leading icon using the button's intent color.         |
+| `fontWeight` | `Enum.FontWeight`                | `undefined` | Overrides the font weight used by the label.                    |
+| `children`   | `React.ReactNode`                | `undefined` | Custom content rendered after the automatic icon/label row.     |
+| `group`      | `boolean`                        | `false`     | Matches this button's width to the widest button in its `Group`.|
+| `Event`      | `React.InstanceEvent<ImageButton>` | `undefined` | Native Roblox event handlers, including `Activated`.             |
+
+### Shared props
+
+The button also supports props inherited from the following interfaces.
+
+| Interface                | Purpose                                        |
+| ------------------------ | ----------------------------------------------- |
+| `IntentElementProps`     | Configures the button's base intent.            |
+| `IconElementProps`       | Configures the `icon` prop's accepted values.   |
+| `PaddingProps`           | Configures individual padding values.           |
+| `BackgroundElementProps` | Configures background colour and transparency.  |
+| `SpacedElementProps`     | Configures theme-based internal spacing.        |
+| `ScalableElementProps`   | Configures the label and icon scale.            |
+| `ShadowElementProps`     | Configures a box shadow.                        |
+| `ZIndexElementProps`     | Configures the button's `ZIndex`.               |
+
+## Behaviour
+
+* The button automatically grows to fit its content (`AutomaticSize.XY`).
+* Hovering the button switches its background, border, and text/icon colours to the intent's `hover` state.
+* When `group` is set and a `Group` ancestor is present, the button's width is fixed to the widest button reporting into that `Group`; its height still grows automatically.
+* Without `text`, `icon`, or `children`, the button renders with no content.
+
+## Theme values
+
+The button uses values from `theme.components.button` for:
+
+* Corner radius
+* Border thickness
+* Background transparency
+* Typography
+* Box shadow
+* Per-intent background, border, and text/icon colours for the `default` and `hover` states
+
+These values can be changed by providing a custom Clean UI theme.

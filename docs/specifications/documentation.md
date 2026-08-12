@@ -7,7 +7,7 @@ When creating .mdx documentation files under `/docs/content/docs/components/`, i
     ```tsx
     import { Container, Box, Row, Column } from "@rbxts/react-clean-ui";
 
-    <Container width="75%" center="50%">
+    <Container width="75%" center>
         <Box>
             <Row>
                 <Column span={{

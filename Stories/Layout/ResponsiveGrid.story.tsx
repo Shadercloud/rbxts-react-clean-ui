@@ -4,7 +4,7 @@ import { Box, Column, Container, createStory, Row } from "@rbxts/react-clean-ui"
 export = createStory((props) => (
     <Container
         width="75%"
-        center="50%">
+        center>
         <Box>
             <Row>
                 <Column span={{

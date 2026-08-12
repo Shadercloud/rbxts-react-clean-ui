@@ -19,14 +19,23 @@ export const Container = React.forwardRef<Frame, ContainerProps>(
     (props, ref) => {
         const group = React.useContext(GroupContext);
 
-        return (
+        const autoSize = SizeHelper.GetAutoSize(props);
+        const isAutoSizeActive = autoSize !== Enum.AutomaticSize.None && autoSize !== "None";
+
+        const centerViaLayout =
+            props.center === true &&
+            props.Position === undefined &&
+            props.AnchorPoint === undefined &&
+            isAutoSizeActive;
+
+        const content = (
             <frame
                 ref={ref}
                 Archivable={props.Archivable}
                 Tag={props.Tag}
                 Active={props.Active}
-                AnchorPoint={SizeHelper.GetAnchor(props)}
-                AutomaticSize={SizeHelper.GetAutoSize(props)}
+                AnchorPoint={centerViaLayout ? Vector2.zero : SizeHelper.GetAnchor(props)}
+                AutomaticSize={autoSize}
                 BackgroundColor3={props.BackgroundColor3}
                 BackgroundTransparency={
                     props.BackgroundTransparency ?? 1
@@ -41,7 +50,7 @@ export const Container = React.forwardRef<Frame, ContainerProps>(
                 NextSelectionLeft={props.NextSelectionLeft}
                 NextSelectionRight={props.NextSelectionRight}
                 NextSelectionUp={props.NextSelectionUp}
-                Position={SizeHelper.GetPosition(props)}
+                Position={centerViaLayout ? UDim2.fromOffset(0, 0) : SizeHelper.GetPosition(props)}
                 Rotation={props.Rotation}
                 Selectable={props.Selectable}
                 SelectionGroup={props.SelectionGroup}
@@ -70,6 +79,26 @@ export const Container = React.forwardRef<Frame, ContainerProps>(
                 <Group.Element enabled={props.group}>
                     {props.children}
                 </Group.Element>
+            </frame>
+        );
+
+        if (!centerViaLayout) {
+            return content;
+        }
+
+        return (
+            <frame
+                Size={UDim2.fromScale(1, 1)}
+                BackgroundTransparency={1}
+                ZIndex={props.ZIndex}
+                LayoutOrder={props.LayoutOrder}
+            >
+                <uilistlayout
+                    FillDirection={Enum.FillDirection.Horizontal}
+                    HorizontalAlignment={Enum.HorizontalAlignment.Center}
+                    VerticalAlignment={Enum.VerticalAlignment.Center}
+                />
+                {content}
             </frame>
         );
     },
