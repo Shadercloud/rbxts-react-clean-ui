@@ -66,6 +66,14 @@ local function AccordionHeaderVisual(props)
 		end
 		rotationTween:start()
 	end, { props.duration, props.open, rotationTween })
+	local _condition = props.header.text == nil and props.header.children ~= nil
+	if _condition then
+		local _children = props.header.children
+		_condition = not (type(_children) == "string")
+	end
+	if _condition then
+		return props.header.children
+	end
 	local _exp = React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.accordion.header.spacing),
 	})
@@ -73,7 +81,21 @@ local function AccordionHeaderVisual(props)
 		icon = props.header.icon,
 		color = colors.textColor,
 	})
-	local _children = props.header.children
+	local _result_1
+	if props.header.text ~= nil then
+		_result_1 = React.createElement(Text, {
+			text = props.header.text,
+			TextColor3 = colors.textColor,
+			typography = TypographyHelper:getTypography(theme, nil, colors.typography or theme.components.accordion.header.typography),
+		})
+	else
+		local _children = props.header.children
+		_result_1 = if type(_children) == "string" then React.createElement(Text, {
+			text = props.header.children,
+			TextColor3 = colors.textColor,
+			typography = TypographyHelper:getTypography(theme, nil, colors.typography or theme.components.accordion.header.typography),
+		}) else props.header.children
+	end
 	return React.createElement(React.Fragment, nil, _exp, React.createElement(HStack, {
 		valign = "Center",
 		Wraps = false,
@@ -81,11 +103,7 @@ local function AccordionHeaderVisual(props)
 	}, _exp_1, React.createElement(Container, {
 		Size = UDim2.new(1, theme.components.accordion.header.indicatorSize, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-	}, if type(_children) == "string" then React.createElement(Text, {
-		text = props.header.children,
-		TextColor3 = colors.textColor,
-		typography = TypographyHelper:getTypography(theme, nil, colors.typography or theme.components.accordion.header.typography),
-	}) else props.header.children), React.createElement(Icon, {
+	}, _result_1), React.createElement(Icon, {
 		icon = "chevron-down",
 		color = if props.disabled then colors.textColor else theme.components.accordion.header.indicatorColor,
 		Size = UDim2.fromOffset(theme.components.accordion.header.indicatorSize, theme.components.accordion.header.indicatorSize),
@@ -226,7 +244,9 @@ local function RenderedAccordionItem(props)
 		},
 	}, React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.accordion.content.spacing),
-	}), props.content)))))
+	}), if props.contentText ~= nil then React.createElement(Text, {
+		text = props.contentText,
+	}) else props.content)))))
 end
 local Accordion = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
@@ -243,6 +263,7 @@ local Accordion = React.forwardRef(function(props, ref)
 				return nil
 			end
 			local header
+			local contentText
 			local content
 			React.Children.forEach(item.props.children, function(itemChild)
 				if not React.isValidElement(itemChild) then
@@ -252,7 +273,9 @@ local Accordion = React.forwardRef(function(props, ref)
 					header = itemChild.props
 				end
 				if itemChild.type == AccordionContent and content == nil then
-					content = (itemChild.props).children
+					local contentProps = itemChild.props
+					contentText = contentProps.text
+					content = contentProps.children
 				end
 			end)
 			if header ~= nil then
@@ -268,6 +291,7 @@ local Accordion = React.forwardRef(function(props, ref)
 				end
 				_object[_left] = _condition
 				_object.header = header
+				_object.contentText = contentText
 				_object.content = content
 				table.insert(parsed, _object)
 			end
@@ -333,7 +357,7 @@ local Accordion = React.forwardRef(function(props, ref)
 		end
 	end, { items, props.value })
 	local activate = function(item)
-		if item.disabled or item.content == nil then
+		if item.disabled or (item.content == nil and item.contentText == nil) then
 			return nil
 		end
 		local _value = item.value

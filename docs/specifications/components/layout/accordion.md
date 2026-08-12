@@ -4,7 +4,7 @@
 
 ## Public API
 
-- `Accordion` accepts `children`, `type`, `defaultValue`, `value`, `onValueChange`, and `collapsible` props in addition to the scalable element props used by other layout components.
+- `Accordion` accepts `children`, `defaultValue`, `value`, `onValueChange`, and `collapsible` props in addition to the scalable element props used by other layout components.
 - `onValueChange` receives the complete next value after a section is opened or closed.
 - Supplying `value` makes the accordion controlled. Without `value`, the accordion owns its state and initializes it from `defaultValue`.
 - `collapsible` defaults to `false` in single mode. When `false`, activating the open section does not close it. Multiple mode always permits individual sections to be collapsed.
@@ -19,7 +19,7 @@
 - Only direct `Accordion.Item` children are treated as sections. Other direct children are ignored.
 - Each item uses the first direct `Accordion.Header` and first direct `Accordion.Content` child it contains. An item without a header is not rendered.
 - An item without content still renders its header but does not expand.
-- `Accordion.Header` and `Accordion.Content` should both accept a 
+- `Accordion.Header` and `Accordion.Content` should both accept `text` prop.  If this is set then use this an create a `<Text>` component with this text.  If `text` props is undefined then use the children instead.
 
 ## Expansion behavior
 
@@ -77,7 +77,7 @@ Accordion defaults live under `theme.components.accordion`:
 The main story `<Container>` should have a 75% width and a fixed pixel height.
 
 The story should demonstrate:
-
+- `Accordion.Header` and `Accordion.Content` that utilize the `text` prop and ones that use custom child elements instead.
 - Collapsible single-mode behavior.
 - A disabled item and content with different heights.
 

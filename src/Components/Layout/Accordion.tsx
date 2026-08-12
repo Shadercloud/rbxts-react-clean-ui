@@ -24,6 +24,7 @@ function AccordionItem(_props: AccordionItemProps) {
 interface AccordionHeaderProps {
     children?: React.ReactNode | string;
     icon?: IconName;
+    text?: string;
 }
 
 function AccordionHeader(_props: AccordionHeaderProps) {
@@ -32,6 +33,7 @@ function AccordionHeader(_props: AccordionHeaderProps) {
 
 interface AccordionContentProps {
     children?: React.ReactNode;
+    text?: string;
 }
 
 function AccordionContent(_props: AccordionContentProps) {
@@ -51,6 +53,7 @@ interface ParsedItem {
     value: string;
     disabled: boolean;
     header: AccordionHeaderProps;
+    contentText?: string;
     content?: React.ReactNode;
 }
 
@@ -73,15 +76,20 @@ function AccordionHeaderVisual(props: {
         rotationTween.start();
     }, [props.duration, props.open, rotationTween]);
 
+    if (props.header.text === undefined && props.header.children !== undefined && !typeIs(props.header.children, "string"))
+        return props.header.children;
+
     return (
         <>
             <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.accordion.header.spacing)} />
             <HStack valign="Center" Wraps={false} HorizontalFlex={Enum.UIFlexAlignment.Fill}>
                 {props.header.icon !== undefined && <Icon icon={props.header.icon} color={colors.textColor} />}
                 <Container Size={new UDim2(1, theme.components.accordion.header.indicatorSize, 0, 0)} AutomaticSize={Enum.AutomaticSize.Y} >
-                    {typeIs(props.header.children, "string")
-                        ? <Text text={props.header.children} TextColor3={colors.textColor} typography={TypographyHelper.getTypography(theme, undefined, colors.typography ?? theme.components.accordion.header.typography)} />
-                        : props.header.children}
+                    {props.header.text !== undefined
+                        ? <Text text={props.header.text} TextColor3={colors.textColor} typography={TypographyHelper.getTypography(theme, undefined, colors.typography ?? theme.components.accordion.header.typography)} />
+                        : typeIs(props.header.children, "string")
+                            ? <Text text={props.header.children} TextColor3={colors.textColor} typography={TypographyHelper.getTypography(theme, undefined, colors.typography ?? theme.components.accordion.header.typography)} />
+                            : props.header.children}
                 </Container>
                 <Icon
                     icon="chevron-down"
@@ -184,7 +192,9 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                             }}
                         >
                             <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.accordion.content.spacing)} />
-                            {props.content}
+                            {props.contentText !== undefined
+                                ? <Text text={props.contentText} />
+                                : props.content}
                         </frame>
                     </frame>
                 )}
@@ -209,15 +219,20 @@ const Accordion = React.forwardRef<Frame, AccordionProps>((props, ref) => {
             const item = child as React.ReactElement<AccordionItemProps>;
             if (seen.has(item.props.value)) return;
             let header: AccordionHeaderProps | undefined;
+            let contentText: string | undefined;
             let content: React.ReactNode;
             React.Children.forEach(item.props.children, (itemChild) => {
                 if (!React.isValidElement(itemChild)) return;
                 if (itemChild.type === AccordionHeader && header === undefined) header = itemChild.props as AccordionHeaderProps;
-                if (itemChild.type === AccordionContent && content === undefined) content = (itemChild.props as AccordionContentProps).children;
+                if (itemChild.type === AccordionContent && content === undefined) {
+                    const contentProps = itemChild.props as AccordionContentProps;
+                    contentText = contentProps.text;
+                    content = contentProps.children;
+                }
             });
             if (header !== undefined) {
                 seen.add(item.props.value);
-                parsed.push({ value: item.props.value, disabled: item.props.disabled ?? false, header, content });
+                parsed.push({ value: item.props.value, disabled: item.props.disabled ?? false, header, contentText, content });
             }
         });
         return parsed;
@@ -238,7 +253,7 @@ const Accordion = React.forwardRef<Frame, AccordionProps>((props, ref) => {
     }, [items, props.value]);
 
     const activate = (item: ParsedItem) => {
-        if (item.disabled || item.content === undefined) return;
+        if (item.disabled || (item.content === undefined && item.contentText === undefined)) return;
         const isOpen = openValues.includes(item.value);
         let nextValues: string[];
         if (isOpen) {

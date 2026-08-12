@@ -9,10 +9,12 @@ declare function AccordionItem(_props: AccordionItemProps): undefined;
 interface AccordionHeaderProps {
     children?: React.ReactNode | string;
     icon?: IconName;
+    text?: string;
 }
 declare function AccordionHeader(_props: AccordionHeaderProps): undefined;
 interface AccordionContentProps {
     children?: React.ReactNode;
+    text?: string;
 }
 declare function AccordionContent(_props: AccordionContentProps): undefined;
 export interface AccordionProps extends ScalableElementProps {

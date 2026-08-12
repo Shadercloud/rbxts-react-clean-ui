@@ -18,10 +18,8 @@ export function AccordionExample() {
         <Container width="75%" height="300">
             <Accordion defaultValue="overview">
                 <Accordion.Item value="overview">
-                    <Accordion.Header><Text text="Overview" /></Accordion.Header>
-                    <Accordion.Content>
-                        <Text text="Accordion sections reveal related information on demand." />
-                    </Accordion.Content>
+                    <Accordion.Header text="Overview" />
+                    <Accordion.Content text="Accordion sections reveal related information on demand." />
                 </Accordion.Item>
                 <Accordion.Item value="features">
                     <Accordion.Header icon="info-circle"><Text text="Features" /></Accordion.Header>
@@ -59,8 +57,8 @@ Opening an item closes the previously open item. By default, activating the open
 ## Child components
 
 - `Accordion.Item` requires a unique `value` and accepts `disabled`.
-- `Accordion.Header` is the activation target and accepts an optional `icon`.
-- `Accordion.Content` is mounted while its item is expanded and unmounted after closing.
+- `Accordion.Header` is the activation target and accepts an optional `icon` and `text`. When `text` is provided, it renders a `<Text>` component automatically; otherwise children are used.
+- `Accordion.Content` is mounted while its item is expanded and unmounted after closing. It accepts an optional `text` prop that renders a `<Text>` component when provided; otherwise children are used.
 
 Only direct `Accordion.Item` children are used. Within each item, the first direct header and content are used; an item without a header is omitted.
 
