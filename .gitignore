@@ -2,3 +2,4 @@
 /out/tsconfig.*
 /include
 *.tsbuildinfo
+/*.png

@@ -1,8 +1,9 @@
 import React from "@rbxts/react";
 import { Button, Container, VStack } from "@rbxts/react-clean-ui";
 
-export function Buttons() {
-    return <Container>
+function Buttons() {
+    return <Container BackgroundColor3={new Color3(1, 1, 1)} BackgroundTransparency={0} BorderSizePixel={0}>
+        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
         <VStack>
             <Button icon="smile-o" text="Primary" intent="primary" />
             <Button icon="check" text="Success" intent="success" />
@@ -12,3 +13,5 @@ export function Buttons() {
         </VStack>
     </Container>
 }
+
+export = Buttons;

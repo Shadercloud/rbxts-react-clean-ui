@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/react-clean-ui",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "description": "",
   "main": "out/init.lua",
   "scripts": {
@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@rbxts/compiler-types": "^3.0.0-types.0",
+    "@rbxts/react-screenshot-plugin": "^0.1.6",
     "@rbxts/types": "^1.0.938",
     "@typescript-eslint/eslint-plugin": "^8.63.0",
     "@typescript-eslint/parser": "^8.63.0",

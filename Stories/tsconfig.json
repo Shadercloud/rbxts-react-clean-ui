@@ -3,7 +3,8 @@
     "compilerOptions": {
         "rootDir": "..",
         "noEmit": true,
-        "incremental": false,
+        "incremental": true,
+        "tsBuildInfoFile": "../out/stories.tsbuildinfo",
         "baseUrl": "..",
         "paths": {
             "@rbxts/react-clean-ui": [
