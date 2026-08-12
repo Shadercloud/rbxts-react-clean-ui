@@ -4,7 +4,7 @@ import { Box, Button, Container, createStory, HStack, FlexItem, Text, VStack, Sc
 export = createStory((props) => (
     <Container
         width="75%"
-        center="50%"
+        center
     >
         <Box>
             <VStack>

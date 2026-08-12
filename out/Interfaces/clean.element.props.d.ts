@@ -73,7 +73,7 @@ export interface ScalableElementProps {
 export interface PositionElementProps {
     Position?: UDim2 | Binding<UDim2>;
     AnchorPoint?: Vector2 | Binding<Vector2> | undefined;
-    center?: CssSize | boolean;
+    center?: boolean;
     top?: CssSize;
     left?: CssSize;
     right?: CssSize;
