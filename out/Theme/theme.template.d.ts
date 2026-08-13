@@ -181,7 +181,7 @@ export interface CleanTheme {
                 cornerRadius: CssSize;
                 backgroundColor: Color3;
                 backgroundTransparency: number;
-                aspectRation?: number;
+                aspectRatio?: number;
             };
         };
         toast: {

@@ -459,7 +459,7 @@ export const DefaultTheme: CleanTheme = {
                 backgroundTransparency: 0,
                 borderColor: Color3.fromHex("#D9DEE8"),
                 cornerRadius: 8,
-                aspectRation: 1
+                aspectRatio: 1
             }
         },
         toast: {

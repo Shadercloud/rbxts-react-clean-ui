@@ -341,7 +341,7 @@ local Slider = React.forwardRef(function(props, ref)
 			["box-shadow"] = theme.handle.boxShadow,
 		}))
 		local _attributes_1 = {}
-		local _condition_2 = theme.handle.aspectRation
+		local _condition_2 = theme.handle.aspectRatio
 		if _condition_2 == nil then
 			_condition_2 = 1
 		end

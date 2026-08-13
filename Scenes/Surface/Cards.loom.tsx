@@ -1,13 +1,13 @@
 import React from "@rbxts/react";
-import { Button } from "../src/Components/Input/Button";
-import { Container } from "../src/Components/Layout/Container";
-import { HStack } from "../src/Components/Layout/HStack";
-import { Text } from "../src/Components/Typography/Text";
-import { LoomScene } from "./LoomScene";
-import { Intent } from "../src/Interfaces/clean.element.props";
-import { Card } from "../src/Components/Surface/Card";
-import { Row } from "../src/Components/Layout/Row";
-import { Column } from "../src/Components/Layout/Column";
+import { Button } from "../../src/Components/Input/Button";
+import { Container } from "../../src/Components/Layout/Container";
+import { HStack } from "../../src/Components/Layout/HStack";
+import { Text } from "../../src/Components/Typography/Text";
+import { LoomScene } from "../LoomScene";
+import { Intent } from "../../src/Interfaces/clean.element.props";
+import { Card } from "../../src/Components/Surface/Card";
+import { Row } from "../../src/Components/Layout/Row";
+import { Column } from "../../src/Components/Layout/Column";
 
 export const preview = {
     render: () => (

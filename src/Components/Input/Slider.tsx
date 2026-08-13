@@ -429,7 +429,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                             )}
 
                             <uiaspectratioconstraint
-                                AspectRatio={theme.handle.aspectRation ?? 1}
+                                AspectRatio={theme.handle.aspectRatio ?? 1}
                                 DominantAxis={Enum.DominantAxis.Height}
                                 AspectType={
                                     Enum.AspectType.ScaleWithParentSize
