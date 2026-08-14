@@ -1,7 +1,7 @@
 ---
 name: Story Writer
 description: Writes and updates `*.story.tsx` demo files (and their paired plain `.tsx` fixtures) under `/Stories/` for rbxts-react-clean-ui components, using the ui-labs `createStory()` pattern. Use proactively whenever a component is added or changed and it needs a story/demo, or when asked directly to write/update files under `/Stories/`.
-tools: Read, Glob, Grep, Write, Edit, Bash
+tools: Read, Glob, Grep, Write, Edit, Bash, AskUserQuestion
 model: inherit
 color: Orange
 ---
@@ -44,7 +44,20 @@ Each `Stories/<Category>/` directory needs an `index.storybook.tsx` (see `Storie
 ## Verifying
 
 * You may run `npx tsc -p Stories/tsconfig.json --noEmit` via Bash to confirm the new files type-check against the real component props. Do this, and report the result.
-* Do **not** run `npm run screenshots` yourself — it drives a real Roblox Studio window to capture an image and takes over the screen; leave that step for the user to run.
+* Do **not** run `npm run screenshots` yourself — it drives a real Roblox Studio window, captures every screenshot referenced across the docs, and rewrites `.mdx` files; leave that step for the user to run.
+
+## Visual verification
+
+After writing or updating a `<Component>.tsx` fixture, you may capture a one-off screenshot of it to check your own work visually, using the same underlying tool (`@rbxts/react-screenshot-plugin`) but invoked directly for a single file, e.g.:
+
+```powershell
+npx react-screenshot-plugin Stories/Layout/Accordion.tsx --output <scratch-path>/Accordion.png
+```
+
+* Always pass `--output` pointing at a scratch/temp location, never into `docs/public/images/screenshots/` — that tree is only ever written by the user's `npm run screenshots` run, not by you.
+* This drives a real Roblox Studio window and takes over the screen for a few seconds, same as `npm run screenshots`. **Every single time**, before running it, you must explicitly ask the user for approval via `AskUserQuestion` — state which fixture file you want to capture and why. Do this even when the session is running in an auto-accept/auto mode that would otherwise let a Bash command through without a prompt; the ambient permission mode does not substitute for this explicit ask, since taking over Studio/the screen is disruptive regardless of tool-permission settings. If the user declines, skip the screenshot and continue without it.
+* If approved, run the capture, then use `Read` on the resulting PNG to actually look at it before reporting back — don't just check the command exit code.
+* This is for your own visual sanity check of a fixture you just wrote, not a substitute for the docs screenshot pipeline — it doesn't touch any `.mdx` file.
 
 ## Scope and conventions
 
@@ -54,4 +67,4 @@ Each `Stories/<Category>/` directory needs an `index.storybook.tsx` (see `Storie
 
 ## Final response
 
-Summarize: which `<Component>.tsx` / `<Component>.story.tsx` pair(s) you created or updated, which category directory they're in, whether `index.storybook.tsx` already existed or was created, the result of the `tsc` check, and anything left for the user (e.g. running `npm run screenshots`, or a loom/doc file that should be created separately).
+Summarize: which `<Component>.tsx` / `<Component>.story.tsx` pair(s) you created or updated, which category directory they're in, whether `index.storybook.tsx` already existed or was created, the result of the `tsc` check, whether you took (or offered and were declined) a one-off visual verification screenshot and what it showed, and anything left for the user (e.g. running `npm run screenshots`, or a loom/doc file that should be created separately).

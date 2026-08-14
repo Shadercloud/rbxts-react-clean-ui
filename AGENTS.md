@@ -2,6 +2,23 @@
 
 This is an existing production codebase. Make focused, conservative changes that preserve current behaviour and public APIs unless the task explicitly requires otherwise.
 
+## Subagent Usage
+
+A specialized subagent exists for most work in this repo. Check the mapping below before doing matching work yourself, and delegate to the matching subagent even if the request did not explicitly ask for a subagent:
+
+* Changes or fixes under `src/Components/**` (including theme/interface/context wiring) → **Component Writer**
+* `.mdx` documentation under `docs/content/docs` → **Documentation Writer**
+* `*.story.tsx` files under `/Stories/` → **Story Writer**
+* `*.loom.tsx` scene files under `/Scenes/` → **Loom Scene Writer**
+* npm helper scripts under `/scripts` (and their `package.json` entries) → **Script Coder**
+
+Rules for delegation:
+
+1. Always run subagents in the background. This is a hard requirement: never block the conversation waiting on a subagent's result, even when it looks like the fastest path or the only remaining step. `run_in_background: false` is not an acceptable choice for these tasks.
+2. Do not duplicate a subagent's work yourself while it runs — don't investigate, edit, or re-derive the same thing in parallel.
+3. When a task is assigned to a subagent, tell the user which subagent it was assigned to and that it is running in the background.
+4. When a subagent's result comes back, report what it found/changed to the user rather than re-verifying or re-explaining it from scratch.
+
 ## Before Making Changes
 
 1. Read the relevant implementation files and their surrounding modules.

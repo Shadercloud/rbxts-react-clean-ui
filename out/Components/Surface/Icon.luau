@@ -52,6 +52,7 @@ function Icon(props)
 		return React.createElement(SpinningIcon, _attributes)
 	end
 	return React.createElement("imagelabel", {
+		AnchorPoint = props.AnchorPoint,
 		Rotation = props.Rotation,
 		Size = props.Size or UDim2.fromOffset(size, size),
 		LayoutOrder = props.LayoutOrder,

@@ -67,10 +67,10 @@ function AccordionHeaderVisual(props: {
     const hover = React.useContext(HoverButtonContext);
     const state = props.disabled ? "disabled" : hover?.isSelected ? "focus" : hover?.hover ? "hover" : "default";
     const colors = ColorHelper.getIntentColors(theme, "primary", state, theme.components.accordion.header.intents);
-    const [rotation, rotationTween] = useTween(props.open ? 0 : -90, { duration: props.duration });
+    const [rotation, rotationTween] = useTween(props.open ? 180 : 0, { duration: props.duration });
 
     React.useEffect(() => {
-        const goal = props.open ? 0 : -90;
+        const goal = props.open ? 180 : 0;
         rotationTween.setGoal(goal, { duration: props.duration });
         if (props.duration === 0) rotationTween.setPosition(goal);
         rotationTween.start();
@@ -91,12 +91,15 @@ function AccordionHeaderVisual(props: {
                             ? <Text text={props.header.children} TextColor3={colors.textColor} typography={TypographyHelper.getTypography(theme, undefined, colors.typography ?? theme.components.accordion.header.typography)} />
                             : props.header.children}
                 </Container>
-                <Icon
-                    icon="chevron-down"
-                    color={props.disabled ? colors.textColor : theme.components.accordion.header.indicatorColor}
-                    Size={UDim2.fromOffset(theme.components.accordion.header.indicatorSize, theme.components.accordion.header.indicatorSize)}
-                    Rotation={rotation}
-                />
+                <Container>
+                    <Icon
+                        icon="chevron-down"
+                        color={props.disabled ? colors.textColor : theme.components.accordion.header.indicatorColor}
+                        Size={UDim2.fromOffset(theme.components.accordion.header.indicatorSize, theme.components.accordion.header.indicatorSize)}
+                        AnchorPoint={new Vector2(0.5, 0.5)}
+                        Rotation={rotation}
+                    />
+                </Container>
             </HStack>
         </>
     );
@@ -146,8 +149,8 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                 <HoverButton
                     isSelected={props.open}
                     default={{
-                        Active: !props.disabled && props.content !== undefined,
-                        Selectable: !props.disabled && props.content !== undefined,
+                        Active: !props.disabled && (props.content !== undefined || props.contentText !== undefined),
+                        Selectable: !props.disabled && (props.content !== undefined || props.contentText !== undefined),
                         AutoButtonColor: false,
                         AutomaticSize: Enum.AutomaticSize.Y,
                         Size: UDim2.fromScale(1, 0),

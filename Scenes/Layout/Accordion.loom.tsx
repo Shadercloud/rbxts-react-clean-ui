@@ -1,7 +1,6 @@
 import React from "@rbxts/react";
 import { Accordion } from "../../src/Components/Layout/Accordion";
 import { Container } from "../../src/Components/Layout/Container";
-import { Text } from "../../src/Components/Typography/Text";
 import { LoomScene } from "../LoomScene";
 import { Box } from "../../src/Components/Surface/Box";
 
@@ -10,18 +9,18 @@ export const preview = {
         <LoomScene>
             <Container width="100%" height="200" center>
                 <Box>
-                    <Accordion defaultValue="overview" animationDuration={0}>
-                        <Accordion.Item value="overview">
-                            <Accordion.Header><Text text="Overview" /></Accordion.Header>
-                            <Accordion.Content><Text text="Accordion sections reveal related information on demand." /></Accordion.Content>
+                    <Accordion defaultValue="sections" animationDuration={0}>
+                        <Accordion.Item value="sections">
+                            <Accordion.Header text="How many sections can be open at once?" />
+                            <Accordion.Content text="Only one section opens at a time by default." />
                         </Accordion.Item>
-                        <Accordion.Item value="features">
-                            <Accordion.Header><Text text="Features" /></Accordion.Header>
-                            <Accordion.Content><Text text="Supports controlled state, collapsible sections, icons, and animation." /></Accordion.Content>
+                        <Accordion.Item value="icons">
+                            <Accordion.Header icon="info-circle" text="Can a header include an icon?" />
+                            <Accordion.Content text="Yes, pass an icon prop to Accordion.Header to pair it with the label." />
                         </Accordion.Item>
                         <Accordion.Item value="disabled" disabled>
-                            <Accordion.Header><Text text="Unavailable" /></Accordion.Header>
-                            <Accordion.Content><Text text="Disabled content." /></Accordion.Content>
+                            <Accordion.Header text="Why is this section disabled?" />
+                            <Accordion.Content text="Disabled items cannot be expanded." />
                         </Accordion.Item>
                     </Accordion>
                 </Box>

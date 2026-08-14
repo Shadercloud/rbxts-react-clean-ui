@@ -43,6 +43,7 @@ export function Icon(props: IconProps) {
 
     return (
         <imagelabel
+            AnchorPoint={props.AnchorPoint}
             Rotation={props.Rotation}
             Size={props.Size ?? UDim2.fromOffset(size, size)}
             LayoutOrder={props.LayoutOrder}

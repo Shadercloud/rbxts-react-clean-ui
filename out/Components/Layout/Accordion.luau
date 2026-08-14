@@ -53,11 +53,11 @@ local function AccordionHeaderVisual(props)
 	end
 	local state = _result
 	local colors = ColorHelper:getIntentColors(theme, "primary", state, theme.components.accordion.header.intents)
-	local rotation, rotationTween = useTween(if props.open then 0 else -90, {
+	local rotation, rotationTween = useTween(if props.open then 180 else 0, {
 		duration = props.duration,
 	})
 	React.useEffect(function()
-		local goal = if props.open then 0 else -90
+		local goal = if props.open then 180 else 0
 		rotationTween:setGoal(goal, {
 			duration = props.duration,
 		})
@@ -103,12 +103,13 @@ local function AccordionHeaderVisual(props)
 	}, _exp_1, React.createElement(Container, {
 		Size = UDim2.new(1, theme.components.accordion.header.indicatorSize, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
-	}, _result_1), React.createElement(Icon, {
+	}, _result_1), React.createElement(Container, nil, React.createElement(Icon, {
 		icon = "chevron-down",
 		color = if props.disabled then colors.textColor else theme.components.accordion.header.indicatorColor,
 		Size = UDim2.fromOffset(theme.components.accordion.header.indicatorSize, theme.components.accordion.header.indicatorSize),
+		AnchorPoint = Vector2.new(0.5, 0.5),
 		Rotation = rotation,
-	})))
+	}))))
 end
 local function RenderedAccordionItem(props)
 	local theme = React.useContext(CleanThemeContext)
@@ -163,8 +164,8 @@ local function RenderedAccordionItem(props)
 		isSelected = props.open,
 	}
 	local _object = {
-		Active = not props.disabled and props.content ~= nil,
-		Selectable = not props.disabled and props.content ~= nil,
+		Active = not props.disabled and (props.content ~= nil or props.contentText ~= nil),
+		Selectable = not props.disabled and (props.content ~= nil or props.contentText ~= nil),
 		AutoButtonColor = false,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.fromScale(1, 0),
