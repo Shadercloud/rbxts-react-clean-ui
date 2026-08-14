@@ -1,13 +1,17 @@
 {
   "name": "@rbxts/react-clean-ui",
-  "version": "1.0.37",
+  "version": "1.0.38",
   "description": "A clean UI library for Roblox TypeScript projects",
   "main": "out/init.lua",
   "scripts": {
     "build": "rbxtsc",
     "watch": "rbxtsc -w",
     "prepublishOnly": "npm run build",
-    "screenshots": "node scripts/generate-screenshots.js"
+    "screenshots": "node scripts/generate-screenshots.js",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [
     "rbxts",
