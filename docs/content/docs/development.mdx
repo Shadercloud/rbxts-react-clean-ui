@@ -9,7 +9,7 @@ This guide explains how to set up a local environment for developing **React Cle
 Follow the guide directions careful, as this step method will allow you to preview your work using **Stories** in the [UI Labs plugin](https://ui-labs.luau.page/docs/installation).
 
 <Callout type="info">
-    This guide assumes you're already familiar with **roblox-ts**, **Rojo**, and **Roblox Studio**.
+	This guide assumes you're already familiar with **roblox-ts**, **Rojo**, and **Roblox Studio**.
 </Callout>
 
 ## 1. Create a development project
@@ -17,8 +17,8 @@ Follow the guide directions careful, as this step method will allow you to previ
 Create a new roblox-ts project outside of the React Clean UI repository.
 
 ```bash
-mkdir C:\Users\username\Documents\dev-game
-cd C:\Users\username\Documents\dev-game
+mkdir C:\Users\username\Documents\dev-packages
+cd C:\Users\username\Documents\dev-packages
 
 npm init roblox-ts game
 ```
@@ -38,26 +38,34 @@ npm install @rbxts/react @rbxts/react-roblox @rbxts/ui-labs @rbxts/services @rbx
 
 ## 3. Clone React Clean UI
 
-Create a `/src/Packages` directory and clone the repository into it.
+Create a `/Packages` directory and clone the repository into it.
 
 ```bash
-cd src
 mkdir Packages
 cd Packages
 
 git clone https://github.com/Shadercloud/rbxts-react-clean-ui.git
 ```
 
-Your project should now look like this:
+## 4. Create a directory junction
 
-```text
-dev-game/
-├── src/
-│   └── Packages/
-│       └── rbxts-react-clean-ui/
+In order to compile the Stories from the React Clean UI package, you must create a directory junction in your development project.
+
+Run this from the root of your development project (`dev-packages`), not from inside `Packages`.
+
+Using `PowerShell`:
+```ps
+cd ..
+New-Item -ItemType Junction -Path "src\Stories" -Target "Packages\rbxts-react-clean-ui\Stories"
 ```
 
-## 4. Configure TypeScript
+**or** using `Command Prompt`:
+```bat
+cd ..
+mklink /J src\Stories Packages\rbxts-react-clean-ui\Stories
+```
+
+## 5. Configure TypeScript
 
 Replace your root project's `tsconfig.json` with the following:
 
@@ -109,22 +117,18 @@ Replace your root project's `tsconfig.json` with the following:
                 "../node_modules/@rbxts/services"
             ],
             "@rbxts/react-clean-ui": [
-                "Packages/rbxts-react-clean-ui"
+                "../Packages/rbxts-react-clean-ui/out"
             ]
         }
     },
-    "exclude": [
-        "src/Packages/**/src",
-		"src/Packages/**/Scenes",
-        "src/Packages/**/node_modules",
-        "src/Packages/**/out",
-        "src/Packages/**/.vscode",
-        "src/Packages/**/docs"
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
     ]
 }
 ```
 
-## 5. Configure Rojo
+## 6. Configure Rojo
 
 You must install [Rojo](https://rojo.space/docs/v7/getting-started/installation/) (easier method is by using the Rojo Extension for `VS Studio Code``)
 
@@ -132,106 +136,106 @@ Create a `default.project.json` file in the root of your development project.
 
 ```json
 {
-	"name": "React Clean UI Dev Environment",
-	"globIgnorePaths": [
-		"**/package.json",
-		"**/tsconfig.json"
-	],
-	"tree": {
-		"$className": "DataModel",
-		"ServerScriptService": {
-			"$className": "ServerScriptService",
-			"TS": {
-				"$path": "out/server"
-			}
-		},
-		"ReplicatedStorage": {
-			"$className": "ReplicatedStorage",
-			"rbxts_include": {
-				"$path": "include",
-				"node_modules": {
-					"$className": "Folder",
-					"@rbxts": {
-						"$className": "Folder",
-						"compiler-types": {
-							"$path": "node_modules/@rbxts/compiler-types"
-						},
-						"react": {
-							"$path": "node_modules/@rbxts/react"
-						},
-						"react-roblox": {
-							"$path": "node_modules/@rbxts/react-roblox"
-						},
-						"services": {
-							"$path": "node_modules/@rbxts/services"
-						},
-						"ui-labs": {
-							"$path": "node_modules/@rbxts/ui-labs"
-						},
-						"ripple": {
-							"$path": "node_modules/@rbxts/ripple"
-						},
-						"react-ripple": {
-							"$path": "node_modules/@rbxts/react-ripple"
-						},
-						"types": {
-							"$path": "node_modules/@rbxts/types"
-						},
-						"rbxts-react-clean-ui": {
-							"$path": "out/Packages/rbxts-react-clean-ui/out"
-						}
-					},
-					"@rbxts-js": {
-						"$path": "node_modules/@rbxts-js"
-					}
-				}
-			},
-			"TS": {
-				"$path": "out/shared"
-			},
-			"PackageStories": {
-				"$path": "out/Packages/rbxts-react-clean-ui/Stories"
-			}
-		},
-		"StarterPlayer": {
-			"$className": "StarterPlayer",
-			"StarterPlayerScripts": {
-				"$className": "StarterPlayerScripts",
-				"TS": {
-					"$path": "out/client"
-				}
-			}
-		},
-		"Workspace": {
-			"$className": "Workspace",
-			"$properties": {
-				"FilteringEnabled": true
-			}
-		},
-		"HttpService": {
-			"$className": "HttpService",
-			"$properties": {
-				"HttpEnabled": true
-			}
-		},
-		"SoundService": {
-			"$className": "SoundService",
-			"$properties": {
-				"RespectFilteringEnabled": true
-			}
-		}
-	}
+    "name": "React Clean UI Dev Environment",
+    "globIgnorePaths": [
+        "**/package.json",
+        "**/tsconfig.json"
+    ],
+    "tree": {
+        "$className": "DataModel",
+        "ServerScriptService": {
+            "$className": "ServerScriptService",
+            "TS": {
+                "$path": "out/server"
+            }
+        },
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+            "rbxts_include": {
+                "$path": "include",
+                "node_modules": {
+                    "$className": "Folder",
+                    "@rbxts": {
+                        "$className": "Folder",
+                        "compiler-types": {
+                            "$path": "node_modules/@rbxts/compiler-types"
+                        },
+                        "react": {
+                            "$path": "node_modules/@rbxts/react"
+                        },
+                        "react-roblox": {
+                            "$path": "node_modules/@rbxts/react-roblox"
+                        },
+                        "services": {
+                            "$path": "node_modules/@rbxts/services"
+                        },
+                        "ui-labs": {
+                            "$path": "node_modules/@rbxts/ui-labs"
+                        },
+                        "ripple": {
+                            "$path": "node_modules/@rbxts/ripple"
+                        },
+                        "react-ripple": {
+                            "$path": "node_modules/@rbxts/react-ripple"
+                        },
+                        "types": {
+                            "$path": "node_modules/@rbxts/types"
+                        },
+                        "rbxts-react-clean-ui": {
+                            "$path": "Packages/rbxts-react-clean-ui/out"
+                        }
+                    },
+                    "@rbxts-js": {
+                        "$path": "node_modules/@rbxts-js"
+                    }
+                }
+            },
+            "TS": {
+                "$path": "out/shared"
+            },
+            "PackageStories": {
+                "$path": "out/Stories"
+            }
+        },
+        "StarterPlayer": {
+            "$className": "StarterPlayer",
+            "StarterPlayerScripts": {
+                "$className": "StarterPlayerScripts",
+                "TS": {
+                    "$path": "out/client"
+                }
+            }
+        },
+        "Workspace": {
+            "$className": "Workspace",
+            "$properties": {
+                "FilteringEnabled": true
+            }
+        },
+        "HttpService": {
+            "$className": "HttpService",
+            "$properties": {
+                "HttpEnabled": true
+            }
+        },
+        "SoundService": {
+            "$className": "SoundService",
+            "$properties": {
+                "RespectFilteringEnabled": true
+            }
+        }
+    }
 }
 ```
 
-## 6. Start the development environment
+## 7. Start the development environment
 
 You'll need **three terminals** running simultaneously (start them in the specific order listed below).
 
 ### Terminal 1 — Compile React Clean UI
 
 ```bash
-cd C:\Users\username\Documents\dev-game\src\Packages\rbxts-react-clean-ui
+cd C:\Users\username\Documents\dev-packages\Packages\rbxts-react-clean-ui
 npm install
 npx rbxtsc -w
 ```
@@ -239,22 +243,22 @@ npx rbxtsc -w
 ### Terminal 2 — Compile your game
 
 ```bash
-cd C:\Users\username\Documents\dev-game
+cd C:\Users\username\Documents\dev-packages
 npx rbxtsc -w
 ```
 
 ### Terminal 3 — Run Rojo
 
 ```bash
-cd C:\Users\username\Documents\dev-game
+cd C:\Users\username\Documents\dev-packages
 rojo serve
 ```
 
-## 7. Open Roblox Studio
+## 8. Open Roblox Studio
 
 Open your development place in Roblox Studio and connect it to the running Rojo server.
 
-## 8. Install UI Labs
+## 9. Install UI Labs
 
 Install the UI Labs plugin:
 
