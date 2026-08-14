@@ -1,0 +1,6 @@
+node_modules
+out
+docs/.next
+docs/node_modules
+docs/out
+*.tsbuildinfo
