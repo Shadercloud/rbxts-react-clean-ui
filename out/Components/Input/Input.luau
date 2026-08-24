@@ -10,11 +10,7 @@ local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
 local FieldsetContext = TS.import(script, script.Parent.Parent, "Layout").FieldsetContext
-local CHARACTER_ALLOW_LIST_PATTERNS = {
-	Telephone = "^[%d%+%-%s%(%)]*$",
-	Alphanumeric = "^[%w]*$",
-	Email = "^[%w@%._%-+]*$",
-}
+local resolveValidatedText = TS.import(script, script.Parent, "Input.validation").resolveValidatedText
 local function Input(props)
 	local theme = React.useContext(CleanThemeContext)
 	local fieldset = React.useContext(FieldsetContext)
@@ -149,14 +145,9 @@ local function Input(props)
 		end
 	end
 	_object_1.Text = function(rbx)
-		local number = tonumber(rbx.Text)
-		if (props.validation == "Number" or props.validation == "Int") and number == nil and rbx.Text ~= "" and rbx.Text ~= "-" then
-			ref.current.Text = lastValidText.current
-			return nil
-		end
-		local allowedPattern = CHARACTER_ALLOW_LIST_PATTERNS[props.validation or "None"]
-		if allowedPattern ~= nil and (string.match(rbx.Text, allowedPattern)) == nil then
-			ref.current.Text = lastValidText.current
+		local resolved = resolveValidatedText(props.validation, rbx.Text, lastValidText.current)
+		if resolved ~= rbx.Text then
+			ref.current.Text = resolved
 			return nil
 		end
 		lastValidText.current = rbx.Text

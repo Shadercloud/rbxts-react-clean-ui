@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rbxtsc",
     "watch": "rbxtsc -w",
+    "test": "rbxtsc && lune run scripts/lune/run-tests.luau out/Tests/Lune node_modules/@rbxts/lunit/out",
     "prepublishOnly": "npm run build",
     "screenshots": "node scripts/generate-screenshots.js",
     "lint": "eslint src/",
@@ -26,13 +27,15 @@
   "types": "out/index.d.ts",
   "files": [
     "out",
-    "!**/*.tsbuildinfo"
+    "!**/*.tsbuildinfo",
+    "!out/Tests/**"
   ],
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
     "@rbxts/compiler-types": "^3.0.0-types.0",
+    "@rbxts/lunit": "^4.0.2",
     "@rbxts/react-screenshot-plugin": "^0.1.6",
     "@rbxts/types": "^1.0.938",
     "@typescript-eslint/eslint-plugin": "^8.63.0",

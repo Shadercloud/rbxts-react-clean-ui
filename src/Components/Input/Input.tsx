@@ -5,8 +5,9 @@ import { ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 import { TypographyStyle } from "../../Theme";
 import { Corners, Padding } from "../Decorator";
 import { FieldsetContext } from "../Layout";
+import { resolveValidatedText } from "./Input.validation";
 
-interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
+export interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
     value: string;
     placeholder?: string;
     validation?: "Number" | "String" | "None" | "Int" | "Telephone" | "Alphanumeric" | "Email";
@@ -16,12 +17,6 @@ interface InputProps extends ScalableElementProps, SpacedElementProps, React.Ins
     Event?: React.InstanceEvent<TextBox>;
     controlled?: boolean;
 }
-
-const CHARACTER_ALLOW_LIST_PATTERNS: Partial<Record<NonNullable<InputProps["validation"]>, string>> = {
-    Telephone: "^[%d%+%-%s%(%)]*$",
-    Alphanumeric: "^[%w]*$",
-    Email: "^[%w@%._%-+]*$",
-};
 
 export function Input(props: InputProps) {
     const theme = React.useContext(CleanThemeContext);
@@ -154,22 +149,10 @@ export function Input(props: InputProps) {
                     ...props.Change,
                     Text: (rbx) => {
 
-                        const number = tonumber(rbx.Text);
+                        const resolved = resolveValidatedText(props.validation, rbx.Text, lastValidText.current);
 
-                        if (
-                            (props.validation === "Number" || props.validation === "Int") &&
-                            number === undefined &&
-                            rbx.Text !== "" &&
-                            rbx.Text !== "-"
-                        ) {
-                            ref.current!.Text = lastValidText.current;
-                            return;
-                        }
-
-                        const allowedPattern = CHARACTER_ALLOW_LIST_PATTERNS[props.validation ?? "None"];
-
-                        if (allowedPattern !== undefined && rbx.Text.match(allowedPattern)[0] === undefined) {
-                            ref.current!.Text = lastValidText.current;
+                        if (resolved !== rbx.Text) {
+                            ref.current!.Text = resolved;
                             return;
                         }
 

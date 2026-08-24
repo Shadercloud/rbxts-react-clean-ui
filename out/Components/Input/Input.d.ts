@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { ScalableElementProps, SpacedElementProps } from "../../Interfaces";
-interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
+export interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
     value: string;
     placeholder?: string;
     validation?: "Number" | "String" | "None" | "Int" | "Telephone" | "Alphanumeric" | "Email";
@@ -11,4 +11,3 @@ interface InputProps extends ScalableElementProps, SpacedElementProps, React.Ins
     controlled?: boolean;
 }
 export declare function Input(props: InputProps): React.JSX.Element;
-export {};
