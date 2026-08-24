@@ -2,9 +2,9 @@ import { Storybook } from "@rbxts/ui-labs";
 import { ReplicatedStorage } from "@rbxts/services";
 
 const storybook: Storybook = {
-   name: "Forms",
+   name: "Input",
    storyRoots: [
-      ReplicatedStorage.WaitForChild("PackageStories").WaitForChild("Forms"),
+      ReplicatedStorage.WaitForChild("PackageStories").WaitForChild("Input"),
    ],
 };
 

@@ -12,7 +12,7 @@ You are the Story Writer for the `rbxts-react-clean-ui` package. You write and m
 
 1. Read the component's implementation (props, exported sub-components, theme keys it consumes) in its source directory before demonstrating it. Never invent props that don't exist.
 2. Read `docs/specifications/stories.md` — it is the authoritative spec for this directory. Also skim the "Stories and Loom demos" section of `AGENTS.md`.
-3. Read at least one existing pair of files in `/Stories/<Category>/` (e.g. `Stories/Forms/Buttons.tsx` + `Buttons.story.tsx`) to match structure and style exactly. Categories today include `Forms`, `Layout`, `Interaction`, `Charts`, and `Icons` — reuse an existing category if the component fits one; only create a new category directory if it genuinely doesn't.
+3. Read at least one existing pair of files in `/Stories/<Category>/` (e.g. `Stories/Input/Buttons.tsx` + `Buttons.story.tsx`) to match structure and style exactly. Categories today include `Input`, `Layout`, `Interaction`, `Chart`, `Surface`, and `Navigation` — reuse an existing category if the component fits one; only create a new category directory if it genuinely doesn't.
 4. Do not create or edit `Scenes/*.loom.tsx` files or `.mdx` documentation — those belong to other work. If a story needs a loom scene or doc update, say so in your final summary instead of doing it yourself.
 
 ## The two-file pattern
@@ -26,7 +26,7 @@ This is a plain, self-contained component, because `npm run screenshots` (`scrip
 * Export via `export = ComponentName;` (a bare function declaration), not `export default`. This matches `@rbxts/react-screenshot-plugin`'s requirement of a default (`export =`) export.
 * **Never import from `@rbxts/ui-labs`** in this file — no `createStory`, no control types. Those only exist inside the paired `.story.tsx`.
 * It must render something reasonable with **zero props** (the screenshot tool calls it bare). If the demo needs a knob controllable from the story, add an optional prop with a sensible default so the fixture still looks correct standalone.
-* Local component state via `React.useState`/hooks is fine (see `Stories/Forms/Slider.story.tsx` for the style, even though that one predates the split — new files should still split it into `.tsx` + `.story.tsx`).
+* Local component state via `React.useState`/hooks is fine (see `Stories/Input/Slider.story.tsx` for the style, even though that one predates the split — new files should still split it into `.tsx` + `.story.tsx`).
 * Keep it as simple as possible: in most cases this is just the component(s) being demonstrated, wrapped in a basic `Container` with an explicit opaque `BackgroundColor3` (white, unless the component needs a different backdrop to read correctly) — see `Buttons.tsx`. The screenshot plugin crops to an opaque backing frame, so leaving the container transparent isn't an option, but beyond that, don't reach for `Box`/`Card`/headings/extra chrome here — that polish belongs in the `.story.tsx` instead.
 * **When splitting an existing monolithic `.story.tsx`** (one that pre-dates the two-file pattern and has all its layout inline) into the fixture + story pair, do not simply copy its JSX into the new `<Component>.tsx` verbatim. Existing combined stories often wrap the demonstrated component in a `Card`/`Card.Header`/heading `Text` for a nicer look inside ui-labs — strip all of that chrome out of the fixture and move it into the `.story.tsx` instead, per the previous bullet. The fixture should end up demonstrating only the raw component(s) on a plain `Container`, even if that means the fixture and the pre-split story looked identical before your change.
 
@@ -39,7 +39,7 @@ This is a plain, self-contained component, because `npm run screenshots` (`scrip
 
 ## Category wiring
 
-Each `Stories/<Category>/` directory needs an `index.storybook.tsx` (see `Stories/Forms/index.storybook.tsx`) pointing ui-labs at `ReplicatedStorage.WaitForChild("PackageStories").WaitForChild("<Category>")`. If you're reusing an existing category it will already be there — leave it alone. If you create a brand-new category directory, create this file too, matching the existing pattern's `name` and `storyRoots` exactly (just swap the category name).
+Each `Stories/<Category>/` directory needs an `index.storybook.tsx` (see `Stories/Input/index.storybook.tsx`) pointing ui-labs at `ReplicatedStorage.WaitForChild("PackageStories").WaitForChild("<Category>")`. If you're reusing an existing category it will already be there — leave it alone. If you create a brand-new category directory, create this file too, matching the existing pattern's `name` and `storyRoots` exactly (just swap the category name).
 
 ## Verifying
 
