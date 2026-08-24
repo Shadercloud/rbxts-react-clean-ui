@@ -9,11 +9,19 @@ import { FieldsetContext } from "../Layout";
 interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
     value: string;
     placeholder?: string;
-    validation?: "Number" | "String" | "None" | "Int";
+    validation?: "Number" | "String" | "None" | "Int" | "Telephone" | "Alphanumeric" | "Email";
+    min?: number;
+    max?: number;
     onChange?: (value: string) => void;
     Event?: React.InstanceEvent<TextBox>;
     controlled?: boolean;
 }
+
+const CHARACTER_ALLOW_LIST_PATTERNS: Partial<Record<NonNullable<InputProps["validation"]>, string>> = {
+    Telephone: "^[%d%+%-%s%(%)]*$",
+    Alphanumeric: "^[%w]*$",
+    Email: "^[%w@%._%-+]*$",
+};
 
 export function Input(props: InputProps) {
     const theme = React.useContext(CleanThemeContext);
@@ -24,6 +32,7 @@ export function Input(props: InputProps) {
     const ref = useRef<TextBox>();
 
     const [value, setValue] = useState(props.value);
+    const lastValidText = useRef(props.value);
 
     const typography: TypographyStyle = TypographyHelper.getTypography(
         theme,
@@ -109,7 +118,38 @@ export function Input(props: InputProps) {
                 TextTruncate={props.TextTruncate}
                 RichText={props.RichText}
 
-                Event={props.Event}
+                Event={{
+                    ...props.Event,
+                    FocusLost: (rbx, enterPressed, inputThatCausedFocusLoss) => {
+
+                        if (props.validation === "Number" || props.validation === "Int") {
+                            const number = tonumber(rbx.Text);
+
+                            if (number !== undefined) {
+                                let clamped = number;
+
+                                if (props.min !== undefined && clamped < props.min) {
+                                    clamped = props.min;
+                                }
+
+                                if (props.max !== undefined && clamped > props.max) {
+                                    clamped = props.max;
+                                }
+
+                                if (clamped !== number) {
+                                    const clampedText = tostring(clamped);
+
+                                    ref.current!.Text = clampedText;
+                                    lastValidText.current = clampedText;
+                                    setValue(clampedText);
+                                    props.onChange?.(clampedText);
+                                }
+                            }
+                        }
+
+                        props.Event?.FocusLost?.(rbx, enterPressed, inputThatCausedFocusLoss);
+                    },
+                }}
                 Change={{
                     ...props.Change,
                     Text: (rbx) => {
@@ -122,9 +162,18 @@ export function Input(props: InputProps) {
                             rbx.Text !== "" &&
                             rbx.Text !== "-"
                         ) {
-                            ref.current!.Text = props.value;
+                            ref.current!.Text = lastValidText.current;
                             return;
                         }
+
+                        const allowedPattern = CHARACTER_ALLOW_LIST_PATTERNS[props.validation ?? "None"];
+
+                        if (allowedPattern !== undefined && rbx.Text.match(allowedPattern)[0] === undefined) {
+                            ref.current!.Text = lastValidText.current;
+                            return;
+                        }
+
+                        lastValidText.current = rbx.Text;
                         setValue(rbx.Text)
                         props.onChange?.(rbx.Text)
 

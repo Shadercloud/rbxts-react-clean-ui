@@ -5,14 +5,13 @@ description: A themed text input with responsive sizing, spacing, validation, an
 icon: TextCursorInput
 ---
 
-<Image alt="Input demonstration" src="/images/input_preview.gif" style={{float: "right", width: "40%", marginLeft: "2rem", marginBottom: "1rem",}} />
-
 `<Input>` is a styled wrapper around Roblox's native [`TextBox`](https://create.roblox.com/docs/reference/engine/classes/TextBox).
 
 It automatically applies the current Clean UI theme, including typography, border styling, corner radius, text color, and internal padding.
 
 ## Basic Usage
 
+<Demo preview="Scenes/Form/Input.loom.tsx" previewHeight={280} screenshot="/images/input_preview.gif" screenshotAlt="Input demonstration">
 ```tsx
 import React, { useState } from "@rbxts/react";
 import { Input } from "@rbxts/react-clean-ui";
@@ -29,6 +28,7 @@ export function UsernameInput() {
     );
 }
 ```
+</Demo>
 
 The `value` prop sets the initial value of the input, while `onChange` is called whenever the text changes.
 
@@ -89,6 +89,64 @@ Use `Int` to only allow whole numbers:
 ```
 
 Decimal values are rejected.
+
+### Min and Max
+
+When `validation` is `"Number"` or `"Int"`, the `min` and `max` props constrain the accepted value:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter a percentage"
+    validation="Number"
+    min={0}
+    max={100}
+/>
+```
+
+`min` and `max` are not enforced while typing. Instead, they are checked when the input loses focus: if the value falls outside the `[min, max]` range, it is clamped to the nearest bound and `onChange` is called with the clamped value.
+
+### Telephone
+
+Use `Telephone` to restrict input to digits, `+`, `-`, spaces, and parentheses:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter your phone number"
+    validation="Telephone"
+/>
+```
+
+This only restricts which characters can be typed; it does not enforce a specific phone number format.
+
+### Alphanumeric
+
+Use `Alphanumeric` to allow only letters and digits:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter a username"
+    validation="Alphanumeric"
+/>
+```
+
+Spaces, punctuation, and other symbols are rejected.
+
+### Email
+
+Use `Email` to allow only characters valid within an email address, letters, digits, `@`, `.`, `_`, `-`, and `+`:
+
+```tsx
+<Input
+    value=""
+    placeholder="Enter your email address"
+    validation="Email"
+/>
+```
+
+This only restricts which characters can be typed; it does not verify that the resulting text is a well-formed email address.
 
 ### String
 
@@ -254,7 +312,9 @@ A `Change` handler can also be supplied to react to native property-changed even
 | ------------------- | ----------------------------------------- | ------------------------ | ------------------------------------------------------------------ |
 | `value`             | `string`                                  | Required                 | The initial text displayed by the input.                           |
 | `placeholder`       | `string`                                  | `undefined`              | Simplified alias for `PlaceholderText`.                            |
-| `validation`        | `"Number" \| "String" \| "None" \| "Int"` | `undefined`              | Restricts the values accepted by the input.                        |
+| `validation`        | `"Number" \| "String" \| "None" \| "Int" \| "Telephone" \| "Alphanumeric" \| "Email"` | `undefined`              | Restricts the values accepted by the input.                        |
+| `min`               | `number`                                  | `undefined`              | Minimum value allowed when `validation` is `"Number"` or `"Int"`. Enforced on blur, not while typing. |
+| `max`               | `number`                                  | `undefined`              | Maximum value allowed when `validation` is `"Number"` or `"Int"`. Enforced on blur, not while typing. |
 | `onChange`          | `(value: string) => void`                 | `undefined`              | Called whenever the input value changes.                           |
 | `Event`             | `React.InstanceEvent<TextBox>`            | `undefined`              | Native Roblox event handlers for the underlying `TextBox`.         |
 | `scale`             | `ScaleSize`                               | Theme default            | Controls the typography scale.                                     |

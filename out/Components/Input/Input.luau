@@ -10,6 +10,11 @@ local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
 local FieldsetContext = TS.import(script, script.Parent.Parent, "Layout").FieldsetContext
+local CHARACTER_ALLOW_LIST_PATTERNS = {
+	Telephone = "^[%d%+%-%s%(%)]*$",
+	Alphanumeric = "^[%w]*$",
+	Email = "^[%w@%._%-+]*$",
+}
 local function Input(props)
 	local theme = React.useContext(CleanThemeContext)
 	local fieldset = React.useContext(FieldsetContext)
@@ -20,6 +25,7 @@ local function Input(props)
 	local labelActivated = _labelActivated
 	local ref = useRef()
 	local value, setValue = useState(props.value)
+	local lastValidText = useRef(props.value)
 	local typography = TypographyHelper:getTypography(theme, props.scale, theme.components.input.typography)
 	React.useEffect(function()
 		if not labelActivated then
@@ -96,20 +102,64 @@ local function Input(props)
 	_attributes_1.TextEditable = props.TextEditable
 	_attributes_1.TextTruncate = props.TextTruncate
 	_attributes_1.RichText = props.RichText
-	_attributes_1.Event = props.Event
 	local _object = {}
-	local _spread = props.Change
+	local _spread = props.Event
 	if _spread then
 		for _k, _v in _spread do
 			_object[_k] = _v
 		end
 	end
-	_object.Text = function(rbx)
+	_object.FocusLost = function(rbx, enterPressed, inputThatCausedFocusLoss)
+		if props.validation == "Number" or props.validation == "Int" then
+			local number = tonumber(rbx.Text)
+			if number ~= nil then
+				local clamped = number
+				if props.min ~= nil and clamped < props.min then
+					clamped = props.min
+				end
+				if props.max ~= nil and clamped > props.max then
+					clamped = props.max
+				end
+				if clamped ~= number then
+					local clampedText = tostring(clamped)
+					ref.current.Text = clampedText
+					lastValidText.current = clampedText
+					setValue(clampedText)
+					local _result = props.onChange
+					if _result ~= nil then
+						_result(clampedText)
+					end
+				end
+			end
+		end
+		local _result = props.Event
+		if _result ~= nil then
+			_result = _result.FocusLost
+			if _result ~= nil then
+				_result(rbx, enterPressed, inputThatCausedFocusLoss)
+			end
+		end
+	end
+	_attributes_1.Event = _object
+	local _object_1 = {}
+	local _spread_1 = props.Change
+	if _spread_1 then
+		for _k, _v in _spread_1 do
+			_object_1[_k] = _v
+		end
+	end
+	_object_1.Text = function(rbx)
 		local number = tonumber(rbx.Text)
 		if (props.validation == "Number" or props.validation == "Int") and number == nil and rbx.Text ~= "" and rbx.Text ~= "-" then
-			ref.current.Text = props.value
+			ref.current.Text = lastValidText.current
 			return nil
 		end
+		local allowedPattern = CHARACTER_ALLOW_LIST_PATTERNS[props.validation or "None"]
+		if allowedPattern ~= nil and (string.match(rbx.Text, allowedPattern)) == nil then
+			ref.current.Text = lastValidText.current
+			return nil
+		end
+		lastValidText.current = rbx.Text
 		setValue(rbx.Text)
 		local _result = props.onChange
 		if _result ~= nil then
@@ -123,7 +173,7 @@ local function Input(props)
 			end
 		end
 	end
-	_attributes_1.Change = _object
+	_attributes_1.Change = _object_1
 	return React.createElement("frame", {
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
