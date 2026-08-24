@@ -10,6 +10,7 @@
         "---[Puzzle]Components---",
         "components/layout",
         "components/surface",
+        "components/typography",
         "components/form",
         "components/navigation",
         "components/interaction",

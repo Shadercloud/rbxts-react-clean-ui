@@ -65,26 +65,74 @@ local function Input(props)
 	_attributes_1.LineHeight = typography.lineHeight
 	_attributes_1.Text = if props.controlled then props.value else value
 	_attributes_1.TextColor3 = props.TextColor3 or theme.colors.intents.primary.default.textColor
-	_attributes_1.ClearTextOnFocus = false
+	_attributes_1.Active = props.Active
+	_attributes_1.Archivable = props.Archivable
+	_attributes_1.BorderColor3 = props.BorderColor3
+	_attributes_1.BorderMode = props.BorderMode
+	_attributes_1.BorderSizePixel = props.BorderSizePixel
+	_attributes_1.ClipsDescendants = props.ClipsDescendants
+	_attributes_1.Rotation = props.Rotation
+	_attributes_1.Selectable = props.Selectable
+	_attributes_1.SelectionImageObject = props.SelectionImageObject
+	_attributes_1.SizeConstraint = props.SizeConstraint
+	_attributes_1.Tag = props.Tag
+	_attributes_1.AutoLocalize = props.AutoLocalize
+	_attributes_1.RootLocalizationTable = props.RootLocalizationTable
+	_attributes_1.NextSelectionDown = props.NextSelectionDown
+	_attributes_1.NextSelectionLeft = props.NextSelectionLeft
+	_attributes_1.NextSelectionRight = props.NextSelectionRight
+	_attributes_1.NextSelectionUp = props.NextSelectionUp
+	_attributes_1.SelectionGroup = props.SelectionGroup
+	_attributes_1.SelectionOrder = props.SelectionOrder
+	local _condition_1 = props.ClearTextOnFocus
+	if _condition_1 == nil then
+		_condition_1 = false
+	end
+	_attributes_1.ClearTextOnFocus = _condition_1
+	_attributes_1.CursorPosition = props.CursorPosition
+	_attributes_1.MultiLine = props.MultiLine
+	_attributes_1.SelectionStart = props.SelectionStart
+	_attributes_1.ShowNativeInput = props.ShowNativeInput
+	_attributes_1.TextEditable = props.TextEditable
+	_attributes_1.TextTruncate = props.TextTruncate
+	_attributes_1.RichText = props.RichText
 	_attributes_1.Event = props.Event
-	_attributes_1.Change = {
-		Text = function(rbx)
-			local number = tonumber(rbx.Text)
-			if (props.validation == "Number" or props.validation == "Int") and number == nil and rbx.Text ~= "" and rbx.Text ~= "-" then
-				ref.current.Text = props.value
-				return nil
+	local _object = {}
+	local _spread = props.Change
+	if _spread then
+		for _k, _v in _spread do
+			_object[_k] = _v
+		end
+	end
+	_object.Text = function(rbx)
+		local number = tonumber(rbx.Text)
+		if (props.validation == "Number" or props.validation == "Int") and number == nil and rbx.Text ~= "" and rbx.Text ~= "-" then
+			ref.current.Text = props.value
+			return nil
+		end
+		setValue(rbx.Text)
+		local _result = props.onChange
+		if _result ~= nil then
+			_result(rbx.Text)
+		end
+		local _result_1 = props.Change
+		if _result_1 ~= nil then
+			_result_1 = _result_1.Text
+			if _result_1 ~= nil then
+				_result_1(rbx)
 			end
-			setValue(rbx.Text)
-			local _result = props.onChange
-			if _result ~= nil then
-				_result(rbx.Text)
-			end
-		end,
-	}
+		end
+	end
+	_attributes_1.Change = _object
 	return React.createElement("frame", {
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
+		AnchorPoint = props.AnchorPoint,
+		Position = props.Position,
+		LayoutOrder = props.LayoutOrder,
+		Visible = props.Visible,
+		ZIndex = props.ZIndex,
 	}, _exp, _exp_1, _exp_2, React.createElement("textbox", _attributes_1))
 end
 return {

@@ -51,6 +51,11 @@ export function Input(props: InputProps) {
             Size={UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
             BackgroundTransparency={1}
+            AnchorPoint={props.AnchorPoint}
+            Position={props.Position}
+            LayoutOrder={props.LayoutOrder}
+            Visible={props.Visible}
+            ZIndex={props.ZIndex}
         >
             <uistroke
                 Thickness={theme.components.input.borderThickness}
@@ -74,9 +79,39 @@ export function Input(props: InputProps) {
                 LineHeight={typography.lineHeight}
                 Text={props.controlled ? props.value : value}
                 TextColor3={props.TextColor3 ?? theme.colors.intents.primary.default.textColor}
-                ClearTextOnFocus={false}
+
+                Active={props.Active}
+                Archivable={props.Archivable}
+                BorderColor3={props.BorderColor3}
+                BorderMode={props.BorderMode}
+                BorderSizePixel={props.BorderSizePixel}
+                ClipsDescendants={props.ClipsDescendants}
+                Rotation={props.Rotation}
+                Selectable={props.Selectable}
+                SelectionImageObject={props.SelectionImageObject}
+                SizeConstraint={props.SizeConstraint}
+                Tag={props.Tag}
+                AutoLocalize={props.AutoLocalize}
+                RootLocalizationTable={props.RootLocalizationTable}
+                NextSelectionDown={props.NextSelectionDown}
+                NextSelectionLeft={props.NextSelectionLeft}
+                NextSelectionRight={props.NextSelectionRight}
+                NextSelectionUp={props.NextSelectionUp}
+                SelectionGroup={props.SelectionGroup}
+                SelectionOrder={props.SelectionOrder}
+
+                ClearTextOnFocus={props.ClearTextOnFocus ?? false}
+                CursorPosition={props.CursorPosition}
+                MultiLine={props.MultiLine}
+                SelectionStart={props.SelectionStart}
+                ShowNativeInput={props.ShowNativeInput}
+                TextEditable={props.TextEditable}
+                TextTruncate={props.TextTruncate}
+                RichText={props.RichText}
+
                 Event={props.Event}
                 Change={{
+                    ...props.Change,
                     Text: (rbx) => {
 
                         const number = tonumber(rbx.Text);
@@ -92,6 +127,8 @@ export function Input(props: InputProps) {
                         }
                         setValue(rbx.Text)
                         props.onChange?.(rbx.Text)
+
+                        props.Change?.Text?.(rbx);
                     },
                 }}
             >

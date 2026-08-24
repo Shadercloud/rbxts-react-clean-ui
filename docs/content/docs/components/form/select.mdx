@@ -285,19 +285,43 @@ Avoid wrapping options inside another component or frame:
 
 The `Select` component assigns option indexes while processing its direct children.
 
+## Native Frame Properties
+
+`Select` renders its root as a [`Container`](/components/layout/container), so it extends `React.InstanceProps<Frame>` and accepts native Roblox `Frame` properties directly, rather than the `TextBox` properties its underlying control might suggest.
+
+```tsx
+<Select
+    Position={UDim2.fromScale(0, 0.1)}
+    ZIndex={2}
+    BackgroundColor3={Color3.fromHex("#1F2937")}
+>
+    <Select.Option text="Option One" />
+</Select>
+```
+
+See the `Container` documentation for the full set of native `Frame` properties `Select` accepts, such as `AnchorPoint`, `LayoutOrder`, `Visible`, `Change`, and `Event`.
+
 ## Select Properties
 
-| Property     | Type                           | Default       | Description                                                           |
-| ------------ | ------------------------------ | ------------- | --------------------------------------------------------------------- |
-| `selected`   | `number`                       | `0`           | The zero-based index of the selected option.                          |
-| `onChange`   | `(value: number) => void`      | —             | Called when an option is selected.                                    |
-| `scale`      | `ScaleSize`                    | Theme default | Controls the typography scale used by the select.                     |
-| `spacing`    | `SpaceSize`                    | Theme default | Controls the internal padding of the select.                          |
-| `max-height` | `CssSize`                      | Theme default | Sets the maximum height of the dropdown before it becomes scrollable. |
-| `children`   | `React.ReactNode`              | —             | The `Select.Option` components displayed in the dropdown.             |
-| `Event`      | `React.InstanceEvent<TextBox>` | —             | Roblox instance events passed to the component.                       |
+### Select-specific properties
 
-The component also supports applicable Roblox instance properties inherited from its base component properties.
+| Property     | Type                       | Default       | Description                                                           |
+| ------------ | --------------------------- | ------------- | --------------------------------------------------------------------- |
+| `selected`   | `number`                    | `0`           | The zero-based index of the selected option.                          |
+| `onChange`   | `(value: number) => void`   | —             | Called when an option is selected.                                    |
+| `scale`      | `ScaleSize`                 | Theme default | Controls the typography scale used by the select.                     |
+| `spacing`    | `SpaceSize`                 | Theme default | Controls the internal padding of the select.                          |
+| `max-height` | `CssSize`                   | Theme default | Sets the maximum height of the dropdown before it becomes scrollable. |
+| `children`   | `React.ReactNode`           | —             | The `Select.Option` components displayed in the dropdown.             |
+
+### Shared and native properties
+
+| Property   | Type                              | Default | Description                                                                    |
+| ---------- | ---------------------------------- | ------- | -------------------------------------------------------------------------------- |
+| `Event`    | `React.InstanceEvent<Frame>`       | —       | Native Roblox events for the underlying `Frame`.                                |
+| `Change`   | `React.InstanceChangeEvent<Frame>` | —       | Native property-changed handlers for the underlying `Frame`.                    |
+
+All other compatible native `Frame` properties inherited from `React.InstanceProps<Frame>` are also accepted—see [Native Frame Properties](#native-frame-properties) above.
 
 ## Select.Option Properties
 

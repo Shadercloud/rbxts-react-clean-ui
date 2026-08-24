@@ -1,10 +1,9 @@
 import React from "@rbxts/react";
 import { CssSize, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
-interface SelectProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
+interface SelectProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<Frame> {
     selected?: number;
     'max-height'?: CssSize;
     onChange?: (selected: number, value?: string) => void;
-    Event?: React.InstanceEvent<TextBox>;
 }
 interface SelectOptionProps {
     text?: string;

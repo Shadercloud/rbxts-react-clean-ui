@@ -25,7 +25,7 @@ function SpinningIcon(props: IconProps) {
 
     });
     return <frame BackgroundTransparency={1} Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY}>
-        <Icon Size={props.Size} color={props.color} icon={props.icon} scale={props.scale} Rotation={rotation} />
+        <Icon {...props} Rotation={rotation} />
     </frame>
 }
 
@@ -46,14 +46,49 @@ export function Icon(props: IconProps) {
             AnchorPoint={props.AnchorPoint}
             Rotation={props.Rotation}
             Size={props.Size ?? UDim2.fromOffset(size, size)}
+            Position={props.Position}
             LayoutOrder={props.LayoutOrder}
             Image={
                 iconId === undefined
                     ? undefined
                     : `rbxassetid://${iconId}`
             }
-            BackgroundTransparency={1}
+            BackgroundTransparency={props.BackgroundTransparency ?? 1}
             ImageColor3={props.color ?? theme.colors.intents.primary.default.textColor}
+
+            ZIndex={props.ZIndex}
+            Visible={props.Visible}
+            Active={props.Active}
+            Archivable={props.Archivable}
+            BackgroundColor3={props.BackgroundColor3}
+            BorderColor3={props.BorderColor3}
+            BorderMode={props.BorderMode}
+            BorderSizePixel={props.BorderSizePixel}
+            ClipsDescendants={props.ClipsDescendants}
+            Selectable={props.Selectable}
+            SelectionImageObject={props.SelectionImageObject}
+            SizeConstraint={props.SizeConstraint}
+            Tag={props.Tag}
+            AutoLocalize={props.AutoLocalize}
+            RootLocalizationTable={props.RootLocalizationTable}
+            NextSelectionDown={props.NextSelectionDown}
+            NextSelectionLeft={props.NextSelectionLeft}
+            NextSelectionRight={props.NextSelectionRight}
+            NextSelectionUp={props.NextSelectionUp}
+            SelectionGroup={props.SelectionGroup}
+            SelectionOrder={props.SelectionOrder}
+
+            ImageRectOffset={props.ImageRectOffset}
+            ImageRectSize={props.ImageRectSize}
+            ImageTransparency={props.ImageTransparency}
+            ResampleMode={props.ResampleMode}
+            ScaleType={props.ScaleType}
+            SliceCenter={props.SliceCenter}
+            SliceScale={props.SliceScale}
+            TileSize={props.TileSize}
+
+            Change={props.Change}
+            Event={props.Event}
         />
     );
 }

@@ -234,6 +234,20 @@ Some properties are managed internally by the component, including:
 * `ClearTextOnFocus`
 * `AutomaticSize`
 
+A `Change` handler can also be supplied to react to native property-changed events. `Input` merges your `Change` handlers with its own internal `Change.Text` handling, so a `Change.Text` handler you provide still runs alongside the component's built-in validation.
+
+```tsx
+<Input
+    value=""
+    validation="Int"
+    Change={{
+        Text: (rbx) => {
+            print(`Native Text changed to: ${rbx.Text}`);
+        },
+    }}
+/>
+```
+
 ## Props
 
 | Prop                | Type                                      | Default                  | Description                                                        |
@@ -250,6 +264,7 @@ Some properties are managed internally by the component, including:
 | `TextColor3`        | `Color3`                                  | Theme primary text color | Controls the input text color.                                     |
 | `PlaceholderColor3` | `Color3`                                  | Roblox default           | Controls the placeholder text color.                               |
 | `TextScaled`        | `boolean`                                 | Roblox default           | Enables Roblox text scaling.                                       |
+| `Change`            | `React.InstanceChangeEvent<TextBox>`      | `undefined`              | Native property-changed handlers, merged with the component's internal validation. |
 
 All other compatible native `TextBox` properties are also accepted.
 

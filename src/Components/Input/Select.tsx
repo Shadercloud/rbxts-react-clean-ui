@@ -18,11 +18,10 @@ import { Icon } from "../Surface";
 interface SelectProps
     extends ScalableElementProps,
     SpacedElementProps,
-    React.InstanceProps<TextBox> {
+    React.InstanceProps<Frame> {
     selected?: number;
     'max-height'?: CssSize;
     onChange?: (selected: number, value?: string) => void;
-    Event?: React.InstanceEvent<TextBox>;
 }
 
 
@@ -237,6 +236,7 @@ const Select = React.forwardRef<Frame, SelectProps>((props, ref) => {
     return (
         <Container
             ref={ref}
+            {...props}
             Size={UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
         >

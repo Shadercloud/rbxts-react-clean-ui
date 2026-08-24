@@ -248,6 +248,44 @@ local Slider = React.forwardRef(function(props, ref)
 		}
 		table.insert(handles, _arg0)
 	end
+	local _attributes = {
+		ref = ref,
+		Archivable = props.Archivable,
+		Tag = props.Tag,
+		Active = props.Active,
+		AnchorPoint = SizeHelper:GetAnchor(props),
+		BackgroundColor3 = props.BackgroundColor3,
+	}
+	local _condition_1 = props.BackgroundTransparency
+	if _condition_1 == nil then
+		_condition_1 = 1
+	end
+	_attributes.BackgroundTransparency = _condition_1
+	_attributes.BorderColor3 = props.BorderColor3
+	_attributes.BorderMode = props.BorderMode
+	_attributes.BorderSizePixel = props.BorderSizePixel
+	_attributes.ClipsDescendants = props.ClipsDescendants
+	_attributes.Interactable = props.Interactable
+	_attributes.LayoutOrder = props.LayoutOrder
+	_attributes.NextSelectionDown = props.NextSelectionDown
+	_attributes.NextSelectionLeft = props.NextSelectionLeft
+	_attributes.NextSelectionRight = props.NextSelectionRight
+	_attributes.NextSelectionUp = props.NextSelectionUp
+	_attributes.Position = SizeHelper:GetPosition(props)
+	_attributes.Rotation = props.Rotation
+	_attributes.Selectable = props.Selectable
+	_attributes.SelectionGroup = props.SelectionGroup
+	_attributes.SelectionImageObject = props.SelectionImageObject
+	_attributes.SelectionOrder = props.SelectionOrder
+	_attributes.Size = SizeHelper:GetSize(props, UDim2.new(UDim.new(1, 0), height))
+	_attributes.SizeConstraint = props.SizeConstraint
+	_attributes.Visible = props.Visible
+	_attributes.ZIndex = props.ZIndex
+	_attributes.AutoLocalize = props.AutoLocalize
+	_attributes.RootLocalizationTable = props.RootLocalizationTable
+	_attributes.Style = props.Style
+	_attributes.Change = props.Change
+	_attributes.Event = props.Event
 	local _exp = React.createElement("frame", {
 		Size = UDim2.new(UDim.new(1, 0), SizeHelper:toUDim(theme.bar.height)),
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -260,18 +298,18 @@ local Slider = React.forwardRef(function(props, ref)
 	}), React.createElement("uicorner", {
 		CornerRadius = SizeHelper:toUDim(theme.bar.cornerRadius),
 	}))
-	local _attributes = {
+	local _attributes_1 = {
 		ref = containerRef,
 	}
 	local _exp_1 = UDim2.fromScale(1, 1)
 	local _uDim2 = UDim2.new(padding + padding, UDim.new(0, 0))
-	_attributes.Size = _exp_1 - _uDim2
-	_attributes.BackgroundTransparency = 1
-	_attributes.Position = UDim2.fromScale(0.5, 0.5)
-	_attributes.AnchorPoint = Vector2.new(0.5, 0.5)
-	local _condition_1 = props.highlight ~= nil
-	if _condition_1 then
-		local _attributes_1 = {
+	_attributes_1.Size = _exp_1 - _uDim2
+	_attributes_1.BackgroundTransparency = 1
+	_attributes_1.Position = UDim2.fromScale(0.5, 0.5)
+	_attributes_1.AnchorPoint = Vector2.new(0.5, 0.5)
+	local _condition_2 = props.highlight ~= nil
+	if _condition_2 then
+		local _attributes_2 = {
 			BackgroundColor3 = theme.bar.highlight.backgroundColor,
 			BackgroundTransparency = theme.bar.highlight.backgroundTransparency,
 		}
@@ -291,8 +329,8 @@ local Slider = React.forwardRef(function(props, ref)
 			end
 			_result = _result_1
 		end
-		_attributes_1.Position = _result
-		_attributes_1.AnchorPoint = if props.highlight == "end" then Vector2.new(1, 0.5) else Vector2.new(0, 0.5)
+		_attributes_2.Position = _result
+		_attributes_2.AnchorPoint = if props.highlight == "end" then Vector2.new(1, 0.5) else Vector2.new(0, 0.5)
 		local _result_1
 		if props.highlight == "start" then
 			local _uDim2_1 = UDim2.new(UDim.new(firstPosition, 0), SizeHelper:toUDim(theme.bar.height))
@@ -301,24 +339,24 @@ local Slider = React.forwardRef(function(props, ref)
 		else
 			local _result_2
 			if props.highlight == "end" then
-				local _condition_2 = secondPosition
-				if _condition_2 == nil then
-					_condition_2 = firstPosition
+				local _condition_3 = secondPosition
+				if _condition_3 == nil then
+					_condition_3 = firstPosition
 				end
-				local _uDim2_1 = UDim2.new(UDim.new(1 - _condition_2, 0), SizeHelper:toUDim(theme.bar.height))
+				local _uDim2_1 = UDim2.new(UDim.new(1 - _condition_3, 0), SizeHelper:toUDim(theme.bar.height))
 				local _uDim2_2 = UDim2.new(padding, UDim.new(0, 0))
 				_result_2 = _uDim2_1 + _uDim2_2
 			else
-				local _condition_2 = secondPosition
-				if _condition_2 == nil then
-					_condition_2 = 0
+				local _condition_3 = secondPosition
+				if _condition_3 == nil then
+					_condition_3 = 0
 				end
-				_result_2 = UDim2.new(UDim.new(_condition_2 - firstPosition, 0), SizeHelper:toUDim(theme.bar.height))
+				_result_2 = UDim2.new(UDim.new(_condition_3 - firstPosition, 0), SizeHelper:toUDim(theme.bar.height))
 			end
 			_result_1 = _result_2
 		end
-		_attributes_1.Size = _result_1
-		_condition_1 = (React.createElement("frame", _attributes_1, React.createElement("uistroke", {
+		_attributes_2.Size = _result_1
+		_condition_2 = (React.createElement("frame", _attributes_2, React.createElement("uistroke", {
 			Thickness = theme.bar.borderThickness,
 			Color = theme.bar.highlight.borderColor,
 		}), React.createElement("uicorner", {
@@ -340,14 +378,14 @@ local Slider = React.forwardRef(function(props, ref)
 		local _exp_4 = (hoveredHandle == index or (dragging and activeHandleRef.current == index)) and (React.createElement(BoxShadow, {
 			["box-shadow"] = theme.handle.boxShadow,
 		}))
-		local _attributes_1 = {}
-		local _condition_2 = theme.handle.aspectRatio
-		if _condition_2 == nil then
-			_condition_2 = 1
+		local _attributes_2 = {}
+		local _condition_3 = theme.handle.aspectRatio
+		if _condition_3 == nil then
+			_condition_3 = 1
 		end
-		_attributes_1.AspectRatio = _condition_2
-		_attributes_1.DominantAxis = Enum.DominantAxis.Height
-		_attributes_1.AspectType = Enum.AspectType.ScaleWithParentSize
+		_attributes_2.AspectRatio = _condition_3
+		_attributes_2.DominantAxis = Enum.DominantAxis.Height
+		_attributes_2.AspectType = Enum.AspectType.ScaleWithParentSize
 		return React.createElement("frame", {
 			key = index,
 			Position = UDim2.fromScale(position, 0.5),
@@ -369,17 +407,13 @@ local Slider = React.forwardRef(function(props, ref)
 					end)
 				end,
 			},
-		}, _exp_2, _exp_3, _exp_4, React.createElement("uiaspectratioconstraint", _attributes_1))
+		}, _exp_2, _exp_3, _exp_4, React.createElement("uiaspectratioconstraint", _attributes_2))
 	end
 	for _k, _v in handles do
 		_newValue[_k] = _callback(_v, _k - 1, handles)
 	end
 	-- ▲ ReadonlyArray.map ▲
-	return React.createElement("frame", {
-		ref = ref,
-		Size = UDim2.new(UDim.new(1, 0), height),
-		BackgroundTransparency = 1,
-	}, _exp, React.createElement("frame", _attributes, _condition_1, _newValue))
+	return React.createElement("frame", _attributes, _exp, React.createElement("frame", _attributes_1, _condition_2, _newValue))
 end)
 return {
 	Slider = Slider,

@@ -1,0 +1,184 @@
+---
+title: Text
+description: Display themed, auto-sizing text using the active theme's typography scale.
+icon: Type
+---
+
+`Text` is a themed wrapper around Roblox's native [`TextLabel`](https://create.roblox.com/docs/reference/engine/classes/TextLabel). It resolves its font, size, weight, line height, and color from the active Clean UI theme, and automatically sizes itself to fit its content.
+
+## Import
+
+```tsx
+import { Text } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Typography/Text.loom.tsx" previewHeight={520} screenshot="/images/screenshots/Typography/Text.png">
+```tsx
+import React from "@rbxts/react";
+import { Text } from "@rbxts/react-clean-ui";
+
+export function TextExample() {
+    return <Text text="The quick brown fox jumps over the lazy dog." />;
+}
+```
+</Demo>
+
+`text` is the only required prop. Without a `variant`, the text renders using the theme's `body` typography style.
+
+## Variants
+
+Use `variant` to select a typography style from the active theme's `typography` scale.
+
+```tsx
+<Text text="Display" variant="display" />
+<Text text="Title" variant="title" />
+<Text text="Heading" variant="heading" />
+<Text text="Body" variant="body" />
+<Text text="Label" variant="label" />
+<Text text="Caption" variant="caption" />
+```
+
+Each variant defines its own font, size, weight, and line height. When `variant` is omitted, `"body"` is used.
+
+## Font weight
+
+Use `weight` to override the font weight defined by the variant.
+
+```tsx
+<Text text="Bold text" weight="bold" />
+<Text text="Extra bold text" weight={Enum.FontWeight.ExtraBold} />
+```
+
+The string `"bold"` is a shorthand for `Enum.FontWeight.Bold`. Without `weight`, the variant's own weight is used, falling back to `Enum.FontWeight.Regular`.
+
+## Color
+
+Use `TextColor3` to override the text color.
+
+```tsx
+<Text
+    text="Custom color"
+    TextColor3={Color3.fromHex("#3B72E6")}
+/>
+```
+
+By default, the text color comes from `theme.colors.intents.primary.default.textColor`.
+
+## Alignment
+
+Use `align` to control horizontal text alignment.
+
+```tsx
+<Text text="Left aligned" align="Left" />
+<Text text="Center aligned" align="Center" />
+<Text text="Right aligned" align="Right" />
+```
+
+`align` defaults to `"Left"`.
+
+## Text wrapping
+
+Long text wraps across multiple lines by default.
+
+```tsx
+<Text text="Long paragraphs wrap across multiple lines by default so body copy stays readable inside narrow containers." />
+```
+
+Set `TextWrap={false}` to keep the text on a single line.
+
+```tsx
+<Text
+    text="This text will not wrap."
+    TextWrap={false}
+/>
+```
+
+## Custom typography
+
+Use `typography` to supply a complete typography style, bypassing `variant` entirely.
+
+```tsx
+<Text
+    text="Custom typography"
+    typography={{
+        font: Enum.Font.Gotham,
+        size: Enum.FontSize.Size24,
+        weight: Enum.FontWeight.Bold,
+        lineHeight: 1.3,
+    }}
+/>
+```
+
+When `typography` is provided, `variant` is ignored.
+
+## Native properties
+
+`Text` extends `React.InstanceProps<TextLabel>`, so native Roblox `TextLabel` properties can be passed directly to it.
+
+```tsx
+<Text
+    text="Custom label"
+    Position={UDim2.fromScale(0.5, 0.5)}
+    ZIndex={2}
+    TextTransparency={0.25}
+    Event={{
+        MouseEnter: () => {
+            print("Hovering text");
+        },
+    }}
+/>
+```
+
+Some properties are managed internally by the component, including:
+
+* `FontFace` and `FontSize`, fully derived from `variant`/`typography` and `weight`. They cannot be set independently, even though `React.InstanceProps<TextLabel>` includes them.
+* `Text`, set from `text`.
+* `TextXAlignment`, set from `align`.
+* `Size` and `AutomaticSize`, used to auto-size the label to its content.
+
+## Props
+
+### Text-specific props
+
+| Prop                      | Type                                 | Default                                                 | Description                                                                 |
+| -------------------------- | ------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `text`                    | `string`                             | Required                                                | The text content to display.                                                |
+| `variant`                 | `TextVariant`                        | `"body"`                                                | Selects a typography style from `theme.typography`.                         |
+| `typography`              | `TypographyStyle`                    | The resolved `variant` style                            | Overrides the typography style entirely, bypassing `variant`.               |
+| `weight`                  | `Enum.FontWeight \| "bold"`          | The variant's `weight`, or `Enum.FontWeight.Regular`    | Overrides the font weight. `"bold"` is shorthand for `Enum.FontWeight.Bold`. |
+| `align`                   | `"Left" \| "Right" \| "Center"`      | `"Left"`                                                | Sets the horizontal text alignment.                                         |
+| `TextWrap`                | `boolean`                             | `true`                                                  | Controls whether the text wraps across multiple lines.                      |
+| `TextColor3`              | `Color3`                             | `theme.colors.intents.primary.default.textColor`        | Overrides the text color.                                                   |
+| `LineHeight`               | `number`                             | The resolved typography style's `lineHeight`            | Overrides the line height.                                                  |
+| `RichText`                | `boolean`                             | `true`                                                  | Enables or disables Roblox rich text tags in `text`.                        |
+| `TextScaled`               | `boolean`                             | `false`                                                 | Scales the text to fit its container.                                       |
+| `BackgroundTransparency`   | `number`                             | `1`                                                     | Overrides the label's background transparency.                              |
+
+### Shared props
+
+The text label also supports props inherited from the following interface.
+
+| Interface                        | Purpose                                                                                |
+| --------------------------------- | ---------------------------------------------------------------------------------------- |
+| `React.InstanceProps<TextLabel>` | Accepts native `TextLabel` properties, including `Position`, `ZIndex`, `Change`, and `Event`. |
+
+All other compatible native `TextLabel` properties, such as `AnchorPoint`, `Visible`, `Rotation`, `TextStrokeColor3`, `TextTransparency`, and `TextTruncate`, are also accepted—see [Native properties](#native-properties) above.
+
+## Behaviour
+
+* The label automatically sizes itself to fit its content (`AutomaticSize.XY`).
+* Setting either `TextWrap={false}` or the native `TextWrapped={false}` disables wrapping; both must be non-`false` for wrapping to stay enabled.
+* `FontFace` and `FontSize` are always derived from `variant`/`typography` and `weight`, and cannot be overridden directly, even though they are technically part of `React.InstanceProps<TextLabel>`.
+* Without `variant` or `typography`, the theme's `body` typography style is used.
+* The background is fully transparent by default (`BackgroundTransparency={1}`).
+
+## Theme values
+
+`Text` reads from the active theme for:
+
+* `theme.typography.<variant>` — the `font`, `size`, `weight`, and `lineHeight` for each of `display`, `title`, `heading`, `body`, `label`, and `caption`.
+* `theme.colors.intents.primary.default.textColor` — the default text color when `TextColor3` is not provided.
+
+These values can be changed by providing a custom Clean UI theme.

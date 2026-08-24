@@ -337,8 +337,40 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
         return (
             <frame
                 ref={ref}
-                Size={new UDim2(new UDim(1, 0), height)}
-                BackgroundTransparency={1}
+                Archivable={props.Archivable}
+                Tag={props.Tag}
+                Active={props.Active}
+                AnchorPoint={SizeHelper.GetAnchor(props)}
+                BackgroundColor3={props.BackgroundColor3}
+                BackgroundTransparency={props.BackgroundTransparency ?? 1}
+                BorderColor3={props.BorderColor3}
+                BorderMode={props.BorderMode}
+                BorderSizePixel={props.BorderSizePixel}
+                ClipsDescendants={props.ClipsDescendants}
+                Interactable={props.Interactable}
+                LayoutOrder={props.LayoutOrder}
+                NextSelectionDown={props.NextSelectionDown}
+                NextSelectionLeft={props.NextSelectionLeft}
+                NextSelectionRight={props.NextSelectionRight}
+                NextSelectionUp={props.NextSelectionUp}
+                Position={SizeHelper.GetPosition(props)}
+                Rotation={props.Rotation}
+                Selectable={props.Selectable}
+                SelectionGroup={props.SelectionGroup}
+                SelectionImageObject={props.SelectionImageObject}
+                SelectionOrder={props.SelectionOrder}
+                Size={SizeHelper.GetSize(props, new UDim2(new UDim(1, 0), height))}
+                SizeConstraint={props.SizeConstraint}
+                Visible={props.Visible}
+                ZIndex={props.ZIndex}
+
+                AutoLocalize={props.AutoLocalize}
+                RootLocalizationTable={props.RootLocalizationTable}
+
+                Style={props.Style}
+
+                Change={props.Change}
+                Event={props.Event}
             >
                 <frame
                     Size={new UDim2(new UDim(1, 0), SizeHelper.toUDim(theme.bar.height))}

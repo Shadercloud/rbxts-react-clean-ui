@@ -127,7 +127,27 @@ The `highlight` prop controls which part of the slider track is highlighted.
 
 `"middle"` is primarily intended for range sliders.
 
+## Native properties
+
+`Slider` extends `ContainerProps`, so it accepts the same native `Frame` properties as [`Container`](/components/layout/container), including `Position`, `AnchorPoint`, `BackgroundColor3`, `ZIndex`, `Change`, and `Event`.
+
+```tsx
+<Slider
+    min-value={0}
+    max-value={100}
+    value={50}
+    BackgroundColor3={Color3.fromHex("#1F2937")}
+    ZIndex={2}
+/>
+```
+
+`Size`, `Position`, and `AnchorPoint` are resolved the same way as `Container`, so the `width`, `height`, `top`, `left`, `right`, `bottom`, and `center` props also apply. The slider's height defaults to `theme.components.slider.height` unless `Size` or `height` is provided.
+
+`BackgroundTransparency` defaults to `1` but can be overridden.
+
 ## Props
+
+### Slider-specific props
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -141,4 +161,13 @@ The `highlight` prop controls which part of the slider track is highlighted.
 | `onDragged` | `(value: number \| Vector2) => void` | — | Called while a handle is dragged. |
 | `onChanged` | `(value: number \| Vector2) => void` | — | Called when dragging finishes. |
 
-The component also accepts the standard container props supported by the library.
+### Shared props
+
+The slider also supports props inherited from `ContainerProps`, the same interface used by [`Container`](/components/layout/container).
+
+| Interface | Purpose |
+| --- | --- |
+| `SizeElementProps` | Configures `width`, `height`, and `Size`. |
+| `PositionElementProps` | Configures `Position`, `AnchorPoint`, `center`, and edge offsets. |
+| `ZIndexElementProps` | Configures the slider's `ZIndex`. |
+| `React.InstanceProps<Frame>` | Accepts native `Frame` properties, including `Change` and `Event`. |

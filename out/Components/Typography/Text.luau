@@ -31,9 +31,45 @@ local Text = React.forwardRef(function(props, ref)
 	_attributes.TextWrapped = textwrapped
 	_attributes.FontFace = Font.fromName(style.font.Name, weight)
 	_attributes.FontSize = style.size
-	_attributes.RichText = true
+	local _condition_2 = props.RichText
+	if _condition_2 == nil then
+		_condition_2 = true
+	end
+	_attributes.RichText = _condition_2
+	local _condition_3 = props.TextScaled
+	if _condition_3 == nil then
+		_condition_3 = false
+	end
+	_attributes.TextScaled = _condition_3
+	_attributes.ZIndex = props.ZIndex
+	_attributes.LayoutOrder = props.LayoutOrder
+	_attributes.Visible = props.Visible
+	_attributes.Rotation = props.Rotation
+	_attributes.Active = props.Active
+	_attributes.Archivable = props.Archivable
+	_attributes.BackgroundColor3 = props.BackgroundColor3
+	_attributes.BorderColor3 = props.BorderColor3
+	_attributes.BorderMode = props.BorderMode
+	_attributes.BorderSizePixel = props.BorderSizePixel
+	_attributes.ClipsDescendants = props.ClipsDescendants
+	_attributes.Selectable = props.Selectable
+	_attributes.SelectionImageObject = props.SelectionImageObject
+	_attributes.SizeConstraint = props.SizeConstraint
+	_attributes.Tag = props.Tag
+	_attributes.AutoLocalize = props.AutoLocalize
+	_attributes.RootLocalizationTable = props.RootLocalizationTable
+	_attributes.NextSelectionDown = props.NextSelectionDown
+	_attributes.NextSelectionLeft = props.NextSelectionLeft
+	_attributes.NextSelectionRight = props.NextSelectionRight
+	_attributes.NextSelectionUp = props.NextSelectionUp
+	_attributes.SelectionGroup = props.SelectionGroup
+	_attributes.SelectionOrder = props.SelectionOrder
+	_attributes.TextStrokeColor3 = props.TextStrokeColor3
+	_attributes.TextStrokeTransparency = props.TextStrokeTransparency
+	_attributes.TextTransparency = props.TextTransparency
+	_attributes.TextTruncate = props.TextTruncate
+	_attributes.Change = props.Change
 	_attributes.Event = props.Event
-	_attributes.TextScaled = false
 	return React.createElement("textlabel", _attributes, props.children)
 end)
 return {

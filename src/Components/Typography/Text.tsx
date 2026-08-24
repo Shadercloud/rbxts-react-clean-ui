@@ -40,9 +40,40 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
             TextWrapped={textwrapped}
             FontFace={Font.fromName(style.font.Name, weight)}
             FontSize={style.size}
-            RichText
-            Event={props.Event}
-            TextScaled={false} >
+            RichText={props.RichText ?? true}
+            TextScaled={props.TextScaled ?? false}
+
+            ZIndex={props.ZIndex}
+            LayoutOrder={props.LayoutOrder}
+            Visible={props.Visible}
+            Rotation={props.Rotation}
+            Active={props.Active}
+            Archivable={props.Archivable}
+            BackgroundColor3={props.BackgroundColor3}
+            BorderColor3={props.BorderColor3}
+            BorderMode={props.BorderMode}
+            BorderSizePixel={props.BorderSizePixel}
+            ClipsDescendants={props.ClipsDescendants}
+            Selectable={props.Selectable}
+            SelectionImageObject={props.SelectionImageObject}
+            SizeConstraint={props.SizeConstraint}
+            Tag={props.Tag}
+            AutoLocalize={props.AutoLocalize}
+            RootLocalizationTable={props.RootLocalizationTable}
+            NextSelectionDown={props.NextSelectionDown}
+            NextSelectionLeft={props.NextSelectionLeft}
+            NextSelectionRight={props.NextSelectionRight}
+            NextSelectionUp={props.NextSelectionUp}
+            SelectionGroup={props.SelectionGroup}
+            SelectionOrder={props.SelectionOrder}
+
+            TextStrokeColor3={props.TextStrokeColor3}
+            TextStrokeTransparency={props.TextStrokeTransparency}
+            TextTransparency={props.TextTransparency}
+            TextTruncate={props.TextTruncate}
+
+            Change={props.Change}
+            Event={props.Event} >
             {props.children}
         </textlabel>
     }
