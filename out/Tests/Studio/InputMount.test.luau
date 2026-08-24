@@ -7,6 +7,7 @@ local Test = _lunit.Test
 local Assert = _lunit.Assert
 local Decorators = _lunit.Decorators
 local Runtime = _lunit.Runtime
+local Tag = _lunit.Tag
 local _binding = Decorators
 local Skip = _binding.Skip
 local Input = TS.import(script, script.Parent.Parent.Parent, "Components", "Input", "Input").Input
@@ -60,5 +61,6 @@ do
 	if _descriptor_1 then
 		InputMountValidation.typingAnInvalidCharacterKeepsLastValidNumber = _descriptor_1.value
 	end
+	InputMountValidation = Tag("Studio")(InputMountValidation) or InputMountValidation
 end
 return InputMountValidation

@@ -6,7 +6,6 @@
   "scripts": {
     "build": "rbxtsc",
     "watch": "rbxtsc -w",
-    "test": "rbxtsc && lune run scripts/lune/run-tests.luau out/Tests/Lune node_modules/@rbxts/lunit/out",
     "prepublishOnly": "npm run build",
     "screenshots": "node scripts/generate-screenshots.js",
     "lint": "eslint src/",

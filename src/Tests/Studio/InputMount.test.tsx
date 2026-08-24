@@ -1,10 +1,11 @@
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
-import { Test, Assert, Decorators, Runtime } from "@rbxts/lunit";
+import { Test, Assert, Decorators, Runtime, Tag } from "@rbxts/lunit";
 
 const { Skip } = Decorators;
 import { Input } from "../../Components/Input/Input";
 
+@Tag("Studio")
 class InputMountValidation {
 	@Skip(
 		!Runtime.isRoblox(),
