@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
-import { Box, Button, Container, createStory, HStack, FlexItem, Text, VStack, Input, Fieldset, Select, Icon, Checkbox } from "@rbxts/react-clean-ui";
+import { Box, Button, Container, createStory, HStack, FlexItem, Text, VStack } from "@rbxts/react-clean-ui";
+import Checkbox from "./Checkbox";
 
 export = createStory((props) => (
     <Container
@@ -16,48 +17,7 @@ export = createStory((props) => (
                         <Button icon="times" />
                     </HStack>
                 </Container>
-                <Fieldset checkbox>
-                    <Fieldset.Control>
-                        <Checkbox onChange={(value: boolean) => {
-                            print(`Checked: ${value}`)
-                        }} />
-                    </Fieldset.Control>
-                    <Fieldset.Label>
-                        <Text text="Default checkbox settings" />
-                    </Fieldset.Label>
-                </Fieldset>
-                <Fieldset checkbox>
-                    <Fieldset.Control>
-                        <Checkbox checked />
-                    </Fieldset.Control>
-                    <Fieldset.Label>
-                        <Text text="Initially Checked" />
-                    </Fieldset.Label>
-                </Fieldset>
-                <Fieldset checkbox>
-                    <Fieldset.Control>
-                        <Checkbox scale="xl" spacing="xl" />
-                    </Fieldset.Control>
-                    <Fieldset.Label>
-                        <Text text="<b>xl</b> Scale and Spacing" />
-                    </Fieldset.Label>
-                </Fieldset>
-                <Fieldset checkbox>
-                    <Fieldset.Control>
-                        <Checkbox scale="xs" spacing="xl" />
-                    </Fieldset.Control>
-                    <Fieldset.Label>
-                        <Text text="<b>xs</b> Scale with <b>xl</b> Spacing" />
-                    </Fieldset.Label>
-                </Fieldset>
-                <Fieldset checkbox>
-                    <Fieldset.Control>
-                        <Checkbox icon-checked="thumbs-up" icon-unchecked="thumbs-down" intent-checked="info" intent-unchecked="danger" />
-                    </Fieldset.Control>
-                    <Fieldset.Label>
-                        <Text text="Custom icons and colors" />
-                    </Fieldset.Label>
-                </Fieldset>
+                <Checkbox />
                 <Container>
                     <Button text="Submit Form" intent="info" icon="arrow-circle-right"></Button>
                 </Container>

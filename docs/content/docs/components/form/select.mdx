@@ -23,13 +23,26 @@ import {
 
 ## Basic Usage
 
+<Demo preview="Scenes/Form/Select.loom.tsx" previewHeight={280} screenshot="/images/screenshots/Input/Select.png">
 ```tsx
-<Select>
-    <Select.Option text="Option One" />
-    <Select.Option text="Option Two" />
-    <Select.Option text="Option Three" />
-</Select>
+import React from "@rbxts/react";
+import { Select } from "@rbxts/react-clean-ui";
+
+export function SelectExample() {
+    return (
+        <Select
+            onChange={(index) => {
+                print(`Selected option: ${index}`);
+            }}
+        >
+            <Select.Option text="United Kingdom" />
+            <Select.Option text="United States" />
+            <Select.Option text="Canada" />
+        </Select>
+    );
+}
 ```
+</Demo>
 
 ## Example
 

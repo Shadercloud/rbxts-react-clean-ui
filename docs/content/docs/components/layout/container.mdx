@@ -9,6 +9,31 @@ The `<Container>` component is a lightweight wrapper around a Roblox `Frame` tha
 
 Use a `<Container>` whenever you need to define the size or placement of a section of your UI before adding layouts or other components inside it.
 
+## Basic usage
+
+<Demo preview="Scenes/Layout/Container.loom.tsx" previewHeight={300} screenshot="/images/screenshots/Layout/Container.png">
+```tsx
+import React from "@rbxts/react";
+import { Container, HStack, Text } from "@rbxts/react-clean-ui";
+
+export function ContainerExample() {
+    return (
+        <Container width="100%" height="200">
+            <HStack HorizontalFlex={Enum.UIFlexAlignment.SpaceEvenly} valign="Center">
+                <Container width="150" height="120" center>
+                    <Text text="Fixed 150x120" />
+                </Container>
+
+                <Container height="80" center>
+                    <Text text="Auto width, fixed height" />
+                </Container>
+            </HStack>
+        </Container>
+    );
+}
+```
+</Demo>
+
 ## Features
 
 * Set width and height using percentages or pixel values.

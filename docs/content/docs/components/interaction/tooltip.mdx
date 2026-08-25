@@ -12,11 +12,20 @@ Tooltips provide additional context for buttons, text, and other interface eleme
 
 Wrap any single UI element with a `Tooltip` and provide the tooltip content.
 
+<Demo preview="Scenes/Interaction/Tooltip.loom.tsx" previewHeight={260} screenshot="/images/screenshots/Interaction/ToolTip.png">
 ```tsx
-<Tooltip content="Save your changes">
-    <Button text="Save" />
-</Tooltip>
+import React from "@rbxts/react";
+import { Button, Tooltip } from "@rbxts/react-clean-ui";
+
+export function TooltipExample() {
+    return (
+        <Tooltip content="Save your changes">
+            <Button text="Save" />
+        </Tooltip>
+    );
+}
 ```
+</Demo>
 
 ## Placement
 

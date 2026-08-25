@@ -21,13 +21,22 @@ import { Checkbox } from "@rbxts/react-clean-ui";
 
 ## Basic usage
 
+<Demo preview="Scenes/Form/Checkbox.loom.tsx" previewHeight={240} screenshot="/images/screenshots/Input/Checkbox.png">
 ```tsx
-<Checkbox
-    onChange={(checked) => {
-        print(`Checked: ${checked}`);
-    }}
-/>
+import React from "@rbxts/react";
+import { Checkbox } from "@rbxts/react-clean-ui";
+
+export function CheckboxExample() {
+    return (
+        <Checkbox
+            onChange={(checked) => {
+                print(`Checked: ${checked}`);
+            }}
+        />
+    );
+}
 ```
+</Demo>
 
 The checkbox starts unchecked by default.
 

@@ -8,14 +8,25 @@ The `Box` component is a themed container that provides a background, border, ro
 
 ## Example
 
+<Demo preview="Scenes/Surface/Box.loom.tsx" previewHeight={300} screenshot="/images/screenshots/Surface/Box.png">
 ```tsx
-<Box spacing="md">
-    <VStack>
-        <Text text="Account Settings" variant="heading" />
-        <Text text="Manage your account preferences." />
-    </VStack>
-</Box>
+import React from "@rbxts/react";
+import { Box, Container, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function BoxExample() {
+    return (
+        <Container width="80%" center>
+            <Box spacing="md">
+                <VStack>
+                    <Text text="Account Settings" variant="heading" />
+                    <Text text="Manage your account preferences." />
+                </VStack>
+            </Box>
+        </Container>
+    );
+}
 ```
+</Demo>
 
 ## Sizing
 

@@ -8,7 +8,7 @@ import { LoomScene } from "../LoomScene";
 export const preview = {
     render: () => (
         <LoomScene>
-            <Container width="80%" height="180" center>
+            <Container width="80%" height="220" center>
                 <Box>
                     <VStack>
                         <Input placeholder="Enter your email address" value="" validation="Email" />
