@@ -2,7 +2,7 @@
 [x] Test Development environment setup
 [x] Add Fade in/out to Tooltips
 [x] Add Accordion component
-[ ] Add incremented input
+[x] Add incremented input
 [ ] Add search select
 [x] Add Charts
 [ ] Add Tables / Pagination

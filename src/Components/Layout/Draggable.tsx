@@ -4,7 +4,7 @@ import { DraggableRegistration, DraggableRegistryKey, DroppableRegistration, Dro
 import { CleanThemeContext, DraggableContext, DraggableContextValue, OverlayConsumer } from "../../Contexts";
 import { createPortal } from "@rbxts/react-roblox";
 import { Corners } from "../Decorator";
-import { CustomInputService } from "../../Interfaces";
+import { CustomInputService } from "../../Helpers";
 
 
 type GuiObjectProps = React.InstanceProps<GuiObject>;

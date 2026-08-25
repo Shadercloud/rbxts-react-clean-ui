@@ -1,4 +1,4 @@
-import { CssBoxShadow, CssShadow, CssSize } from "../Interfaces/clean.element.props";
+import { CssBoxShadow, CssShadow, CssSize } from "../Interfaces/css.types";
 interface ParsedShadow {
     offset: UDim2;
     blurRadius: UDim;

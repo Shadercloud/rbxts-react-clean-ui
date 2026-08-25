@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Breakpoint } from "../Interfaces/clean.element.props";
+import { Breakpoint } from "../Interfaces/responsive.types";
 
 export interface RowContextValue {
     width: number;

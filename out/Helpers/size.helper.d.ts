@@ -1,5 +1,7 @@
 import { Binding } from "@rbxts/react";
-import { CssSize, Breakpoint, ResponsiveValue, SizeElementProps, PositionElementProps } from "../Interfaces/clean.element.props";
+import { CssSize } from "../Interfaces/css.types";
+import { Breakpoint, ResponsiveValue } from "../Interfaces/responsive.types";
+import { SizeElementProps, PositionElementProps } from "../Interfaces/element.props";
 export declare class SizeHelper {
     static GetSize(props: SizeElementProps, defaultSize?: UDim2): UDim2 | Binding<UDim2>;
     static GetPosition(props: PositionElementProps): UDim2 | Binding<UDim2>;

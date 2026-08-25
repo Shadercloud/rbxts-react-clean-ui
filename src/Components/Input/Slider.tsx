@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { ContainerProps } from "../Layout";
-import { CustomInputService } from "../../Interfaces";
+import { CustomInputService } from "../../Helpers";
 import { CleanThemeContext } from "../../Contexts";
 import { SizeHelper } from "../../Helpers";
 import { BoxShadow } from "../Decorator";

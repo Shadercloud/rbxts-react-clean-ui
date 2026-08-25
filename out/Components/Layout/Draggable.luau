@@ -12,7 +12,7 @@ local DraggableContext = _Contexts.DraggableContext
 local OverlayConsumer = _Contexts.OverlayConsumer
 local createPortal = TS.import(script, TS.getModule(script, "@rbxts", "react-roblox")).createPortal
 local Corners = TS.import(script, script.Parent.Parent, "Decorator").Corners
-local CustomInputService = TS.import(script, script.Parent.Parent.Parent, "Interfaces").CustomInputService
+local CustomInputService = TS.import(script, script.Parent.Parent.Parent, "Helpers").CustomInputService
 local function DragHandle(_param)
 	local children = _param.children
 	local draggable = React.useContext(DraggableContext)

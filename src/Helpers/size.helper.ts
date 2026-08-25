@@ -1,5 +1,7 @@
 import { Binding } from "@rbxts/react";
-import { CssBreakpointSize, CssSize, ResponsiveCssSize, Breakpoint, ResponsiveValue, BreakpointValue, SizeElementProps, PositionElementProps } from "../Interfaces/clean.element.props";
+import { CssBreakpointSize, CssSize, ResponsiveCssSize } from "../Interfaces/css.types";
+import { Breakpoint, ResponsiveValue, BreakpointValue } from "../Interfaces/responsive.types";
+import { SizeElementProps, PositionElementProps } from "../Interfaces/element.props";
 
 const breakpointOrder: Breakpoint[] = [
     "xs",

@@ -1,59 +1,8 @@
 import { Binding } from "@rbxts/react";
 import { IconName } from "./icon";
-export type ButtonFlag = "default" | "hover" | "focus" | "disabled";
-export type CssUnit = "px" | "%";
-export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl";
-export declare const ScaleSizes: readonly ["xs", "sm", "md", "lg", "xl"];
-export type ScaleSize = typeof ScaleSizes[number];
-export type TextVariant = "display" | "title" | "heading" | "body" | "label" | "caption";
-export type Intent = "primary" | "success" | "warning" | "danger" | "info";
-export type GridSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-export interface ResponsiveGridSpan {
-    xs?: GridSpan;
-    sm?: GridSpan;
-    md?: GridSpan;
-    lg?: GridSpan;
-    xl?: GridSpan;
-}
-export type ResponsiveValue<T> = T | Partial<Record<Breakpoint, T>>;
-export interface BreakpointValue<T> {
-    xs?: T;
-    sm?: T;
-    md?: T;
-    lg?: T;
-    xl?: T;
-}
-export interface ScaleSizeValue<T> {
-    xs?: T;
-    sm?: T;
-    md?: T;
-    lg?: T;
-    xl?: T;
-}
-export type CssSize = "Auto" | number | `${number}` | `${number}${CssUnit}`;
-export type CssBreakpoint = {
-    xs: number;
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-};
-export type CssBreakpointSize = {
-    xs?: CssSize;
-    sm?: CssSize;
-    md?: CssSize;
-    lg?: CssSize;
-    xl?: CssSize;
-};
-export type CssQuad = CssSize | `${CssSize} ${CssSize}` | `${CssSize} ${CssSize} ${CssSize}` | `${CssSize} ${CssSize} ${CssSize} ${CssSize}`;
-export type CssShadow = CssQuad;
-export type CssBoxShadow = {
-    shadow: CssShadow;
-    color: Color3;
-    transparency: number;
-};
-export type CssPadding = CssQuad;
-export type ResponsiveCssSize = CssSize | CssBreakpointSize;
+import { CssSize, CssShadow, CssPadding, ResponsiveCssSize } from "./css.types";
+import { ScaleSize, BreakpointValue } from "./responsive.types";
+import { Intent } from "./semantics";
 export interface ZIndexElementProps {
     ZIndex?: number | Binding<number> | undefined;
 }
