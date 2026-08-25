@@ -1,6 +1,6 @@
 # Bar Chart
 
-`BarChart` compares categories using vertical stacked bars. It follows the shared requirements in [Charts](./index.md).
+`BarChart` compares categories using vertical stacked bars. It follows the shared requirements in [Charts](./index.md) and the general conventions in [Components](../index.md).
 
 ## Public API
 

@@ -26,8 +26,8 @@ Rules for delegation:
 2. Review similar existing implementations to understand established patterns.
 3. Check for applicable specifications:
 
-   * Architecture specifications: `/docs/architecture/*.md`
-   * Feature specifications: `/docs/specifications/*.md`
+   * Architecture specifications: `/.claude/architecture/*.md`
+   * Feature specifications: `/.claude/specifications/*.md`
 4. When a feature specification is located in a directory containing an `index.md`, read that file as additional context.
 5. Identify existing helpers, components, types, and abstractions that can be reused.
 
@@ -61,12 +61,12 @@ Do not make broad architectural changes when a local solution is sufficient.
 
 Specifications are authoritative when they apply to the requested task.
 
-* Follow applicable files in `/docs/architecture/`.
-* Follow applicable files in `/docs/specifications/`.
+* Follow applicable files in `/.claude/architecture/`.
+* Follow applicable files in `/.claude/specifications/`.
 * Resolve ambiguity by comparing the specification with existing implementation patterns.
 * Do not silently contradict a specification.
-* If the implementation and specification disagree, clearly identify the conflict before changing behaviour.
-* Do not edit a specification file unless specifically told to.
+* If the implementation and specification disagree, clearly identify the conflict before changing behaviour, and add an entry to `/.claude/ISSUES.md` describing it (unless you're fixing it in the same change) so it stays tracked instead of getting rediscovered later.
+* Do not edit a specification file unless specifically told to, **except** the per-component behaviour specs under `/.claude/specifications/components/`, which are updated as part of ordinary component work per "Components and Documentation" below.
 
 ## Components and Documentation
 
@@ -76,6 +76,7 @@ Unless explicitly instructed otherwise, when creating or updating a component:
 * Match the structure and style of existing component documentation.
 * Document the component’s purpose, public props, typical usage, and any important behaviour.
 * Update relevant documentation indexes or navigation files when required by the existing documentation structure.
+* Create or update the component's behaviour spec at `/.claude/specifications/components/<category>/<component>.md` (category is the lowercase form of its `src/Components/<Category>/` folder). Do this even for a component created ad hoc without an explicit request for a spec — it is not optional follow-up work. Keep the spec minimal: only what's needed to reimplement similar behaviour, public API, theming, and layout — not a restatement of the code. Match the depth and structure of existing specs such as `layout/accordion.md` and `chart/barchart.md`, scaled down for simpler components, and reference (rather than repeat) shared conventions already documented in `components/index.md` or the category's own `index.md`.
 
 Documentation changes should remain scoped to the component being changed.
 
@@ -89,9 +90,9 @@ When updating or creating components:
 * Loom file will be a simplistic demonstration of the component.
 * Story and Loom files will be put into context directories such as `/Stories/Chart/*` and `/scenes/Chart/*`
 * When creating `.mdx` documentation files use a `<Demo>` component to embed the Loom file near the top of the documentation and an approciate code demo.
-* Utilize the `/docs/specifications/stories.md` for story specifications.
-* Utilize the `/docs/specifications/documentation.md` for documentation specifications.
-* Utilize the `/docs/specifications/loom.md` for loom scene specifications.
+* Utilize the `/.claude/specifications/stories.md` for story specifications.
+* Utilize the `/.claude/specifications/documentation.md` for documentation specifications.
+* Utilize the `/.claude/specifications/loom.md` for loom scene specifications.
 
 ## Validation
 

@@ -11,7 +11,7 @@ You are the Story Writer for the `rbxts-react-clean-ui` package. You write and m
 ## Before writing
 
 1. Read the component's implementation (props, exported sub-components, theme keys it consumes) in its source directory before demonstrating it. Never invent props that don't exist.
-2. Read `docs/specifications/stories.md` — it is the authoritative spec for this directory. Also skim the "Stories and Loom demos" section of `AGENTS.md`.
+2. Read `.claude/specifications/stories.md` — it is the authoritative spec for this directory. Also skim the "Stories and Loom demos" section of `AGENTS.md`.
 3. Read at least one existing pair of files in `/Stories/<Category>/` (e.g. `Stories/Input/Buttons.tsx` + `Buttons.story.tsx`) to match structure and style exactly. Categories today include `Input`, `Layout`, `Interaction`, `Chart`, `Surface`, and `Navigation` — reuse an existing category if the component fits one; only create a new category directory if it genuinely doesn't.
 4. Do not create or edit `Scenes/*.loom.tsx` files or `.mdx` documentation — those belong to other work. If a story needs a loom scene or doc update, say so in your final summary instead of doing it yourself.
 
@@ -34,7 +34,7 @@ This is a plain, self-contained component, because `npm run screenshots` (`scrip
 ### 2. `<Component>.story.tsx` — the ui-labs story
 
 * `import ComponentName from "./ComponentName";` then `export = createStory((props) => <ComponentName />);` — see `Buttons.story.tsx` for the minimal shape.
-* This file is where the demo is allowed to look nicer than the raw screenshot fixture: per `docs/specifications/stories.md`, wrap `<ComponentName />` in a `Box` or `Card` (headers, labels, extra layout) when that makes it read better inside the ui-labs panel — the screenshot tool never sees this file, so there's no need to keep it minimal.
+* This file is where the demo is allowed to look nicer than the raw screenshot fixture: per `.claude/specifications/stories.md`, wrap `<ComponentName />` in a `Box` or `Card` (headers, labels, extra layout) when that makes it read better inside the ui-labs panel — the screenshot tool never sees this file, so there's no need to keep it minimal.
 * If the demo benefits from interactive knobs, add `ui-labs` controls (`Boolean`, `Number`, `EnumList`, etc. from `@rbxts/ui-labs`) as the second argument to `createStory`, and forward `props.controls.X` into props on the fixture component. Cap this at **3 custom controls unless explicitly told otherwise** (per `stories.md`), and only add controls that make a meaningfully different visual result — not one control per prop.
 * If the fixture needs no variation and no extra chrome, skip controls and wrapping entirely (plain `createStory((props) => <ComponentName />)`, as in `Buttons.story.tsx`).
 

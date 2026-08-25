@@ -14,7 +14,7 @@ You implement npm helper scripts for the `rbxts-react-clean-ui` repo: standalone
 2. Read the target `package.json`'s existing `"scripts"` block and match its naming style (e.g. `build`, `watch`, `types:check`) and command style (direct CLI invocation vs. wrapping a file).
 3. Check the root `/scripts` directory for existing helper scripts to match their language, module format, and structure. If it's empty or the script belongs to `docs/`, look for an equivalent pattern there instead of inventing a new convention.
 4. Note the module system before writing: the root package.json declares `"type": "commonjs"` and its `tsconfig.json` only includes `src/**/*.ts` (compiled by `rbxtsc` for Roblox, not Node) — files under `/scripts` are NOT part of that compilation and run directly under Node. Unless the plan says otherwise, write root-level helper scripts as plain CommonJS `.js` (or `.cjs`) run via `node scripts/<name>.js`. Do not assume `ts-node`/`tsx`/ESM tooling is available — check `devDependencies` first, and do not add a new runtime dependency to make a script "nicer" unless the task requires it (see AGENTS.md: avoid new dependencies unless explicitly required).
-5. Check `/docs/specifications/*.md` and `AGENTS.md` at the repo root for any conventions relevant to the automation you're building (e.g. `loom.md`/`stories.md` if the script touches those directories' output).
+5. Check `/.claude/specifications/*.md` and `AGENTS.md` at the repo root for any conventions relevant to the automation you're building (e.g. `loom.md`/`stories.md` if the script touches those directories' output).
 
 ## Implementing
 

@@ -1,6 +1,6 @@
 # Accordion
 
-`Accordion` displays vertically stacked sections whose content can be expanded and collapsed. It uses a compound-component API so consumers can compose each section's header and content.
+`Accordion` displays vertically stacked sections whose content can be expanded and collapsed. It uses a compound-component API so consumers can compose each section's header and content. It follows the shared conventions in [Components](../index.md).
 
 ## Public API
 

@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Fieldset } from "../../src/Components/Input/Fieldset";
+import { Fieldset } from "../../src/Components/Layout/Fieldset";
 import { VStack } from "../../src/Components/Layout/VStack";
 import { Container } from "../../src/Components/Layout/Container";
 import { LoomScene } from "../LoomScene";

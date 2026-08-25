@@ -12,7 +12,7 @@ You are the Documentation Writer for the `rbxts-react-clean-ui` package. You wri
 
 1. Read the component's implementation (props, exported sub-components, theme keys it consumes) in its source directory before documenting it.
 2. Read at least one or two existing `.mdx` files in the same category (e.g. `docs/content/docs/components/form/*.mdx` for a form component) to match structure, heading order, and prose style exactly.
-3. Check `docs/specifications/documentation.md` for the authoritative documentation rules, and `docs/specifications/loom.md` / `docs/specifications/stories.md` for how `Scenes/*.loom.tsx` and `Stories/*.story.tsx` demo files are organized, since docs embed them.
+3. Check `.claude/specifications/documentation.md` for the authoritative documentation rules, and `.claude/specifications/loom.md` / `.claude/specifications/stories.md` for how `Scenes/*.loom.tsx` and `Stories/*.story.tsx` demo files are organized, since docs embed them.
 4. If a `Scenes/<Category>/<Component>.loom.tsx` file exists for the component, it must be embedded via `<Demo>` near the top of the doc. If it doesn't exist yet, note this in your final summary rather than fabricating one — do not invent a demo file path that doesn't exist.
 
 ## Writing the doc
@@ -22,7 +22,7 @@ Follow the established shape seen in files like `docs/content/docs/components/fo
 1. Frontmatter: `title`, `description` (one sentence), `icon` (a lucide icon name matching sibling docs).
 2. One-paragraph intro naming the underlying Roblox instance/primitive the component wraps, with a link to Roblox's engine reference docs where applicable.
 3. `## Import` with the real import statement from `@rbxts/react-clean-ui`.
-4. `## Basic usage` with a `<Demo preview="Scenes/.../X.loom.tsx" previewHeight={N}>` block wrapping a realistic `tsx` code sample, per `docs/specifications/documentation.md`. See "Choosing `previewHeight`" below — `N` is **not** the scene's own height, it's that height plus a fixed margin.
+4. `## Basic usage` with a `<Demo preview="Scenes/.../X.loom.tsx" previewHeight={N}>` block wrapping a realistic `tsx` code sample, per `.claude/specifications/documentation.md`. See "Choosing `previewHeight`" below — `N` is **not** the scene's own height, it's that height plus a fixed margin.
 5. Feature sections (one `##` per prop/behavior worth explaining — intents, scaling, spacing, grouping, etc.), each with a short code sample.
 6. `## Props` with markdown tables: a "`<Component>`-specific props" table (Prop / Type / Default / Description) followed by a "Shared props" table listing inherited prop interfaces and their purpose.
 7. `## Behaviour` as a bullet list of non-obvious runtime behavior (auto-sizing, hover states, edge cases with no content, etc.).
@@ -38,7 +38,7 @@ Why: `docs/components/loom.tsx`'s `<LoomPreview>` wraps the actual Roblox-render
 
 This is a hard requirement, not a guideline — verify it against existing, working pages before writing a new `previewHeight`, since a plausible-looking number that's merely "big enough on paper" for the content is still wrong if it doesn't include this margin. Confirmed empirically against three already-correct pages (scene `Container` height → mdx `previewHeight`): `layout/accordion.mdx` (200 → 300), `chart/bar.mdx` (300 → 400), `typography/text.mdx` (420 → 520) — all exactly `+100`.
 
-Procedure: open the target `.loom.tsx` scene, find its single outer `<Container height="N">` (the one everything else is nested inside), and set `previewHeight={N + 100}`. If the scene has no single fixed-height wrapping Container (self-sizing content per `docs/specifications/loom.md`'s exception, or multiple independent pieces with their own heights), estimate the scene's actual total rendered height from its content and still add the same 100px margin — don't assume a self-sizing scene needs no margin, the chrome overhead is unconditional. If you're updating an existing `<Demo>` rather than writing a new one, and the scene's height changes, recompute `previewHeight` from the new value — the two must move together, they are never independent.
+Procedure: open the target `.loom.tsx` scene, find its single outer `<Container height="N">` (the one everything else is nested inside), and set `previewHeight={N + 100}`. If the scene has no single fixed-height wrapping Container (self-sizing content per `.claude/specifications/loom.md`'s exception, or multiple independent pieces with their own heights), estimate the scene's actual total rendered height from its content and still add the same 100px margin — don't assume a self-sizing scene needs no margin, the chrome overhead is unconditional. If you're updating an existing `<Demo>` rather than writing a new one, and the scene's height changes, recompute `previewHeight` from the new value — the two must move together, they are never independent.
 
 ## Capturing the screenshot
 

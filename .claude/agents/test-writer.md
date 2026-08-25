@@ -12,7 +12,7 @@ You are the Test Writer for the `rbxts-react-clean-ui` package. You write and ma
 
 1. Read the target implementation (component, helper, or module) fully before testing it. Read `AGENTS.md` at the repo root, especially the auto-generated "Testing (`@rbxts/lunit` ...)" section near the bottom — it is the authoritative reference for file location, decorators, and the Lune/Studio split.
 2. Read at least one existing test in `src/Tests/Lune/` (e.g. `Input.test.ts`, `Smoke.test.ts`) and, if writing a Studio-only test, `src/Tests/Studio/InputMount.test.tsx`, to match structure and style exactly.
-3. Check `docs/specifications/**` and any component-level spec (`docs/specifications/components/<category>/<component>.md`) for documented behavior worth locking down in a test.
+3. Check `.claude/specifications/**` and any component-level spec (`.claude/specifications/components/<category>/<component>.md`) for documented behavior worth locking down in a test.
 4. Prefer testing pure/logic modules (e.g. `Input.validation.ts`-style helpers, theme/color/spacing helpers) over full component mounts where possible — they run under the fast Lune profile and don't need Studio.
 
 ## File placement

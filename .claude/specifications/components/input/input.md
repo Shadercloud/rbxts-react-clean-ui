@@ -1,0 +1,41 @@
+# Input
+
+`Input` is a themed wrapper around a native `TextBox`, with text validation and fieldset integration. It follows the shared conventions in [Components](../index.md) and [Input](./index.md).
+
+## Public API
+
+- `InputProps` composes `ScalableElementProps`, `SpacedElementProps`, and `React.InstanceProps<TextBox>`, plus:
+  - `value: string` (required) — the initial text, unless `controlled` is set.
+  - `placeholder?: string` — alias for `PlaceholderText`; `PlaceholderText`, if supplied, takes priority.
+  - `validation?: "Number" | "String" | "None" | "Int" | "Telephone" | "Alphanumeric" | "Email"`.
+  - `min?`, `max?: number` — only enforced when `validation` is `"Number"` or `"Int"`.
+  - `onChange?: (value: string) => void`.
+  - `controlled?: boolean`.
+- Several native `TextBox` properties are managed internally and cannot be meaningfully overridden: `Text`, `FontFace`, `FontSize`, `BackgroundTransparency` (fixed at `1`), `ClearTextOnFocus` (defaults to `false` unless overridden), and `AutomaticSize`.
+
+## Controlled vs. uncontrolled
+
+- Without `controlled`, `value` seeds internal state (`React.useState(props.value)`) once; the rendered `Text` afterward comes from that internal state, updated as the user types.
+- With `controlled: true`, the rendered `Text` is always `props.value` directly, so the consumer is responsible for feeding back `onChange` into `value`.
+
+## Validation
+
+- Validation is applied on every keystroke via the `Change.Text` handler, using `resolveValidatedText` (`Input.validation.ts`): if the candidate text is rejected, the `TextBox`'s `Text` is reset back to the last valid text (`lastValidText`) and neither `onChange` nor state update run for that keystroke.
+- `"Number"`/`"Int"`: rejects text that doesn't parse as a number, except it always allows `""` and `"-"` so a negative number can be typed. `"Int"` is not distinguished from `"Number"` at the character-filtering stage — both allow decimals while typing; the `Int`/`Number` distinction only affects the min/max-clamping behavior below.
+- `"Telephone"`, `"Alphanumeric"`, `"Email"`: reject text that doesn't match a fixed Lua pattern allow-list (`CHARACTER_ALLOW_LIST_PATTERNS`). `"String"` and `"None"` (or omitting `validation`) apply no character filtering.
+- `min`/`max` are enforced only in the `FocusLost` handler, and only when `validation` is `"Number"` or `"Int"`: if the parsed number is outside `[min, max]`, it is clamped, written back to the `TextBox`, and `onChange` is called with the clamped text.
+- `props.Change`/`props.Event` handlers passed by the consumer are merged with (and run alongside) the component's internal `Change.Text`/`Event.FocusLost` handling.
+
+## Fieldset integration
+
+Per the [Input](./index.md) convention, when rendered inside a `Fieldset`, activating the paired `Fieldset.Label` calls `CaptureFocus()` on the underlying `TextBox`.
+
+## Theme
+
+`theme.components.input` supplies:
+
+- `typography`, resolved via `TypographyHelper.getTypography(theme, props.scale, theme.components.input.typography)`.
+- `borderThickness` and `borderColor` for an `Enum.BorderStrokePosition.Inner` stroke.
+- `cornerRadius`.
+
+`TextColor3` defaults to `theme.colors.intents.primary.default.textColor` when not supplied as a prop.
