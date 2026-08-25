@@ -8,6 +8,52 @@ The `Icon` component displays an icon from the active theme's icon set.
 
 Icons support theme-based sizing, custom colors, fixed sizes, rotation, and continuous spinning animations.
 
+
+<Demo preview="Scenes/Surface/AllIcons.loom.tsx" previewHeight={460} screenshot="/images/screenshots/Surface/AllIcons.png">
+```tsx
+const icons = new Array<IconName>();
+
+for (const [icon] of pairs(DefaultIconSet)) {
+    icons.push(icon);
+}
+
+icons.sort((a, b) => a < b);
+
+return (
+    <Scroller>
+        <frame
+            BackgroundTransparency={1}
+            Size={UDim2.fromScale(1, 0)}
+            AutomaticSize={Enum.AutomaticSize.Y}
+        >
+            <uigridlayout
+                CellSize={UDim2.fromOffset(160, 64)}
+                CellPadding={UDim2.fromOffset(8, 8)}
+                SortOrder={Enum.SortOrder.LayoutOrder}
+            />
+
+            {icons.map((icon, index) => (
+                <frame
+                    key={icon}
+                    LayoutOrder={index}
+                    BackgroundTransparency={1}
+                >
+                    <HStack spacing="sm">
+                        <Icon icon={icon} />
+
+                        <Text
+                            text={icon}
+                            variant="label"
+                        />
+                    </HStack>
+                </frame>
+            ))}
+        </frame>
+    </Scroller>
+);
+```
+</Demo>
+
 ## Import
 
 ```tsx
@@ -344,55 +390,6 @@ Some commonly used icons include:
 <Icon icon="envelope" />
 <Icon icon="folder" />
 ```
-
-## Rendering an icon gallery
-
-Because `IconName` is a TypeScript union type, it cannot be directly iterated at runtime. To build an icon browser, iterate over `DefaultIconSet` instead.
-
-<Demo preview="Scenes/Surface/AllIcons.loom.tsx" previewHeight={460} screenshot="/images/screenshots/Surface/AllIcons.png">
-```tsx
-const icons = new Array<IconName>();
-
-for (const [icon] of pairs(DefaultIconSet)) {
-    icons.push(icon);
-}
-
-icons.sort((a, b) => a < b);
-
-return (
-    <Scroller>
-        <frame
-            BackgroundTransparency={1}
-            Size={UDim2.fromScale(1, 0)}
-            AutomaticSize={Enum.AutomaticSize.Y}
-        >
-            <uigridlayout
-                CellSize={UDim2.fromOffset(160, 64)}
-                CellPadding={UDim2.fromOffset(8, 8)}
-                SortOrder={Enum.SortOrder.LayoutOrder}
-            />
-
-            {icons.map((icon, index) => (
-                <frame
-                    key={icon}
-                    LayoutOrder={index}
-                    BackgroundTransparency={1}
-                >
-                    <HStack spacing="sm">
-                        <Icon icon={icon} />
-
-                        <Text
-                            text={icon}
-                            variant="label"
-                        />
-                    </HStack>
-                </frame>
-            ))}
-        </frame>
-    </Scroller>
-);
-```
-</Demo>
 
 ## Notes
 
