@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { CleanTheme } from "../Theme/theme.template";
+import { ThemeTemplate } from "../Theme/theme.template";
 import { DefaultTheme } from "../Theme/themes/default.theme";
 
-export const CleanThemeContext = React.createContext<CleanTheme>(DefaultTheme);
+export const CleanThemeContext = React.createContext<ThemeTemplate>(DefaultTheme);

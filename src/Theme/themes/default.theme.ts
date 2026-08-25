@@ -1,7 +1,7 @@
-import { CleanTheme } from "../theme.template"
+import { ThemeTemplate } from "../theme.template"
 
 const font = Enum.Font.Roboto;
-export const DefaultTheme: CleanTheme = {
+export const DefaultTheme: ThemeTemplate = {
     colors: {
         intents: {
             primary: {

@@ -1,1 +1,1 @@
-export declare const SandstoneTheme: import("..").CleanTheme;
+export declare const SandstoneTheme: import("..").ThemeTemplate;

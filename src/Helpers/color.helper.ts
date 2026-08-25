@@ -1,5 +1,5 @@
 import {
-    CleanTheme,
+    ThemeTemplate,
     InlineIntentColors,
     IntentScheme,
 } from "../Theme";
@@ -11,7 +11,7 @@ type ComponentIntentColors =
 
 export class ColorHelper {
     public static getIntentColors(
-        theme: CleanTheme,
+        theme: ThemeTemplate,
         intent: Intent | undefined,
         state: ButtonFlag = "default",
         componentColors?: ComponentIntentColors,

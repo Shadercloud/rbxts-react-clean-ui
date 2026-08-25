@@ -1,33 +1,7 @@
-import { CssShadow, CssSize, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, ButtonFlag, PositionElementProps, CssBoxShadow } from "../Interfaces/";
+import { CssShadow, CssSize, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow } from "../Interfaces/";
+import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors } from "./theme.style";
 
-export interface TypographyStyle {
-    font: Enum.Font;
-    size: Enum.FontSize;
-    weight?: Enum.FontWeight;
-    lineHeight?: number;
-}
-
-export type ScaledTypographyStyle = Partial<Record<ScaleSize, Partial<TypographyStyle>>>
-
-export interface IntentScheme {
-    textColor: Color3;
-    backgroundColor: Color3;
-    borderColor: Color3;
-    backgroundTransparency?: number;
-    boxShadow?: CssShadow;
-    typography?: Partial<TypographyStyle>;
-}
-
-export interface IntentColors extends Partial<Record<ButtonFlag, IntentScheme>> {
-    default: IntentScheme;
-    hover?: IntentScheme;
-    focus?: IntentScheme;
-}
-export type InlineIntentColors = {
-    [State in keyof IntentColors]?: Partial<NonNullable<IntentColors[State]>>;
-};
-
-export interface CleanTheme {
+export interface ThemeTemplate {
     colors: {
         intents: Record<Intent, IntentColors>;
     };

@@ -1,1 +1,1 @@
-export declare const DarkTheme: import("..").CleanTheme;
+export declare const DarkTheme: import("..").ThemeTemplate;

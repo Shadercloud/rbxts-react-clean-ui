@@ -1,8 +1,8 @@
 import React from "@rbxts/react";
-import { CleanTheme } from "../Theme";
+import { ThemeTemplate } from "../Theme";
 interface CleanUiProviderProps {
     children?: React.ReactNode;
-    theme: CleanTheme;
+    theme: ThemeTemplate;
     toasts?: boolean;
 }
 export declare function CleanUiProvider({ children, theme, toasts }: CleanUiProviderProps): React.JSX.Element;

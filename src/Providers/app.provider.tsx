@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { CleanTheme } from "../Theme";
+import { ThemeTemplate } from "../Theme";
 import { ToastContainer } from "../Components/Interaction/Toast";
 import { RegistryProvider } from "./registry.provider";
 import { ThemeProvider } from "./theme.provider";
@@ -8,7 +8,7 @@ import { ToastProvider } from "./toast.provider";
 
 interface CleanUiProviderProps {
     children?: React.ReactNode;
-    theme: CleanTheme;
+    theme: ThemeTemplate;
     toasts?: boolean;
 }
 

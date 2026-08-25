@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import { CleanThemeContext } from "../Contexts/";
-import { CleanTheme } from "../Theme";
+import { ThemeTemplate } from "../Theme";
 
 interface ThemeProviderProps {
-    theme: CleanTheme;
+    theme: ThemeTemplate;
     children?: React.ReactNode;
 }
 

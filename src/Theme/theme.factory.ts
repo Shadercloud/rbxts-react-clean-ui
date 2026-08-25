@@ -1,4 +1,4 @@
-import { CleanTheme } from "./theme.template";
+import { ThemeTemplate } from "./theme.template";
 import { DefaultTheme } from "./themes/default.theme";
 
 export type DeepPartial<T> = {
@@ -39,14 +39,14 @@ function deepMerge<T extends object>(
 
 
 export function createTheme(
-    overrides: DeepPartial<CleanTheme> = {},
-): CleanTheme {
+    overrides: DeepPartial<ThemeTemplate> = {},
+): ThemeTemplate {
     return deepMerge(DefaultTheme, overrides);
 }
 
 export function extendTheme(
-    baseTheme: CleanTheme,
-    overrides: DeepPartial<CleanTheme>,
-): CleanTheme {
+    baseTheme: ThemeTemplate,
+    overrides: DeepPartial<ThemeTemplate>,
+): ThemeTemplate {
     return deepMerge(baseTheme, overrides);
 }

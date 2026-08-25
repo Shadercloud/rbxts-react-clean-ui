@@ -1,10 +1,10 @@
 import { PaddingProps, ResolvedPadding, ScaleSize, ScaleSizeValue } from "../Interfaces";
-import { CleanTheme } from "../Theme";
+import { ThemeTemplate } from "../Theme";
 
 
 export class SpacingHelper {
     public static GetResolvedPadding(
-        theme: CleanTheme,
+        theme: ThemeTemplate,
         props: PaddingProps,
         component?: ScaleSizeValue<number>
     ): ResolvedPadding {
@@ -18,7 +18,7 @@ export class SpacingHelper {
         };
     }
 
-    public static GetPadding(theme: CleanTheme, spacing?: ScaleSize | "None", component?: ScaleSizeValue<number>): number {
+    public static GetPadding(theme: ThemeTemplate, spacing?: ScaleSize | "None", component?: ScaleSizeValue<number>): number {
         if (spacing === "None") return 0
 
         const resolveSpacing = spacing !== undefined ? spacing : theme.default.spacing

@@ -31,8 +31,6 @@ export interface PositionElementProps {
 export interface IntentElementProps {
     intent?: Intent;
 }
-export interface CleanElementProps extends SizeElementProps, PositionElementProps {
-}
 export interface SpacedElementProps {
     spacing?: ScaleSize | "None";
 }

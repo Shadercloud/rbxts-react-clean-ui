@@ -5,7 +5,7 @@ import { ToastContainer } from "../src/Components/Interaction/Toast";
 import { DefaultTheme } from "../src/Theme/themes/default.theme";
 import { SandstoneTheme } from "../src/Theme/themes/sandstone.theme";
 import { DarkTheme } from "../src/Theme/themes/dark.theme";
-import { CleanTheme } from "../src/Theme";
+import { ThemeTemplate } from "../src/Theme";
 
 declare const window: {
     location: {
@@ -23,7 +23,7 @@ interface LoomSceneProps {
     children?: React.ReactNode;
 }
 
-function getLoomTheme(): CleanTheme {
+function getLoomTheme(): ThemeTemplate {
     const params = new URLSearchParams(window.location.search);
     const componentTheme = params.get("ct");
 

@@ -1,9 +1,9 @@
 import { ScaleSize, ScaleSizes } from "../Interfaces";
-import { TypographyStyle, ScaledTypographyStyle, CleanTheme } from "../Theme";
+import { TypographyStyle, ScaledTypographyStyle, ThemeTemplate } from "../Theme";
 
 export class TypographyHelper {
     public static getTypography(
-        theme: CleanTheme,
+        theme: ThemeTemplate,
         scale?: ScaleSize,
         component?: Partial<TypographyStyle> | ScaledTypographyStyle,
     ): TypographyStyle {

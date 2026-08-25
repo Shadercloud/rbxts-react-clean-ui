@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { CleanTheme } from "../Theme";
+import { ThemeTemplate } from "../Theme";
 interface ThemeProviderProps {
-    theme: CleanTheme;
+    theme: ThemeTemplate;
     children?: React.ReactNode;
 }
 export declare function ThemeProvider(props: ThemeProviderProps): React.JSX.Element;
