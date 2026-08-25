@@ -11,6 +11,7 @@ local FlexItem = React.forwardRef(function(props, ref)
 		GrowRatio = props.GrowRatio,
 		ShrinkRatio = props.ShrinkRatio,
 	}), React.createElement("uilistlayout", {
+		HorizontalFlex = props.HorizontalFlex,
 		FillDirection = Enum.FillDirection.Horizontal,
 		HorizontalAlignment = props.align,
 	}), props.children)

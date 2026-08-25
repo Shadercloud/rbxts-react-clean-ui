@@ -7,13 +7,17 @@ export interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIn
     Event?: React.InstanceEvent<ImageButton>;
     children?: React.ReactNode;
     group?: boolean;
+    disabled?: boolean;
+    LayoutOrder?: number;
 }
 export interface ButtonTextProps extends ScalableElementProps, IntentElementProps {
     children?: string;
     text: string;
+    disabled?: boolean;
 }
 declare function ButtonText(props: ButtonTextProps): React.JSX.Element;
 export interface ButtonIconProps extends IconProps, IntentElementProps {
+    disabled?: boolean;
 }
 declare function ButtonIcon(props: ButtonIconProps): React.JSX.Element;
 type ButtonComponent = React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<ImageButton>> & {

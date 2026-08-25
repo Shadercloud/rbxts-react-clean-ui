@@ -173,25 +173,50 @@ export const SandstoneTheme = createTheme({
                     default: {
                         textColor: Color3.fromHex("#244F4A"),
                     },
+                    disabled: {
+                        backgroundColor: Color3.fromHex("#E8DFCF"),
+                        borderColor: Color3.fromHex("#D8CDBA"),
+                        textColor: Color3.fromHex("#9B8B73"),
+                    },
                 },
                 success: {
                     default: {
                         textColor: Color3.fromHex("#2E6245"),
+                    },
+                    disabled: {
+                        backgroundColor: Color3.fromHex("#E8DFCF"),
+                        borderColor: Color3.fromHex("#D8CDBA"),
+                        textColor: Color3.fromHex("#9B8B73"),
                     },
                 },
                 info: {
                     default: {
                         textColor: Color3.fromHex("#365F78"),
                     },
+                    disabled: {
+                        backgroundColor: Color3.fromHex("#E8DFCF"),
+                        borderColor: Color3.fromHex("#D8CDBA"),
+                        textColor: Color3.fromHex("#9B8B73"),
+                    },
                 },
                 warning: {
                     default: {
                         textColor: Color3.fromHex("#7A5721"),
                     },
+                    disabled: {
+                        backgroundColor: Color3.fromHex("#E8DFCF"),
+                        borderColor: Color3.fromHex("#D8CDBA"),
+                        textColor: Color3.fromHex("#9B8B73"),
+                    },
                 },
                 danger: {
                     default: {
                         textColor: Color3.fromHex("#8A3D3A"),
+                    },
+                    disabled: {
+                        backgroundColor: Color3.fromHex("#E8DFCF"),
+                        borderColor: Color3.fromHex("#D8CDBA"),
+                        textColor: Color3.fromHex("#9B8B73"),
                     },
                 },
             },

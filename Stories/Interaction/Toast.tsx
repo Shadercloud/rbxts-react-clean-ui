@@ -52,11 +52,14 @@ interface ToastProps {
 }
 
 function Toast(props: ToastProps = {}) {
-    return <Container BackgroundColor3={new Color3(1, 1, 1)} BackgroundTransparency={0} BorderSizePixel={0} width={320} height={160}>
+    return <Container
+        BackgroundColor3={new Color3(1, 1, 1)}
+        BackgroundTransparency={0}
+        BorderSizePixel={0}
+        width={320}
+        height={160}>
         <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
-        <CleanUiProvider theme={DefaultTheme}>
-            <ToastDemo intent={props.intent} />
-        </CleanUiProvider>
+        <ToastDemo intent={props.intent} />
     </Container>
 }
 

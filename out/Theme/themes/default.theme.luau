@@ -157,25 +157,55 @@ local DefaultTheme = {
 					default = {
 						textColor = Color3.fromHex("#1D2433"),
 					},
+					disabled = {
+						backgroundColor = Color3.fromHex("#F5F5F5"),
+						backgroundTransparency = 0.35,
+						borderColor = Color3.fromHex("#D9DEE8"),
+						textColor = Color3.fromHex("#8A8A8A"),
+					},
 				},
 				success = {
 					default = {
 						textColor = Color3.fromHex("#FFFFFF"),
+					},
+					disabled = {
+						backgroundColor = Color3.fromHex("#F5F5F5"),
+						backgroundTransparency = 0.35,
+						borderColor = Color3.fromHex("#D9DEE8"),
+						textColor = Color3.fromHex("#8A8A8A"),
 					},
 				},
 				info = {
 					default = {
 						textColor = Color3.fromHex("#FFFFFF"),
 					},
+					disabled = {
+						backgroundColor = Color3.fromHex("#F5F5F5"),
+						backgroundTransparency = 0.35,
+						borderColor = Color3.fromHex("#D9DEE8"),
+						textColor = Color3.fromHex("#8A8A8A"),
+					},
 				},
 				warning = {
 					default = {
 						textColor = Color3.fromHex("#FFFFFF"),
 					},
+					disabled = {
+						backgroundColor = Color3.fromHex("#F5F5F5"),
+						backgroundTransparency = 0.35,
+						borderColor = Color3.fromHex("#D9DEE8"),
+						textColor = Color3.fromHex("#8A8A8A"),
+					},
 				},
 				danger = {
 					default = {
 						textColor = Color3.fromHex("#FFFFFF"),
+					},
+					disabled = {
+						backgroundColor = Color3.fromHex("#F5F5F5"),
+						backgroundTransparency = 0.35,
+						borderColor = Color3.fromHex("#D9DEE8"),
+						textColor = Color3.fromHex("#8A8A8A"),
 					},
 				},
 			},

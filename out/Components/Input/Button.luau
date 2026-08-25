@@ -21,7 +21,7 @@ local function ButtonText(props)
 	return React.createElement(Text, {
 		text = props.text,
 		typography = TypographyHelper:getTypography(theme, props.scale, theme.components.button.typography),
-		TextColor3 = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).textColor,
+		TextColor3 = ColorHelper:getIntentColors(theme, props.intent, if props.disabled then "disabled" else "default", theme.components.button.intents).textColor,
 	})
 end
 local function ButtonIcon(props)
@@ -31,16 +31,23 @@ local function ButtonIcon(props)
 		icon = props.icon,
 		spinning = props.spinning,
 		speed = props.speed,
-		color = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).textColor,
+		color = ColorHelper:getIntentColors(theme, props.intent, if props.disabled then "disabled" else "default", theme.components.button.intents).textColor,
 	})
 end
 local Button = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local hover, setHover = React.useState(false)
+	React.useEffect(function()
+		if props.disabled then
+			setHover(false)
+		end
+	end, { props.disabled })
 	local group = React.useContext(GroupContext)
 	local padding = SpacingHelper:GetResolvedPadding(theme, props)
+	local state = if props.disabled then "disabled" elseif hover then "hover" else "default"
 	local _attributes = {
 		ref = ref,
+		Active = not props.disabled,
 	}
 	local _object = {}
 	local _spread = props.Event
@@ -50,7 +57,9 @@ local Button = React.forwardRef(function(props, ref)
 		end
 	end
 	_object.MouseEnter = function(button, x, y)
-		setHover(true)
+		if not props.disabled then
+			setHover(true)
+		end
 		local _result = props.Event
 		if _result ~= nil then
 			_result = _result.MouseEnter
@@ -60,12 +69,26 @@ local Button = React.forwardRef(function(props, ref)
 		end
 	end
 	_object.MouseLeave = function(button, x, y)
-		setHover(false)
+		if not props.disabled then
+			setHover(false)
+		end
 		local _result = props.Event
 		if _result ~= nil then
 			_result = _result.MouseLeave
 			if _result ~= nil then
 				_result(button, x, y)
+			end
+		end
+	end
+	_object.Activated = function(button, inputObject, clickCount)
+		if props.disabled then
+			return nil
+		end
+		local _result = props.Event
+		if _result ~= nil then
+			_result = _result.Activated
+			if _result ~= nil then
+				_result(button, inputObject, clickCount)
 			end
 		end
 	end
@@ -94,8 +117,9 @@ local Button = React.forwardRef(function(props, ref)
 		_condition = theme.components.button.backgroundTransparency
 	end
 	_attributes.BackgroundTransparency = _condition
-	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, props.intent, if hover then "hover" else "default", theme.components.button.intents).backgroundColor
+	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, props.intent, state, theme.components.button.intents).backgroundColor
 	_attributes.AutoButtonColor = false
+	_attributes.LayoutOrder = props.LayoutOrder
 	_attributes.ZIndex = props.ZIndex
 	local _exp = React.createElement(Corners, {
 		radius = theme.components.button.cornerRadius,
@@ -103,7 +127,7 @@ local Button = React.forwardRef(function(props, ref)
 	local _exp_1 = React.createElement("uistroke", {
 		Thickness = theme.components.button.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-		Color = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).borderColor,
+		Color = ColorHelper:getIntentColors(theme, props.intent, state, theme.components.button.intents).borderColor,
 	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
@@ -120,10 +144,12 @@ local Button = React.forwardRef(function(props, ref)
 	}, props.icon ~= nil and React.createElement(ButtonIcon, {
 		scale = props.scale,
 		intent = props.intent,
+		disabled = props.disabled,
 		icon = props.icon,
 	}), props.text ~= nil and React.createElement(ButtonText, {
 		text = props.text,
 		intent = props.intent,
+		disabled = props.disabled,
 		scale = props.scale,
 	})), props.children))
 end)

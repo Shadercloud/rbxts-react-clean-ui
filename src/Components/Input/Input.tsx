@@ -52,7 +52,7 @@ export function Input(props: InputProps) {
 
     return (
         <frame
-            Size={UDim2.fromScale(1, 0)}
+            Size={props.Size ?? UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
             BackgroundTransparency={1}
             AnchorPoint={props.AnchorPoint}

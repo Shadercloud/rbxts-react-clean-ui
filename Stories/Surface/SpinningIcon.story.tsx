@@ -1,5 +1,5 @@
 import React, { useState } from "@rbxts/react";
-import { Box, Button, Container, createStory, HStack, Icon, IconName, DefaultIconSet, Scroller, Text, FlexItem } from "@rbxts/react-clean-ui";
+import { Box, Button, Container, createStory, HStack, Icon, FlexItem } from "@rbxts/react-clean-ui";
 
 
 function spinningIcons() {

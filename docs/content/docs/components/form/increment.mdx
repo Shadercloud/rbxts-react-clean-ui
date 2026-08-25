@@ -1,0 +1,149 @@
+---
+title: Increment
+description: A numeric stepper with minus/plus buttons and a numeric text field.
+icon: ChevronsUpDown
+---
+
+`Increment` is a numeric stepper that composes the existing [`Button`](/components/form/button) and [`Input`](/components/form/input) components: a minus button, a centered numeric field, and a plus button laid out in a row. Its root renders through [`Container`](/components/layout/container), a wrapper around Roblox's native [`Frame`](https://create.roblox.com/docs/reference/engine/classes/Frame).
+
+## Import
+
+```tsx
+import { Increment } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Form/Increment.loom.tsx" previewHeight={320}>
+```tsx
+import React from "@rbxts/react";
+import { Increment } from "@rbxts/react-clean-ui";
+
+export function IncrementExample() {
+    return (
+        <Increment
+            value={5}
+            onChange={(value) => {
+                print(`Value changed to: ${value}`);
+            }}
+        />
+    );
+}
+```
+</Demo>
+
+The `value` prop sets the initial value. `onChange` is called whenever the value changes, whether from clicking the minus/plus buttons or typing directly into the field.
+
+## Step
+
+Use `step` to control how much the minus and plus buttons change the value by. It defaults to `1`.
+
+```tsx
+<Increment value={20} step={5} />
+```
+
+Clicking the plus button changes the value from `20` to `25`, then `30`, and so on.
+
+## Minimum and maximum
+
+Use `min` and `max` to bound the value.
+
+```tsx
+<Increment value={0} min={0} max={10} />
+```
+
+The minus and plus buttons clamp the value to `[min, max]`. If the value is already at `min`, clicking minus does nothing; if it's already at `max`, clicking plus does nothing — no state change and no `onChange` call.
+
+`min` and `max` are not enforced while typing into the field. Instead, they're checked when the field loses focus (the same behavior as `Input`'s own `min`/`max`): if the typed value falls outside the range, it's clamped to the nearest bound and `onChange` fires again with the corrected value.
+
+## Controlled value
+
+Set `controlled` when the rendered value should always come from the `value` prop, mirroring `Input`'s controlled/uncontrolled convention.
+
+```tsx
+function ControlledIncrement() {
+    const [value, setValue] = React.useState(5);
+
+    return (
+        <Increment
+            controlled
+            value={value}
+            min={0}
+            max={10}
+            onChange={setValue}
+        />
+    );
+}
+```
+
+Without `controlled`, `value` is used as the initial value and `Increment` manages subsequent changes internally.
+
+## Intents
+
+`intent` is forwarded to the minus and plus buttons, controlling their background, border, and icon colors. It has no effect on the numeric field, since `Input` has no `intent` prop.
+
+```tsx
+<Increment value={5} intent="success" />
+<Increment value={5} intent="danger" />
+```
+
+## Scaling
+
+`Increment` supports the shared `scale` prop, which is forwarded to the minus/plus buttons and the numeric field, resolving their typography and icon size from the active theme.
+
+```tsx
+<Increment value={5} scale="sm" />
+<Increment value={5} scale="lg" />
+```
+
+Available scales are `xs`, `sm`, `md`, `lg`, and `xl`.
+
+## Spacing
+
+The shared `spacing` prop controls the gap between the minus button, field, and plus button, as well as each part's own internal padding.
+
+```tsx
+<Increment value={5} spacing="lg" />
+```
+
+## Props
+
+### Increment-specific props
+
+| Prop         | Type                       | Default     | Description                                                                          |
+| ------------ | -------------------------- | ----------- | -------------------------------------------------------------------------------------- |
+| `value`      | `number`                   | Required    | The current value, or the initial value when uncontrolled.                            |
+| `onChange`   | `(value: number) => void`  | `undefined` | Called whenever the value changes, from a button click or a typed edit.                |
+| `step`       | `number`                   | `1`         | Amount the minus/plus buttons change the value by.                                    |
+| `min`        | `number`                   | `undefined` | Inclusive lower bound, enforced by the minus button and on blur of the field.          |
+| `max`        | `number`                   | `undefined` | Inclusive upper bound, enforced by the plus button and on blur of the field.           |
+| `controlled` | `boolean`                  | `false`     | Reads the rendered value directly from `value`, instead of managing it internally.    |
+
+### Shared props
+
+The increment also supports props inherited from the following interfaces.
+
+| Interface                    | Purpose                                                                                      |
+| ----------------------------- | --------------------------------------------------------------------------------------------- |
+| `IntentElementProps`          | Forwards `intent` to the minus/plus `Button`s. Has no effect on the numeric field.            |
+| `SpacedElementProps`          | Configures the gap between the three parts and each part's own internal padding.              |
+| `ScalableElementProps`        | Configures the scale forwarded to the minus/plus `Button`s and the `Input`.                   |
+| `React.InstanceProps<Frame>`  | Accepts native `Frame` properties on the root `Container`.                                    |
+
+## Behaviour
+
+* The root renders through `Container` at a fixed `Size={UDim2.fromScale(1, 0)}` with `AutomaticSize.Y` — full available width, height fit to content. `Size`/`AutomaticSize` passed in props are not honored.
+* `Increment` manages its own numeric state (separate from `Input`'s internal string state) unless `controlled` is set. The `Input` is always rendered `controlled={true}`.
+* Activating the minus/plus `Button` computes `current - step`/`current + step`, clamps it to `[min, max]`, updates internal state (unless `controlled`), and calls `onChange` with the clamped value.
+* If the value is already at `min` (minus) or `max` (plus), activating that button is a no-op — neither internal state nor `onChange` fire.
+* Typing into the field is forwarded straight through as a number without clamping mid-edit. Only the field's `FocusLost` handling (inherited from `Input`) clamps an out-of-range value once focus is lost, at which point `onChange` fires again with the corrected value.
+* `Button` has no disabled visual state, so the minus/plus buttons render identically whether or not they're at a bound — only their activation is guarded.
+
+## Theme values
+
+`Increment` has no `theme.components.increment` entry of its own. Its appearance is entirely driven by:
+
+* `theme.components.button` — used by the minus and plus `Button`s.
+* `theme.components.input` — used by the numeric field.
+
+The gap between the three parts falls back to `theme.default.spacing` when `spacing` is omitted, the same default `HStack` and `Button` use elsewhere.

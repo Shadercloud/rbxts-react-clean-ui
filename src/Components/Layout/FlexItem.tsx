@@ -7,6 +7,7 @@ interface FlexItemProps extends ContainerProps {
     mode?: Enum.UIFlexMode | "Grow" | "None" | "Shrink" | "Fill" | "Custom" | Binding<Enum.UIFlexMode>
     GrowRatio?: number;
     ShrinkRatio?: number;
+    HorizontalFlex?: Enum.UIFlexAlignment | "None" | "SpaceAround" | "Fill" | Binding<Enum.UIFlexAlignment>
 
 }
 export const FlexItem = React.forwardRef<Frame, FlexItemProps>(
@@ -19,7 +20,10 @@ export const FlexItem = React.forwardRef<Frame, FlexItemProps>(
                     GrowRatio={props.GrowRatio}
                     ShrinkRatio={props.ShrinkRatio}
                 />
-                <uilistlayout FillDirection={Enum.FillDirection.Horizontal} HorizontalAlignment={props.align} />
+                <uilistlayout
+                    HorizontalFlex={props.HorizontalFlex}
+                    FillDirection={Enum.FillDirection.Horizontal}
+                    HorizontalAlignment={props.align} />
                 {props.children}
             </Container>
         );

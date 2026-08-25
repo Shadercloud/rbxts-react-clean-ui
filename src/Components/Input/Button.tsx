@@ -29,11 +29,14 @@ export interface ButtonProps extends
     Event?: React.InstanceEvent<ImageButton>;
     children?: React.ReactNode;
     group?: boolean;
+    disabled?: boolean;
+    LayoutOrder?: number;
 }
 
 export interface ButtonTextProps extends ScalableElementProps, IntentElementProps {
     children?: string;
     text: string;
+    disabled?: boolean;
 }
 
 function ButtonText(props: ButtonTextProps) {
@@ -51,7 +54,7 @@ function ButtonText(props: ButtonTextProps) {
                 ColorHelper.getIntentColors(
                     theme,
                     props.intent,
-                    "default",
+                    props.disabled ? "disabled" : "default",
                     theme.components.button.intents,
                 ).textColor
             } />
@@ -59,7 +62,9 @@ function ButtonText(props: ButtonTextProps) {
 }
 
 
-export interface ButtonIconProps extends IconProps, IntentElementProps { }
+export interface ButtonIconProps extends IconProps, IntentElementProps {
+    disabled?: boolean;
+}
 
 function ButtonIcon(props: ButtonIconProps) {
     const theme = React.useContext(CleanThemeContext);
@@ -72,7 +77,7 @@ function ButtonIcon(props: ButtonIconProps) {
             ColorHelper.getIntentColors(
                 theme,
                 props.intent,
-                "default",
+                props.disabled ? "disabled" : "default",
                 theme.components.button.intents,
             ).textColor
 
@@ -91,28 +96,48 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
         const theme = React.useContext(CleanThemeContext);
         const [hover, setHover] = React.useState(false);
 
+        React.useEffect(() => {
+            if (props.disabled) {
+                setHover(false);
+            }
+        }, [props.disabled]);
+
         const group = React.useContext(GroupContext)
 
         const padding = SpacingHelper.GetResolvedPadding(theme, props);
 
+        const state = props.disabled ? "disabled" : hover ? "hover" : "default";
+
         return (
             <imagebutton
                 ref={ref}
+                Active={!props.disabled}
                 Event={{
                     ...props.Event,
 
                     MouseEnter: (button, x, y) => {
-                        setHover(true);
+                        if (!props.disabled) {
+                            setHover(true);
+                        }
 
                         props.Event?.MouseEnter?.(button, x, y);
                     },
 
                     MouseLeave: (button, x, y) => {
-                        setHover(false);
+                        if (!props.disabled) {
+                            setHover(false);
+                        }
 
                         props.Event?.MouseLeave?.(button, x, y);
                     },
 
+                    Activated: (button, inputObject, clickCount) => {
+                        if (props.disabled) {
+                            return;
+                        }
+
+                        props.Event?.Activated?.(button, inputObject, clickCount);
+                    },
                 }}
 
                 Size={UDim2.fromOffset(props.group ? group?.size?.X ?? 0 : 0, 0)}
@@ -124,10 +149,11 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 BackgroundColor3={ColorHelper.getIntentColors(
                     theme,
                     props.intent,
-                    hover ? "hover" : "default",
+                    state,
                     theme.components.button.intents,
                 ).backgroundColor}
                 AutoButtonColor={false}
+                LayoutOrder={props.LayoutOrder}
                 ZIndex={props.ZIndex}
             >
                 <Corners radius={theme.components.button.cornerRadius} />
@@ -138,7 +164,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                     Color={ColorHelper.getIntentColors(
                         theme,
                         props.intent,
-                        "default",
+                        state,
                         theme.components.button.intents,
                     ).borderColor}
                 />
@@ -153,12 +179,14 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                                 <ButtonIcon
                                     scale={props.scale}
                                     intent={props.intent}
+                                    disabled={props.disabled}
                                     icon={props.icon} />
                             }
                             {props.text !== undefined &&
                                 <ButtonText
                                     text={props.text}
                                     intent={props.intent}
+                                    disabled={props.disabled}
                                     scale={props.scale} />
                             }
                         </HStack>

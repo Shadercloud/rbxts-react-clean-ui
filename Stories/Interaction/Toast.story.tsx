@@ -4,10 +4,7 @@ import { Card, Container, createStory, HStack, Intent, Text } from "@rbxts/react
 import Toast from "./Toast";
 
 export = createStory((props) => (
-    <Container
-        width="300"
-        center>
-
+    <Container center>
         <Card>
             <Card.Header>
                 <HStack valign="Center">

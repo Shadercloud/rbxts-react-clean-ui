@@ -25,7 +25,7 @@ function SpinningIcon(props: IconProps) {
 
     });
     return <frame BackgroundTransparency={1} Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY}>
-        <Icon {...props} Rotation={rotation} />
+        <Icon Size={props.Size} color={props.color} icon={props.icon} scale={props.scale} Rotation={rotation} />
     </frame>
 }
 

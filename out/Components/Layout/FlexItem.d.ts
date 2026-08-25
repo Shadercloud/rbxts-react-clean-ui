@@ -6,6 +6,7 @@ interface FlexItemProps extends ContainerProps {
     mode?: Enum.UIFlexMode | "Grow" | "None" | "Shrink" | "Fill" | "Custom" | Binding<Enum.UIFlexMode>;
     GrowRatio?: number;
     ShrinkRatio?: number;
+    HorizontalFlex?: Enum.UIFlexAlignment | "None" | "SpaceAround" | "Fill" | Binding<Enum.UIFlexAlignment>;
 }
 export declare const FlexItem: React.ForwardRefExoticComponent<Omit<FlexItemProps, "ref"> & React.RefAttributes<Frame>>;
 export {};

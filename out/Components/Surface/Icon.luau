@@ -20,14 +20,17 @@ local function SpinningIcon(props)
 		tween:setGoal(360)
 		tween:start()
 	end)
-	local _attributes = table.clone(props)
-	setmetatable(_attributes, nil)
-	_attributes.Rotation = rotation
 	return React.createElement("frame", {
 		BackgroundTransparency = 1,
 		Size = UDim2.fromOffset(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
-	}, React.createElement(Icon, _attributes))
+	}, React.createElement(Icon, {
+		Size = props.Size,
+		color = props.color,
+		icon = props.icon,
+		scale = props.scale,
+		Rotation = rotation,
+	}))
 end
 function Icon(props)
 	local theme = React.useContext(CleanThemeContext)

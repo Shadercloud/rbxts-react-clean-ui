@@ -166,7 +166,7 @@ local function Input(props)
 	end
 	_attributes_1.Change = _object_1
 	return React.createElement("frame", {
-		Size = UDim2.fromScale(1, 0),
+		Size = props.Size or UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		AnchorPoint = props.AnchorPoint,
