@@ -14,7 +14,7 @@ interface TabContentProps {
 declare function TabContent(props: TabContentProps): undefined;
 interface TabsProps extends ScalableElementProps {
 }
-type TabsComponent = React.ForwardRefExoticComponent<TabsProps & React.RefAttributes<Frame>> & {
+type TabsComponent = React.ForwardRefExoticComponent<TabsProps & React.RefAttributes<ImageLabel>> & {
     Tab: typeof Tab;
     Title: typeof TabTitle;
     Content: typeof TabContent;

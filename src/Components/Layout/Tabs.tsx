@@ -62,14 +62,14 @@ function TabButtonContent(props: {
 }
 
 type TabsComponent = React.ForwardRefExoticComponent<
-    TabsProps & React.RefAttributes<Frame>
+    TabsProps & React.RefAttributes<ImageLabel>
 > & {
     Tab: typeof Tab;
     Title: typeof TabTitle;
     Content: typeof TabContent;
 };
 
-const Tabs = React.forwardRef<Frame, TabsProps>(
+const Tabs = React.forwardRef<ImageLabel, TabsProps>(
     (props, ref) => {
 
         const theme = React.useContext(CleanThemeContext);

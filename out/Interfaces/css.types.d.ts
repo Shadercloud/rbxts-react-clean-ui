@@ -14,8 +14,10 @@ export type CssBreakpointSize = {
     lg?: CssSize;
     xl?: CssSize;
 };
-export type CssQuad = CssSize | `${CssSize} ${CssSize}` | `${CssSize} ${CssSize} ${CssSize}` | `${CssSize} ${CssSize} ${CssSize} ${CssSize}`;
+export type CssDual = CssSize | `${CssSize} ${CssSize}`;
+export type CssQuad = CssDual | `${CssSize} ${CssSize} ${CssSize}` | `${CssSize} ${CssSize} ${CssSize} ${CssSize}`;
 export type CssShadow = CssQuad;
+export type CssSliceInset = `${CssSize} ${CssSize}` | `${CssSize} ${CssSize} ${CssSize} ${CssSize}`;
 export type CssBoxShadow = {
     shadow: CssShadow;
     color: Color3;

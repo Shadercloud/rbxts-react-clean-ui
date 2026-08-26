@@ -21,12 +21,12 @@ interface MenuProps {
 }
 
 type MenuComponent = React.ForwardRefExoticComponent<
-    MenuProps & React.RefAttributes<Frame>
+    MenuProps & React.RefAttributes<ImageLabel>
 > & {
     Item: typeof MenuItem;
 };
 
-const Menu = React.forwardRef<Frame, MenuProps>(
+const Menu = React.forwardRef<ImageLabel, MenuProps>(
     (props, ref) => {
 
         const [collapsed, setCollapsed] = React.useState<boolean>(props.collapsed ?? false)

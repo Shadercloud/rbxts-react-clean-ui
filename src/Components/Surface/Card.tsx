@@ -17,7 +17,7 @@ interface CardHeaderProps extends IntentElementProps {
     children?: React.ReactNode;
 }
 
-export const CardHeader = React.forwardRef<Frame, CardHeaderProps>(
+export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
         const card = React.useContext(CardContext);
@@ -43,7 +43,7 @@ interface CardBodyProps extends BoxProps {
 
 }
 
-export const CardBody = React.forwardRef<Frame, CardBodyProps>(
+export const CardBody = React.forwardRef<ImageLabel, CardBodyProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
         const padding = SpacingHelper.ResolveNumberPadding(SpacingHelper.GetPadding(theme, "md", theme.components.card.header.spacing))
@@ -63,7 +63,7 @@ interface CardFooterProps extends BoxProps, IntentElementProps {
 
 }
 
-export const CardFooter = React.forwardRef<Frame, CardFooterProps>(
+export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
         const card = React.useContext(CardContext);
@@ -92,14 +92,14 @@ interface CardProps extends BoxProps, IntentElementProps {
 
 
 type CardComponent = React.ForwardRefExoticComponent<
-    CardProps & React.RefAttributes<Frame>
+    CardProps & React.RefAttributes<ImageLabel>
 > & {
     Header: typeof CardHeader;
     Footer: typeof CardFooter;
     Body: typeof CardBody;
 };
 
-const Card = React.forwardRef<Frame, CardProps>(
+const Card = React.forwardRef<ImageLabel, CardProps>(
     (props, ref) => {
 
         const theme = React.useContext(CleanThemeContext);

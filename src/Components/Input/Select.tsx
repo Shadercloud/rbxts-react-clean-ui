@@ -18,7 +18,7 @@ import { Icon } from "../Surface";
 interface SelectProps
     extends ScalableElementProps,
     SpacedElementProps,
-    React.InstanceProps<Frame> {
+    React.InstanceProps<ImageLabel> {
     selected?: number;
     'max-height'?: CssSize;
     onChange?: (selected: number, value?: string) => void;
@@ -111,13 +111,13 @@ function SelectOption(props: SelectOptionProps) {
 }
 
 type SelectComponent = React.ForwardRefExoticComponent<
-    SelectProps & React.RefAttributes<Frame>
+    SelectProps & React.RefAttributes<ImageLabel>
 > & {
     Option: typeof SelectOption;
 };
 
 
-const Select = React.forwardRef<Frame, SelectProps>((props, ref) => {
+const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
     const theme = React.useContext(CleanThemeContext);
     const overlay = React.useContext(OverlayContext);
     const fieldset = React.useContext(FieldsetContext);

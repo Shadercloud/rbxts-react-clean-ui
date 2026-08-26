@@ -8,7 +8,7 @@ interface MenuProps {
     title: string;
     collapsed?: boolean;
 }
-type MenuComponent = React.ForwardRefExoticComponent<MenuProps & React.RefAttributes<Frame>> & {
+type MenuComponent = React.ForwardRefExoticComponent<MenuProps & React.RefAttributes<ImageLabel>> & {
     Item: typeof MenuItem;
 };
 declare const Menu: MenuComponent;

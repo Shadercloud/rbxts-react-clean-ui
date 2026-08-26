@@ -1,4 +1,5 @@
-import { ScaleSize, CssShadow, ButtonFlag } from "../Interfaces/";
+import { Binding } from "@rbxts/react";
+import { ScaleSize, CssShadow, ButtonFlag, CssDual, CssSliceInset } from "../Interfaces/";
 export interface TypographyStyle {
     font: Enum.Font;
     size: Enum.FontSize;
@@ -22,3 +23,12 @@ export interface IntentColors extends Partial<Record<ButtonFlag, IntentScheme>> 
 export type InlineIntentColors = {
     [State in keyof IntentColors]?: Partial<NonNullable<IntentColors[State]>>;
 };
+export interface CssBackgroundImage {
+    image: string | number;
+    slice?: CssSliceInset;
+    size?: Enum.ScaleType | "Stretch" | "Slice" | "Tile" | "Fit" | "Crop" | Binding<Enum.ScaleType>;
+    transparency?: number;
+    tintColor?: Color3;
+    tileSize?: CssDual;
+    sliceScale?: number;
+}

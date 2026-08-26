@@ -1,5 +1,5 @@
-import { CssShadow, CssSize, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow } from "../Interfaces/";
-import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors } from "./theme.style";
+import { CssShadow, CssSize, CssPadding, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow } from "../Interfaces/";
+import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors, CssBackgroundImage } from "./theme.style";
 export interface ThemeTemplate {
     colors: {
         intents: Record<Intent, IntentColors>;
@@ -48,7 +48,9 @@ export interface ThemeTemplate {
             borderColor: Color3;
             borderThickness: number;
             cornerRadius: CssSize;
+            padding?: CssPadding;
             boxShadow?: CssShadow;
+            backgroundImage?: CssBackgroundImage;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
         button: {

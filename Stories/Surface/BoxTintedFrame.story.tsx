@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import { createStory } from "@rbxts/react-clean-ui";
-import Box from "./Box";
+import BoxTintedFrame from "./BoxTintedFrame";
 
 // backgroundImage lives on theme.components.box.backgroundImage rather than as a Box
-// prop, so it's demonstrated inside Box.tsx via a themed subtree instead of a control here.
+// prop, so it's demonstrated inside BoxTintedFrame.tsx via a themed subtree instead of a control here.
 export = createStory((props) => (
-    <Box />
+    <BoxTintedFrame />
 ));

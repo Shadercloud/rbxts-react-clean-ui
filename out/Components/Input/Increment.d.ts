@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { IntentElementProps, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
-export interface IncrementProps extends ScalableElementProps, SpacedElementProps, IntentElementProps, React.InstanceProps<Frame> {
+export interface IncrementProps extends ScalableElementProps, SpacedElementProps, IntentElementProps, React.InstanceProps<ImageLabel> {
     value: number;
     onChange?: (value: number) => void;
     step?: number;
@@ -8,4 +8,4 @@ export interface IncrementProps extends ScalableElementProps, SpacedElementProps
     max?: number;
     controlled?: boolean;
 }
-export declare const Increment: React.ForwardRefExoticComponent<Omit<IncrementProps, "ref"> & React.RefAttributes<Frame>>;
+export declare const Increment: React.ForwardRefExoticComponent<Omit<IncrementProps, "ref"> & React.RefAttributes<ImageLabel>>;

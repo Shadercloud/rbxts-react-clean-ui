@@ -10,7 +10,9 @@ type SliderHandleIndex = 0 | 1;
 
 type HighlightOption = "start" | "end" | "middle";
 
-export interface SliderProps extends ContainerProps {
+export interface SliderProps extends
+    Omit<ContainerProps, keyof React.InstanceProps<ImageLabel>>,
+    React.InstanceProps<Frame> {
     "max-value": number;
     "min-value"?: number;
 

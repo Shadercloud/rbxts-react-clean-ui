@@ -1,1 +1,4 @@
 -- Compiled with roblox-ts v3.0.0
+-- absolute pixel corner coordinates for Rect.new(minX, minY, maxX, maxY)-style slicing,
+-- e.g. Roblox's SliceCenter — not a CSS border-image-slice edge-inset shorthand, since
+-- Roblox has no intrinsic-image-size equivalent to derive corners from an inset alone

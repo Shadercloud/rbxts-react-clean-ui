@@ -16,7 +16,7 @@ interface FieldsetSlotProps {
 }
 declare function FieldsetLabel(props: FieldsetSlotProps): React.JSX.Element;
 declare function FieldsetControl(props: FieldsetSlotProps): React.JSX.Element;
-type FieldsetComponent = React.ForwardRefExoticComponent<FieldsetProps & React.RefAttributes<Frame>> & {
+type FieldsetComponent = React.ForwardRefExoticComponent<FieldsetProps & React.RefAttributes<ImageLabel>> & {
     Label: typeof FieldsetLabel;
     Control: typeof FieldsetControl;
 };

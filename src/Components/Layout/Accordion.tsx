@@ -206,13 +206,13 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
     );
 }
 
-type AccordionComponent = React.ForwardRefExoticComponent<AccordionProps & React.RefAttributes<Frame>> & {
+type AccordionComponent = React.ForwardRefExoticComponent<AccordionProps & React.RefAttributes<ImageLabel>> & {
     Item: typeof AccordionItem;
     Header: typeof AccordionHeader;
     Content: typeof AccordionContent;
 };
 
-const Accordion = React.forwardRef<Frame, AccordionProps>((props, ref) => {
+const Accordion = React.forwardRef<ImageLabel, AccordionProps>((props, ref) => {
     const theme = React.useContext(CleanThemeContext);
     const items = React.useMemo(() => {
         const parsed = new Array<ParsedItem>();

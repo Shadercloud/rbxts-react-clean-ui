@@ -74,13 +74,13 @@ function FieldsetControl(props: FieldsetSlotProps) {
 
 
 type FieldsetComponent = React.ForwardRefExoticComponent<
-    FieldsetProps & React.RefAttributes<Frame>
+    FieldsetProps & React.RefAttributes<ImageLabel>
 > & {
     Label: typeof FieldsetLabel;
     Control: typeof FieldsetControl;
 };
 
-const Fieldset = React.forwardRef<Frame, FieldsetProps>(
+const Fieldset = React.forwardRef<ImageLabel, FieldsetProps>(
     (props, ref) => {
 
         const theme = React.useContext(CleanThemeContext);

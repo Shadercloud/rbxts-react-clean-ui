@@ -4,18 +4,20 @@ import {
     SizeElementProps,
     ZIndexElementProps,
 } from "../../Interfaces/";
-import { SizeHelper } from "../../Helpers/";
+import { SizeHelper, CssHelper } from "../../Helpers/";
+import { CssBackgroundImage } from "../../Theme";
 import { Group, GroupContext } from "./Group";
 
 export interface ContainerProps
     extends SizeElementProps,
     PositionElementProps,
     ZIndexElementProps,
-    React.InstanceProps<Frame> {
+    React.InstanceProps<ImageLabel> {
     group?: boolean;
+    backgroundImage?: CssBackgroundImage;
 }
 
-export const Container = React.forwardRef<Frame, ContainerProps>(
+export const Container = React.forwardRef<ImageLabel, ContainerProps>(
     (props, ref) => {
         const group = React.useContext(GroupContext);
 
@@ -28,8 +30,10 @@ export const Container = React.forwardRef<Frame, ContainerProps>(
             props.AnchorPoint === undefined &&
             isAutoSizeActive;
 
+        const backgroundImage = CssHelper.resolveBackgroundImage(props.backgroundImage);
+
         const content = (
-            <frame
+            <imagelabel
                 ref={ref}
                 Archivable={props.Archivable}
                 Tag={props.Tag}
@@ -70,7 +74,13 @@ export const Container = React.forwardRef<Frame, ContainerProps>(
                 AutoLocalize={props.AutoLocalize}
                 RootLocalizationTable={props.RootLocalizationTable}
 
-                Style={props.Style}
+                Image={backgroundImage.Image}
+                ImageColor3={backgroundImage.ImageColor3}
+                ImageTransparency={backgroundImage.ImageTransparency}
+                ScaleType={backgroundImage.ScaleType}
+                SliceCenter={backgroundImage.SliceCenter}
+                SliceScale={backgroundImage.SliceScale}
+                TileSize={backgroundImage.TileSize}
 
                 Change={props.Change}
                 Event={props.Event}
@@ -79,7 +89,7 @@ export const Container = React.forwardRef<Frame, ContainerProps>(
                 <Group.Element enabled={props.group}>
                     {props.children}
                 </Group.Element>
-            </frame>
+            </imagelabel>
         );
 
         if (!centerViaLayout) {

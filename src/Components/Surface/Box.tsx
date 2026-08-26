@@ -3,7 +3,8 @@ import { BackgroundElementProps, PaddingProps, PositionElementProps, ShadowEleme
 import { CleanThemeContext } from "../../Contexts/";
 import { Padding, Corners, BoxShadow } from "../Decorator";
 import { Container } from "../Layout";
-import { SizeHelper } from "../../Helpers";
+import { SizeHelper, CssHelper } from "../../Helpers";
+import { CssBackgroundImage } from "../../Theme";
 
 export interface BoxProps extends SpacedElementProps,
     ShadowElementProps,
@@ -11,14 +12,32 @@ export interface BoxProps extends SpacedElementProps,
     ZIndexElementProps,
     SizeElementProps,
     PositionElementProps,
-    React.InstanceProps<Frame> {
+    React.InstanceProps<ImageLabel> {
     'border-thickness'?: number;
     'border-color'?: Color3;
+    'background-image'?: CssBackgroundImage;
 }
 
-export const Box = React.forwardRef<Frame, BoxProps>(
+export const Box = React.forwardRef<ImageLabel, BoxProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
+
+        const paddingSourceProps = props as PaddingProps;
+
+        const hasCustomPadding =
+            paddingSourceProps.top !== undefined ||
+            paddingSourceProps.bottom !== undefined ||
+            paddingSourceProps.left !== undefined ||
+            paddingSourceProps.right !== undefined ||
+            paddingSourceProps.spacing !== undefined ||
+            paddingSourceProps.padding !== undefined ||
+            paddingSourceProps.resolvedPadding !== undefined;
+
+        const themePadding = theme.components.box.padding;
+
+        const paddingProps: PaddingProps = !hasCustomPadding && themePadding !== undefined
+            ? { resolvedPadding: CssHelper.parseCssQuad(themePadding) }
+            : paddingSourceProps;
 
         return (
             <Container
@@ -36,6 +55,7 @@ export const Box = React.forwardRef<Frame, BoxProps>(
                 }
                 ZIndex={props.ZIndex}
                 Event={props.Event}
+                backgroundImage={props['background-image'] ?? theme.components.box.backgroundImage}
             >
                 <uistroke
                     Thickness={props['border-thickness'] ?? theme.components.box.borderThickness}
@@ -43,11 +63,9 @@ export const Box = React.forwardRef<Frame, BoxProps>(
                     Color={props['border-color'] ?? theme.components.box.borderColor}
                 />
                 <BoxShadow {...props} value={theme.components.box.boxShadow} />
-                <Padding {...props as PaddingProps} />
+                <Padding {...paddingProps} />
 
                 <Corners radius={theme.components.box.cornerRadius} />
-
-
 
                 {props.children}
             </Container>

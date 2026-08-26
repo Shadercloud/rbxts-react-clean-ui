@@ -38,6 +38,94 @@ export function BoxExample() {
 </Box>
 ```
 
+## Background image
+
+Theme authors can set `theme.components.box.backgroundImage` to layer a 9-slice or scaled image on top of every `Box`'s background colour. This is purely additive — `backgroundColor`, `border-color`, corner radius, and `box-shadow` all keep working unchanged, so it's a way to build custom visual skins (a wooden-frame box, a beveled button, etc.) without giving up the existing token-based options. The border stroke still draws on top of the image, the corner radius still clips it, and the shadow still applies outside it.
+
+`Box` also accepts a `background-image` prop directly, which overrides the themed `backgroundImage` for that single instance — the same pattern used by `border-color`/`border-thickness`.
+
+Unlike CSS's `border-image-slice`, `slice` isn't an edge inset — it's the two literal corner points of the unscaled centre region, in absolute source-image pixel coordinates (the same values you'd pass to Roblox's own `SliceCenter`/`Rect.new(minX, minY, maxX, maxY)`). Roblox has no API for deriving those coordinates from an inset alone, so picking sensible values means knowing the source image's actual pixel dimensions. The example below assumes a 128x128 source image with a 12px sharp border, so the unscaled centre region runs from `(12, 12)` to `(116, 116)`:
+
+```tsx
+<Box
+    spacing="md"
+    background-image={{
+        image: "rbxassetid://1234567890",
+        slice: "12 116",
+    }}
+>
+    <Text text="Wooden Frame" variant="heading" />
+</Box>
+```
+
+`slice`'s coordinates are always the border's literal pixel size in the source image, so that same 12px border would otherwise render at 12px on every `Box` regardless of size. Add `sliceScale` (below `1`) to shrink the rendered border thickness without touching `slice` itself:
+
+```tsx
+<Box
+    spacing="md"
+    background-image={{
+        image: "rbxassetid://1234567890",
+        slice: "12 116",
+        sliceScale: 0.5,
+    }}
+>
+    <Text text="Thinner border" variant="heading" />
+</Box>
+```
+
+Use `createTheme` (or `extendTheme`) to set `components.box.backgroundImage` theme-wide instead, then apply it to a subtree with `ThemeProvider`:
+
+```tsx
+import { Box, createTheme, ThemeProvider, VStack, Text } from "@rbxts/react-clean-ui";
+
+const themeWithBackgroundImage = createTheme({
+    components: {
+        box: {
+            backgroundImage: {
+                image: "rbxassetid://1234567890",
+                slice: "12 116",
+            },
+        },
+    },
+});
+
+<ThemeProvider theme={themeWithBackgroundImage}>
+    <Box spacing="md">
+        <VStack>
+            <Text text="Wooden Frame" variant="heading" />
+            <Text text="The border, corner radius, and shadow still render on top of the image." />
+        </VStack>
+    </Box>
+</ThemeProvider>
+```
+
+`backgroundImage` accepts a `CssBackgroundImage` object:
+
+| Field         | Type                                                                                              | Default                  | Description                                                                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `image`       | `string`                                                                                           | -                         | The `rbxassetid://...` image to use.                                                                                                                  |
+| `slice`       | `CssSliceInset`                                                                                     | -                         | Absolute pixel coordinates, within the source image, of the two corners of the unscaled centre region — matching Roblox's `SliceCenter`/`Rect.new(minX, minY, maxX, maxY)` directly. `"A B"` places the corners at `(A, A)` and `(B, B)` (`Rect(A, A, B, B)`); `"A B C D"` sets them independently as `X1 Y1 X2 Y2` (`Rect(A, B, C, D)`). When set, the corners of the image stay sharp while the edges and centre stretch to fill the box. Omit for a plain, non-sliced image. |
+| `sliceScale`  | `number`                                                                                            | `1`                       | Maps directly to `ImageLabel.SliceScale`. Only has an effect when `slice` is set. Since `slice` is always given in absolute source-image pixel coordinates, a source image with a large sharp-border region would otherwise always render that same large thickness on any `Box`; setting `sliceScale` below `1` shrinks the rendered border thickness proportionally, decoupling it from the slice region's literal pixel size. |
+| `size`        | `Enum.ScaleType \| "Stretch" \| "Slice" \| "Tile" \| "Fit" \| "Crop" \| Binding<Enum.ScaleType>`    | `Enum.ScaleType.Stretch`  | Controls how a non-sliced image scales to fill the box. Accepts the enum, its member name as a string, or a `Binding<Enum.ScaleType>`. Has no effect when `slice` is set — the image is then always rendered 9-sliced with `Enum.ScaleType.Slice`. |
+| `tileSize`    | `CssDual`                                                                                          | `"100%"`                  | Size of each repeat when `size` resolves to `Enum.ScaleType.Tile`, using CSS `background-size`-style shorthand (e.g. `"25%"` for both axes, or `"25% 25%"` for X then Y). Has no effect otherwise, and is ignored when `slice` is set — `slice` always forces `Enum.ScaleType.Slice`.                       |
+| `transparency`| `number`                                                                                           | -                         | Transparency of the image itself, independent of `BackgroundTransparency`.                                                                            |
+| `tintColor`   | `Color3`                                                                                           | -                         | Colour tint applied to the image.                                                                                                                     |
+
+To tile an image instead of stretching it, pair `size: Enum.ScaleType.Tile` with a `tileSize` (e.g. `"25% 25%"` to repeat it 4x4 across the box):
+
+```tsx
+<Box
+    spacing="md"
+    background-image={{
+        image: "rbxassetid://1234567890",
+        size: Enum.ScaleType.Tile,
+        tileSize: "25% 25%",
+    }}
+>
+    <Text text="Tiled pattern" variant="heading" />
+</Box>
+```
+
 ## Props
 
 | Prop                     | Type        | Description                                                  |
@@ -53,6 +141,6 @@ export function BoxExample() {
 
 ## Notes
 
-- Uses the current theme for colours, border, corner radius, shadow, and padding.
+- Uses the current theme for colours, border, corner radius, shadow, padding, and (optionally) background image.
 - Automatically sizes vertically to fit its children.
 - Accepts any child components.

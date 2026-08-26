@@ -7,9 +7,17 @@ local Padding = _Decorator.Padding
 local Corners = _Decorator.Corners
 local BoxShadow = _Decorator.BoxShadow
 local Container = TS.import(script, script.Parent.Parent, "Layout").Container
-local SizeHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").SizeHelper
+local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local SizeHelper = _Helpers.SizeHelper
+local CssHelper = _Helpers.CssHelper
 local Box = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
+	local paddingSourceProps = props
+	local hasCustomPadding = paddingSourceProps.top ~= nil or paddingSourceProps.bottom ~= nil or paddingSourceProps.left ~= nil or paddingSourceProps.right ~= nil or paddingSourceProps.spacing ~= nil or paddingSourceProps.padding ~= nil or paddingSourceProps.resolvedPadding ~= nil
+	local themePadding = theme.components.box.padding
+	local paddingProps = if not hasCustomPadding and themePadding ~= nil then {
+		resolvedPadding = CssHelper:parseCssQuad(themePadding),
+	} else paddingSourceProps
 	local _attributes = {
 		ref = ref,
 	}
@@ -26,6 +34,7 @@ local Box = React.forwardRef(function(props, ref)
 	_attributes.BackgroundColor3 = props.BackgroundColor3 or theme.components.box.backgroundColor
 	_attributes.ZIndex = props.ZIndex
 	_attributes.Event = props.Event
+	_attributes.backgroundImage = props["background-image"] or theme.components.box.backgroundImage
 	local _attributes_1 = {}
 	local _condition_1 = props["border-thickness"]
 	if _condition_1 == nil then
@@ -39,7 +48,7 @@ local Box = React.forwardRef(function(props, ref)
 	setmetatable(_attributes_2, nil)
 	_attributes_2.value = theme.components.box.boxShadow
 	local _exp_1 = React.createElement(BoxShadow, _attributes_2)
-	local _attributes_3 = table.clone(props)
+	local _attributes_3 = table.clone(paddingProps)
 	setmetatable(_attributes_3, nil)
 	return React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(Padding, _attributes_3), React.createElement(Corners, {
 		radius = theme.components.box.cornerRadius,

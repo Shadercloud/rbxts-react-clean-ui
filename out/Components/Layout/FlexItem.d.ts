@@ -8,5 +8,5 @@ interface FlexItemProps extends ContainerProps {
     ShrinkRatio?: number;
     HorizontalFlex?: Enum.UIFlexAlignment | "None" | "SpaceAround" | "Fill" | Binding<Enum.UIFlexAlignment>;
 }
-export declare const FlexItem: React.ForwardRefExoticComponent<Omit<FlexItemProps, "ref"> & React.RefAttributes<Frame>>;
+export declare const FlexItem: React.ForwardRefExoticComponent<Omit<FlexItemProps, "ref"> & React.RefAttributes<ImageLabel>>;
 export {};

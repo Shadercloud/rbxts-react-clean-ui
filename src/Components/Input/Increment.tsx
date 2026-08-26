@@ -13,7 +13,7 @@ export interface IncrementProps
     extends ScalableElementProps,
     SpacedElementProps,
     IntentElementProps,
-    React.InstanceProps<Frame> {
+    React.InstanceProps<ImageLabel> {
     value: number;
     onChange?: (value: number) => void;
     step?: number;
@@ -22,7 +22,7 @@ export interface IncrementProps
     controlled?: boolean;
 }
 
-export const Increment = React.forwardRef<Frame, IncrementProps>(
+export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
     (props, ref) => {
         const [value, setValue] = React.useState(props.value);
 

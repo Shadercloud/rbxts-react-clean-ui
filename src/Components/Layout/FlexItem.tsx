@@ -10,7 +10,7 @@ interface FlexItemProps extends ContainerProps {
     HorizontalFlex?: Enum.UIFlexAlignment | "None" | "SpaceAround" | "Fill" | Binding<Enum.UIFlexAlignment>
 
 }
-export const FlexItem = React.forwardRef<Frame, FlexItemProps>(
+export const FlexItem = React.forwardRef<ImageLabel, FlexItemProps>(
     (props, ref) => {
 
         return (

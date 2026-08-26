@@ -22,13 +22,23 @@ export type CssBreakpointSize = {
     xl?: CssSize;
 };
 
-export type CssQuad =
+export type CssDual =
     | CssSize
-    | `${CssSize} ${CssSize}`
+    | `${CssSize} ${CssSize}`;
+
+export type CssQuad =
+    | CssDual
     | `${CssSize} ${CssSize} ${CssSize}`
     | `${CssSize} ${CssSize} ${CssSize} ${CssSize}`;
 
 export type CssShadow = CssQuad;
+
+// absolute pixel corner coordinates for Rect.new(minX, minY, maxX, maxY)-style slicing,
+// e.g. Roblox's SliceCenter — not a CSS border-image-slice edge-inset shorthand, since
+// Roblox has no intrinsic-image-size equivalent to derive corners from an inset alone
+export type CssSliceInset =
+    | `${CssSize} ${CssSize}`
+    | `${CssSize} ${CssSize} ${CssSize} ${CssSize}`;
 
 export type CssBoxShadow = {
     shadow: CssShadow;

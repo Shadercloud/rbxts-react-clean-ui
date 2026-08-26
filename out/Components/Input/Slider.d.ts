@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { ContainerProps } from "../Layout";
 type SliderValue = number | Vector2;
 type HighlightOption = "start" | "end" | "middle";
-export interface SliderProps extends ContainerProps {
+export interface SliderProps extends Omit<ContainerProps, keyof React.InstanceProps<ImageLabel>>, React.InstanceProps<Frame> {
     "max-value": number;
     "min-value"?: number;
     value?: SliderValue;

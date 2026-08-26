@@ -1,7 +1,9 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local SizeHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").SizeHelper
+local _ = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local SizeHelper = _.SizeHelper
+local CssHelper = _.CssHelper
 local _Group = TS.import(script, script.Parent, "Group")
 local Group = _Group.Group
 local GroupContext = _Group.GroupContext
@@ -10,6 +12,7 @@ local Container = React.forwardRef(function(props, ref)
 	local autoSize = SizeHelper:GetAutoSize(props)
 	local isAutoSizeActive = autoSize ~= Enum.AutomaticSize.None and autoSize ~= "None"
 	local centerViaLayout = props.center == true and props.Position == nil and props.AnchorPoint == nil and isAutoSizeActive
+	local backgroundImage = CssHelper:resolveBackgroundImage(props.backgroundImage)
 	local _attributes = {
 		ref = ref,
 		Archivable = props.Archivable,
@@ -64,10 +67,16 @@ local Container = React.forwardRef(function(props, ref)
 	_attributes.ZIndex = props.ZIndex
 	_attributes.AutoLocalize = props.AutoLocalize
 	_attributes.RootLocalizationTable = props.RootLocalizationTable
-	_attributes.Style = props.Style
+	_attributes.Image = backgroundImage.Image
+	_attributes.ImageColor3 = backgroundImage.ImageColor3
+	_attributes.ImageTransparency = backgroundImage.ImageTransparency
+	_attributes.ScaleType = backgroundImage.ScaleType
+	_attributes.SliceCenter = backgroundImage.SliceCenter
+	_attributes.SliceScale = backgroundImage.SliceScale
+	_attributes.TileSize = backgroundImage.TileSize
 	_attributes.Change = props.Change
 	_attributes.Event = props.Event
-	local content = (React.createElement("frame", _attributes, React.createElement(Group.Element, {
+	local content = (React.createElement("imagelabel", _attributes, React.createElement(Group.Element, {
 		enabled = props.group,
 	}, props.children)))
 	if not centerViaLayout then
