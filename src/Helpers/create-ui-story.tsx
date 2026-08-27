@@ -4,8 +4,20 @@ import { DarkTheme, DefaultTheme, SandstoneTheme, WoodenTheme } from "../Theme";
 import { InferProps, Choose } from "@rbxts/ui-labs";
 import { CleanUiProvider } from "../Providers/app.provider";
 
+const THEME_ATTRIBUTE = "UILabsSelectedTheme";
+const themeControl = Choose(["Default", "Dark", "Sandstone", "Wooden"]);
+const persistedTheme = script.GetAttribute(THEME_ATTRIBUTE);
+
+function isThemeName(value: unknown): value is typeof themeControl.ControlValue {
+    return typeIs(value, "string") && themeControl.List.some((theme) => theme === value);
+}
+
+if (isThemeName(persistedTheme)) {
+    themeControl.ControlValue = persistedTheme;
+}
+
 const controls = {
-    Theme: Choose(["Default", "Dark", "Sandstone", "Wooden"]),
+    Theme: themeControl,
 };
 
 type StoryControl = Parameters<typeof import("@rbxts/ui-labs").Ordered>[0];
@@ -28,6 +40,8 @@ export function createStory<T extends StoryControls = {}>(
 
         story: (props: StoryProps<T>) => {
             const baseProps = props as unknown as InferProps<typeof controls>;
+            script.SetAttribute(THEME_ATTRIBUTE, baseProps.controls.Theme);
+
             let theme = DefaultTheme;
             if (baseProps.controls.Theme === "Dark")
                 theme = DarkTheme
