@@ -1,5 +1,6 @@
 export type CssUnit = "px" | "%";
 export type CssSize = "Auto" | number | `${number}` | `${number}${CssUnit}`;
+export type CssCalcSize = CssSize | `${number}% - ${number}px` | `${number}% + ${number}px`;
 export type CssBreakpoint = {
     xs: number;
     sm: number;

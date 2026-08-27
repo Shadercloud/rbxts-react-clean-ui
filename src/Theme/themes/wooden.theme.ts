@@ -141,6 +141,148 @@ export const WoodenTheme = createTheme({
                 color: Color3.fromHex("#546b8a"),
             }
         },
+        card: {
+            borderThickness: 0,
+            cornerRadius: 0,
+            header: {
+                intents: {
+                    // Every intent shares the same plaque (image/slice), text
+                    // color, border color, and transparency — only the wood
+                    // stain tint differs, so only `primary` spells those
+                    // shared fields out. The others just override
+                    // `backgroundImage.tintColor`; ColorHelper's cascade
+                    // always layers the `primary` entry underneath the
+                    // selected intent, and merges `backgroundImage` field-by-
+                    // field rather than replacing it wholesale, so everything
+                    // but `tintColor` falls through from `primary` below
+                    // (same pattern already used by this theme's `button`/
+                    // `checkbox` intents).
+                    primary: {
+                        default: {
+                            textColor: Color3.fromHex("#FFF7CF"),
+                            borderColor: Color3.fromHex("#3D2712"),
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                image: 92016395170536,
+                                slice: "10 5 240 40",
+                                tintColor: Color3.fromHex("#7A4A20"),
+                            },
+                        },
+                    },
+                    success: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#4E6A24"),
+                            },
+                        },
+                    },
+                    info: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#2C5270"),
+                            },
+                        },
+                    },
+                    warning: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#A67A20"),
+                            },
+                        },
+                    },
+                    danger: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#7A3220"),
+                            },
+                        },
+                    },
+                },
+                // Mounted plaque look: centered horizontally on the box and
+                // pulled up so it protrudes above the box's top edge instead
+                // of sitting in-flow like a normal header bar.
+                position: {
+                    position: "absolute",
+                    center: "x",
+                    top: "-10px",
+                    zIndex: 2,
+                },
+            },
+            footer: {
+                spacing: {
+                    xs: 1,
+                    sm: 2,
+                    md: 4,
+                    lg: 6,
+                    xl: 6
+                },
+                intents: {
+                    // Same cascade as `header.intents` above — only `primary`
+                    // spells out the shared fields, the rest just override
+                    // `backgroundImage.tintColor`.
+                    primary: {
+                        default: {
+                            textColor: Color3.fromHex("#FFF7CF"),
+                            borderColor: Color3.fromHex("#3D2712"),
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                image: 92016395170536,
+                                slice: "10 5 240 40",
+                                tintColor: Color3.fromHex("#7A4A20"),
+                            },
+                        },
+                    },
+                    success: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#4E6A24"),
+                            },
+                        },
+                    },
+                    info: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#2C5270"),
+                            },
+                        },
+                    },
+                    warning: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#A67A20"),
+                            },
+                        },
+                    },
+                    danger: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#7A3220"),
+                            },
+                        },
+                    },
+                },
+                // Mounted plaque look, mirroring the header, but flush with
+                // the box's bottom edge (no negative offset/protrusion) and
+                // inset 50px on each side (left/right insets implicitly
+                // center it and imply a width narrower than the box, same as
+                // standard CSS absolute positioning).
+                position: {
+                    position: "absolute",
+                    bottom: "-10px",
+                    left: "50px",
+                    right: "50px",
+                    zIndex: 2,
+                },
+            },
+        },
         select: {
             cornerRadius: 0,
             borderThickness: 0,

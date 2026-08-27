@@ -1,5 +1,5 @@
 import { Binding } from "@rbxts/react";
-import { ScaleSize, CssShadow, ButtonFlag, CssDual, CssSliceInset } from "../Interfaces/";
+import { ScaleSize, CssShadow, ButtonFlag, CssDual, CssSliceInset, CssSize, CssCalcSize } from "../Interfaces/";
 export interface TypographyStyle {
     font: Enum.Font;
     size: Enum.FontSize;
@@ -35,4 +35,14 @@ export interface CssBackgroundImage {
     tintColor?: Color3;
     tileSize?: CssDual;
     sliceScale?: number;
+}
+export interface CssPosition {
+    position?: "static" | "absolute";
+    top?: CssSize;
+    left?: CssSize;
+    right?: CssSize;
+    bottom?: CssSize;
+    center?: boolean | "x" | "y";
+    zIndex?: number;
+    width?: CssCalcSize;
 }

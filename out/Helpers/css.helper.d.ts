@@ -1,4 +1,4 @@
-import { CssBoxShadow, CssShadow, CssSize, CssQuad, CssDual, CssSliceInset } from "../Interfaces/css.types";
+import { CssBoxShadow, CssShadow, CssCalcSize, CssQuad, CssDual, CssSliceInset } from "../Interfaces/css.types";
 import { CssBackgroundImage } from "../Theme";
 interface ParsedShadow {
     offset: UDim2;
@@ -20,7 +20,7 @@ interface ParsedSliceInset {
 export declare class CssHelper {
     static parseCssShadow(value: CssShadow): ParsedShadow | undefined;
     private static isZero;
-    static parseCssSize(value: CssSize): UDim;
+    static parseCssSize(value: CssCalcSize): UDim;
     static parseCssQuad(value: CssQuad): ParsedQuad;
     private static toRawPixels;
     static parseCssSliceInset(value: CssSliceInset): ParsedSliceInset;

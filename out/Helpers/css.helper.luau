@@ -86,6 +86,24 @@ do
 		if type(_value) == "number" then
 			return UDim.new(0, value)
 		end
+		-- The one CSS calc() shape supported: "<percent>% - <px>px" /
+		-- "<percent>% + <px>px" (e.g. "100% - 50px") maps directly onto
+		-- UDim(scale, offset) — split on the literal " - "/" + " separator
+		-- and parse each term with this same function. Anything without
+		-- either separator falls through to the single-token parsing below,
+		-- unchanged.
+		local minusParts = string.split(value, " - ")
+		if #minusParts == 2 then
+			local scale = self:parseCssSize(minusParts[1]).Scale
+			local offset = self:parseCssSize(minusParts[2]).Offset
+			return UDim.new(scale, -offset)
+		end
+		local plusParts = string.split(value, " + ")
+		if #plusParts == 2 then
+			local scale = self:parseCssSize(plusParts[1]).Scale
+			local offset = self:parseCssSize(plusParts[2]).Offset
+			return UDim.new(scale, offset)
+		end
 		if string.sub(value, -1) == "%" then
 			local _condition = tonumber(string.sub(value, 1, -2))
 			if _condition == nil then

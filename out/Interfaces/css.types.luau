@@ -1,4 +1,17 @@
 -- Compiled with roblox-ts v3.0.0
+-- The one CSS calc() shape supported on top of CssSize: a percent term
+-- plus/minus a pixel term (e.g. "100% - 50px"), which maps directly onto
+-- UDim(scale, offset) — no general calc() parser needed for anything beyond
+-- this two-term form. Deliberately kept as its own type rather than folded
+-- directly into CssSize: CssSize is composed multiple times over in CssQuad/
+-- CssDual (a 4-term CssQuad is `${CssSize} ${CssSize} ${CssSize} ${CssSize}`),
+-- so widening CssSize itself multiplies out through every one of those
+-- combinations — doing so was observed to blow past TypeScript's template-
+-- literal complexity limit ("union type that is too complex to represent")
+-- at unrelated call sites that spread a large props object containing
+-- several CssQuad-shaped fields (e.g. Button.tsx's `<BoxShadow {...props} />`).
+-- Use CssCalcSize only where a calc() term is actually needed (currently
+-- just CssPosition.width) rather than everywhere CssSize appears.
 -- absolute pixel corner coordinates for Rect.new(minX, minY, maxX, maxY)-style slicing,
 -- e.g. Roblox's SliceCenter — not a CSS border-image-slice edge-inset shorthand, since
 -- Roblox has no intrinsic-image-size equivalent to derive corners from an inset alone

@@ -141,6 +141,126 @@ local WoodenTheme = createTheme({
 				color = Color3.fromHex("#546b8a"),
 			},
 		},
+		card = {
+			borderThickness = 0,
+			cornerRadius = 0,
+			header = {
+				intents = {
+					primary = {
+						default = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							borderColor = Color3.fromHex("#3D2712"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								image = 92016395170536,
+								slice = "10 5 240 40",
+								tintColor = Color3.fromHex("#7A4A20"),
+							},
+						},
+					},
+					success = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#4E6A24"),
+							},
+						},
+					},
+					info = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#2C5270"),
+							},
+						},
+					},
+					warning = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#A67A20"),
+							},
+						},
+					},
+					danger = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#7A3220"),
+							},
+						},
+					},
+				},
+				position = {
+					position = "absolute",
+					center = "x",
+					top = "-10px",
+					zIndex = 2,
+				},
+			},
+			footer = {
+				spacing = {
+					xs = 1,
+					sm = 2,
+					md = 4,
+					lg = 6,
+					xl = 6,
+				},
+				intents = {
+					primary = {
+						default = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							borderColor = Color3.fromHex("#3D2712"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								image = 92016395170536,
+								slice = "10 5 240 40",
+								tintColor = Color3.fromHex("#7A4A20"),
+							},
+						},
+					},
+					success = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#4E6A24"),
+							},
+						},
+					},
+					info = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#2C5270"),
+							},
+						},
+					},
+					warning = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#A67A20"),
+							},
+						},
+					},
+					danger = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#7A3220"),
+							},
+						},
+					},
+				},
+				position = {
+					position = "absolute",
+					bottom = "-10px",
+					left = "50px",
+					right = "50px",
+					zIndex = 2,
+				},
+			},
+		},
 		select = {
 			cornerRadius = 0,
 			borderThickness = 0,

@@ -1,4 +1,4 @@
-import { CssBoxShadow, CssShadow, CssSize, CssQuad, CssDual, CssSliceInset } from "../Interfaces/css.types";
+import { CssBoxShadow, CssShadow, CssSize, CssCalcSize, CssQuad, CssDual, CssSliceInset } from "../Interfaces/css.types";
 import { CssBackgroundImage } from "../Theme";
 
 interface ParsedShadow {
@@ -67,9 +67,33 @@ export class CssHelper {
         return value.Scale === 0 && value.Offset === 0;
     }
 
-    public static parseCssSize(value: CssSize): UDim {
+    // Accepts CssCalcSize (a CssSize plus the one supported calc() shape)
+    // rather than plain CssSize so a caller like CssPosition.width can pass
+    // a calc() term through — every existing CssSize-typed caller still
+    // type-checks unchanged, since CssSize is a subset of CssCalcSize.
+    public static parseCssSize(value: CssCalcSize): UDim {
         if (typeIs(value, "number")) {
             return new UDim(0, value);
+        }
+
+        // The one CSS calc() shape supported: "<percent>% - <px>px" /
+        // "<percent>% + <px>px" (e.g. "100% - 50px") maps directly onto
+        // UDim(scale, offset) — split on the literal " - "/" + " separator
+        // and parse each term with this same function. Anything without
+        // either separator falls through to the single-token parsing below,
+        // unchanged.
+        const minusParts = value.split(" - ");
+        if (minusParts.size() === 2) {
+            const scale = this.parseCssSize(minusParts[0] as CssCalcSize).Scale;
+            const offset = this.parseCssSize(minusParts[1] as CssCalcSize).Offset;
+            return new UDim(scale, -offset);
+        }
+
+        const plusParts = value.split(" + ");
+        if (plusParts.size() === 2) {
+            const scale = this.parseCssSize(plusParts[0] as CssCalcSize).Scale;
+            const offset = this.parseCssSize(plusParts[1] as CssCalcSize).Offset;
+            return new UDim(scale, offset);
         }
 
         if (value.sub(-1) === "%") {

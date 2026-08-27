@@ -14,7 +14,7 @@ export interface ContainerProps
     ZIndexElementProps,
     React.InstanceProps<ImageLabel> {
     group?: boolean;
-    backgroundImage?: CssBackgroundImage;
+    backgroundImage?: Partial<CssBackgroundImage>;
 }
 
 export const Container = React.forwardRef<ImageLabel, ContainerProps>(
