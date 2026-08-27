@@ -169,6 +169,7 @@ local Select = React.forwardRef(function(props, ref)
 	end
 	_attributes.Size = UDim2.fromScale(1, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes.backgroundImage = props.backgroundImage or theme.components.select.backgroundImage
 	local _exp_1 = React.createElement("uistroke", {
 		Thickness = theme.components.select.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,

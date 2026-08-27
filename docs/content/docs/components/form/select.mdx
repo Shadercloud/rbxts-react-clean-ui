@@ -298,6 +298,27 @@ Avoid wrapping options inside another component or frame:
 
 The `Select` component assigns option indexes while processing its direct children.
 
+## Background Image
+
+Use `backgroundImage` to apply a scaled, tiled, or sliced image to the closed select control. The image is layered over the select's background colour, while its border and corner styling continue to come from the active theme.
+
+```tsx
+<Select
+    backgroundImage={{
+        image: "rbxassetid://1234567890",
+        slice: "12 116",
+    }}
+>
+    <Select.Option text="Oak" />
+    <Select.Option text="Walnut" />
+    <Select.Option text="Maple" />
+</Select>
+```
+
+The `backgroundImage` prop accepts a `CssBackgroundImage` object. Its fields match the background-image styling supported by [`Box`](/components/surface/box), including `slice`, `sliceScale`, `size`, `tileSize`, `transparency`, and `tintColor`.
+
+When `backgroundImage` is not provided, the select uses `theme.components.select.backgroundImage` if the active theme defines one. A directly supplied prop overrides the theme value for that select instance.
+
 ## Native Frame Properties
 
 `Select` renders its root as a [`Container`](/components/layout/container), so it extends `React.InstanceProps<Frame>` and accepts native Roblox `Frame` properties directly, rather than the `TextBox` properties its underlying control might suggest.
@@ -325,6 +346,7 @@ See the `Container` documentation for the full set of native `Frame` properties 
 | `scale`      | `ScaleSize`                 | Theme default | Controls the typography scale used by the select.                     |
 | `spacing`    | `SpaceSize`                 | Theme default | Controls the internal padding of the select.                          |
 | `max-height` | `CssSize`                   | Theme default | Sets the maximum height of the dropdown before it becomes scrollable. |
+| `backgroundImage` | `CssBackgroundImage`       | Theme default | Sets the image layered over the closed select control's background.   |
 | `children`   | `React.ReactNode`           | —             | The `Select.Option` components displayed in the dropdown.             |
 
 ### Shared and native properties
@@ -418,3 +440,7 @@ export function SettingsForm() {
     );
 }
 ```
+
+## Theme Values
+
+The select's appearance is controlled by `theme.components.select`. Its `backgroundImage` value supplies the closed control's background image when the `backgroundImage` prop is omitted. Existing select theme values continue to control typography, spacing, borders, corner radius, dropdown height, dropdown colour, and option intent colours.

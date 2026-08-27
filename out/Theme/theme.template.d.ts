@@ -76,6 +76,7 @@ export interface ThemeTemplate {
             borderColor: Color3;
             borderThickness: number;
             cornerRadius: CssSize;
+            backgroundImage?: CssBackgroundImage;
             dropDownBackgroundColor: Color3;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             intents?: Partial<Record<Intent, InlineIntentColors>>;

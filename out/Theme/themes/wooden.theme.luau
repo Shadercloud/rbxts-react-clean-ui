@@ -141,6 +141,32 @@ local WoodenTheme = createTheme({
 				color = Color3.fromHex("#546b8a"),
 			},
 		},
+		select = {
+			cornerRadius = 0,
+			borderThickness = 0,
+			dropDownBackgroundColor = Color3.fromHex("#295896"),
+			backgroundImage = {
+				image = 92016395170536,
+				slice = "10 5 248 44",
+				tintColor = Color3.fromHex("#295896"),
+			},
+			intents = {
+				primary = {
+					default = {
+						textColor = Color3.fromHex("#FFF7CF"),
+						backgroundColor = Color3.fromHex("#295896"),
+					},
+					hover = {
+						textColor = Color3.fromHex("#FFF7CF"),
+						backgroundColor = Color3.fromHex("#376FAF"),
+					},
+					focus = {
+						textColor = Color3.fromHex("#FFF7CF"),
+						backgroundColor = Color3.fromHex("#1F477D"),
+					},
+				},
+			},
+		},
 		increment = {
 			button = {
 				intents = {

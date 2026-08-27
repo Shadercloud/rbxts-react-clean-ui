@@ -10,6 +10,11 @@ export const preview = {
             <Container width="80%" height="180" center>
                 <Box>
                     <Select
+                        backgroundImage={{
+                            image: 92016395170536,
+                            slice: "10 5 248 44",
+                            tintColor: Color3.fromHex("#295896"),
+                        }}
                         onChange={(index: number) => {
                             print(`Selected Option: ${index}`);
                         }}

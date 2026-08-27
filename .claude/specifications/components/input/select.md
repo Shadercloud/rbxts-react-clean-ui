@@ -4,7 +4,7 @@
 
 ## Public API
 
-- `SelectProps` composes `ScalableElementProps`, `SpacedElementProps`, and `React.InstanceProps<Frame>` (it renders through `Container`, so it accepts native `Frame` properties, not `TextBox` properties), plus `selected?: number`, `'max-height'?: CssSize`, and `onChange?: (selected: number, value?: string) => void`.
+- `SelectProps` composes `ScalableElementProps`, `SpacedElementProps`, and `React.InstanceProps<ImageLabel>` (it renders through `Container`, so it accepts native `ImageLabel` properties, not `TextBox` properties), plus `selected?: number`, `'max-height'?: CssSize`, `backgroundImage?: CssBackgroundImage`, and `onChange?: (selected: number, value?: string) => void`.
 - `Select.Option` accepts `text?: string`, `children?: React.ReactNode`, `Event?: React.InstanceEvent<ImageButton>`, and `BackgroundColor3?: Color3`. `index` and `value` are assigned/consumed internally; `index` must not be set by a consumer (`Select` assigns it based on child position).
 - Only direct `Select.Option` children are recognized — `Select` assigns each child's `index` by iterating `props.children` directly, so options nested inside another element do not receive a valid `index` and their `Select.Option` internals will assert.
 - `selected` only seeds the initial selected index (`React.useState(props.selected ?? 0)`); after mount, the component manages the selected index internally and does not resync to a later change of the `selected` prop.
@@ -27,6 +27,7 @@
 - `borderColor`, `borderThickness` (`Inner` stroke on the control, `Outer` stroke on the dropdown), `cornerRadius` for both the control and the dropdown.
 - `dropDownBackgroundColor`.
 - `typography`, resolved via `TypographyHelper.getTypography`.
+- Optional `backgroundImage`, overridden per instance by the matching `SelectProps.backgroundImage`, renders directly on the root `Container` using the shared `CssBackgroundImage` shape and resolution behavior.
 - `intents` for the `default`/`hover`/`focus` (selected) option colors.
 - `maxDropDownHeight`, the fallback for `'max-height'`.
 

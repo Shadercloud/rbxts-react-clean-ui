@@ -10,17 +10,19 @@ import {
     ScalableElementProps,
     SpacedElementProps,
 } from "../../Interfaces";
+import { CssBackgroundImage } from "../../Theme";
 import { Corners, Padding } from "../Decorator";
 import { Container, FieldsetContext, FlexItem, HStack, Scroller, VStack } from "../Layout";
 import { Text } from "../Typography";
 import { Icon } from "../Surface";
 
-interface SelectProps
+export interface SelectProps
     extends ScalableElementProps,
     SpacedElementProps,
     React.InstanceProps<ImageLabel> {
     selected?: number;
     'max-height'?: CssSize;
+    backgroundImage?: CssBackgroundImage;
     onChange?: (selected: number, value?: string) => void;
 }
 
@@ -239,6 +241,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
             {...props}
             Size={UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
+            backgroundImage={props.backgroundImage ?? theme.components.select.backgroundImage}
         >
             <SelectContext.Provider value={context}>
                 <imagebutton
