@@ -100,9 +100,11 @@ export interface ThemeTemplate {
             list: {
                 borderColor?: Color3;
                 backgroundColor?: Color3;
+                backgroundTransparency?: number;
                 borderThickness: number;
                 cornerRadius: CssSize;
                 spacing?: ScaleSizeValue<number>;
+                backgroundImage?: CssBackgroundImage;
             };
             button: {
                 borderThickness: number;

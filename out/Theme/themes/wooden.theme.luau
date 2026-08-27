@@ -118,6 +118,105 @@ local WoodenTheme = createTheme({
 				},
 			},
 		},
+		tabs = {
+			list = {
+				borderThickness = 0,
+				cornerRadius = 0,
+				backgroundTransparency = 1,
+				backgroundImage = {
+					image = 92016395170536,
+					slice = "10 5 240 40",
+					tintColor = Color3.fromHex("#5C3A18"),
+				},
+			},
+			button = {
+				cornerRadius = 0,
+				borderThickness = 0,
+				intents = {
+					primary = {
+						default = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								image = 92016395170536,
+								slice = "10 5 240 40",
+								tintColor = Color3.fromHex("#A16B30"),
+							},
+						},
+						hover = {
+							textColor = Color3.fromHex("#d3cba3"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#BA854A"),
+							},
+						},
+						focus = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#7A4A20"),
+							},
+						},
+					},
+					success = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#63ff00"),
+							},
+						},
+						hover = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#29ff52"),
+							},
+						},
+					},
+					info = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#00bfff"),
+							},
+						},
+						hover = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#29d4ff"),
+							},
+						},
+					},
+					warning = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#ffbf00"),
+							},
+						},
+						hover = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#ffd429"),
+							},
+						},
+					},
+					danger = {
+						default = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#ff0000"),
+							},
+						},
+						hover = {
+							backgroundTransparency = 1,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#ff2929"),
+							},
+						},
+					},
+				},
+			},
+		},
 		box = {
 			borderThickness = 0,
 			boxShadow = 0,

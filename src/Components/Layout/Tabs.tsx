@@ -5,7 +5,7 @@ import { Text } from "../Typography";
 import { Container } from "./Container";
 import { CleanThemeContext } from "../../Contexts";
 import { BoxShadow, Corners, Padding } from "../Decorator";
-import { ColorHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { ScalableElementProps } from "../../Interfaces";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
 
@@ -143,6 +143,10 @@ const Tabs = React.forwardRef<ImageLabel, TabsProps>(
             theme.components.tabs.button.intents,
         );
 
+        const buttonDefaultBackgroundImage = CssHelper.resolveBackgroundImage(buttonDefault.backgroundImage);
+        const buttonHoverBackgroundImage = CssHelper.resolveBackgroundImage(buttonHover.backgroundImage);
+        const buttonFocusBackgroundImage = CssHelper.resolveBackgroundImage(buttonFocus.backgroundImage);
+
         return (
 
             <VStack>
@@ -150,7 +154,8 @@ const Tabs = React.forwardRef<ImageLabel, TabsProps>(
                     ref={ref}
                     BackgroundColor3={theme.components.tabs.list.backgroundColor}
                     width="100%"
-                    BackgroundTransparency={0}>
+                    BackgroundTransparency={theme.components.tabs.list.backgroundTransparency ?? 0}
+                    backgroundImage={theme.components.tabs.list.backgroundImage}>
                     <Corners radius={theme.components.tabs.list.cornerRadius} />
                     <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing)} />
                     <HStack>
@@ -159,11 +164,17 @@ const Tabs = React.forwardRef<ImageLabel, TabsProps>(
                                 default={{
                                     Size: UDim2.fromScale(0, 0),
                                     AutomaticSize: Enum.AutomaticSize.XY,
-                                    ImageTransparency: 1,
                                     BackgroundColor3: buttonDefault.backgroundColor,
                                     BackgroundTransparency: buttonDefault.backgroundTransparency,
                                     BorderSizePixel: 0,
                                     AutoButtonColor: false,
+                                    Image: buttonDefaultBackgroundImage.Image,
+                                    ImageColor3: buttonDefaultBackgroundImage.ImageColor3,
+                                    ImageTransparency: buttonDefaultBackgroundImage.ImageTransparency,
+                                    ScaleType: buttonDefaultBackgroundImage.ScaleType,
+                                    SliceCenter: buttonDefaultBackgroundImage.SliceCenter,
+                                    SliceScale: buttonDefaultBackgroundImage.SliceScale,
+                                    TileSize: buttonDefaultBackgroundImage.TileSize,
                                     Event: {
                                         Activated: () => {
                                             setSelected(index);
@@ -172,9 +183,23 @@ const Tabs = React.forwardRef<ImageLabel, TabsProps>(
                                 }} hover={{
                                     BackgroundColor3: buttonHover.backgroundColor,
                                     BackgroundTransparency: buttonHover.backgroundTransparency,
+                                    Image: buttonHoverBackgroundImage.Image,
+                                    ImageColor3: buttonHoverBackgroundImage.ImageColor3,
+                                    ImageTransparency: buttonHoverBackgroundImage.ImageTransparency,
+                                    ScaleType: buttonHoverBackgroundImage.ScaleType,
+                                    SliceCenter: buttonHoverBackgroundImage.SliceCenter,
+                                    SliceScale: buttonHoverBackgroundImage.SliceScale,
+                                    TileSize: buttonHoverBackgroundImage.TileSize,
                                 }} focus={{
                                     BackgroundColor3: buttonFocus.backgroundColor,
                                     BackgroundTransparency: buttonFocus.backgroundTransparency,
+                                    Image: buttonFocusBackgroundImage.Image,
+                                    ImageColor3: buttonFocusBackgroundImage.ImageColor3,
+                                    ImageTransparency: buttonFocusBackgroundImage.ImageTransparency,
+                                    ScaleType: buttonFocusBackgroundImage.ScaleType,
+                                    SliceCenter: buttonFocusBackgroundImage.SliceCenter,
+                                    SliceScale: buttonFocusBackgroundImage.SliceScale,
+                                    TileSize: buttonFocusBackgroundImage.TileSize,
                                 }}>
                                 <TabButtonContent text={tab.title.text} />
                             </HoverButton>

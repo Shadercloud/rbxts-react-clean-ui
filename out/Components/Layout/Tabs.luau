@@ -12,6 +12,7 @@ local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
+local CssHelper = _Helpers.CssHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local _HoverButton = TS.import(script, script.Parent.Parent, "Input", "HoverButton")
@@ -98,6 +99,20 @@ local Tabs = React.forwardRef(function(props, ref)
 	local buttonDefault = ColorHelper:getIntentColors(theme, "primary", "default", theme.components.tabs.button.intents)
 	local buttonHover = ColorHelper:getIntentColors(theme, "primary", "hover", theme.components.tabs.button.intents)
 	local buttonFocus = ColorHelper:getIntentColors(theme, "primary", "focus", theme.components.tabs.button.intents)
+	local buttonDefaultBackgroundImage = CssHelper:resolveBackgroundImage(buttonDefault.backgroundImage)
+	local buttonHoverBackgroundImage = CssHelper:resolveBackgroundImage(buttonHover.backgroundImage)
+	local buttonFocusBackgroundImage = CssHelper:resolveBackgroundImage(buttonFocus.backgroundImage)
+	local _attributes = {
+		ref = ref,
+		BackgroundColor3 = theme.components.tabs.list.backgroundColor,
+		width = "100%",
+	}
+	local _condition = theme.components.tabs.list.backgroundTransparency
+	if _condition == nil then
+		_condition = 0
+	end
+	_attributes.BackgroundTransparency = _condition
+	_attributes.backgroundImage = theme.components.tabs.list.backgroundImage
 	local _exp = React.createElement(Corners, {
 		radius = theme.components.tabs.list.cornerRadius,
 	})
@@ -112,11 +127,17 @@ local Tabs = React.forwardRef(function(props, ref)
 			default = {
 				Size = UDim2.fromScale(0, 0),
 				AutomaticSize = Enum.AutomaticSize.XY,
-				ImageTransparency = 1,
 				BackgroundColor3 = buttonDefault.backgroundColor,
 				BackgroundTransparency = buttonDefault.backgroundTransparency,
 				BorderSizePixel = 0,
 				AutoButtonColor = false,
+				Image = buttonDefaultBackgroundImage.Image,
+				ImageColor3 = buttonDefaultBackgroundImage.ImageColor3,
+				ImageTransparency = buttonDefaultBackgroundImage.ImageTransparency,
+				ScaleType = buttonDefaultBackgroundImage.ScaleType,
+				SliceCenter = buttonDefaultBackgroundImage.SliceCenter,
+				SliceScale = buttonDefaultBackgroundImage.SliceScale,
+				TileSize = buttonDefaultBackgroundImage.TileSize,
 				Event = {
 					Activated = function()
 						setSelected(index)
@@ -126,10 +147,24 @@ local Tabs = React.forwardRef(function(props, ref)
 			hover = {
 				BackgroundColor3 = buttonHover.backgroundColor,
 				BackgroundTransparency = buttonHover.backgroundTransparency,
+				Image = buttonHoverBackgroundImage.Image,
+				ImageColor3 = buttonHoverBackgroundImage.ImageColor3,
+				ImageTransparency = buttonHoverBackgroundImage.ImageTransparency,
+				ScaleType = buttonHoverBackgroundImage.ScaleType,
+				SliceCenter = buttonHoverBackgroundImage.SliceCenter,
+				SliceScale = buttonHoverBackgroundImage.SliceScale,
+				TileSize = buttonHoverBackgroundImage.TileSize,
 			},
 			focus = {
 				BackgroundColor3 = buttonFocus.backgroundColor,
 				BackgroundTransparency = buttonFocus.backgroundTransparency,
+				Image = buttonFocusBackgroundImage.Image,
+				ImageColor3 = buttonFocusBackgroundImage.ImageColor3,
+				ImageTransparency = buttonFocusBackgroundImage.ImageTransparency,
+				ScaleType = buttonFocusBackgroundImage.ScaleType,
+				SliceCenter = buttonFocusBackgroundImage.SliceCenter,
+				SliceScale = buttonFocusBackgroundImage.SliceScale,
+				TileSize = buttonFocusBackgroundImage.TileSize,
 			},
 		}, React.createElement(TabButtonContent, {
 			text = tab.title.text,
@@ -139,12 +174,7 @@ local Tabs = React.forwardRef(function(props, ref)
 		_newValue[_k] = _callback(_v, _k - 1, tabs)
 	end
 	-- ▲ ReadonlyArray.map ▲
-	local _exp_2 = React.createElement(Container, {
-		ref = ref,
-		BackgroundColor3 = theme.components.tabs.list.backgroundColor,
-		width = "100%",
-		BackgroundTransparency = 0,
-	}, _exp, _exp_1, React.createElement(HStack, nil, _newValue))
+	local _exp_2 = React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(HStack, nil, _newValue))
 	local _exp_3 = React.createElement("uistroke", {
 		Thickness = theme.components.tabs.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,

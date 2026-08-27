@@ -118,6 +118,117 @@ export const WoodenTheme = createTheme({
                 }
             }
         },
+        tabs: {
+            list: {
+                borderThickness: 0,
+                cornerRadius: 0,
+                // Same plaque asset as the buttons, stretched across the
+                // full tab bar width — a darker/more muted stain than the
+                // buttons' own default tint so the buttons still read as
+                // distinct, raised elements sitting on top of this backing
+                // strip. backgroundTransparency: 1 hides the flat fill so
+                // only the image shows.
+                backgroundTransparency: 1,
+                backgroundImage: {
+                    image: 92016395170536,
+                    slice: "10 5 240 40",
+                    tintColor: Color3.fromHex("#5C3A18"),
+                },
+            },
+            button: {
+                cornerRadius: 0,
+                borderThickness: 0,
+                intents: {
+                    // Same cascade as `card.header.intents`/`card.footer.
+                    // intents` above — only `primary` spells out the shared
+                    // plaque (image/slice), text color, and transparency;
+                    // the rest just override `backgroundImage.tintColor`.
+                    // Tints reused from `button.intents` above since these
+                    // are literal buttons too.
+                    primary: {
+                        default: {
+                            textColor: Color3.fromHex("#FFF7CF"),
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                image: 92016395170536,
+                                slice: "10 5 240 40",
+                                tintColor: Color3.fromHex("#A16B30"),
+                            },
+                        },
+                        hover: {
+                            textColor: Color3.fromHex("#d3cba3"),
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#BA854A"),
+                            },
+                        },
+                        focus: {
+                            textColor: Color3.fromHex("#FFF7CF"),
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#7A4A20"),
+                            },
+                        },
+                    },
+                    success: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#63ff00"),
+                            },
+                        },
+                        hover: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#29ff52"),
+                            },
+                        },
+                    },
+                    info: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#00bfff"),
+                            },
+                        },
+                        hover: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#29d4ff"),
+                            },
+                        },
+                    },
+                    warning: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#ffbf00"),
+                            },
+                        },
+                        hover: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#ffd429"),
+                            },
+                        },
+                    },
+                    danger: {
+                        default: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#ff0000"),
+                            },
+                        },
+                        hover: {
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#ff2929"),
+                            },
+                        },
+                    },
+                },
+            },
+        },
         box: {
             borderThickness: 0,
             boxShadow: 0,
