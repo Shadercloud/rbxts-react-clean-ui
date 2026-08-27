@@ -27,18 +27,9 @@ const themeWithBackgroundImage = createTheme({
 
 function Box(props: { screenshot?: boolean } = {}) {
     const content = (
-        <Container width={360}>
-            <VStack>
-                <BoxComponent>
-                    <Text text="Boxes give content a bordered, shadowed surface to sit on." />
-                </BoxComponent>
-                <ThemeProvider theme={themeWithBackgroundImage}>
-                    <BoxComponent>
-                        <Text text="theme.components.box.backgroundImage layers a 9-sliced image under Box's existing border, shadow, and corner radius, which still draw on top." />
-                    </BoxComponent>
-                </ThemeProvider>
-            </VStack>
-        </Container>
+        <BoxComponent>
+            <Text text="Boxes give content a bordered, shadowed surface to sit on." />
+        </BoxComponent>
     );
 
     return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;

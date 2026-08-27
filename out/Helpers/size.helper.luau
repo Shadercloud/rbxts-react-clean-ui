@@ -31,7 +31,8 @@ do
 				width = props.width
 			end
 		end
-		return UDim2.new(self:toUDim(width), self:toUDim(props.height))
+		local height = if props.height == "Auto" then 0 else props.height
+		return UDim2.new(self:toUDim(width), self:toUDim(height))
 	end
 	function SizeHelper:GetPosition(props)
 		if props.Position ~= nil then
@@ -62,25 +63,25 @@ do
 		if props.AutomaticSize ~= nil then
 			return props.AutomaticSize
 		end
-		if props.width == "Auto" then
-			return Enum.AutomaticSize.X
-		end
+		-- "Auto" behaves like an unset dimension for the purposes of deciding
+		-- which axes get AutomaticSize, but still forces that axis to 0 in GetSize.
+		local width = if props.width == "Auto" then nil else props.width
+		local height = if props.height == "Auto" then nil else props.height
 		local _condition = props.Size ~= nil
 		if not _condition then
-			local _condition_1 = props.width
+			local _condition_1 = width
 			if _condition_1 ~= 0 and _condition_1 == _condition_1 and _condition_1 ~= "" and _condition_1 then
-				_condition_1 = props.height
+				_condition_1 = height
 			end
 			_condition = _condition_1
 		end
 		if _condition ~= 0 and _condition == _condition and _condition ~= "" and _condition then
 			return Enum.AutomaticSize.None
 		end
-		if props.width == nil and props.height == nil and defaultValue == nil then
+		if width == nil and height == nil and defaultValue == nil then
 			return Enum.AutomaticSize.XY
 		end
-		local _value = props.width
-		if not (_value ~= 0 and _value == _value and _value ~= "" and _value) then
+		if not (width ~= 0 and width == width and width ~= "" and width) then
 			return Enum.AutomaticSize.X
 		end
 		return if defaultValue ~= nil then defaultValue else Enum.AutomaticSize.Y

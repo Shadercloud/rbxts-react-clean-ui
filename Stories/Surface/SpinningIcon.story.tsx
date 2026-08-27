@@ -25,7 +25,7 @@ function spinningIcons() {
                     </Button>
                 </FlexItem>
                 {loading &&
-                    <Icon scale="xl" icon="spinner" spinning={loading} color={new Color3(0, 0, 0)} />
+                    <Icon scale="xl" icon="spinner" spinning={loading} />
                 }
             </HStack>
         </Box>

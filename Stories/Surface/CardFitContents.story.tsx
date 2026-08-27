@@ -7,7 +7,7 @@ export = createStory((props) => (
             <Text variant="heading" text="Player Profile" />
         </Card.Header>
         <Card.Body>
-            <frame Size={UDim2.fromOffset(600, 400)} />
+            <frame Size={UDim2.fromOffset(600, 200)} />
         </Card.Body>
         <Card.Footer>
             <HStack>

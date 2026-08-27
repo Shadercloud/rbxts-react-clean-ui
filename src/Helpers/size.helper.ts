@@ -29,9 +29,12 @@ export class SizeHelper {
                 width = props.width
             }
         }
+
+        const height = props.height === "Auto" ? 0 : props.height;
+
         return new UDim2(
             this.toUDim(width),
-            this.toUDim(props.height),
+            this.toUDim(height),
         )
     }
 
@@ -81,15 +84,17 @@ export class SizeHelper {
         if (props.AutomaticSize !== undefined)
             return props.AutomaticSize
 
-        if (props.width === "Auto")
-            return Enum.AutomaticSize.X
+        // "Auto" behaves like an unset dimension for the purposes of deciding
+        // which axes get AutomaticSize, but still forces that axis to 0 in GetSize.
+        const width = props.width === "Auto" ? undefined : props.width;
+        const height = props.height === "Auto" ? undefined : props.height;
 
-        if (props.Size !== undefined || (props.width && props.height))
+        if (props.Size !== undefined || (width && height))
             return Enum.AutomaticSize.None
-        if (props.width === undefined && props.height === undefined && defaultValue === undefined)
+        if (width === undefined && height === undefined && defaultValue === undefined)
             return Enum.AutomaticSize.XY
 
-        if (!props.width)
+        if (!width)
             return Enum.AutomaticSize.X
 
         return defaultValue !== undefined ? defaultValue : Enum.AutomaticSize.Y
