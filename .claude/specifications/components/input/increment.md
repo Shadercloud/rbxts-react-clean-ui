@@ -28,7 +28,9 @@
 
 ## Theme
 
-`Increment` has no `theme.components.increment` entry of its own — all visuals come from `theme.components.button` (minus/plus buttons) and `theme.components.input` (the numeric field), resolved by those components exactly as documented in `button.md` and `input.md`. The gap between the three parts uses the same `spacing`-driven default as `HStack`/`Button` elsewhere (`theme.default.spacing` when `spacing` is omitted), not a bespoke layout knob.
+- The minus/plus `Button`s use the normal `theme.components.button` styling by default, and the numeric field uses `theme.components.input`, resolved by those components exactly as documented in `button.md` and `input.md`.
+- `theme.components.increment.button` is an optional `Partial<theme.components.button>` that, when set, is passed as `styleOverride` to both the minus and plus `Button`s (see `button.md`'s Theme section for how `styleOverride` resolves per-field). Any field left unset on `theme.components.increment.button` falls back to the normal `theme.components.button` value for that field — a theme that wants Increment's buttons borderless while every other button keeps its border only needs to set `borderThickness: 0` under `theme.components.increment.button`, for example. The default theme leaves `theme.components.increment.button` unset, so `Increment` uses ordinary button styling out of the box.
+- The gap between the three parts uses the same `spacing`-driven default as `HStack`/`Button` elsewhere (`theme.default.spacing` when `spacing` is omitted), not a bespoke layout knob.
 
 ## Story
 

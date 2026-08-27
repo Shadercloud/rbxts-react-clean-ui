@@ -17,6 +17,12 @@ export class ColorHelper {
         intent: Intent | undefined,
         state: ButtonFlag = "default",
         componentColors?: ComponentIntentColors,
+        // Highest-precedence tier, layered on top of `componentColors` (which
+        // itself layers on top of the theme-global tier) rather than replacing
+        // it. Used for per-instance style overrides (e.g. Button's
+        // `styleOverride.intents`) so a partial override doesn't wipe out the
+        // base component theme's fields it didn't set.
+        overrideColors?: ComponentIntentColors,
     ): IntentScheme {
         const selectedIntent = intent ?? "primary";
 
@@ -25,6 +31,9 @@ export class ColorHelper {
 
         const componentPrimary = componentColors?.primary;
         const componentMatching = componentColors?.[selectedIntent];
+
+        const overridePrimary = overrideColors?.primary;
+        const overrideMatching = overrideColors?.[selectedIntent];
 
         const layers: (Partial<IntentScheme> | undefined)[] = [
             // Theme tier, `default` sub-layers (primary before matching)
@@ -42,6 +51,14 @@ export class ColorHelper {
             // Component tier, requested-state sub-layers (primary before matching)
             this.resolveComponentStateLayer(componentPrimary, state),
             this.resolveComponentStateLayer(componentMatching, state),
+
+            // Override tier, `default` sub-layers (primary before matching)
+            this.resolveComponentDefaultLayer(overridePrimary),
+            this.resolveComponentDefaultLayer(overrideMatching),
+
+            // Override tier, requested-state sub-layers (primary before matching)
+            this.resolveComponentStateLayer(overridePrimary, state),
+            this.resolveComponentStateLayer(overrideMatching, state),
         ];
 
         return this.mergeLayers(layers);

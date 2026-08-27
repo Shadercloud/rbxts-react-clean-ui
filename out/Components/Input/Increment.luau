@@ -1,6 +1,7 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
+local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local _Layout = TS.import(script, script.Parent.Parent, "Layout")
 local Container = _Layout.Container
 local FlexItem = _Layout.FlexItem
@@ -9,6 +10,12 @@ local Button = TS.import(script, script.Parent, "Button").Button
 local resolveSteppedValue = TS.import(script, script.Parent, "Increment.step").resolveSteppedValue
 local Input = TS.import(script, script.Parent, "Input").Input
 local Increment = React.forwardRef(function(props, ref)
+	local theme = React.useContext(CleanThemeContext)
+	local _buttonStyleOverride = theme.components.increment
+	if _buttonStyleOverride ~= nil then
+		_buttonStyleOverride = _buttonStyleOverride.button
+	end
+	local buttonStyleOverride = _buttonStyleOverride
 	local value, setValue = React.useState(props.value)
 	local current = if props.controlled then props.value else value
 	local _condition = props.step
@@ -45,6 +52,7 @@ local Increment = React.forwardRef(function(props, ref)
 		scale = props.scale,
 		spacing = props.spacing,
 		disabled = decrementDisabled,
+		styleOverride = buttonStyleOverride,
 		LayoutOrder = 0,
 		Event = {
 			Activated = function()
@@ -81,6 +89,7 @@ local Increment = React.forwardRef(function(props, ref)
 		scale = props.scale,
 		spacing = props.spacing,
 		disabled = incrementDisabled,
+		styleOverride = buttonStyleOverride,
 		LayoutOrder = 2,
 		Event = {
 			Activated = function()

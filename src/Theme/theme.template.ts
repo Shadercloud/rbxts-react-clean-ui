@@ -71,11 +71,17 @@ export interface ThemeTemplate {
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
 
+        increment: {
+            button?: Partial<ThemeTemplate["components"]["button"]>;
+        };
+
         input: {
             borderColor: Color3;
             borderThickness: number;
             cornerRadius: CssSize;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+            backgroundImage?: CssBackgroundImage;
+            placeholder?: Partial<TypographyStyle> | ScaledTypographyStyle;
         };
         select: {
             borderColor: Color3;
@@ -89,9 +95,11 @@ export interface ThemeTemplate {
         checkbox: {
             borderColor: Color3;
             borderThickness: number;
+            borderTransparency?: number;
             cornerRadius: CssSize;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
             spacing?: ScaleSizeValue<number>;
+            backgroundImage?: CssBackgroundImage;
         };
         tabs: {
             borderColor: Color3;

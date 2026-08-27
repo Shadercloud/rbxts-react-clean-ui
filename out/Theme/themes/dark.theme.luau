@@ -211,6 +211,9 @@ local DarkTheme = createTheme({
 			borderColor = Color3.fromHex("#3A4352"),
 			borderThickness = 1,
 			cornerRadius = 8,
+			placeholder = {
+				color = Color3.fromHex("#697386"),
+			},
 		},
 		select = {
 			dropDownBackgroundColor = Color3.fromHex("#20252E"),

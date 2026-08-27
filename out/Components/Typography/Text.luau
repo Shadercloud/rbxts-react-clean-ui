@@ -7,22 +7,95 @@ local Text = React.forwardRef(function(props, ref)
 	local style = props.typography or theme.typography[props.variant or "body"]
 	local weight = if props.weight == "bold" then Enum.FontWeight.Bold else props.weight or style.weight or Enum.FontWeight.Regular
 	local textwrapped = props.TextWrap ~= false and props.TextWrapped ~= false
+	local _condition = props.letterSpacing
+	if _condition == nil then
+		_condition = style.letterSpacing
+	end
+	local letterSpacing = _condition
+	-- Roblox text instances have no native letter-spacing property, so a nonzero
+	-- value is faked by splitting the text into one TextLabel per character laid
+	-- out in a UIListLayout row with the spacing as its Padding. This only makes
+	-- sense for short, single-line, plain text: RichText is forced off per-character
+	-- (markup tags can't survive being split apart), and wrapping/truncation are
+	-- moot since each character label auto-sizes to itself and never overflows.
+	if letterSpacing ~= nil and letterSpacing ~= 0 and props.text ~= "" then
+		local characters = {}
+		for index = 0, #props.text - 1 do
+			local _text = props.text
+			local _arg0 = index + 1
+			local _arg1 = index + 1
+			local _arg0_1 = string.sub(_text, _arg0, _arg1)
+			table.insert(characters, _arg0_1)
+		end
+		local _exp = React.createElement("uilistlayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, letterSpacing),
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			HorizontalAlignment = props.align or Enum.HorizontalAlignment.Left,
+		})
+		-- ▼ ReadonlyArray.map ▼
+		local _newValue = table.create(#characters)
+		local _callback = function(character, index)
+			local _attributes = {
+				key = index,
+				LayoutOrder = index,
+				Size = UDim2.fromScale(0, 0),
+				AutomaticSize = Enum.AutomaticSize.XY,
+				BackgroundTransparency = 1,
+				TextColor3 = props.TextColor3 or theme.colors.intents.primary.default.textColor,
+				Text = character,
+			}
+			local _condition_1 = props.LineHeight
+			if _condition_1 == nil then
+				_condition_1 = style.lineHeight
+			end
+			_attributes.LineHeight = _condition_1
+			_attributes.FontFace = Font.fromName(style.font.Name, weight)
+			_attributes.FontSize = style.size
+			_attributes.RichText = false
+			local _condition_2 = props.TextScaled
+			if _condition_2 == nil then
+				_condition_2 = false
+			end
+			_attributes.TextScaled = _condition_2
+			_attributes.TextStrokeColor3 = props.TextStrokeColor3
+			_attributes.TextStrokeTransparency = props.TextStrokeTransparency
+			_attributes.TextTransparency = props.TextTransparency
+			return React.createElement("textlabel", _attributes)
+		end
+		for _k, _v in characters do
+			_newValue[_k] = _callback(_v, _k - 1, characters)
+		end
+		-- ▲ ReadonlyArray.map ▲
+		return React.createElement("frame", {
+			Size = UDim2.fromScale(0, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			AnchorPoint = props.AnchorPoint,
+			BackgroundTransparency = 1,
+			Position = props.Position,
+			ZIndex = props.ZIndex,
+			LayoutOrder = props.LayoutOrder,
+			Visible = props.Visible,
+			Rotation = props.Rotation,
+		}, _exp, _newValue)
+	end
 	local _attributes = {
 		ref = ref,
 		Size = UDim2.fromScale(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		AnchorPoint = props.AnchorPoint,
 	}
-	local _condition = props.LineHeight
-	if _condition == nil then
-		_condition = style.lineHeight
-	end
-	_attributes.LineHeight = _condition
-	local _condition_1 = props.BackgroundTransparency
+	local _condition_1 = props.LineHeight
 	if _condition_1 == nil then
-		_condition_1 = 1
+		_condition_1 = style.lineHeight
 	end
-	_attributes.BackgroundTransparency = _condition_1
+	_attributes.LineHeight = _condition_1
+	local _condition_2 = props.BackgroundTransparency
+	if _condition_2 == nil then
+		_condition_2 = 1
+	end
+	_attributes.BackgroundTransparency = _condition_2
 	_attributes.TextXAlignment = props.align or (props.TextXAlignment or Enum.TextXAlignment.Left)
 	_attributes.TextColor3 = props.TextColor3 or theme.colors.intents.primary.default.textColor
 	_attributes.Text = props.text
@@ -31,16 +104,16 @@ local Text = React.forwardRef(function(props, ref)
 	_attributes.TextWrapped = textwrapped
 	_attributes.FontFace = Font.fromName(style.font.Name, weight)
 	_attributes.FontSize = style.size
-	local _condition_2 = props.RichText
-	if _condition_2 == nil then
-		_condition_2 = true
-	end
-	_attributes.RichText = _condition_2
-	local _condition_3 = props.TextScaled
+	local _condition_3 = props.RichText
 	if _condition_3 == nil then
-		_condition_3 = false
+		_condition_3 = true
 	end
-	_attributes.TextScaled = _condition_3
+	_attributes.RichText = _condition_3
+	local _condition_4 = props.TextScaled
+	if _condition_4 == nil then
+		_condition_4 = false
+	end
+	_attributes.TextScaled = _condition_4
 	_attributes.ZIndex = props.ZIndex
 	_attributes.LayoutOrder = props.LayoutOrder
 	_attributes.Visible = props.Visible

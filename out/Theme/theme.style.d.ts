@@ -5,6 +5,9 @@ export interface TypographyStyle {
     size: Enum.FontSize;
     weight?: Enum.FontWeight;
     lineHeight?: number;
+    letterSpacing?: number;
+    color?: Color3;
+    transparency?: number;
 }
 export type ScaledTypographyStyle = Partial<Record<ScaleSize, Partial<TypographyStyle>>>;
 export interface IntentScheme {

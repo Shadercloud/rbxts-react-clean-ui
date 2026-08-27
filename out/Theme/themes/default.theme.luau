@@ -186,10 +186,14 @@ local DefaultTheme = {
 				},
 			},
 		},
+		increment = {},
 		input = {
 			borderColor = Color3.fromHex("#D9DEE8"),
 			borderThickness = 1,
 			cornerRadius = 8,
+			placeholder = {
+				color = Color3.fromHex("#8A8A8A"),
+			},
 		},
 		select = {
 			dropDownBackgroundColor = Color3.fromHex("#FFFFFF"),

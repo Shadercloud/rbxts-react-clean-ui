@@ -4,6 +4,7 @@ import {
     ScalableElementProps,
     SpacedElementProps,
 } from "../../Interfaces";
+import { CleanThemeContext } from "../../Contexts/";
 import { Container, FlexItem, HStack } from "../Layout";
 import { Button } from "./Button";
 import { resolveSteppedValue } from "./Increment.step";
@@ -24,6 +25,9 @@ export interface IncrementProps
 
 export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
     (props, ref) => {
+        const theme = React.useContext(CleanThemeContext);
+        const buttonStyleOverride = theme.components.increment?.button;
+
         const [value, setValue] = React.useState(props.value);
 
         const current = props.controlled ? props.value : value;
@@ -67,6 +71,7 @@ export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
                         scale={props.scale}
                         spacing={props.spacing}
                         disabled={decrementDisabled}
+                        styleOverride={buttonStyleOverride}
                         LayoutOrder={0}
                         Event={{
                             Activated: () => {
@@ -116,6 +121,7 @@ export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
                         scale={props.scale}
                         spacing={props.spacing}
                         disabled={incrementDisabled}
+                        styleOverride={buttonStyleOverride}
                         LayoutOrder={2}
                         Event={{
                             Activated: () => {

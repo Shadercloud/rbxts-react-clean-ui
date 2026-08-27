@@ -15,6 +15,9 @@ import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../H
 import { Icon, IconProps } from "../Surface";
 import { HStack } from "../Layout";
 import { Group, GroupContext } from "../Layout/";
+import { ThemeTemplate } from "../../Theme/theme.template";
+
+export type ButtonStyleOverride = Partial<ThemeTemplate["components"]["button"]>;
 
 export interface ButtonProps extends
     SpacedElementProps,
@@ -31,12 +34,14 @@ export interface ButtonProps extends
     group?: boolean;
     disabled?: boolean;
     LayoutOrder?: number;
+    styleOverride?: ButtonStyleOverride;
 }
 
 export interface ButtonTextProps extends ScalableElementProps, IntentElementProps {
     children?: string;
     text: string;
     disabled?: boolean;
+    styleOverride?: ButtonStyleOverride;
 }
 
 function ButtonText(props: ButtonTextProps) {
@@ -48,7 +53,7 @@ function ButtonText(props: ButtonTextProps) {
             typography={TypographyHelper.getTypography(
                 theme,
                 props.scale,
-                theme.components.button.typography
+                { ...theme.components.button.typography, ...props.styleOverride?.typography }
             )}
             TextColor3={
                 ColorHelper.getIntentColors(
@@ -56,6 +61,7 @@ function ButtonText(props: ButtonTextProps) {
                     props.intent,
                     props.disabled ? "disabled" : "default",
                     theme.components.button.intents,
+                    props.styleOverride?.intents,
                 ).textColor
             } />
     );
@@ -64,6 +70,7 @@ function ButtonText(props: ButtonTextProps) {
 
 export interface ButtonIconProps extends IconProps, IntentElementProps {
     disabled?: boolean;
+    styleOverride?: ButtonStyleOverride;
 }
 
 function ButtonIcon(props: ButtonIconProps) {
@@ -79,6 +86,7 @@ function ButtonIcon(props: ButtonIconProps) {
                 props.intent,
                 props.disabled ? "disabled" : "default",
                 theme.components.button.intents,
+                props.styleOverride?.intents,
             ).textColor
 
         } />
@@ -113,6 +121,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
             props.intent,
             state,
             theme.components.button.intents,
+            props.styleOverride?.intents,
         );
 
         const backgroundImage = CssHelper.resolveBackgroundImage(intentColors.backgroundImage);
@@ -153,6 +162,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 AutomaticSize={Enum.AutomaticSize.XY}
                 BackgroundTransparency={
                     props.BackgroundTransparency ??
+                    props.styleOverride?.backgroundTransparency ??
                     theme.components.button.backgroundTransparency
                 }
                 BackgroundColor3={intentColors.backgroundColor}
@@ -168,15 +178,15 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 SliceScale={backgroundImage.SliceScale}
                 TileSize={backgroundImage.TileSize}
             >
-                <Corners radius={theme.components.button.cornerRadius} />
+                <Corners radius={props.styleOverride?.cornerRadius ?? theme.components.button.cornerRadius} />
 
                 <uistroke
-                    Thickness={theme.components.button.borderThickness}
+                    Thickness={props.styleOverride?.borderThickness ?? theme.components.button.borderThickness}
                     BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                     Color={intentColors.borderColor}
                 />
 
-                <BoxShadow {...props} value={theme.components.button.boxShadow} />
+                <BoxShadow {...props} value={props.styleOverride?.boxShadow ?? theme.components.button.boxShadow} />
                 <Padding {...props} />
                 <Group.Element enabled={props.group} padding={padding}>
 
@@ -187,14 +197,16 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                                     scale={props.scale}
                                     intent={props.intent}
                                     disabled={props.disabled}
-                                    icon={props.icon} />
+                                    icon={props.icon}
+                                    styleOverride={props.styleOverride} />
                             }
                             {props.text !== undefined &&
                                 <ButtonText
                                     text={props.text}
                                     intent={props.intent}
                                     disabled={props.disabled}
-                                    scale={props.scale} />
+                                    scale={props.scale}
+                                    styleOverride={props.styleOverride} />
                             }
                         </HStack>
                     }

@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Box, Button, Container, HStack, Icon, IconName, DefaultIconSet, Scroller } from "@rbxts/react-clean-ui";
+import { Box, Button, Container, HStack, IconName, DefaultIconSet, Scroller } from "@rbxts/react-clean-ui";
 
 const entries = [] as Array<[IconName, number]>;
 
@@ -10,9 +10,7 @@ for (const [icon, assetId] of pairs(DefaultIconSet)) {
 entries.sort((a, b) => a[0] < b[0]);
 
 const icons = entries.map(([icon]) => (
-    <Button key={icon}>
-        <Icon icon={icon} color={Color3.fromHex("#000000")} scale="xl" />
-    </Button>
+    <Button key={icon} icon={icon} scale="xl" />
 ));
 
 function AllIcons() {

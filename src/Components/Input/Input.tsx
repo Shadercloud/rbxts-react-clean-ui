@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
-import { TypographyHelper } from "../../Helpers";
+import { CssHelper, TypographyHelper } from "../../Helpers";
 import { ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 import { TypographyStyle } from "../../Theme";
 import { Corners, Padding } from "../Decorator";
@@ -35,6 +35,16 @@ export function Input(props: InputProps) {
         theme.components.input.typography
     )
 
+    // Roblox's TextBox has no PlaceholderTransparency and shares font/size/weight/lineHeight
+    // between Text and PlaceholderText, so only `.color` from this resolution is actually used below.
+    const placeholderTypography: TypographyStyle = TypographyHelper.getTypography(
+        theme,
+        props.scale,
+        theme.components.input.placeholder
+    )
+
+    const backgroundImage = CssHelper.resolveBackgroundImage(theme.components.input.backgroundImage);
+
     React.useEffect(() => {
         if (!labelActivated) {
             return;
@@ -51,7 +61,7 @@ export function Input(props: InputProps) {
     ]);
 
     return (
-        <frame
+        <imagelabel
             Size={props.Size ?? UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
             BackgroundTransparency={1}
@@ -60,6 +70,14 @@ export function Input(props: InputProps) {
             LayoutOrder={props.LayoutOrder}
             Visible={props.Visible}
             ZIndex={props.ZIndex}
+
+            Image={backgroundImage.Image}
+            ImageColor3={backgroundImage.ImageColor3}
+            ImageTransparency={backgroundImage.ImageTransparency}
+            ScaleType={backgroundImage.ScaleType}
+            SliceCenter={backgroundImage.SliceCenter}
+            SliceScale={backgroundImage.SliceScale}
+            TileSize={backgroundImage.TileSize}
         >
             <uistroke
                 Thickness={theme.components.input.borderThickness}
@@ -78,11 +96,12 @@ export function Input(props: InputProps) {
                 FontFace={Font.fromName(typography.font.Name, typography.weight ?? Enum.FontWeight.Regular)}
                 FontSize={typography.size}
                 PlaceholderText={props.PlaceholderText ?? props.placeholder}
-                PlaceholderColor3={props.PlaceholderColor3}
+                PlaceholderColor3={props.PlaceholderColor3 ?? placeholderTypography.color}
                 TextScaled={props.TextScaled}
                 LineHeight={typography.lineHeight}
                 Text={props.controlled ? props.value : value}
-                TextColor3={props.TextColor3 ?? theme.colors.intents.primary.default.textColor}
+                TextColor3={props.TextColor3 ?? typography.color ?? theme.colors.intents.primary.default.textColor}
+                TextTransparency={props.TextTransparency ?? typography.transparency}
 
                 Active={props.Active}
                 Archivable={props.Archivable}
@@ -166,6 +185,6 @@ export function Input(props: InputProps) {
             >
 
             </textbox>
-        </frame>
+        </imagelabel>
     );
 }

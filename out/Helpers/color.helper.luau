@@ -13,7 +13,7 @@ do
 	end
 	function ColorHelper:constructor()
 	end
-	function ColorHelper:getIntentColors(theme, intent, state, componentColors)
+	function ColorHelper:getIntentColors(theme, intent, state, componentColors, overrideColors)
 		if state == nil then
 			state = "default"
 		end
@@ -30,7 +30,17 @@ do
 			_componentMatching = _componentMatching[selectedIntent]
 		end
 		local componentMatching = _componentMatching
-		local layers = { defaultPrimary.default, defaultMatching.default, defaultPrimary[state], defaultMatching[state], self:resolveComponentDefaultLayer(componentPrimary), self:resolveComponentDefaultLayer(componentMatching), self:resolveComponentStateLayer(componentPrimary, state), self:resolveComponentStateLayer(componentMatching, state) }
+		local _overridePrimary = overrideColors
+		if _overridePrimary ~= nil then
+			_overridePrimary = _overridePrimary.primary
+		end
+		local overridePrimary = _overridePrimary
+		local _overrideMatching = overrideColors
+		if _overrideMatching ~= nil then
+			_overrideMatching = _overrideMatching[selectedIntent]
+		end
+		local overrideMatching = _overrideMatching
+		local layers = { defaultPrimary.default, defaultMatching.default, defaultPrimary[state], defaultMatching[state], self:resolveComponentDefaultLayer(componentPrimary), self:resolveComponentDefaultLayer(componentMatching), self:resolveComponentStateLayer(componentPrimary, state), self:resolveComponentStateLayer(componentMatching, state), self:resolveComponentDefaultLayer(overridePrimary), self:resolveComponentDefaultLayer(overrideMatching), self:resolveComponentStateLayer(overridePrimary, state), self:resolveComponentStateLayer(overrideMatching, state) }
 		return self:mergeLayers(layers)
 	end
 	function ColorHelper:mergeLayers(layers)

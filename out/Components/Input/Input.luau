@@ -5,7 +5,9 @@ local React = _react
 local useRef = _react.useRef
 local useState = _react.useState
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
-local TypographyHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").TypographyHelper
+local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local CssHelper = _Helpers.CssHelper
+local TypographyHelper = _Helpers.TypographyHelper
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
@@ -23,6 +25,10 @@ local function Input(props)
 	local value, setValue = useState(props.value)
 	local lastValidText = useRef(props.value)
 	local typography = TypographyHelper:getTypography(theme, props.scale, theme.components.input.typography)
+	-- Roblox's TextBox has no PlaceholderTransparency and shares font/size/weight/lineHeight
+	-- between Text and PlaceholderText, so only `.color` from this resolution is actually used below.
+	local placeholderTypography = TypographyHelper:getTypography(theme, props.scale, theme.components.input.placeholder)
+	local backgroundImage = CssHelper:resolveBackgroundImage(theme.components.input.backgroundImage)
 	React.useEffect(function()
 		if not labelActivated then
 			return nil
@@ -62,11 +68,16 @@ local function Input(props)
 		_condition = props.placeholder
 	end
 	_attributes_1.PlaceholderText = _condition
-	_attributes_1.PlaceholderColor3 = props.PlaceholderColor3
+	_attributes_1.PlaceholderColor3 = props.PlaceholderColor3 or placeholderTypography.color
 	_attributes_1.TextScaled = props.TextScaled
 	_attributes_1.LineHeight = typography.lineHeight
 	_attributes_1.Text = if props.controlled then props.value else value
-	_attributes_1.TextColor3 = props.TextColor3 or theme.colors.intents.primary.default.textColor
+	_attributes_1.TextColor3 = props.TextColor3 or typography.color or theme.colors.intents.primary.default.textColor
+	local _condition_1 = props.TextTransparency
+	if _condition_1 == nil then
+		_condition_1 = typography.transparency
+	end
+	_attributes_1.TextTransparency = _condition_1
 	_attributes_1.Active = props.Active
 	_attributes_1.Archivable = props.Archivable
 	_attributes_1.BorderColor3 = props.BorderColor3
@@ -86,11 +97,11 @@ local function Input(props)
 	_attributes_1.NextSelectionUp = props.NextSelectionUp
 	_attributes_1.SelectionGroup = props.SelectionGroup
 	_attributes_1.SelectionOrder = props.SelectionOrder
-	local _condition_1 = props.ClearTextOnFocus
-	if _condition_1 == nil then
-		_condition_1 = false
+	local _condition_2 = props.ClearTextOnFocus
+	if _condition_2 == nil then
+		_condition_2 = false
 	end
-	_attributes_1.ClearTextOnFocus = _condition_1
+	_attributes_1.ClearTextOnFocus = _condition_2
 	_attributes_1.CursorPosition = props.CursorPosition
 	_attributes_1.MultiLine = props.MultiLine
 	_attributes_1.SelectionStart = props.SelectionStart
@@ -165,7 +176,7 @@ local function Input(props)
 		end
 	end
 	_attributes_1.Change = _object_1
-	return React.createElement("frame", {
+	return React.createElement("imagelabel", {
 		Size = props.Size or UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
@@ -174,6 +185,13 @@ local function Input(props)
 		LayoutOrder = props.LayoutOrder,
 		Visible = props.Visible,
 		ZIndex = props.ZIndex,
+		Image = backgroundImage.Image,
+		ImageColor3 = backgroundImage.ImageColor3,
+		ImageTransparency = backgroundImage.ImageTransparency,
+		ScaleType = backgroundImage.ScaleType,
+		SliceCenter = backgroundImage.SliceCenter,
+		SliceScale = backgroundImage.SliceScale,
+		TileSize = backgroundImage.TileSize,
 	}, _exp, _exp_1, _exp_2, React.createElement("textbox", _attributes_1))
 end
 return {

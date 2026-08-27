@@ -9,6 +9,7 @@ local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
+local CssHelper = _Helpers.CssHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local function Checkbox(props)
 	local theme = React.useContext(CleanThemeContext)
@@ -44,6 +45,7 @@ local function Checkbox(props)
 			_result(checked)
 		end
 	end, { checked })
+	local backgroundImage = CssHelper:resolveBackgroundImage(theme.components.checkbox.backgroundImage)
 	local _attributes = {
 		Size = UDim2.fromOffset(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
@@ -60,13 +62,27 @@ local function Checkbox(props)
 	_attributes.BackgroundTransparency = _condition_1
 	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).backgroundColor
 	_attributes.AutoButtonColor = false
-	return React.createElement("imagebutton", _attributes, React.createElement(Corners, {
+	_attributes.Image = backgroundImage.Image
+	_attributes.ImageColor3 = backgroundImage.ImageColor3
+	_attributes.ImageTransparency = backgroundImage.ImageTransparency
+	_attributes.ScaleType = backgroundImage.ScaleType
+	_attributes.SliceCenter = backgroundImage.SliceCenter
+	_attributes.SliceScale = backgroundImage.SliceScale
+	_attributes.TileSize = backgroundImage.TileSize
+	local _exp = React.createElement(Corners, {
 		radius = theme.components.checkbox.cornerRadius,
-	}), React.createElement("uistroke", {
-		Thickness = theme.components.button.borderThickness,
+	})
+	local _attributes_1 = {
+		Thickness = theme.components.checkbox.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-		Color = ColorHelper:getIntentColors(theme, if checked then props["intent-checked"] or "success" else props["intent-unchecked"] or "primary", "default", theme.components.checkbox.intents).borderColor,
-	}), React.createElement(Padding, {
+	}
+	local _condition_2 = theme.components.checkbox.borderTransparency
+	if _condition_2 == nil then
+		_condition_2 = 0
+	end
+	_attributes_1.Transparency = _condition_2
+	_attributes_1.Color = ColorHelper:getIntentColors(theme, if checked then props["intent-checked"] or "success" else props["intent-unchecked"] or "primary", "default", theme.components.checkbox.intents).borderColor
+	return React.createElement("imagebutton", _attributes, _exp, React.createElement("uistroke", _attributes_1), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.checkbox.spacing),
 	}), React.createElement(Icon, {
 		scale = props.scale,

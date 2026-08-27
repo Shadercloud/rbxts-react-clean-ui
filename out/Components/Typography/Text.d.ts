@@ -8,6 +8,7 @@ interface TextProps extends React.InstanceProps<TextLabel> {
     weight?: Enum.FontWeight | "bold";
     align?: "Left" | "Right" | "Center";
     TextWrap?: boolean;
+    letterSpacing?: number;
 }
 export declare const Text: React.ForwardRefExoticComponent<Omit<TextProps, "ref"> & React.RefAttributes<TextLabel>>;
 export {};

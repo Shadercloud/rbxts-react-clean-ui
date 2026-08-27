@@ -3,7 +3,7 @@ import { Icon } from "../Surface";
 import { CleanThemeContext } from "../../Contexts";
 import { FieldsetContext } from "../Layout";
 import { Corners, Padding } from "../Decorator";
-import { ColorHelper, SpacingHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SpacingHelper } from "../../Helpers";
 import { BackgroundElementProps, IconName, Intent, IntentElementProps, PaddingProps, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 
 interface CheckboxProps extends IntentElementProps, PaddingProps, BackgroundElementProps, SpacedElementProps, ScalableElementProps {
@@ -40,6 +40,8 @@ export function Checkbox(props: CheckboxProps) {
         props.onChange?.(checked);
     }, [checked]);
 
+    const backgroundImage = CssHelper.resolveBackgroundImage(theme.components.checkbox.backgroundImage);
+
     return <imagebutton
         Size={UDim2.fromOffset(0, 0)}
         AutomaticSize={Enum.AutomaticSize.XY}
@@ -59,11 +61,20 @@ export function Checkbox(props: CheckboxProps) {
             theme.components.button.intents,
         ).backgroundColor}
         AutoButtonColor={false}
+
+        Image={backgroundImage.Image}
+        ImageColor3={backgroundImage.ImageColor3}
+        ImageTransparency={backgroundImage.ImageTransparency}
+        ScaleType={backgroundImage.ScaleType}
+        SliceCenter={backgroundImage.SliceCenter}
+        SliceScale={backgroundImage.SliceScale}
+        TileSize={backgroundImage.TileSize}
     >
         <Corners radius={theme.components.checkbox.cornerRadius} />
         <uistroke
-            Thickness={theme.components.button.borderThickness}
+            Thickness={theme.components.checkbox.borderThickness}
             BorderStrokePosition={Enum.BorderStrokePosition.Inner}
+            Transparency={theme.components.checkbox.borderTransparency ?? 0}
             Color={ColorHelper.getIntentColors(
                 theme,
                 checked ? props['intent-checked'] ?? "success" : props['intent-unchecked'] ?? "primary",
