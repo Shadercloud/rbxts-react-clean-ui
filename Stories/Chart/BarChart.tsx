@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
 import { Container, BarChart as BarChartComponent, BarChartDataset } from "@rbxts/react-clean-ui";
+import { ScreenshotFrame } from "../ScreenshotFrame";
 
 type BarChartColorMode = "Default" | "Custom" | "Unique";
 
@@ -7,6 +8,7 @@ interface BarChartProps {
     stacked?: boolean;
     combinedTooltips?: boolean;
     colors?: BarChartColorMode;
+    screenshot?: boolean;
 }
 
 function BarChart(props: BarChartProps = {}) {
@@ -25,31 +27,28 @@ function BarChart(props: BarChartProps = {}) {
         },
     ];
 
-    return <Container
-        width={500}
-        height={300}
-        BackgroundColor3={new Color3(1, 1, 1)}
-        BackgroundTransparency={0}
-        BorderSizePixel={0}
-        ClipsDescendants={true}>
-        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
-        <BarChartComponent data={
-            {
-                labels: ["some really long label", "B", "something else", "D"],
-                yAxis: {
-                    ticks: 5,
-                },
-                stacked,
-                tooltips: {
-                    combined: combinedTooltips,
-                },
-                colors: colorMode === "Custom"
-                    ? [Color3.fromHex("#7A9E7E"), Color3.fromHex("#C97A4A")]
-                    : undefined,
-                datasets,
-            }
-        } />
-    </Container>;
+    const content = (
+        <Container width={500} height={300} ClipsDescendants={true}>
+            <BarChartComponent data={
+                {
+                    labels: ["some really long label", "B", "something else", "D"],
+                    yAxis: {
+                        ticks: 5,
+                    },
+                    stacked,
+                    tooltips: {
+                        combined: combinedTooltips,
+                    },
+                    colors: colorMode === "Custom"
+                        ? [Color3.fromHex("#7A9E7E"), Color3.fromHex("#C97A4A")]
+                        : undefined,
+                    datasets,
+                }
+            } />
+        </Container>
+    );
+
+    return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
 }
 
 export = BarChart;

@@ -16,21 +16,14 @@ const icons = entries.map(([icon]) => (
 ));
 
 function AllIcons() {
-    return <Container
-        BackgroundColor3={new Color3(1, 1, 1)}
-        BackgroundTransparency={0}
-        BorderSizePixel={0}
-        width="90%"
-        height="300"
-        >
-        <Box>
-            <Scroller>
-                <HStack>
-                    {icons}
-                </HStack>
-            </Scroller>
-        </Box>
-    </Container>
+    return <Box width="100%" height="100%">
+        <Scroller>
+            <HStack>
+                {icons}
+            </HStack>
+        </Scroller>
+    </Box>
+
 }
 
 export = AllIcons;

@@ -1,11 +1,11 @@
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
-import { DarkTheme, DefaultTheme, SandstoneTheme } from "../Theme";
+import { DarkTheme, DefaultTheme, SandstoneTheme, WoodenTheme } from "../Theme";
 import { InferProps, Choose } from "@rbxts/ui-labs";
 import { CleanUiProvider } from "../Providers/app.provider";
 
 const controls = {
-    Theme: Choose(["Default", "Dark", "Sandstone"]),
+    Theme: Choose(["Default", "Dark", "Sandstone", "Wooden"]),
 };
 
 type StoryControl = Parameters<typeof import("@rbxts/ui-labs").Ordered>[0];
@@ -33,7 +33,8 @@ export function createStory<T extends StoryControls = {}>(
                 theme = DarkTheme
             if (baseProps.controls.Theme === 'Sandstone')
                 theme = SandstoneTheme
-
+            if (baseProps.controls.Theme === 'Wooden')
+                theme = WoodenTheme
 
             return (
                 <CleanUiProvider theme={theme}>

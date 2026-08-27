@@ -44,7 +44,7 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
                 ref={ref}
                 {...props}
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 1))}
-                AutomaticSize={Enum.AutomaticSize.XY}
+                AutomaticSize={SizeHelper.GetAutoSize(props)}
                 BackgroundTransparency={
                     props.BackgroundTransparency ??
                     theme.components.box.backgroundTransparency

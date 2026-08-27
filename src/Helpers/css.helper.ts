@@ -165,7 +165,7 @@ export class CssHelper {
         }
     }
 
-    public static resolveBackgroundImage(value: CssBackgroundImage | undefined): {
+    public static resolveBackgroundImage(value: Partial<CssBackgroundImage> | undefined): {
         Image?: string;
         ImageColor3?: Color3;
         ImageTransparency?: number;

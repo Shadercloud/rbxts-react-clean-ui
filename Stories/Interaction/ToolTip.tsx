@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import { Button, Container, HStack, Icon, Text, Tooltip as TooltipComponent, VStack } from "@rbxts/react-clean-ui";
+import { ScreenshotFrame } from "../ScreenshotFrame";
 
-function ToolTip() {
-    return <Container BackgroundColor3={new Color3(1, 1, 1)} BackgroundTransparency={0} BorderSizePixel={0}>
-        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
+function ToolTip(props: { screenshot?: boolean } = {}) {
+    const content = (
         <VStack>
             <TooltipComponent
                 content="Tooltip text goes here"
@@ -49,7 +49,9 @@ function ToolTip() {
                 <Text text="Testing" />
             </TooltipComponent>
         </VStack>
-    </Container>
+    );
+
+    return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
 }
 
 export = ToolTip;

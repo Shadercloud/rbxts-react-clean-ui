@@ -25,7 +25,7 @@ local Box = React.forwardRef(function(props, ref)
 		_attributes[_k] = _v
 	end
 	_attributes.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1))
-	_attributes.AutomaticSize = Enum.AutomaticSize.XY
+	_attributes.AutomaticSize = SizeHelper:GetAutoSize(props)
 	local _condition = props.BackgroundTransparency
 	if _condition == nil then
 		_condition = theme.components.box.backgroundTransparency

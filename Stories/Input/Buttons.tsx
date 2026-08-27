@@ -1,17 +1,19 @@
 import React from "@rbxts/react";
-import { Button, Container, VStack } from "@rbxts/react-clean-ui";
+import { Button, VStack } from "@rbxts/react-clean-ui";
+import { ScreenshotFrame } from "../ScreenshotFrame";
 
-function Buttons() {
-    return <Container BackgroundColor3={new Color3(1, 1, 1)} BackgroundTransparency={0} BorderSizePixel={0}>
-        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
+function Buttons(props: {disabled?: boolean; screenshot?: boolean}) {
+    const content = (
         <VStack>
-            <Button icon="smile-o" text="Primary" intent="primary" />
-            <Button icon="check" text="Success" intent="success" />
-            <Button icon="info" text="Info" intent="info" />
-            <Button icon="exclamation" text="Warning" intent="warning" />
-            <Button icon="times" text="Danger" intent="danger" />
+            <Button icon="smile-o" text="Primary" intent="primary" disabled={props.disabled} />
+            <Button icon="check" text="Success" intent="success" disabled={props.disabled} />
+            <Button icon="info" text="Info" intent="info" disabled={props.disabled} />
+            <Button icon="exclamation" text="Warning" intent="warning" disabled={props.disabled} />
+            <Button icon="times" text="Danger" intent="danger" disabled={props.disabled} />
         </VStack>
-    </Container>
+    );
+
+    return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
 }
 
 export = Buttons;

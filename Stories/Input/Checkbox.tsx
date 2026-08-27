@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
-import { Checkbox as CheckboxComponent, Container, Fieldset, Text, VStack } from "@rbxts/react-clean-ui";
+import { Checkbox as CheckboxComponent, Fieldset, Text, VStack } from "@rbxts/react-clean-ui";
+import { ScreenshotFrame } from "../ScreenshotFrame";
 
-function Checkbox() {
-    return <Container BackgroundColor3={new Color3(1, 1, 1)} BackgroundTransparency={0} BorderSizePixel={0}>
-        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
+function Checkbox(props: { screenshot?: boolean } = {}) {
+    const content = (
         <VStack>
             <Fieldset checkbox>
                 <Fieldset.Control>
@@ -48,7 +48,9 @@ function Checkbox() {
                 </Fieldset.Label>
             </Fieldset>
         </VStack>
-    </Container>
+    );
+
+    return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
 }
 
 export = Checkbox;

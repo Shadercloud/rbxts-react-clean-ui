@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
 import { Button, CleanUiProvider, Container, DefaultTheme, IconName, Intent, useToast } from "@rbxts/react-clean-ui";
+import { ScreenshotFrame } from "../ScreenshotFrame";
 
 interface ToastDemoProps {
     intent?: Intent;
@@ -49,18 +50,17 @@ function ToastDemo(props: ToastDemoProps) {
 
 interface ToastProps {
     intent?: Intent;
+    screenshot?: boolean;
 }
 
 function Toast(props: ToastProps = {}) {
-    return <Container
-        BackgroundColor3={new Color3(1, 1, 1)}
-        BackgroundTransparency={0}
-        BorderSizePixel={0}
-        width={320}
-        height={160}>
-        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
-        <ToastDemo intent={props.intent} />
-    </Container>
+    const content = (
+        <Container width={320} height={160}>
+            <ToastDemo intent={props.intent} />
+        </Container>
+    );
+
+    return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
 }
 
 export = Toast;

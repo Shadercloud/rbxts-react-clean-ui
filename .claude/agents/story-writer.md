@@ -21,19 +21,35 @@ Every component you demonstrate gets exactly two files in `Stories/<Category>/`:
 
 ### 1. `<Component>.tsx` — the screenshot fixture
 
-This is a plain, self-contained component, because `npm run screenshots` (`scripts/generate-screenshots.js`, backed by `@rbxts/react-screenshot-plugin`) compiles this file **standalone**, outside of ui-labs, and renders it with no props by default:
+This is a plain, self-contained component, because `npm run screenshots` (`scripts/generate-screenshots.js`, backed by `@rbxts/react-screenshot-plugin`) compiles this file **standalone**, outside of ui-labs, and renders it directly — this same file is also what the paired `.story.tsx` renders directly inside ui-labs (themed via `createStory`'s `Theme` control):
 
 * Export via `export = ComponentName;` (a bare function declaration), not `export default`. This matches `@rbxts/react-screenshot-plugin`'s requirement of a default (`export =`) export.
-* **Never import from `@rbxts/ui-labs`** in this file — no `createStory`, no control types. Those only exist inside the paired `.story.tsx`.
-* It must render something reasonable with **zero props** (the screenshot tool calls it bare). If the demo needs a knob controllable from the story, add an optional prop with a sensible default so the fixture still looks correct standalone.
+* **Never import from `@rbxts/ui-labs`** in this file — no `createStory`, no control types. Those only exist inside the paired `.story.tsx`. (Importing the shared `ScreenshotFrame` component, see below, is fine — it isn't a ui-labs import.)
+* It must render something reasonable with **zero props** (the screenshot tool calls it with only `{ screenshot: true }`, the story calls it with no props at all — see below). If the demo needs a knob controllable from the story, add an optional prop with a sensible default so the fixture still looks correct standalone.
+* **Never hardcode an opaque background (`BackgroundColor3` + `BackgroundTransparency={0}`) directly on the fixture's own layout `Container`.** This same file is rendered directly inside the ui-labs story panel under whatever theme the story's `Theme` control selects (Default/Dark/Sandstone/Wooden); a background baked straight into that Container shows a white box regardless of the selected theme, which is wrong.
+* **Accept an optional `screenshot?: boolean` prop and use it to conditionally wrap your existing content in the shared `ScreenshotFrame` (`import { ScreenshotFrame } from "../ScreenshotFrame";`) — never any other opaque background.** `ScreenshotFrame` is one component reused by every fixture in every category; never reimplement its white backing inline, and never create a per-component wrapper file for this. Shape:
+
+    ```tsx
+    function ComponentName(props: { screenshot?: boolean }) {
+        const content = (
+            <Container /* real layout/sizing props only, no background */>
+                {/* ...the actual demo... */}
+            </Container>
+        );
+
+        return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
+    }
+    ```
+
+  `scripts/generate-screenshots.js` passes `--props '{"screenshot":true}'` to every capture, so this prop is `true` only during a real screenshot run — the story (and Studio browsing) always renders `content` bare, themed correctly. See `Stories/ScreenshotFrame.tsx` for the shared wrapper itself (an auto-sizing `Container` with opaque white background, `BorderSizePixel={0}`, and standard padding) — create it once at that exact path if it doesn't exist yet, never per-category or per-component.
 * Local component state via `React.useState`/hooks is fine (see `Stories/Input/Slider.story.tsx` for the style, even though that one predates the split — new files should still split it into `.tsx` + `.story.tsx`).
-* Keep it as simple as possible: in most cases this is just the component(s) being demonstrated, wrapped in a basic `Container` with an explicit opaque `BackgroundColor3` (white, unless the component needs a different backdrop to read correctly) — see `Buttons.tsx`. The screenshot plugin crops to an opaque backing frame, so leaving the container transparent isn't an option, but beyond that, don't reach for `Box`/`Card`/headings/extra chrome here — that polish belongs in the `.story.tsx` instead.
+* Keep it as simple as possible: in most cases this is just the component(s) being demonstrated, wrapped in a basic `Container` (sizing only — `width`/`height` if the demo needs a specific size — no background props) — see `Buttons.tsx`. Beyond the `screenshot` prop handling above, don't reach for `Box`/`Card`/headings/extra chrome here — that polish belongs in the `.story.tsx` instead.
 * **Never pass `center` on the fixture's own outer `Container`.** `center` resolves to a percentage-based `Position`/`AnchorPoint` (see `SizeHelper.GetPosition`/`GetAnchor`), which only means something relative to a parent that itself has a well-defined absolute size — the screenshot tool's render harness doesn't reliably provide one, so a centered outer `Container` renders with zero/collapsed size and the capture fails with "the marker border is incomplete, non-rectangular, or ambiguous". Leave the fixture's outer `Container` anchored at its default top-left origin (no `center`, no `Position`, no `AnchorPoint`) with a fixed pixel `width`/`height` if the demo needs a specific size — never a percentage size either, for the same reason (a percentage of an undefined parent is 0). If the demo should look centered when browsed as a story, add that centering in the `.story.tsx` instead, wrapping the imported fixture in its own `<Container center>` there — see `Stories/Layout/Tabs.tsx` (fixture: fixed `width="75%" height="300"`, no `center`) and `Stories/Layout/Tabs.story.tsx` (`<Container center><Tabs /></Container>`) for the reference split.
-* **When splitting an existing monolithic `.story.tsx`** (one that pre-dates the two-file pattern and has all its layout inline) into the fixture + story pair, do not simply copy its JSX into the new `<Component>.tsx` verbatim. Existing combined stories often wrap the demonstrated component in a `Card`/`Card.Header`/heading `Text` for a nicer look inside ui-labs — strip all of that chrome out of the fixture and move it into the `.story.tsx` instead, per the previous bullet. The fixture should end up demonstrating only the raw component(s) on a plain `Container`, even if that means the fixture and the pre-split story looked identical before your change.
+* **When splitting an existing monolithic `.story.tsx`** (one that pre-dates the two-file pattern and has all its layout inline) into the fixture + story pair, do not simply copy its JSX into the new `<Component>.tsx` verbatim. Existing combined stories often wrap the demonstrated component in a `Card`/`Card.Header`/heading `Text` for a nicer look inside ui-labs — strip all of that chrome out of the fixture and move it into the `.story.tsx` instead, per the previous bullet. The fixture should end up demonstrating only the raw component(s) on a plain `Container` plus the `screenshot`-prop wrapping above, even if that means the fixture and the pre-split story looked identical before your change.
 
 ### 2. `<Component>.story.tsx` — the ui-labs story
 
-* `import ComponentName from "./ComponentName";` then `export = createStory((props) => <ComponentName />);` — see `Buttons.story.tsx` for the minimal shape.
+* `import ComponentName from "./ComponentName";` then `export = createStory((props) => <ComponentName />);` — see `Buttons.story.tsx` for the minimal shape. Never pass `screenshot` from here; that prop only exists for the screenshot tool.
 * This file is where the demo is allowed to look nicer than the raw screenshot fixture: per `.claude/specifications/stories.md`, wrap `<ComponentName />` in a `Box` or `Card` (headers, labels, extra layout) when that makes it read better inside the ui-labs panel — the screenshot tool never sees this file, so there's no need to keep it minimal.
 * If the demo benefits from interactive knobs, add `ui-labs` controls (`Boolean`, `Number`, `EnumList`, etc. from `@rbxts/ui-labs`) as the second argument to `createStory`, and forward `props.controls.X` into props on the fixture component. Cap this at **3 custom controls unless explicitly told otherwise** (per `stories.md`), and only add controls that make a meaningfully different visual result — not one control per prop.
 * If the fixture needs no variation and no extra chrome, skip controls and wrapping entirely (plain `createStory((props) => <ComponentName />)`, as in `Buttons.story.tsx`).
@@ -49,10 +65,10 @@ Each `Stories/<Category>/` directory needs an `index.storybook.tsx` (see `Storie
 
 ## Visual verification
 
-After writing or updating a `<Component>.tsx` fixture, you may capture a one-off screenshot of it to check your own work visually, using the same underlying tool (`@rbxts/react-screenshot-plugin`) but invoked directly for a single file, e.g.:
+After writing or updating a `<Component>.tsx` fixture, you may capture a one-off screenshot of it to check your own work visually, using the same underlying tool (`@rbxts/react-screenshot-plugin`) but invoked directly for a single file. Pass `--props '{"screenshot":true}'` so it renders wrapped in `ScreenshotFrame`, matching what `npm run screenshots` actually produces — without it you'll only see the bare, theme-driven fixture:
 
 ```powershell
-npx react-screenshot-plugin Stories/Layout/Accordion.tsx --output <scratch-path>/Accordion.png
+npx react-screenshot-plugin Stories/Layout/Accordion.tsx --props "{\"screenshot\":true}" --output <scratch-path>/Accordion.png
 ```
 
 * Always pass `--output` pointing at a scratch/temp location, never into `docs/public/images/screenshots/` — that tree is only ever written by the user's `npm run screenshots` run, not by you.
@@ -68,4 +84,4 @@ npx react-screenshot-plugin Stories/Layout/Accordion.tsx --output <scratch-path>
 
 ## Final response
 
-Summarize: which `<Component>.tsx` / `<Component>.story.tsx` pair(s) you created or updated, which category directory they're in, whether `index.storybook.tsx` already existed or was created, the result of the `tsc` check, whether you took (or offered and were declined) a one-off visual verification screenshot and what it showed, and anything left for the user (e.g. running `npm run screenshots`, or a loom/doc file that should be created separately).
+Summarize: which `<Component>.tsx` / `<Component>.story.tsx` pair(s) you created or updated, which category directory they're in, whether `Stories/ScreenshotFrame.tsx` already existed or was created, whether `index.storybook.tsx` already existed or was created, the result of the `tsc` check, whether you took (or offered and were declined) a one-off visual verification screenshot and what it showed, and anything left for the user (e.g. running `npm run screenshots`, or a loom/doc file that should be created separately).

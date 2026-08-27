@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { InferProps } from "@rbxts/ui-labs";
 declare const controls: {
-    Theme: import("@rbxts/ui-labs/src/ControlTypings/Advanced").AdvancedTypes.Choose<"Default" | "Dark" | "Sandstone">;
+    Theme: import("@rbxts/ui-labs/src/ControlTypings/Advanced").AdvancedTypes.Choose<"Default" | "Dark" | "Sandstone" | "Wooden">;
 };
 type StoryControl = Parameters<typeof import("@rbxts/ui-labs").Ordered>[0];
 type StoryControls = Record<string, StoryControl>;
@@ -11,7 +11,7 @@ export declare function createStory<T extends StoryControls = {}>(StoryComponent
     react: typeof React;
     reactRoblox: typeof ReactRoblox;
     controls: {
-        Theme: import("@rbxts/ui-labs/src/ControlTypings/Advanced").AdvancedTypes.Choose<"Default" | "Dark" | "Sandstone">;
+        Theme: import("@rbxts/ui-labs/src/ControlTypings/Advanced").AdvancedTypes.Choose<"Default" | "Dark" | "Sandstone" | "Wooden">;
     } & T;
     story: (props: StoryProps<T>) => React.JSX.Element;
 };

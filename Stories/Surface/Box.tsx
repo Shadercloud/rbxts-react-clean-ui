@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
 import { Box as BoxComponent, Container, createTheme, Text, ThemeProvider, VStack } from "@rbxts/react-clean-ui";
+import { ScreenshotFrame } from "../ScreenshotFrame";
 
 // backgroundImage is theme-only (theme.components.box.backgroundImage), not a Box prop,
 // so it's demonstrated here via a themed subtree rather than a per-instance control.
@@ -24,20 +25,23 @@ const themeWithBackgroundImage = createTheme({
     },
 });
 
-function Box() {
-    return <Container BackgroundColor3={new Color3(1, 1, 1)} BackgroundTransparency={0} BorderSizePixel={0} width={360}>
-        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
-        <VStack>
-            <BoxComponent>
-                <Text text="Boxes give content a bordered, shadowed surface to sit on." />
-            </BoxComponent>
-            <ThemeProvider theme={themeWithBackgroundImage}>
+function Box(props: { screenshot?: boolean } = {}) {
+    const content = (
+        <Container width={360}>
+            <VStack>
                 <BoxComponent>
-                    <Text text="theme.components.box.backgroundImage layers a 9-sliced image under Box's existing border, shadow, and corner radius, which still draw on top." />
+                    <Text text="Boxes give content a bordered, shadowed surface to sit on." />
                 </BoxComponent>
-            </ThemeProvider>
-        </VStack>
-    </Container>
+                <ThemeProvider theme={themeWithBackgroundImage}>
+                    <BoxComponent>
+                        <Text text="theme.components.box.backgroundImage layers a 9-sliced image under Box's existing border, shadow, and corner radius, which still draw on top." />
+                    </BoxComponent>
+                </ThemeProvider>
+            </VStack>
+        </Container>
+    );
+
+    return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
 }
 
 export = Box;

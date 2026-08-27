@@ -26,7 +26,7 @@ export declare class CssHelper {
     static parseCssSliceInset(value: CssSliceInset): ParsedSliceInset;
     static parseCssDual(value: CssDual): UDim2;
     static ResolveShadow(shadow: CssBoxShadow): React.InstanceProps<UIShadow>;
-    static resolveBackgroundImage(value: CssBackgroundImage | undefined): {
+    static resolveBackgroundImage(value: Partial<CssBackgroundImage> | undefined): {
         Image?: string;
         ImageColor3?: Color3;
         ImageTransparency?: number;

@@ -11,7 +11,7 @@ import {
 import { CleanThemeContext } from "../../Contexts/";
 import { BoxShadow, Corners, Padding } from "../Decorator";
 import { Text } from "../Typography";
-import { ColorHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { Icon, IconProps } from "../Surface";
 import { HStack } from "../Layout";
 import { Group, GroupContext } from "../Layout/";
@@ -108,6 +108,15 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
 
         const state = props.disabled ? "disabled" : hover ? "hover" : "default";
 
+        const intentColors = ColorHelper.getIntentColors(
+            theme,
+            props.intent,
+            state,
+            theme.components.button.intents,
+        );
+
+        const backgroundImage = CssHelper.resolveBackgroundImage(intentColors.backgroundImage);
+
         return (
             <imagebutton
                 ref={ref}
@@ -146,27 +155,25 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                     props.BackgroundTransparency ??
                     theme.components.button.backgroundTransparency
                 }
-                BackgroundColor3={ColorHelper.getIntentColors(
-                    theme,
-                    props.intent,
-                    state,
-                    theme.components.button.intents,
-                ).backgroundColor}
+                BackgroundColor3={intentColors.backgroundColor}
                 AutoButtonColor={false}
                 LayoutOrder={props.LayoutOrder}
                 ZIndex={props.ZIndex}
+
+                Image={backgroundImage.Image}
+                ImageColor3={backgroundImage.ImageColor3}
+                ImageTransparency={backgroundImage.ImageTransparency}
+                ScaleType={backgroundImage.ScaleType}
+                SliceCenter={backgroundImage.SliceCenter}
+                SliceScale={backgroundImage.SliceScale}
+                TileSize={backgroundImage.TileSize}
             >
                 <Corners radius={theme.components.button.cornerRadius} />
 
                 <uistroke
                     Thickness={theme.components.button.borderThickness}
                     BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-                    Color={ColorHelper.getIntentColors(
-                        theme,
-                        props.intent,
-                        state,
-                        theme.components.button.intents,
-                    ).borderColor}
+                    Color={intentColors.borderColor}
                 />
 
                 <BoxShadow {...props} value={theme.components.button.boxShadow} />
@@ -174,7 +181,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 <Group.Element enabled={props.group} padding={padding}>
 
                     {(props.icon !== undefined || props.text !== undefined) &&
-                        <HStack valign="Center" spacing={props.spacing}>
+                        <HStack valign="Center" spacing={props.spacing} Wraps={false}>
                             {props.icon !== undefined &&
                                 <ButtonIcon
                                     scale={props.scale}

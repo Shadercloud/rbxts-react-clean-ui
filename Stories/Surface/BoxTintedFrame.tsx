@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
 import { Box as BoxComponent, Container, createTheme, Text, ThemeProvider } from "@rbxts/react-clean-ui";
+import { ScreenshotFrame } from "../ScreenshotFrame";
 
 // backgroundImage is theme-only (theme.components.box.backgroundImage), not a Box prop,
 // so it's demonstrated here via a themed subtree rather than a per-instance control.
@@ -26,26 +27,23 @@ const themeWithTintedFrame = createTheme({
             backgroundImage: {
                 image: 89050878990049,
                 slice: "54 55 969 565",
-                sliceScale: 1,
-                // tintColor: new Color3(0.55, 0.35, 0.18),
             },
         },
     },
 });
 
-function BoxTintedFrame() {
-    return <Container
-        BackgroundColor3={new Color3(1, 1, 1)}
-        BackgroundTransparency={0} BorderSizePixel={0}
-        width="100%"
-        height="100%">
-        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
-        <ThemeProvider theme={themeWithTintedFrame}>
-            <BoxComponent>
-                <Text text="This wooden border comes from a plain white 9-sliced image recolored with theme.components.box.backgroundImage.tintColor, instead of an already-brown photographic texture." />
-            </BoxComponent>
-        </ThemeProvider>
-    </Container>
+function BoxTintedFrame(props: { screenshot?: boolean } = {}) {
+    const content = (
+        <Container width="100%" height="100%">
+            <ThemeProvider theme={themeWithTintedFrame}>
+                <BoxComponent>
+                    <Text text="This wooden border comes from a plain white 9-sliced image recolored with theme.components.box.backgroundImage.tintColor, instead of an already-brown photographic texture." />
+                </BoxComponent>
+            </ThemeProvider>
+        </Container>
+    );
+
+    return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
 }
 
 export = BoxTintedFrame;

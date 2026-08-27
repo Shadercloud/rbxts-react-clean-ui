@@ -30,48 +30,66 @@ do
 			_componentMatching = _componentMatching[selectedIntent]
 		end
 		local componentMatching = _componentMatching
-		local _object = table.clone(defaultPrimary.default)
-		setmetatable(_object, nil)
-		local _condition = defaultPrimary[state]
-		if _condition == nil then
-			_condition = {}
-		end
-		for _k, _v in _condition do
-			_object[_k] = _v
-		end
-		for _k, _v in defaultMatching.default do
-			_object[_k] = _v
-		end
-		local _condition_1 = defaultMatching[state]
-		if _condition_1 == nil then
-			_condition_1 = {}
-		end
-		for _k, _v in _condition_1 do
-			_object[_k] = _v
-		end
-		for _k, _v in self:resolveComponentColors(componentPrimary, state) do
-			_object[_k] = _v
-		end
-		for _k, _v in self:resolveComponentColors(componentMatching, state) do
-			_object[_k] = _v
-		end
-		return _object
+		local layers = { defaultPrimary.default, defaultMatching.default, defaultPrimary[state], defaultMatching[state], self:resolveComponentDefaultLayer(componentPrimary), self:resolveComponentDefaultLayer(componentMatching), self:resolveComponentStateLayer(componentPrimary, state), self:resolveComponentStateLayer(componentMatching, state) }
+		return self:mergeLayers(layers)
 	end
-	function ColorHelper:resolveComponentColors(colors, state)
-		if colors == nil then
-			return {}
-		end
-		if self:isInlineIntentColors(colors) then
-			local _object = table.clone((colors.default or {}))
+	function ColorHelper:mergeLayers(layers)
+		local merged = {}
+		local backgroundImage
+		local typography
+		for _, layer in layers do
+			if layer == nil then
+				continue
+			end
+			local _object = table.clone(merged)
 			setmetatable(_object, nil)
-			for _k, _v in (colors[state] or {}) do
+			for _k, _v in layer do
 				_object[_k] = _v
 			end
-			return _object
+			merged = _object
+			if layer.backgroundImage ~= nil then
+				local _object_1 = {}
+				if backgroundImage then
+					for _k, _v in backgroundImage do
+						_object_1[_k] = _v
+					end
+				end
+				for _k, _v in layer.backgroundImage do
+					_object_1[_k] = _v
+				end
+				backgroundImage = _object_1
+			end
+			if layer.typography ~= nil then
+				local _object_1 = {}
+				if typography then
+					for _k, _v in typography do
+						_object_1[_k] = _v
+					end
+				end
+				for _k, _v in layer.typography do
+					_object_1[_k] = _v
+				end
+				typography = _object_1
+			end
 		end
-		-- A direct Partial<IntentScheme> has no state variants,
-		-- so the requested state is ignored.
+		merged.backgroundImage = backgroundImage
+		merged.typography = typography
+		return merged
+	end
+	function ColorHelper:resolveComponentDefaultLayer(colors)
+		if colors == nil then
+			return nil
+		end
+		if self:isInlineIntentColors(colors) then
+			return colors.default
+		end
 		return colors
+	end
+	function ColorHelper:resolveComponentStateLayer(colors, state)
+		if colors == nil or not self:isInlineIntentColors(colors) then
+			return nil
+		end
+		return colors[state]
 	end
 	function ColorHelper:isInlineIntentColors(colors)
 		local statefulColors = colors

@@ -2,6 +2,8 @@ import {
     ThemeTemplate,
     InlineIntentColors,
     IntentScheme,
+    CssBackgroundImage,
+    TypographyStyle,
 } from "../Theme";
 import { ButtonFlag, Intent } from "../Interfaces";
 
@@ -24,41 +26,88 @@ export class ColorHelper {
         const componentPrimary = componentColors?.primary;
         const componentMatching = componentColors?.[selectedIntent];
 
-        return {
-            // 4. Default theme, primary intent
-            ...defaultPrimary.default,
-            ...(defaultPrimary[state] ?? {}),
+        const layers: (Partial<IntentScheme> | undefined)[] = [
+            // Theme tier, `default` sub-layers (primary before matching)
+            defaultPrimary.default,
+            defaultMatching.default,
 
-            // 3. Default theme, matching intent
-            ...defaultMatching.default,
-            ...(defaultMatching[state] ?? {}),
+            // Theme tier, requested-state sub-layers (primary before matching)
+            defaultPrimary[state],
+            defaultMatching[state],
 
-            // 2. Component theme, primary intent
-            ...this.resolveComponentColors(componentPrimary, state),
+            // Component tier, `default` sub-layers (primary before matching)
+            this.resolveComponentDefaultLayer(componentPrimary),
+            this.resolveComponentDefaultLayer(componentMatching),
 
-            // 1. Component theme, matching intent
-            ...this.resolveComponentColors(componentMatching, state),
-        };
+            // Component tier, requested-state sub-layers (primary before matching)
+            this.resolveComponentStateLayer(componentPrimary, state),
+            this.resolveComponentStateLayer(componentMatching, state),
+        ];
+
+        return this.mergeLayers(layers);
     }
 
-    private static resolveComponentColors(
+    // Combines an ordered list of cascade layers (earliest = lowest precedence)
+    // into a single IntentScheme. Most fields are last-wins/shallow-replace, but
+    // `backgroundImage` and `typography` are nested objects where a later layer
+    // should only override the fields it actually sets, inheriting the rest from
+    // earlier layers instead of wiping the whole object out.
+    private static mergeLayers(layers: (Partial<IntentScheme> | undefined)[]): IntentScheme {
+        let merged: Partial<IntentScheme> = {};
+        let backgroundImage: Partial<CssBackgroundImage> | undefined;
+        let typography: Partial<TypographyStyle> | undefined;
+
+        for (const layer of layers) {
+            if (layer === undefined) {
+                continue;
+            }
+
+            merged = { ...merged, ...layer };
+
+            if (layer.backgroundImage !== undefined) {
+                backgroundImage = { ...backgroundImage, ...layer.backgroundImage };
+            }
+
+            if (layer.typography !== undefined) {
+                typography = { ...typography, ...layer.typography };
+            }
+        }
+
+        merged.backgroundImage = backgroundImage;
+        merged.typography = typography;
+
+        return merged as IntentScheme;
+    }
+
+    // Extracts a component-theme intent entry's `default` sub-layer.
+    // A direct Partial<IntentScheme> (no state variants) is always
+    // applied here, since the requested state is ignored for it.
+    private static resolveComponentDefaultLayer(
         colors: InlineIntentColors | Partial<IntentScheme> | undefined,
-        state: ButtonFlag,
-    ): Partial<IntentScheme> {
+    ): Partial<IntentScheme> | undefined {
         if (colors === undefined) {
-            return {};
+            return undefined;
         }
 
         if (this.isInlineIntentColors(colors)) {
-            return {
-                ...(colors.default ?? {}),
-                ...(colors[state] ?? {}),
-            };
+            return colors.default;
         }
 
-        // A direct Partial<IntentScheme> has no state variants,
-        // so the requested state is ignored.
         return colors;
+    }
+
+    // Extracts a component-theme intent entry's requested-state sub-layer.
+    // A direct Partial<IntentScheme> has no state variants, so it never
+    // contributes a state layer (it's already applied by the default layer).
+    private static resolveComponentStateLayer(
+        colors: InlineIntentColors | Partial<IntentScheme> | undefined,
+        state: ButtonFlag,
+    ): Partial<IntentScheme> | undefined {
+        if (colors === undefined || !this.isInlineIntentColors(colors)) {
+            return undefined;
+        }
+
+        return colors[state];
     }
 
     private static isInlineIntentColors(

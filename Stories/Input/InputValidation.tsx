@@ -1,14 +1,15 @@
 import React from "@rbxts/react";
-import { Container, Fieldset, Input, Text, VStack } from "@rbxts/react-clean-ui";
+import { Fieldset, Input, Text, VStack } from "@rbxts/react-clean-ui";
+import { ScreenshotFrame } from "../ScreenshotFrame";
 
 interface InputValidationProps {
     min?: number;
     max?: number;
+    screenshot?: boolean;
 }
 
 function InputValidation(props: InputValidationProps = {}) {
-    return <Container BackgroundColor3={new Color3(1, 1, 1)} BackgroundTransparency={0} BorderSizePixel={0}>
-        <uipadding PaddingTop={new UDim(0, 10)} PaddingBottom={new UDim(0, 10)} PaddingLeft={new UDim(0, 10)} PaddingRight={new UDim(0, 10)} />
+    const content = (
         <VStack>
             <Fieldset>
                 <Fieldset.Label>
@@ -43,7 +44,9 @@ function InputValidation(props: InputValidationProps = {}) {
                 </Fieldset.Control>
             </Fieldset>
         </VStack>
-    </Container>
+    );
+
+    return props.screenshot ? <ScreenshotFrame>{content}</ScreenshotFrame> : content;
 }
 
 export = InputValidation;

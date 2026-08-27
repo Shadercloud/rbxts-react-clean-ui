@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Box, Container, createStory, Text } from "@rbxts/react-clean-ui";
+import { Box, Container, createStory, Text, VStack } from "@rbxts/react-clean-ui";
 import Slider from "./Slider";
 
 export = createStory((props) => (
@@ -8,10 +8,13 @@ export = createStory((props) => (
         center
     >
         <Box>
-            <Container>
-                <Text text="Slider Example" variant="heading" />
-            </Container>
-            <Slider />
+            <VStack>
+                <Container>
+                    <Text text="Slider Example" variant="heading" />
+                </Container>
+
+                <Slider />
+            </VStack>
         </Box>
     </Container>
 ));

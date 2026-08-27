@@ -14,6 +14,7 @@ export interface IntentScheme {
     backgroundTransparency?: number;
     boxShadow?: CssShadow;
     typography?: Partial<TypographyStyle>;
+    backgroundImage?: Partial<CssBackgroundImage>;
 }
 export interface IntentColors extends Partial<Record<ButtonFlag, IntentScheme>> {
     default: IntentScheme;

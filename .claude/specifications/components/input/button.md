@@ -38,7 +38,8 @@ Button defaults live under `theme.components.button`:
 
 - `backgroundTransparency`, `cornerRadius`, `boxShadow`, and `borderThickness` style the button surface. The border stroke uses `Enum.BorderStrokePosition.Inner`.
 - `typography` resolves the label's font via `TypographyHelper.getTypography(theme, props.scale, theme.components.button.typography)`.
-- `intents` provides per-`Intent` `default`/`hover`/`disabled` background, border, and text colors. `disabled` has no theme-wide fallback (`theme.colors.intents` only defines `default`/`hover`), so each intent's `disabled` entry is defined directly under `theme.components.button.intents.<intent>`.
+- `intents` provides per-`Intent` `default`/`hover`/`disabled` background, border, and text colors. `disabled` has no theme-wide fallback (`theme.colors.intents` only defines `default`/`hover`), so it's defined directly under `theme.components.button.intents.<intent>`. Per the shared cascade in [Components](../index.md), a `disabled` entry only needs to be defined once under `theme.components.button.intents.primary` — every other intent inherits it automatically unless it defines its own `disabled` entry to override it.
+- Each intent/state entry may also define `backgroundImage` (see [Components](../index.md) for how it merges across the intent/state cascade). When present, it renders on the root `imagebutton` alongside `BackgroundColor3`, resolved through the same `default`/`hover`/`disabled` state as the background color — there is no separate prop to override it, matching how `BackgroundColor3` itself is theme/intent-driven only.
 - `props.BackgroundTransparency` overrides the theme's `backgroundTransparency` when supplied — this still applies even when `disabled`.
 
 ## Story

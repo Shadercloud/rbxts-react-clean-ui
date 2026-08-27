@@ -9,6 +9,7 @@ local Padding = _Decorator.Padding
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
+local CssHelper = _Helpers.CssHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
@@ -45,6 +46,8 @@ local Button = React.forwardRef(function(props, ref)
 	local group = React.useContext(GroupContext)
 	local padding = SpacingHelper:GetResolvedPadding(theme, props)
 	local state = if props.disabled then "disabled" elseif hover then "hover" else "default"
+	local intentColors = ColorHelper:getIntentColors(theme, props.intent, state, theme.components.button.intents)
+	local backgroundImage = CssHelper:resolveBackgroundImage(intentColors.backgroundImage)
 	local _attributes = {
 		ref = ref,
 		Active = not props.disabled,
@@ -117,17 +120,24 @@ local Button = React.forwardRef(function(props, ref)
 		_condition = theme.components.button.backgroundTransparency
 	end
 	_attributes.BackgroundTransparency = _condition
-	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, props.intent, state, theme.components.button.intents).backgroundColor
+	_attributes.BackgroundColor3 = intentColors.backgroundColor
 	_attributes.AutoButtonColor = false
 	_attributes.LayoutOrder = props.LayoutOrder
 	_attributes.ZIndex = props.ZIndex
+	_attributes.Image = backgroundImage.Image
+	_attributes.ImageColor3 = backgroundImage.ImageColor3
+	_attributes.ImageTransparency = backgroundImage.ImageTransparency
+	_attributes.ScaleType = backgroundImage.ScaleType
+	_attributes.SliceCenter = backgroundImage.SliceCenter
+	_attributes.SliceScale = backgroundImage.SliceScale
+	_attributes.TileSize = backgroundImage.TileSize
 	local _exp = React.createElement(Corners, {
 		radius = theme.components.button.cornerRadius,
 	})
 	local _exp_1 = React.createElement("uistroke", {
 		Thickness = theme.components.button.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-		Color = ColorHelper:getIntentColors(theme, props.intent, state, theme.components.button.intents).borderColor,
+		Color = intentColors.borderColor,
 	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
@@ -141,6 +151,7 @@ local Button = React.forwardRef(function(props, ref)
 	}, (props.icon ~= nil or props.text ~= nil) and React.createElement(HStack, {
 		valign = "Center",
 		spacing = props.spacing,
+		Wraps = false,
 	}, props.icon ~= nil and React.createElement(ButtonIcon, {
 		scale = props.scale,
 		intent = props.intent,

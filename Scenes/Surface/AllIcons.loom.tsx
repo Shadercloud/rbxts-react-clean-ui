@@ -27,7 +27,7 @@ export const preview = {
     render: () => (
         <LoomScene>
             <Container width="90%" height="360" center>
-                <Box>
+                <Box width="100%" height="100%">
                     <Scroller>
                         <HStack>
                             {icons}

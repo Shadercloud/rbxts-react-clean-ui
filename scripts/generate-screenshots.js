@@ -23,7 +23,7 @@ function walkMdxFiles(dir) {
 }
 
 function quoteArg(arg) {
-	return `"${arg}"`;
+	return `"${String(arg).replace(/"/g, '\\"')}"`;
 }
 
 function resolveBinPath() {
@@ -95,7 +95,13 @@ function main() {
 				skipped += 1;
 			} else {
 				console.log(`Capturing: ${tsxRelativePath} -> ${path.relative(REPO_ROOT, outputPath)}`);
-				const captureArgs = [tsxRelativePath, "--output", path.relative(REPO_ROOT, outputPath)];
+				const captureArgs = [
+					tsxRelativePath,
+					"--output",
+					path.relative(REPO_ROOT, outputPath),
+					"--props",
+					JSON.stringify({ screenshot: true }),
+				];
 				const result = spawnSync(quoteArg(binPath) + " " + captureArgs.map(quoteArg).join(" "), {
 					cwd: REPO_ROOT,
 					stdio: "inherit",

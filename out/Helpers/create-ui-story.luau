@@ -6,10 +6,11 @@ local _Theme = TS.import(script, script.Parent.Parent, "Theme")
 local DarkTheme = _Theme.DarkTheme
 local DefaultTheme = _Theme.DefaultTheme
 local SandstoneTheme = _Theme.SandstoneTheme
+local WoodenTheme = _Theme.WoodenTheme
 local Choose = TS.import(script, TS.getModule(script, "@rbxts", "ui-labs").src).Choose
 local CleanUiProvider = TS.import(script, script.Parent.Parent, "Providers", "app.provider").CleanUiProvider
 local controls = {
-	Theme = Choose({ "Default", "Dark", "Sandstone" }),
+	Theme = Choose({ "Default", "Dark", "Sandstone", "Wooden" }),
 }
 local function createStory(StoryComponent, additionalControls)
 	local _object = {}
@@ -34,6 +35,9 @@ local function createStory(StoryComponent, additionalControls)
 			end
 			if baseProps.controls.Theme == "Sandstone" then
 				theme = SandstoneTheme
+			end
+			if baseProps.controls.Theme == "Wooden" then
+				theme = WoodenTheme
 			end
 			local _attributes = table.clone(props)
 			setmetatable(_attributes, nil)
