@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { Button, CleanUiProvider, Container, DefaultTheme, IconName, Intent, useToast } from "@rbxts/react-clean-ui";
+import { Button, Container, IconName, Intent, useToast } from "@rbxts/react-clean-ui";
 import { ScreenshotFrame } from "../ScreenshotFrame";
 
 interface ToastDemoProps {

@@ -9,7 +9,7 @@
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
-    "download-icons": "node scripts/download-icons.js"
+    "download-icons": "node --env-file-if-exists=.env.local scripts/download-icons.js"
   },
   "dependencies": {
     "@orama/orama": "^3.1.18",
@@ -35,5 +35,8 @@
     "postcss": "^8.5.17",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "@loom-dev/runtime": "npm:@shadercloud/loom-runtime@0.11.0-shadercloud.1"
   }
 }

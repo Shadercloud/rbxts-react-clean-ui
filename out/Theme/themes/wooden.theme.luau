@@ -436,6 +436,61 @@ local WoodenTheme = createTheme({
 				},
 			},
 		},
+		slider = {
+			height = 20,
+			bar = {
+				height = "50%",
+				padding = 10,
+				backgroundColor = Color3.fromHex("#5C3A18"),
+				backgroundTransparency = 0,
+				borderThickness = 1,
+				borderColor = Color3.fromHex("#3D2712"),
+				cornerRadius = 4,
+				highlight = {
+					backgroundColor = Color3.fromHex("#A16B30"),
+					backgroundTransparency = 0,
+					borderColor = Color3.fromHex("#3D2712"),
+				},
+			},
+			handle = {
+				boxShadow = "0px 0px 5px 5px",
+				backgroundColor = Color3.fromHex("#BA854A"),
+				backgroundTransparency = 0,
+				borderThickness = 2,
+				borderColor = Color3.fromHex("#3D2712"),
+				cornerRadius = "100%",
+			},
+		},
+		toast = {
+			intents = {
+				primary = {
+					backgroundTransparency = 1,
+				},
+			},
+		},
+		tooltip = {
+			cornerRadius = 0,
+			intents = {
+				primary = {
+					textColor = Color3.fromHex("#FFF7CF"),
+					backgroundColor = Color3.fromHex("#7A4A20"),
+					borderColor = Color3.fromHex("#3D2712"),
+					backgroundTransparency = 0,
+				},
+				success = {
+					backgroundColor = Color3.fromHex("#4E6A24"),
+				},
+				info = {
+					backgroundColor = Color3.fromHex("#2C5270"),
+				},
+				warning = {
+					backgroundColor = Color3.fromHex("#A67A20"),
+				},
+				danger = {
+					backgroundColor = Color3.fromHex("#7A3220"),
+				},
+			},
+		},
 	},
 })
 return {

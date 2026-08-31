@@ -1,10 +1,10 @@
 import React from "@rbxts/react";
 import { CleanUiProvider } from "../src/Providers/app.provider";
-import { Container } from "../src/Components/Layout/Container";
 import { ToastContainer } from "../src/Components/Interaction/Toast";
 import { DefaultTheme } from "../src/Theme/themes/default.theme";
 import { SandstoneTheme } from "../src/Theme/themes/sandstone.theme";
 import { DarkTheme } from "../src/Theme/themes/dark.theme";
+import { WoodenTheme } from "../src/Theme/themes/wooden.theme";
 import { ThemeTemplate } from "../src/Theme";
 
 declare const window: {
@@ -33,6 +33,10 @@ function getLoomTheme(): ThemeTemplate {
 
     if (componentTheme === "dark") {
         return DarkTheme;
+    }
+
+    if (componentTheme === "wooden") {
+        return WoodenTheme;
     }
 
     return DefaultTheme;

@@ -27,6 +27,7 @@ export function HStack(props: HStackProps) {
                     new UDim(0, math.ceil(SpacingHelper.GetPadding(theme, props.spacing) / 2))
                 }
                 Wraps={props.Wraps === undefined ? true : props.Wraps}
+                SortOrder={Enum.SortOrder.LayoutOrder}
                 Change={props.Change}
                 Event={props.Event}
             />

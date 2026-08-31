@@ -41,12 +41,12 @@ const Menu = React.forwardRef<ImageLabel, MenuProps>(
                     <VStack spacing="sm">
                         <Container group >
                             <HStack valign="Center">
-                                <Button icon="bars" Event={{
+                                <Button icon="bars" LayoutOrder={1} Event={{
                                     Activated: () => {
                                         setCollapsed(!collapsed);
                                     }
                                 }} />
-                                {!collapsed && <Text text={props.title} variant="heading" />}
+                                {!collapsed && <Text text={props.title} variant="heading" LayoutOrder={2} />}
                             </HStack>
                         </Container>
                         <FlexItem mode="Fill">

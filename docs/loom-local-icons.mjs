@@ -25,8 +25,45 @@ import { createGalleryServer } from "loom-dev/embed";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ICONS_DIR = path.join(__dirname, "public", "loom-icons");
+const ASSET_DELIVERY_URL = "https://assetdelivery.roblox.com/v1/asset/?id=";
 
-/** `<base>__loom/asset/<id>` → local PNG when cached, else `next()`. */
+/**
+ * When `ROBLOSECURITY` is set (Next's own `.env.local` loading already puts
+ * it in `process.env` for this file), fetch the true original file for `id`
+ * from `assetdelivery.roblox.com`, authenticated as the local dev's Roblox
+ * account, and cache it to `ICONS_DIR` so both this middleware and the next
+ * `npm run download-icons` / production build reuse it. Returns `null` (never
+ * throws) on any failure — no cookie, network error, or an inaccessible/missing
+ * asset (401/403/404 JSON error body) — so the caller can fall through to
+ * loom's own live thumbnail resolution exactly as it does today.
+ */
+async function fetchAndCacheFullResolutionAsset(id) {
+	const cookie = process.env.ROBLOSECURITY;
+	if (!cookie) {
+		return null;
+	}
+	try {
+		const response = await fetch(`${ASSET_DELIVERY_URL}${id}`, {
+			headers: { Cookie: `.ROBLOSECURITY=${cookie}` },
+		});
+		const contentType = response.headers.get("content-type") ?? "";
+		if (!response.ok || !contentType.startsWith("image/")) {
+			return null;
+		}
+		const data = Buffer.from(await response.arrayBuffer());
+		await fs.promises.mkdir(ICONS_DIR, { recursive: true });
+		await fs.promises.writeFile(path.join(ICONS_DIR, `${id}.png`), data);
+		return data;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * `<base>__loom/asset/<id>` → local PNG when cached, else (with
+ * `ROBLOSECURITY` set) a live authenticated full-resolution fetch that's
+ * cached for next time, else `next()`.
+ */
 function localIconMiddleware(base) {
 	const assetRoute = `${base}__loom/asset/`;
 	return function loomLocalIcons(req, res, next) {
@@ -42,8 +79,18 @@ function localIconMiddleware(base) {
 		}
 		fs.readFile(path.join(ICONS_DIR, `${id}.png`), (err, data) => {
 			if (err) {
-				// Not cached locally — let loom's own live-resolving proxy handle it.
-				next();
+				// Not cached locally — try an authenticated live fetch before
+				// falling through to loom's own live-resolving proxy.
+				fetchAndCacheFullResolutionAsset(id).then((fetched) => {
+					if (!fetched) {
+						next();
+						return;
+					}
+					res.statusCode = 200;
+					res.setHeader("Content-Type", "image/png");
+					res.setHeader("Cache-Control", "public, max-age=86400");
+					res.end(fetched);
+				});
 				return;
 			}
 			res.statusCode = 200;

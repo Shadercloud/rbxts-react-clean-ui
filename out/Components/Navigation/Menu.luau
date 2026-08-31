@@ -40,6 +40,7 @@ local Menu = React.forwardRef(function(props, ref)
 		valign = "Center",
 	}, React.createElement(Button, {
 		icon = "bars",
+		LayoutOrder = 1,
 		Event = {
 			Activated = function()
 				setCollapsed(not collapsed)
@@ -48,6 +49,7 @@ local Menu = React.forwardRef(function(props, ref)
 	}), not collapsed and React.createElement(Text, {
 		text = props.title,
 		variant = "heading",
+		LayoutOrder = 2,
 	}))), React.createElement(FlexItem, {
 		mode = "Fill",
 	}, React.createElement(Scroller, {

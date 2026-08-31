@@ -39,6 +39,8 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
             ? { resolvedPadding: CssHelper.parseCssQuad(themePadding) }
             : paddingSourceProps;
 
+        const borderThickness = props['border-thickness'] ?? theme.components.box.borderThickness;
+
         return (
             <Container
                 ref={ref}
@@ -57,11 +59,13 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
                 Event={props.Event}
                 backgroundImage={props['background-image'] ?? theme.components.box.backgroundImage}
             >
-                <uistroke
-                    Thickness={props['border-thickness'] ?? theme.components.box.borderThickness}
-                    BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-                    Color={props['border-color'] ?? theme.components.box.borderColor}
-                />
+                {borderThickness > 0 && (
+                    <uistroke
+                        Thickness={borderThickness}
+                        BorderStrokePosition={Enum.BorderStrokePosition.Inner}
+                        Color={props['border-color'] ?? theme.components.box.borderColor}
+                    />
+                )}
                 <BoxShadow {...props} value={theme.components.box.boxShadow} />
                 <Padding {...paddingProps} />
 
