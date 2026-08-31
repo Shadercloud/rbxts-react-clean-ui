@@ -96,6 +96,7 @@ export interface ThemeTemplate {
         tabs: {
             borderColor: Color3;
             backgroundColor: Color3;
+            backgroundImage?: CssBackgroundImage;
             borderThickness: number;
             cornerRadius: CssSize;
             spacing?: ScaleSizeValue<number>;

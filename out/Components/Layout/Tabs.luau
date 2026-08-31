@@ -46,7 +46,7 @@ local function TabButtonContent(props)
 	end
 	local intent = ColorHelper:getIntentColors(theme, "primary", _result_1, theme.components.tabs.button.intents)
 	return React.createElement(React.Fragment, nil, React.createElement(Corners, {
-		radius = theme.components.tabs.button.cornerRadius,
+		radius = theme.components.tabs.list.cornerRadius,
 	}), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding),
 	}), React.createElement(BoxShadow, {
@@ -184,13 +184,15 @@ local Tabs = React.forwardRef(function(props, ref)
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding),
 	})
 	local _exp_5 = React.createElement(Corners, {
-		radius = theme.components.tabs.list.cornerRadius,
+		radius = theme.components.tabs.cornerRadius,
 	})
 	local _result = selectedTab
 	if _result ~= nil then
 		_result = _result.content
 	end
-	return React.createElement(VStack, nil, _exp_2, React.createElement(Container, nil, _exp_3, _exp_4, _exp_5, _result))
+	return React.createElement(VStack, nil, _exp_2, React.createElement(Container, {
+		backgroundImage = props.backgroundImage or theme.components.tabs.backgroundImage,
+	}, _exp_3, _exp_4, _exp_5, _result))
 end)
 Tabs.Title = TabTitle
 Tabs.Tab = Tab

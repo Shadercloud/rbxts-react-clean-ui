@@ -9,9 +9,14 @@ interface CornerProps {
 export function Corners(props: CornerProps) {
     if (props.radius === undefined)
         return undefined
+
+    const radius = SizeHelper.toUDim(props.radius);
+    if (radius.Scale === 0 && radius.Offset === 0)
+        return undefined
+
     return (
         <uicorner
-            CornerRadius={SizeHelper.toUDim(props.radius)}
+            CornerRadius={radius}
         />
     );
 }

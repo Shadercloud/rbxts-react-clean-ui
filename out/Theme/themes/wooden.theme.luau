@@ -164,6 +164,14 @@ local WoodenTheme = createTheme({
 			},
 		},
 		tabs = {
+			backgroundImage = {
+				image = 137043424796720,
+				tintColor = Color3.fromHex("#8a5a28"),
+				size = "Tile",
+				tileSize = "200px",
+			},
+			borderColor = Color3.fromHex("#331d07"),
+			cornerRadius = 8,
 			list = {
 				borderThickness = 0,
 				cornerRadius = 0,

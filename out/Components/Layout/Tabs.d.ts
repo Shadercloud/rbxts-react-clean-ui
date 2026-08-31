@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
 import { PaddingProps, ScalableElementProps } from "../../Interfaces";
+import { CssBackgroundImage } from "../../Theme";
 interface TabProps {
     children?: React.ReactNode;
 }
@@ -13,6 +14,7 @@ interface TabContentProps {
 }
 declare function TabContent(props: TabContentProps): undefined;
 interface TabsProps extends ScalableElementProps {
+    backgroundImage?: CssBackgroundImage;
 }
 type TabsComponent = React.ForwardRefExoticComponent<TabsProps & React.RefAttributes<ImageLabel>> & {
     Tab: typeof Tab;

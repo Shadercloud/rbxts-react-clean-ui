@@ -6,8 +6,12 @@ local function Corners(props)
 	if props.radius == nil then
 		return nil
 	end
+	local radius = SizeHelper:toUDim(props.radius)
+	if radius.Scale == 0 and radius.Offset == 0 then
+		return nil
+	end
 	return React.createElement("uicorner", {
-		CornerRadius = SizeHelper:toUDim(props.radius),
+		CornerRadius = radius,
 	})
 end
 return {

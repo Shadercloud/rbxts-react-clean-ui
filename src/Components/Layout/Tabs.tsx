@@ -8,6 +8,7 @@ import { BoxShadow, Corners, Padding } from "../Decorator";
 import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
+import { CssBackgroundImage } from "../../Theme";
 
 interface ParsedTab {
     title: TabTitleProps;
@@ -40,7 +41,7 @@ function TabContent(props: TabContentProps) {
 
 
 interface TabsProps extends ScalableElementProps {
-
+    backgroundImage?: CssBackgroundImage;
 }
 
 function TabButtonContent(props: TabTitleProps) {
@@ -48,7 +49,7 @@ function TabButtonContent(props: TabTitleProps) {
     const hover = React.useContext(HoverButtonContext);
     const intent = ColorHelper.getIntentColors(theme, "primary", hover?.isSelected ? "focus" : hover?.hover ? "hover" : "default", theme.components.tabs.button.intents);
     return <>
-        <Corners radius={theme.components.tabs.button.cornerRadius} />
+        <Corners radius={theme.components.tabs.list.cornerRadius} />
         <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding)} />
         <BoxShadow value={intent.boxShadow} />
         <Text
@@ -204,14 +205,14 @@ const Tabs = React.forwardRef<ImageLabel, TabsProps>(
                         ))}
                     </HStack>
                 </Container>
-                <Container >
+                <Container backgroundImage={props.backgroundImage ?? theme.components.tabs.backgroundImage}>
                     <uistroke
                         Thickness={theme.components.tabs.borderThickness}
                         BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                         Color={theme.components.tabs.borderColor}
                     />
                     <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding)} />
-                    <Corners radius={theme.components.tabs.list.cornerRadius} />
+                    <Corners radius={theme.components.tabs.cornerRadius} />
 
                     {selectedTab?.content}
                 </Container>
