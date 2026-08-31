@@ -5,7 +5,7 @@ import { ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 import { TypographyStyle } from "../../Theme";
 import { Corners, Padding } from "../Decorator";
 import { FieldsetContext } from "../Layout";
-import { resolveValidatedText } from "./Input.validation";
+import { resolveClampedText, resolveValidatedText } from "./Input.validation";
 
 export interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
     value: string;
@@ -136,29 +136,13 @@ export function Input(props: InputProps) {
                     ...props.Event,
                     FocusLost: (rbx, enterPressed, inputThatCausedFocusLoss) => {
 
-                        if (props.validation === "Number" || props.validation === "Int") {
-                            const number = tonumber(rbx.Text);
+                        const clampedText = resolveClampedText(props.validation, rbx.Text, props.min, props.max);
 
-                            if (number !== undefined) {
-                                let clamped = number;
-
-                                if (props.min !== undefined && clamped < props.min) {
-                                    clamped = props.min;
-                                }
-
-                                if (props.max !== undefined && clamped > props.max) {
-                                    clamped = props.max;
-                                }
-
-                                if (clamped !== number) {
-                                    const clampedText = tostring(clamped);
-
-                                    ref.current!.Text = clampedText;
-                                    lastValidText.current = clampedText;
-                                    setValue(clampedText);
-                                    props.onChange?.(clampedText);
-                                }
-                            }
+                        if (clampedText !== undefined) {
+                            ref.current!.Text = clampedText;
+                            lastValidText.current = clampedText;
+                            setValue(clampedText);
+                            props.onChange?.(clampedText);
                         }
 
                         props.Event?.FocusLost?.(rbx, enterPressed, inputThatCausedFocusLoss);

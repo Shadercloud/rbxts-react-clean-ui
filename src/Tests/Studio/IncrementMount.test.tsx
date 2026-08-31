@@ -118,49 +118,6 @@ class IncrementMountValidation {
 		root.unmount();
 		host.Destroy();
 	}
-
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
-	@Test
-	public outOfRangeValueIsClampedOnFocusLossAndReportedViaOnChange() {
-		const host = new Instance("Folder");
-
-		let latestOnChangeValue: number | undefined;
-
-		const root = ReactRoblox.createRoot(host);
-
-		root.render(
-			<Increment
-				value={5}
-				min={0}
-				max={10}
-				onChange={(value) => {
-					latestOnChangeValue = value;
-				}}
-			/>,
-		);
-
-		task.wait();
-
-		const textBox = host.FindFirstChildWhichIsA("TextBox", true) as TextBox | undefined;
-
-		Assert.notUndefined(textBox);
-
-		textBox!.Text = "50";
-		task.wait();
-
-		textBox!.CaptureFocus();
-		textBox!.ReleaseFocus(true);
-		task.wait();
-
-		Assert.equal(latestOnChangeValue, 10);
-		Assert.equal(textBox!.Text, "10");
-
-		root.unmount();
-		host.Destroy();
-	}
 }
 
 export = IncrementMountValidation;

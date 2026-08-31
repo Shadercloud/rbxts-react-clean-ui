@@ -12,7 +12,9 @@ local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
 local FieldsetContext = TS.import(script, script.Parent.Parent, "Layout").FieldsetContext
-local resolveValidatedText = TS.import(script, script.Parent, "Input.validation").resolveValidatedText
+local _Input_validation = TS.import(script, script.Parent, "Input.validation")
+local resolveClampedText = _Input_validation.resolveClampedText
+local resolveValidatedText = _Input_validation.resolveValidatedText
 local function Input(props)
 	local theme = React.useContext(CleanThemeContext)
 	local fieldset = React.useContext(FieldsetContext)
@@ -117,26 +119,14 @@ local function Input(props)
 		end
 	end
 	_object.FocusLost = function(rbx, enterPressed, inputThatCausedFocusLoss)
-		if props.validation == "Number" or props.validation == "Int" then
-			local number = tonumber(rbx.Text)
-			if number ~= nil then
-				local clamped = number
-				if props.min ~= nil and clamped < props.min then
-					clamped = props.min
-				end
-				if props.max ~= nil and clamped > props.max then
-					clamped = props.max
-				end
-				if clamped ~= number then
-					local clampedText = tostring(clamped)
-					ref.current.Text = clampedText
-					lastValidText.current = clampedText
-					setValue(clampedText)
-					local _result = props.onChange
-					if _result ~= nil then
-						_result(clampedText)
-					end
-				end
+		local clampedText = resolveClampedText(props.validation, rbx.Text, props.min, props.max)
+		if clampedText ~= nil then
+			ref.current.Text = clampedText
+			lastValidText.current = clampedText
+			setValue(clampedText)
+			local _result = props.onChange
+			if _result ~= nil then
+				_result(clampedText)
 			end
 		end
 		local _result = props.Event

@@ -96,31 +96,6 @@ do
 		root:unmount()
 		host:Destroy()
 	end
-	function IncrementMountValidation:outOfRangeValueIsClampedOnFocusLossAndReportedViaOnChange()
-		local host = Instance.new("Folder")
-		local latestOnChangeValue
-		local root = ReactRoblox.createRoot(host)
-		root:render(React.createElement(Increment, {
-			value = 5,
-			min = 0,
-			max = 10,
-			onChange = function(value)
-				latestOnChangeValue = value
-			end,
-		}))
-		task.wait()
-		local textBox = host:FindFirstChildWhichIsA("TextBox", true)
-		Assert:notUndefined(textBox)
-		textBox.Text = "50"
-		task.wait()
-		textBox:CaptureFocus()
-		textBox:ReleaseFocus(true)
-		task.wait()
-		Assert:equal(latestOnChangeValue, 10)
-		Assert:equal(textBox.Text, "10")
-		root:unmount()
-		host:Destroy()
-	end
 	local _decorator = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.")
 	local _descriptor = Test(IncrementMountValidation, "seedsDisplayedTextFromInitialValueWhenUncontrolled", {
 		value = IncrementMountValidation.seedsDisplayedTextFromInitialValueWhenUncontrolled,
@@ -172,19 +147,6 @@ do
 	})
 	if _descriptor_7 then
 		IncrementMountValidation.typingAValidNumberForwardsItAsANumberWithoutClampingMidEdit = _descriptor_7.value
-	end
-	local _decorator_4 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.")
-	local _descriptor_8 = Test(IncrementMountValidation, "outOfRangeValueIsClampedOnFocusLossAndReportedViaOnChange", {
-		value = IncrementMountValidation.outOfRangeValueIsClampedOnFocusLossAndReportedViaOnChange,
-	})
-	if _descriptor_8 then
-		IncrementMountValidation.outOfRangeValueIsClampedOnFocusLossAndReportedViaOnChange = _descriptor_8.value
-	end
-	local _descriptor_9 = _decorator_4(IncrementMountValidation, "outOfRangeValueIsClampedOnFocusLossAndReportedViaOnChange", {
-		value = IncrementMountValidation.outOfRangeValueIsClampedOnFocusLossAndReportedViaOnChange,
-	})
-	if _descriptor_9 then
-		IncrementMountValidation.outOfRangeValueIsClampedOnFocusLossAndReportedViaOnChange = _descriptor_9.value
 	end
 	IncrementMountValidation = Tag("Studio")(IncrementMountValidation) or IncrementMountValidation
 end

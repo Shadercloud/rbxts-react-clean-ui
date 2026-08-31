@@ -3,7 +3,9 @@ local TS = _G[script]
 local _lunit = TS.import(script, TS.getModule(script, "@rbxts", "lunit").out)
 local Test = _lunit.Test
 local Assert = _lunit.Assert
-local resolveValidatedText = TS.import(script, script.Parent.Parent.Parent, "Components", "Input", "Input.validation").resolveValidatedText
+local _Input_validation = TS.import(script, script.Parent.Parent.Parent, "Components", "Input", "Input.validation")
+local resolveValidatedText = _Input_validation.resolveValidatedText
+local resolveClampedText = _Input_validation.resolveClampedText
 local InputNumberValidation
 do
 	InputNumberValidation = setmetatable({}, {
@@ -28,11 +30,51 @@ do
 		end
 		Assert:equal(lastValid, "123")
 	end
+	function InputNumberValidation:clampsDownToMaxWhenTextIsOverRange()
+		local resolved = resolveClampedText("Number", "50", 0, 10)
+		Assert:equal(resolved, "10")
+	end
+	function InputNumberValidation:clampsUpToMinWhenTextIsUnderRange()
+		local resolved = resolveClampedText("Number", "-5", 0, 10)
+		Assert:equal(resolved, "0")
+	end
+	function InputNumberValidation:returnsUndefinedWhenTextIsWithinRange()
+		local resolved = resolveClampedText("Number", "5", 0, 10)
+		Assert:undefined(resolved)
+	end
+	function InputNumberValidation:returnsUndefinedWhenTextIsNonNumeric()
+		local resolved = resolveClampedText("Number", "abc", 0, 10)
+		Assert:undefined(resolved)
+	end
 	local _descriptor = Test(InputNumberValidation, "keepsLastValidTextWhenAnInvalidCharacterIsTyped", {
 		value = InputNumberValidation.keepsLastValidTextWhenAnInvalidCharacterIsTyped,
 	})
 	if _descriptor then
 		InputNumberValidation.keepsLastValidTextWhenAnInvalidCharacterIsTyped = _descriptor.value
+	end
+	local _descriptor_1 = Test(InputNumberValidation, "clampsDownToMaxWhenTextIsOverRange", {
+		value = InputNumberValidation.clampsDownToMaxWhenTextIsOverRange,
+	})
+	if _descriptor_1 then
+		InputNumberValidation.clampsDownToMaxWhenTextIsOverRange = _descriptor_1.value
+	end
+	local _descriptor_2 = Test(InputNumberValidation, "clampsUpToMinWhenTextIsUnderRange", {
+		value = InputNumberValidation.clampsUpToMinWhenTextIsUnderRange,
+	})
+	if _descriptor_2 then
+		InputNumberValidation.clampsUpToMinWhenTextIsUnderRange = _descriptor_2.value
+	end
+	local _descriptor_3 = Test(InputNumberValidation, "returnsUndefinedWhenTextIsWithinRange", {
+		value = InputNumberValidation.returnsUndefinedWhenTextIsWithinRange,
+	})
+	if _descriptor_3 then
+		InputNumberValidation.returnsUndefinedWhenTextIsWithinRange = _descriptor_3.value
+	end
+	local _descriptor_4 = Test(InputNumberValidation, "returnsUndefinedWhenTextIsNonNumeric", {
+		value = InputNumberValidation.returnsUndefinedWhenTextIsNonNumeric,
+	})
+	if _descriptor_4 then
+		InputNumberValidation.returnsUndefinedWhenTextIsNonNumeric = _descriptor_4.value
 	end
 end
 return InputNumberValidation

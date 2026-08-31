@@ -9,7 +9,7 @@ This guide explains how to set up a local environment for developing **React Cle
 Follow the guide directions careful, as this step method will allow you to preview your work using **Stories** in the [UI Labs plugin](https://ui-labs.luau.page/docs/installation).
 
 <Callout type="info">
-	This guide assumes you're already familiar with **roblox-ts**, **Rojo**, and **Roblox Studio**.
+    This guide assumes you're already familiar with **roblox-ts**, **Rojo**, and **Roblox Studio**.
 </Callout>
 
 ## 1. Create a development project
@@ -116,6 +116,9 @@ Replace your root project's `tsconfig.json` with the following:
             "@rbxts/services": [
                 "../node_modules/@rbxts/services"
             ],
+            "lunit": {
+                "$path": "node_modules/@rbxts/lunit"
+            },
             "@rbxts/react-clean-ui": [
                 "../Packages/rbxts-react-clean-ui/out"
             ]

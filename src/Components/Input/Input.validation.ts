@@ -30,3 +30,36 @@ export function resolveValidatedText(
 
     return candidateText;
 }
+
+export function resolveClampedText(
+    validation: InputProps["validation"],
+    text: string,
+    min: number | undefined,
+    max: number | undefined,
+): string | undefined {
+    if (validation !== "Number" && validation !== "Int") {
+        return undefined;
+    }
+
+    const number = tonumber(text);
+
+    if (number === undefined) {
+        return undefined;
+    }
+
+    let clamped = number;
+
+    if (min !== undefined && clamped < min) {
+        clamped = min;
+    }
+
+    if (max !== undefined && clamped > max) {
+        clamped = max;
+    }
+
+    if (clamped === number) {
+        return undefined;
+    }
+
+    return tostring(clamped);
+}
