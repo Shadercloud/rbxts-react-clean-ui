@@ -14,8 +14,8 @@
 
 - `Accordion.Item` defines one section and requires a unique `value: string` prop.
 - `Accordion.Item` accepts an optional `disabled` prop. A disabled item cannot change state and its header uses the disabled visual treatment.
-- `Accordion.Header` defines the interactive header and accepts React children. It may also accept an optional leading `icon` using the library's existing icon type.
-- `Accordion.Content` contains the content associated with the header and accepts React children.
+- `Accordion.Header` defines the interactive header and accepts React children. It may also accept an optional leading `icon` using the library's existing icon type, plus the full shared `PaddingProps` set (`spacing`, `top`/`bottom`/`left`/`right`, `padding`, `resolvedPadding` — no `PositionElementProps` collision on this sub-part), which overrides that header's own padding per side against `theme.components.accordion.header.spacing`/`.padding`.
+- `Accordion.Content` contains the content associated with the header and accepts React children, plus the same full `PaddingProps` set as `Accordion.Header`, overriding per side against `theme.components.accordion.content.spacing`/`.padding`.
 - Only direct `Accordion.Item` children are treated as sections. Other direct children are ignored.
 - Each item uses the first direct `Accordion.Header` and first direct `Accordion.Content` child it contains. An item without a header is not rendered.
 - An item without content still renders its header but does not expand.
@@ -55,9 +55,9 @@ Accordion defaults live under `theme.components.accordion`:
 
 - `borderColor`, `borderThickness`, and `cornerRadius` style the outer accordion and its items.
 - `spacing` controls spacing between accordion items.
-- `header.spacing`, `header.typography`, and `header.intents` configure header padding, text, and default, hover, focus, and disabled states.
+- `header.spacing`, `header.padding`, `header.typography`, and `header.intents` configure header padding (tier 2/3 of the shared [padding resolution](../index.md#padding-resolution); a per-header `padding`/`spacing`/`resolvedPadding` prop is the tier-4 override — see Composition), text, and default, hover, focus, and disabled states.
 - `header.indicatorSize` and `header.indicatorColor` configure the expand indicator.
-- `content.spacing`, `content.backgroundColor`, and `content.backgroundTransparency` configure the expanded content area.
+- `content.spacing`, `content.padding`, `content.backgroundColor`, and `content.backgroundTransparency` configure the expanded content area (`content.spacing`/`content.padding` are the tier 2/3 padding overrides; a per-content padding prop is the tier-4 override).
 - `animation.duration` controls expand, collapse, and indicator-rotation duration. A duration of `0` disables animation.
 - Component props that expose a corresponding style override take precedence over theme defaults.
 - `Enum.BorderStrokePosition.Outer` should be used for the main border in order to not be over lapped by the accordion child backgrounds

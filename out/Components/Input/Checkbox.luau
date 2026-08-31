@@ -83,7 +83,7 @@ local function Checkbox(props)
 	_attributes_1.Transparency = _condition_2
 	_attributes_1.Color = ColorHelper:getIntentColors(theme, if checked then props["intent-checked"] or "success" else props["intent-unchecked"] or "primary", "default", theme.components.checkbox.intents).borderColor
 	return React.createElement("imagebutton", _attributes, _exp, React.createElement("uistroke", _attributes_1), React.createElement(Padding, {
-		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.checkbox.spacing),
+		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.checkbox.spacing, theme.components.checkbox.padding),
 	}), React.createElement(Icon, {
 		scale = props.scale,
 		icon = if checked then props["icon-checked"] or "check" else props["icon-unchecked"],

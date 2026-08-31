@@ -4,7 +4,7 @@ import { Container, FlexItem, VStack } from "../Layout";
 import { ColorHelper, CssHelper, SizeHelper, SpacingHelper } from "../../Helpers";
 import { CleanThemeContext } from "../../Contexts";
 import { Padding } from "../Decorator";
-import { Intent, IntentElementProps, PaddingProps, PositionElementProps, ResolvedPadding, SizeElementProps, ZIndexElementProps } from "../../Interfaces";
+import { CssPadding, Intent, IntentElementProps, PaddingProps, PositionElementProps, ResolvedPadding, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces";
 import { CssPosition } from "../../Theme";
 
 
@@ -154,9 +154,11 @@ function resolveOverlayPosition(
     };
 }
 
-interface CardHeaderProps extends IntentElementProps, PositionElementProps, ZIndexElementProps {
+interface CardHeaderProps extends IntentElementProps, PositionElementProps, ZIndexElementProps, SpacedElementProps {
     children?: React.ReactNode;
     overlay?: boolean;
+    padding?: CssPadding;
+    resolvedPadding?: ResolvedPadding;
 }
 
 export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
@@ -164,7 +166,7 @@ export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
         const theme = React.useContext(CleanThemeContext);
         const card = React.useContext(CardContext);
         const intent = ColorHelper.getIntentColors(theme, props.intent ?? card.intent ?? "primary", "default", theme.components.card.header.intents);
-        const padding = SpacingHelper.ResolveNumberPadding(SpacingHelper.GetPadding(theme, "md", theme.components.card.header.spacing));
+        const padding = SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.card.header.spacing, theme.components.card.header.padding, "md");
         const corners = CssHelper.parseCssSize(theme.components.card.cornerRadius);
         const { overlay, positionProps } = resolveOverlayPosition(props, theme.components.card.header.position);
         return <Container
@@ -196,47 +198,15 @@ export const CardBody = React.forwardRef<ImageLabel, CardBodyProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
 
-        // Mirrors Box.tsx's own padding resolution (CardBody wraps its
-        // children in a Container, not a Box, so it doesn't get Box's
-        // automatic `box.padding` application for free) — apply the card
-        // body's own theme padding only when the caller hasn't set explicit
-        // padding props. `card.body.padding`, when set, is an intentional
-        // full-override escape hatch and wins wholesale over everything
-        // below. Absent that, top/bottom fall back to the same generic
-        // md-scale default Header/Footer use for their own padding (NOT
-        // `box.padding`'s top/bottom) — CardBody's bottom padding stacks
-        // directly against an in-flow CardFooter's own top padding (the
-        // VStack's spacing is "None"), so inheriting `box.padding`'s
-        // vertical values here would double them up with Footer's/Header's
-        // own padding. Left/right still inherit `box.padding` since nothing
-        // else contributes horizontal padding at that seam.
+        // Unified 4-tier padding resolution (see SpacingHelper.GetResolvedPadding):
+        // `card.body.spacing` (tier 2) overrides the global spacing map per
+        // scale key, falling back to it for any key it doesn't define, and
+        // `card.body.padding` (tier 3) overrides the scale-based tiers
+        // entirely at the active key. CardBody wraps its children in a
+        // Container, not a Box, so it doesn't get Box's automatic
+        // `box.padding` application for free — this resolves independently
+        // against `theme.components.card.body`'s own tiers.
         const paddingSourceProps = props as PaddingProps;
-
-        const hasCustomPadding =
-            paddingSourceProps.top !== undefined ||
-            paddingSourceProps.bottom !== undefined ||
-            paddingSourceProps.left !== undefined ||
-            paddingSourceProps.right !== undefined ||
-            paddingSourceProps.spacing !== undefined ||
-            paddingSourceProps.padding !== undefined ||
-            paddingSourceProps.resolvedPadding !== undefined;
-
-        const bodyThemePadding = theme.components.card.body?.padding;
-        const boxThemePadding = theme.components.box.padding;
-        const mdPadding = SpacingHelper.GetPadding(theme, "md");
-
-        const paddingProps: PaddingProps = hasCustomPadding
-            ? paddingSourceProps
-            : bodyThemePadding !== undefined
-                ? { resolvedPadding: CssHelper.parseCssQuad(bodyThemePadding) }
-                : {
-                    resolvedPadding: {
-                        top: mdPadding,
-                        bottom: mdPadding,
-                        left: boxThemePadding !== undefined ? CssHelper.parseCssQuad(boxThemePadding).left : mdPadding,
-                        right: boxThemePadding !== undefined ? CssHelper.parseCssQuad(boxThemePadding).right : mdPadding,
-                    },
-                };
 
         return <FlexItem>
             <Container
@@ -244,7 +214,7 @@ export const CardBody = React.forwardRef<ImageLabel, CardBodyProps>(
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(0, 0))}
                 {...props}
                 AutomaticSize={Enum.AutomaticSize.XY}>
-                <Padding {...paddingProps} />
+                <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, paddingSourceProps, theme.components.card.body?.spacing, theme.components.card.body?.padding)} />
                 {props.children}
             </Container>
         </FlexItem>
@@ -252,6 +222,8 @@ export const CardBody = React.forwardRef<ImageLabel, CardBodyProps>(
 
 interface CardFooterProps extends BoxProps, IntentElementProps {
     overlay?: boolean;
+    padding?: CssPadding;
+    resolvedPadding?: ResolvedPadding;
 }
 
 export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
@@ -259,7 +231,7 @@ export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
         const theme = React.useContext(CleanThemeContext);
         const card = React.useContext(CardContext);
         const intent = ColorHelper.getIntentColors(theme, props.intent ?? card.intent ?? "primary", "default", theme.components.card.footer.intents);
-        const padding = SpacingHelper.ResolveNumberPadding(SpacingHelper.GetPadding(theme, "md", theme.components.card.footer.spacing));
+        const padding = SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.card.footer.spacing, theme.components.card.footer.padding, "md");
         const corners = CssHelper.parseCssSize(theme.components.card.cornerRadius);
         const { overlay, positionProps } = resolveOverlayPosition(props, theme.components.card.footer.position);
         return <Container

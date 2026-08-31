@@ -84,7 +84,7 @@ export function Checkbox(props: CheckboxProps) {
         />
 
 
-        <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props, theme.components.checkbox.spacing)} />
+        <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props, theme.components.checkbox.spacing, theme.components.checkbox.padding)} />
         <Icon
             scale={props.scale}
             icon={checked ? props['icon-checked'] ?? "check" : props['icon-unchecked']}

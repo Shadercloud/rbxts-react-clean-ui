@@ -3,7 +3,7 @@ import { BackgroundElementProps, PaddingProps, PositionElementProps, ShadowEleme
 import { CleanThemeContext } from "../../Contexts/";
 import { Padding, Corners, BoxShadow } from "../Decorator";
 import { Container } from "../Layout";
-import { SizeHelper, CssHelper } from "../../Helpers";
+import { SizeHelper, SpacingHelper } from "../../Helpers";
 import { CssBackgroundImage } from "../../Theme";
 
 export interface BoxProps extends SpacedElementProps,
@@ -21,23 +21,6 @@ export interface BoxProps extends SpacedElementProps,
 export const Box = React.forwardRef<ImageLabel, BoxProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
-
-        const paddingSourceProps = props as PaddingProps;
-
-        const hasCustomPadding =
-            paddingSourceProps.top !== undefined ||
-            paddingSourceProps.bottom !== undefined ||
-            paddingSourceProps.left !== undefined ||
-            paddingSourceProps.right !== undefined ||
-            paddingSourceProps.spacing !== undefined ||
-            paddingSourceProps.padding !== undefined ||
-            paddingSourceProps.resolvedPadding !== undefined;
-
-        const themePadding = theme.components.box.padding;
-
-        const paddingProps: PaddingProps = !hasCustomPadding && themePadding !== undefined
-            ? { resolvedPadding: CssHelper.parseCssQuad(themePadding) }
-            : paddingSourceProps;
 
         const borderThickness = props['border-thickness'] ?? theme.components.box.borderThickness;
 
@@ -67,7 +50,7 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
                     />
                 )}
                 <BoxShadow {...props} value={theme.components.box.boxShadow} />
-                <Padding {...paddingProps} />
+                <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.box.spacing, theme.components.box.padding)} />
 
                 <Corners radius={theme.components.box.cornerRadius} />
 

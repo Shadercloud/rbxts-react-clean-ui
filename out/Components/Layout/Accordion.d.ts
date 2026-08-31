@@ -1,18 +1,18 @@
 import React from "@rbxts/react";
-import { IconName, ScalableElementProps } from "../../Interfaces";
+import { IconName, PaddingProps, ScalableElementProps } from "../../Interfaces";
 interface AccordionItemProps {
     children?: React.ReactNode;
     value: string;
     disabled?: boolean;
 }
 declare function AccordionItem(_props: AccordionItemProps): undefined;
-interface AccordionHeaderProps {
+interface AccordionHeaderProps extends PaddingProps {
     children?: React.ReactNode | string;
     icon?: IconName;
     text?: string;
 }
 declare function AccordionHeader(_props: AccordionHeaderProps): undefined;
-interface AccordionContentProps {
+interface AccordionContentProps extends PaddingProps {
     children?: React.ReactNode;
     text?: string;
 }

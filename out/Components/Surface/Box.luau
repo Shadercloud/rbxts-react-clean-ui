@@ -9,15 +9,9 @@ local BoxShadow = _Decorator.BoxShadow
 local Container = TS.import(script, script.Parent.Parent, "Layout").Container
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local SizeHelper = _Helpers.SizeHelper
-local CssHelper = _Helpers.CssHelper
+local SpacingHelper = _Helpers.SpacingHelper
 local Box = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
-	local paddingSourceProps = props
-	local hasCustomPadding = paddingSourceProps.top ~= nil or paddingSourceProps.bottom ~= nil or paddingSourceProps.left ~= nil or paddingSourceProps.right ~= nil or paddingSourceProps.spacing ~= nil or paddingSourceProps.padding ~= nil or paddingSourceProps.resolvedPadding ~= nil
-	local themePadding = theme.components.box.padding
-	local paddingProps = if not hasCustomPadding and themePadding ~= nil then {
-		resolvedPadding = CssHelper:parseCssQuad(themePadding),
-	} else paddingSourceProps
 	local _condition = props["border-thickness"]
 	if _condition == nil then
 		_condition = theme.components.box.borderThickness
@@ -48,10 +42,9 @@ local Box = React.forwardRef(function(props, ref)
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	_attributes_1.value = theme.components.box.boxShadow
-	local _exp_1 = React.createElement(BoxShadow, _attributes_1)
-	local _attributes_2 = table.clone(paddingProps)
-	setmetatable(_attributes_2, nil)
-	return React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(Padding, _attributes_2), React.createElement(Corners, {
+	return React.createElement(Container, _attributes, _exp, React.createElement(BoxShadow, _attributes_1), React.createElement(Padding, {
+		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.box.spacing, theme.components.box.padding),
+	}), React.createElement(Corners, {
 		radius = theme.components.box.cornerRadius,
 	}), props.children)
 end)

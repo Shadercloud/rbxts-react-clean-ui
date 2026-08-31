@@ -15,3 +15,7 @@
 -- absolute pixel corner coordinates for Rect.new(minX, minY, maxX, maxY)-style slicing,
 -- e.g. Roblox's SliceCenter — not a CSS border-image-slice edge-inset shorthand, since
 -- Roblox has no intrinsic-image-size equivalent to derive corners from an inset alone
+-- A CssPadding quad, or a scale-key-indexed map of quads (e.g. a component's
+-- theme.components.X.padding tier, which can pick a different quad shape per
+-- spacing scale key the same way theme.components.X.spacing does for the
+-- numeric tier).

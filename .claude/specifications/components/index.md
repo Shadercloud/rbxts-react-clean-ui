@@ -17,6 +17,21 @@ This specification defines conventions shared by every component in `src/Compone
 - `ColorHelper.getIntentColors` resolves a scheme from up to three tiers, each layered on top of (not replacing) the ones before it: the theme tier (`theme.colors.intents`), the component tier (the `intents` map passed in from `theme.components.<name>`), and an optional override tier (a per-instance `intents` map, e.g. `Button`'s `styleOverride.intents`) for components that support one. Within each tier, layers apply lowest to highest precedence: the primary intent's `default`, the matching intent's `default`, the primary intent's requested state, then the matching intent's requested state — i.e. every `default` layer in a tier is applied before any state-specific layer in that same tier, so a shared `primary.disabled`-style override can't be clobbered by another intent's own `default` colors. Scalar fields (colors, transparency, etc.) are last-wins: a later layer that sets a field fully replaces the earlier value. The two nested-object fields, `backgroundImage` and `typography`, instead merge field-by-field across every layer that sets them — a layer only needs to specify the fields it wants to override (e.g. a `hover` layer overriding just `backgroundImage.tintColor`, or `weight` within `typography`) and inherits the rest from earlier layers rather than restating the whole object.
 - A duration/size knob that gates an optional visual effect (animation length, shadow, border) always accepts `0` (or omission) to mean "disabled," rather than requiring a separate boolean toggle.
 
+### Padding resolution
+
+A component with the standard padding/spacing prop set (`spacing`, `top`/`bottom`/`left`/`right`, `padding`, `resolvedPadding` — see `PaddingProps`) resolves its per-side padding through `SpacingHelper.GetResolvedPadding`, which layers four tiers, each falling back to the one below when unset, merged **per side** rather than wholesale:
+
+1. **Global spacing** — `theme.spacing: ScaleSizeValue<number>`, keyed by scale name.
+2. **Component spacing** — `theme.components.<name>.spacing?: ScaleSizeValue<number>`, overriding the global map per scale key (falling back to the global map for any key it doesn't define).
+3. **Component padding** — `theme.components.<name>.padding?: CssPadding | ScaleSizeValue<CssPadding>` (a `ScaledCssPadding`) — a fixed quad, or a quad keyed the same way as tier 2 — overriding tiers 1/2 at the active scale key.
+4. **Inline prop** — `resolvedPadding` (raw, wins outright and skips every other tier) > individual `top`/`bottom`/`left`/`right` > instance `padding` (a single quad, not scale-indexed) > tiers 3/2/1 at the active scale key.
+
+The active scale key is `props.spacing` (if set and not `"None"`), else a component's own pinned default if it has one (e.g. `Card.Header`/`Card.Footer` always pin `"md"` regardless of `theme.default.spacing`), else `theme.default.spacing`. This key selects both the tier-1/2 magnitude and which tier-3 quad shape applies — `spacing` is not a separate override that bypasses tier 3, it is what tiers 1/2/3 all key off of. `spacing === "None"` forces `0` for every side not otherwise overridden, before any per-side/instance-`padding` override applies on top.
+
+Because resolution merges per side, setting only one side (e.g. `top`) leaves the other sides to fall through tiers 3/2/1 rather than resetting the whole quad to the generic global default — a partial override never silently discards a sibling side's component- or theme-driven value.
+
+A component built on `PositionElementProps` (which declares `top`/`left`/`right`/`bottom` as *position* offsets, `CssSize`) cannot also cleanly extend the full `PaddingProps` (same names, `ScaleSize` scale keys) — on those components, only `spacing`, `padding`, and `resolvedPadding` are safe, collision-free padding-prop additions; per-side padding overrides aren't exposed there (`Box`, `Card.Header`, `Card.Footer`, `Tooltip`).
+
 ## Composition and layout
 
 - Components compose from other library components (layout primitives, `Icon`, `Text`, decorators) rather than hand-rolling equivalent Roblox instances inline, so behavior/theming stays centralized.

@@ -1,3 +1,4 @@
+import { ScaleSizeValue } from "./responsive.types";
 export type CssUnit = "px" | "%";
 export type CssSize = "Auto" | number | `${number}` | `${number}${CssUnit}`;
 export type CssCalcSize = CssSize | `${number}% - ${number}px` | `${number}% + ${number}px`;
@@ -25,4 +26,5 @@ export type CssBoxShadow = {
     transparency: number;
 };
 export type CssPadding = CssQuad;
+export type ScaledCssPadding = CssPadding | ScaleSizeValue<CssPadding>;
 export type ResponsiveCssSize = CssSize | CssBreakpointSize;

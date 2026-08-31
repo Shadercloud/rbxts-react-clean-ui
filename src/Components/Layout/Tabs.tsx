@@ -6,7 +6,7 @@ import { Container } from "./Container";
 import { CleanThemeContext } from "../../Contexts";
 import { BoxShadow, Corners, Padding } from "../Decorator";
 import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
-import { ScalableElementProps } from "../../Interfaces";
+import { PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
 
 interface ParsedTab {
@@ -22,7 +22,7 @@ function Tab(_props: TabProps) {
     return undefined
 }
 
-interface TabTitleProps {
+interface TabTitleProps extends PaddingProps {
     text: string;
 }
 
@@ -43,15 +43,13 @@ interface TabsProps extends ScalableElementProps {
 
 }
 
-function TabButtonContent(props: {
-    text: string;
-}) {
+function TabButtonContent(props: TabTitleProps) {
     const theme = React.useContext(CleanThemeContext);
     const hover = React.useContext(HoverButtonContext);
     const intent = ColorHelper.getIntentColors(theme, "primary", hover?.isSelected ? "focus" : hover?.hover ? "hover" : "default", theme.components.tabs.button.intents);
     return <>
         <Corners radius={theme.components.tabs.button.cornerRadius} />
-        <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.button.spacing)} />
+        <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding)} />
         <BoxShadow value={intent.boxShadow} />
         <Text
             TextColor3={intent.textColor}
@@ -157,7 +155,7 @@ const Tabs = React.forwardRef<ImageLabel, TabsProps>(
                     BackgroundTransparency={theme.components.tabs.list.backgroundTransparency ?? 0}
                     backgroundImage={theme.components.tabs.list.backgroundImage}>
                     <Corners radius={theme.components.tabs.list.cornerRadius} />
-                    <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing)} />
+                    <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing, theme.components.tabs.list.padding)} />
                     <HStack>
                         {tabs.map((tab, index) => (
                             <HoverButton isSelected={selected === index}
@@ -201,7 +199,7 @@ const Tabs = React.forwardRef<ImageLabel, TabsProps>(
                                     SliceScale: buttonFocusBackgroundImage.SliceScale,
                                     TileSize: buttonFocusBackgroundImage.TileSize,
                                 }}>
-                                <TabButtonContent text={tab.title.text} />
+                                <TabButtonContent {...tab.title} />
                             </HoverButton>
                         ))}
                     </HStack>
@@ -212,7 +210,7 @@ const Tabs = React.forwardRef<ImageLabel, TabsProps>(
                         BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                         Color={theme.components.tabs.borderColor}
                     />
-                    <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.spacing)} />
+                    <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding)} />
                     <Corners radius={theme.components.tabs.list.cornerRadius} />
 
                     {selectedTab?.content}

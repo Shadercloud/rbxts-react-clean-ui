@@ -243,6 +243,9 @@ export const WoodenTheme = createTheme({
         card: {
             borderThickness: 0,
             cornerRadius: 0,
+            body: {
+                padding: "10px 40px",
+            },
             header: {
                 intents: {
                     primary: {
@@ -293,7 +296,7 @@ export const WoodenTheme = createTheme({
                 position: {
                     position: "absolute",
                     center: "x",
-                    top: "-10px",
+                    top: "0px",
                     zIndex: 2,
                 },
             },
@@ -353,7 +356,7 @@ export const WoodenTheme = createTheme({
                 },
                 position: {
                     position: "absolute",
-                    bottom: "-10px",
+                    bottom: "0px",
                     left: "50px",
                     right: "50px",
                     zIndex: 2,

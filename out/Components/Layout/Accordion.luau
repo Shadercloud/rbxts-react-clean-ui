@@ -75,7 +75,7 @@ local function AccordionHeaderVisual(props)
 		return props.header.children
 	end
 	local _exp = React.createElement(Padding, {
-		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.accordion.header.spacing),
+		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props.header, theme.components.accordion.header.spacing, theme.components.accordion.header.padding),
 	})
 	local _exp_1 = props.header.icon ~= nil and React.createElement(Icon, {
 		icon = props.header.icon,
@@ -244,7 +244,7 @@ local function RenderedAccordionItem(props)
 			end,
 		},
 	}, React.createElement(Padding, {
-		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.accordion.content.spacing),
+		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props.contentProps, theme.components.accordion.content.spacing, theme.components.accordion.content.padding),
 	}), if props.contentText ~= nil then React.createElement(Text, {
 		text = props.contentText,
 	}) else props.content)))))
@@ -264,6 +264,7 @@ local Accordion = React.forwardRef(function(props, ref)
 				return nil
 			end
 			local header
+			local contentProps
 			local contentText
 			local content
 			React.Children.forEach(item.props.children, function(itemChild)
@@ -274,7 +275,7 @@ local Accordion = React.forwardRef(function(props, ref)
 					header = itemChild.props
 				end
 				if itemChild.type == AccordionContent and content == nil then
-					local contentProps = itemChild.props
+					contentProps = itemChild.props
 					contentText = contentProps.text
 					content = contentProps.children
 				end
@@ -292,6 +293,7 @@ local Accordion = React.forwardRef(function(props, ref)
 				end
 				_object[_left] = _condition
 				_object.header = header
+				_object.contentProps = contentProps or {}
 				_object.contentText = contentText
 				_object.content = content
 				table.insert(parsed, _object)

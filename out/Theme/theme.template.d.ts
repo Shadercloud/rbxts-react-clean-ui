@@ -1,4 +1,4 @@
-import { CssShadow, CssSize, CssPadding, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow } from "../Interfaces/";
+import { CssShadow, CssSize, ScaledCssPadding, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow } from "../Interfaces/";
 import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors, CssBackgroundImage, CssPosition } from "./theme.style";
 export interface ThemeTemplate {
     colors: {
@@ -48,7 +48,8 @@ export interface ThemeTemplate {
             borderColor: Color3;
             borderThickness: number;
             cornerRadius: CssSize;
-            padding?: CssPadding;
+            spacing?: ScaleSizeValue<number>;
+            padding?: ScaledCssPadding;
             boxShadow?: CssShadow;
             backgroundImage?: CssBackgroundImage;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
@@ -89,6 +90,7 @@ export interface ThemeTemplate {
             cornerRadius: CssSize;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
             spacing?: ScaleSizeValue<number>;
+            padding?: ScaledCssPadding;
             backgroundImage?: CssBackgroundImage;
         };
         tabs: {
@@ -97,6 +99,7 @@ export interface ThemeTemplate {
             borderThickness: number;
             cornerRadius: CssSize;
             spacing?: ScaleSizeValue<number>;
+            padding?: ScaledCssPadding;
             list: {
                 borderColor?: Color3;
                 backgroundColor?: Color3;
@@ -104,12 +107,14 @@ export interface ThemeTemplate {
                 borderThickness: number;
                 cornerRadius: CssSize;
                 spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
                 backgroundImage?: CssBackgroundImage;
             };
             button: {
                 borderThickness: number;
                 cornerRadius: CssSize;
                 spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
                 boxShadow?: CssShadow;
                 typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
@@ -122,6 +127,7 @@ export interface ThemeTemplate {
             spacing?: ScaleSizeValue<number>;
             header: {
                 spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
                 typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
                 indicatorSize: number;
@@ -129,6 +135,7 @@ export interface ThemeTemplate {
             };
             content: {
                 spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
                 backgroundColor: Color3;
                 backgroundTransparency: number;
             };
@@ -142,17 +149,20 @@ export interface ThemeTemplate {
             header: {
                 borderThickness?: number;
                 spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
                 position?: CssPosition;
             };
             footer: {
                 borderThickness?: number;
                 spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
                 position?: CssPosition;
             };
             body?: {
-                padding?: CssPadding;
+                spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
             };
         };
         slider: {

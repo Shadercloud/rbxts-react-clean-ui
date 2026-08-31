@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { useTween } from "@rbxts/react-ripple";
 import { CleanThemeContext } from "../../Contexts";
 import { ColorHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
-import { IconName, ScalableElementProps } from "../../Interfaces";
+import { IconName, PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { Corners, Padding } from "../Decorator";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
 import { Icon } from "../Surface/Icon";
@@ -21,7 +21,7 @@ function AccordionItem(_props: AccordionItemProps) {
     return undefined;
 }
 
-interface AccordionHeaderProps {
+interface AccordionHeaderProps extends PaddingProps {
     children?: React.ReactNode | string;
     icon?: IconName;
     text?: string;
@@ -31,7 +31,7 @@ function AccordionHeader(_props: AccordionHeaderProps) {
     return undefined;
 }
 
-interface AccordionContentProps {
+interface AccordionContentProps extends PaddingProps {
     children?: React.ReactNode;
     text?: string;
 }
@@ -53,6 +53,7 @@ interface ParsedItem {
     value: string;
     disabled: boolean;
     header: AccordionHeaderProps;
+    contentProps: AccordionContentProps;
     contentText?: string;
     content?: React.ReactNode;
 }
@@ -81,7 +82,7 @@ function AccordionHeaderVisual(props: {
 
     return (
         <>
-            <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.accordion.header.spacing)} />
+            <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props.header, theme.components.accordion.header.spacing, theme.components.accordion.header.padding)} />
             <HStack valign="Center" Wraps={false} HorizontalFlex={Enum.UIFlexAlignment.Fill}>
                 {props.header.icon !== undefined && <Icon icon={props.header.icon} color={colors.textColor} />}
                 <Container Size={new UDim2(1, theme.components.accordion.header.indicatorSize, 0, 0)} AutomaticSize={Enum.AutomaticSize.Y} >
@@ -194,7 +195,7 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                                 }
                             }}
                         >
-                            <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.accordion.content.spacing)} />
+                            <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props.contentProps, theme.components.accordion.content.spacing, theme.components.accordion.content.padding)} />
                             {props.contentText !== undefined
                                 ? <Text text={props.contentText} />
                                 : props.content}
@@ -222,20 +223,21 @@ const Accordion = React.forwardRef<ImageLabel, AccordionProps>((props, ref) => {
             const item = child as React.ReactElement<AccordionItemProps>;
             if (seen.has(item.props.value)) return;
             let header: AccordionHeaderProps | undefined;
+            let contentProps: AccordionContentProps | undefined;
             let contentText: string | undefined;
             let content: React.ReactNode;
             React.Children.forEach(item.props.children, (itemChild) => {
                 if (!React.isValidElement(itemChild)) return;
                 if (itemChild.type === AccordionHeader && header === undefined) header = itemChild.props as AccordionHeaderProps;
                 if (itemChild.type === AccordionContent && content === undefined) {
-                    const contentProps = itemChild.props as AccordionContentProps;
+                    contentProps = itemChild.props as AccordionContentProps;
                     contentText = contentProps.text;
                     content = contentProps.children;
                 }
             });
             if (header !== undefined) {
                 seen.add(item.props.value);
-                parsed.push({ value: item.props.value, disabled: item.props.disabled ?? false, header, contentText, content });
+                parsed.push({ value: item.props.value, disabled: item.props.disabled ?? false, header, contentProps: contentProps ?? {}, contentText, content });
             }
         });
         return parsed;

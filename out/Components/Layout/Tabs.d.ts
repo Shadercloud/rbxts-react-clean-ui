@@ -1,10 +1,10 @@
 import React from "@rbxts/react";
-import { ScalableElementProps } from "../../Interfaces";
+import { PaddingProps, ScalableElementProps } from "../../Interfaces";
 interface TabProps {
     children?: React.ReactNode;
 }
 declare function Tab(_props: TabProps): undefined;
-interface TabTitleProps {
+interface TabTitleProps extends PaddingProps {
     text: string;
 }
 declare function TabTitle(_props: TabTitleProps): undefined;

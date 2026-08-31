@@ -159,7 +159,7 @@ local CardHeader = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local card = React.useContext(CardContext)
 	local intent = ColorHelper:getIntentColors(theme, props.intent or card.intent or "primary", "default", theme.components.card.header.intents)
-	local padding = SpacingHelper:ResolveNumberPadding(SpacingHelper:GetPadding(theme, "md", theme.components.card.header.spacing))
+	local padding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.card.header.spacing, theme.components.card.header.padding, "md")
 	local corners = CssHelper:parseCssSize(theme.components.card.cornerRadius)
 	local _binding = resolveOverlayPosition(props, theme.components.card.header.position)
 	local overlay = _binding.overlay
@@ -207,39 +207,15 @@ local CardHeader = React.forwardRef(function(props, ref)
 end)
 local CardBody = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
-	-- Mirrors Box.tsx's own padding resolution (CardBody wraps its
-	-- children in a Container, not a Box, so it doesn't get Box's
-	-- automatic `box.padding` application for free) — apply the card
-	-- body's own theme padding only when the caller hasn't set explicit
-	-- padding props. `card.body.padding`, when set, is an intentional
-	-- full-override escape hatch and wins wholesale over everything
-	-- below. Absent that, top/bottom fall back to the same generic
-	-- md-scale default Header/Footer use for their own padding (NOT
-	-- `box.padding`'s top/bottom) — CardBody's bottom padding stacks
-	-- directly against an in-flow CardFooter's own top padding (the
-	-- VStack's spacing is "None"), so inheriting `box.padding`'s
-	-- vertical values here would double them up with Footer's/Header's
-	-- own padding. Left/right still inherit `box.padding` since nothing
-	-- else contributes horizontal padding at that seam.
+	-- Unified 4-tier padding resolution (see SpacingHelper.GetResolvedPadding):
+	-- `card.body.spacing` (tier 2) overrides the global spacing map per
+	-- scale key, falling back to it for any key it doesn't define, and
+	-- `card.body.padding` (tier 3) overrides the scale-based tiers
+	-- entirely at the active key. CardBody wraps its children in a
+	-- Container, not a Box, so it doesn't get Box's automatic
+	-- `box.padding` application for free — this resolves independently
+	-- against `theme.components.card.body`'s own tiers.
 	local paddingSourceProps = props
-	local hasCustomPadding = paddingSourceProps.top ~= nil or paddingSourceProps.bottom ~= nil or paddingSourceProps.left ~= nil or paddingSourceProps.right ~= nil or paddingSourceProps.spacing ~= nil or paddingSourceProps.padding ~= nil or paddingSourceProps.resolvedPadding ~= nil
-	local _bodyThemePadding = theme.components.card.body
-	if _bodyThemePadding ~= nil then
-		_bodyThemePadding = _bodyThemePadding.padding
-	end
-	local bodyThemePadding = _bodyThemePadding
-	local boxThemePadding = theme.components.box.padding
-	local mdPadding = SpacingHelper:GetPadding(theme, "md")
-	local paddingProps = if hasCustomPadding then paddingSourceProps elseif bodyThemePadding ~= nil then {
-		resolvedPadding = CssHelper:parseCssQuad(bodyThemePadding),
-	} else {
-		resolvedPadding = {
-			top = mdPadding,
-			bottom = mdPadding,
-			left = if boxThemePadding ~= nil then CssHelper:parseCssQuad(boxThemePadding).left else mdPadding,
-			right = if boxThemePadding ~= nil then CssHelper:parseCssQuad(boxThemePadding).right else mdPadding,
-		},
-	}
 	local _attributes = {
 		ref = ref,
 		Size = SizeHelper:GetSize(props, UDim2.fromScale(0, 0)),
@@ -248,15 +224,23 @@ local CardBody = React.forwardRef(function(props, ref)
 		_attributes[_k] = _v
 	end
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
-	local _attributes_1 = table.clone(paddingProps)
-	setmetatable(_attributes_1, nil)
+	local _attributes_1 = {}
+	local _result = theme.components.card.body
+	if _result ~= nil then
+		_result = _result.spacing
+	end
+	local _result_1 = theme.components.card.body
+	if _result_1 ~= nil then
+		_result_1 = _result_1.padding
+	end
+	_attributes_1.resolvedPadding = SpacingHelper:GetResolvedPadding(theme, paddingSourceProps, _result, _result_1)
 	return React.createElement(FlexItem, nil, React.createElement(Container, _attributes, React.createElement(Padding, _attributes_1), props.children))
 end)
 local CardFooter = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local card = React.useContext(CardContext)
 	local intent = ColorHelper:getIntentColors(theme, props.intent or card.intent or "primary", "default", theme.components.card.footer.intents)
-	local padding = SpacingHelper:ResolveNumberPadding(SpacingHelper:GetPadding(theme, "md", theme.components.card.footer.spacing))
+	local padding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.card.footer.spacing, theme.components.card.footer.padding, "md")
 	local corners = CssHelper:parseCssSize(theme.components.card.cornerRadius)
 	local _binding = resolveOverlayPosition(props, theme.components.card.footer.position)
 	local overlay = _binding.overlay

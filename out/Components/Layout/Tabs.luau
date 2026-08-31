@@ -48,7 +48,7 @@ local function TabButtonContent(props)
 	return React.createElement(React.Fragment, nil, React.createElement(Corners, {
 		radius = theme.components.tabs.button.cornerRadius,
 	}), React.createElement(Padding, {
-		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.button.spacing),
+		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding),
 	}), React.createElement(BoxShadow, {
 		value = intent.boxShadow,
 	}), React.createElement(Text, {
@@ -117,11 +117,13 @@ local Tabs = React.forwardRef(function(props, ref)
 		radius = theme.components.tabs.list.cornerRadius,
 	})
 	local _exp_1 = React.createElement(Padding, {
-		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing),
+		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing, theme.components.tabs.list.padding),
 	})
 	-- ▼ ReadonlyArray.map ▼
 	local _newValue = table.create(#tabs)
 	local _callback = function(tab, index)
+		local _attributes_1 = table.clone(tab.title)
+		setmetatable(_attributes_1, nil)
 		return React.createElement(HoverButton, {
 			isSelected = selected == index,
 			default = {
@@ -166,9 +168,7 @@ local Tabs = React.forwardRef(function(props, ref)
 				SliceScale = buttonFocusBackgroundImage.SliceScale,
 				TileSize = buttonFocusBackgroundImage.TileSize,
 			},
-		}, React.createElement(TabButtonContent, {
-			text = tab.title.text,
-		}))
+		}, React.createElement(TabButtonContent, _attributes_1))
 	end
 	for _k, _v in tabs do
 		_newValue[_k] = _callback(_v, _k - 1, tabs)
@@ -181,7 +181,7 @@ local Tabs = React.forwardRef(function(props, ref)
 		Color = theme.components.tabs.borderColor,
 	})
 	local _exp_4 = React.createElement(Padding, {
-		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.spacing),
+		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding),
 	})
 	local _exp_5 = React.createElement(Corners, {
 		radius = theme.components.tabs.list.cornerRadius,

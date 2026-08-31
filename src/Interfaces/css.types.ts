@@ -1,3 +1,5 @@
+import { ScaleSizeValue } from "./responsive.types";
+
 export type CssUnit = "px" | "%";
 
 export type CssSize =
@@ -65,5 +67,11 @@ export type CssBoxShadow = {
 }
 
 export type CssPadding = CssQuad;
+
+// A CssPadding quad, or a scale-key-indexed map of quads (e.g. a component's
+// theme.components.X.padding tier, which can pick a different quad shape per
+// spacing scale key the same way theme.components.X.spacing does for the
+// numeric tier).
+export type ScaledCssPadding = CssPadding | ScaleSizeValue<CssPadding>;
 
 export type ResponsiveCssSize = CssSize | CssBreakpointSize;
