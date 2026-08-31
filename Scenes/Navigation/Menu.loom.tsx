@@ -7,7 +7,7 @@ import { LoomScene } from "../LoomScene";
 export const preview = {
     render: () => (
         <LoomScene>
-            <Container height="300">
+            <Container height="350">
                 <Box width="Auto" height="100%">
                     <Menu title="Main Menu">
                         <Menu.Item title="Home" icon="home" />

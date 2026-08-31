@@ -122,12 +122,6 @@ export const WoodenTheme = createTheme({
             list: {
                 borderThickness: 0,
                 cornerRadius: 0,
-                // Same plaque asset as the buttons, stretched across the
-                // full tab bar width — a darker/more muted stain than the
-                // buttons' own default tint so the buttons still read as
-                // distinct, raised elements sitting on top of this backing
-                // strip. backgroundTransparency: 1 hides the flat fill so
-                // only the image shows.
                 backgroundTransparency: 1,
                 backgroundImage: {
                     image: 92016395170536,
@@ -139,12 +133,6 @@ export const WoodenTheme = createTheme({
                 cornerRadius: 0,
                 borderThickness: 0,
                 intents: {
-                    // Same cascade as `card.header.intents`/`card.footer.
-                    // intents` above — only `primary` spells out the shared
-                    // plaque (image/slice), text color, and transparency;
-                    // the rest just override `backgroundImage.tintColor`.
-                    // Tints reused from `button.intents` above since these
-                    // are literal buttons too.
                     primary: {
                         default: {
                             textColor: Color3.fromHex("#FFF7CF"),
@@ -257,17 +245,6 @@ export const WoodenTheme = createTheme({
             cornerRadius: 0,
             header: {
                 intents: {
-                    // Every intent shares the same plaque (image/slice), text
-                    // color, border color, and transparency — only the wood
-                    // stain tint differs, so only `primary` spells those
-                    // shared fields out. The others just override
-                    // `backgroundImage.tintColor`; ColorHelper's cascade
-                    // always layers the `primary` entry underneath the
-                    // selected intent, and merges `backgroundImage` field-by-
-                    // field rather than replacing it wholesale, so everything
-                    // but `tintColor` falls through from `primary` below
-                    // (same pattern already used by this theme's `button`/
-                    // `checkbox` intents).
                     primary: {
                         default: {
                             textColor: Color3.fromHex("#FFF7CF"),
@@ -313,9 +290,6 @@ export const WoodenTheme = createTheme({
                         },
                     },
                 },
-                // Mounted plaque look: centered horizontally on the box and
-                // pulled up so it protrudes above the box's top edge instead
-                // of sitting in-flow like a normal header bar.
                 position: {
                     position: "absolute",
                     center: "x",
@@ -332,9 +306,6 @@ export const WoodenTheme = createTheme({
                     xl: 6
                 },
                 intents: {
-                    // Same cascade as `header.intents` above — only `primary`
-                    // spells out the shared fields, the rest just override
-                    // `backgroundImage.tintColor`.
                     primary: {
                         default: {
                             textColor: Color3.fromHex("#FFF7CF"),
@@ -380,11 +351,6 @@ export const WoodenTheme = createTheme({
                         },
                     },
                 },
-                // Mounted plaque look, mirroring the header, but flush with
-                // the box's bottom edge (no negative offset/protrusion) and
-                // inset 50px on each side (left/right insets implicitly
-                // center it and imply a width narrower than the box, same as
-                // standard CSS absolute positioning).
                 position: {
                     position: "absolute",
                     bottom: "-10px",
@@ -468,6 +434,61 @@ export const WoodenTheme = createTheme({
                         textColor: Color3.fromHex("#ff0000")
                     }
                 }
+            },
+        },
+        slider: {
+            height: 20,
+            bar: {
+                height: "50%",
+                padding: 10,
+                backgroundColor: Color3.fromHex("#5C3A18"),
+                backgroundTransparency: 0,
+                borderThickness: 1,
+                borderColor: Color3.fromHex("#3D2712"),
+                cornerRadius: 4,
+                highlight: {
+                    backgroundColor: Color3.fromHex("#A16B30"),
+                    backgroundTransparency: 0,
+                    borderColor: Color3.fromHex("#3D2712"),
+                }
+            },
+            handle: {
+                boxShadow: "0px 0px 5px 5px",
+                backgroundColor: Color3.fromHex("#BA854A"),
+                backgroundTransparency: 0,
+                borderThickness: 2,
+                borderColor: Color3.fromHex("#3D2712"),
+                cornerRadius: "100%",
+            }
+        },
+        toast: {
+            intents: {
+                primary: {
+                    backgroundTransparency: 1
+                }
+            }
+        },
+        tooltip: {
+            cornerRadius: 0,
+            intents: {
+                primary: {
+                    textColor: Color3.fromHex("#FFF7CF"),
+                    backgroundColor: Color3.fromHex("#7A4A20"),
+                    borderColor: Color3.fromHex("#3D2712"),
+                    backgroundTransparency: 0,
+                },
+                success: {
+                    backgroundColor: Color3.fromHex("#4E6A24"),
+                },
+                info: {
+                    backgroundColor: Color3.fromHex("#2C5270"),
+                },
+                warning: {
+                    backgroundColor: Color3.fromHex("#A67A20"),
+                },
+                danger: {
+                    backgroundColor: Color3.fromHex("#7A3220"),
+                },
             },
         },
     },

@@ -3,7 +3,7 @@
 
 import React from "react";
 
-type ComponentTheme = "default" | "sandstone" | "dark";
+type ComponentTheme = "default" | "sandstone" | "dark" | "wooden";
 
 interface LoomPreviewProps {
     target: string;
@@ -116,6 +116,7 @@ export function LoomPreview({
                     <option value="default">Default Theme</option>
                     <option value="sandstone">Sandstone Theme</option>
                     <option value="dark">Dark Theme</option>
+                    <option value="wooden">Wooden Theme</option>
                 </select>
                 <a
                     className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"

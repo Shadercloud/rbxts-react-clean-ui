@@ -11,6 +11,7 @@ local function HStack(props)
 		VerticalAlignment = props.valign,
 		Padding = props.Padding or UDim.new(0, math.ceil(SpacingHelper:GetPadding(theme, props.spacing) / 2)),
 		Wraps = if props.Wraps == nil then true else props.Wraps,
+		SortOrder = Enum.SortOrder.LayoutOrder,
 		Change = props.Change,
 		Event = props.Event,
 	}), props.children)

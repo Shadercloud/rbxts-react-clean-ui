@@ -18,6 +18,11 @@ local Box = React.forwardRef(function(props, ref)
 	local paddingProps = if not hasCustomPadding and themePadding ~= nil then {
 		resolvedPadding = CssHelper:parseCssQuad(themePadding),
 	} else paddingSourceProps
+	local _condition = props["border-thickness"]
+	if _condition == nil then
+		_condition = theme.components.box.borderThickness
+	end
+	local borderThickness = _condition
 	local _attributes = {
 		ref = ref,
 	}
@@ -26,31 +31,27 @@ local Box = React.forwardRef(function(props, ref)
 	end
 	_attributes.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1))
 	_attributes.AutomaticSize = SizeHelper:GetAutoSize(props)
-	local _condition = props.BackgroundTransparency
-	if _condition == nil then
-		_condition = theme.components.box.backgroundTransparency
+	local _condition_1 = props.BackgroundTransparency
+	if _condition_1 == nil then
+		_condition_1 = theme.components.box.backgroundTransparency
 	end
-	_attributes.BackgroundTransparency = _condition
+	_attributes.BackgroundTransparency = _condition_1
 	_attributes.BackgroundColor3 = props.BackgroundColor3 or theme.components.box.backgroundColor
 	_attributes.ZIndex = props.ZIndex
 	_attributes.Event = props.Event
 	_attributes.backgroundImage = props["background-image"] or theme.components.box.backgroundImage
-	local _attributes_1 = {}
-	local _condition_1 = props["border-thickness"]
-	if _condition_1 == nil then
-		_condition_1 = theme.components.box.borderThickness
-	end
-	_attributes_1.Thickness = _condition_1
-	_attributes_1.BorderStrokePosition = Enum.BorderStrokePosition.Inner
-	_attributes_1.Color = props["border-color"] or theme.components.box.borderColor
-	local _exp = React.createElement("uistroke", _attributes_1)
-	local _attributes_2 = table.clone(props)
+	local _exp = borderThickness > 0 and (React.createElement("uistroke", {
+		Thickness = borderThickness,
+		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
+		Color = props["border-color"] or theme.components.box.borderColor,
+	}))
+	local _attributes_1 = table.clone(props)
+	setmetatable(_attributes_1, nil)
+	_attributes_1.value = theme.components.box.boxShadow
+	local _exp_1 = React.createElement(BoxShadow, _attributes_1)
+	local _attributes_2 = table.clone(paddingProps)
 	setmetatable(_attributes_2, nil)
-	_attributes_2.value = theme.components.box.boxShadow
-	local _exp_1 = React.createElement(BoxShadow, _attributes_2)
-	local _attributes_3 = table.clone(paddingProps)
-	setmetatable(_attributes_3, nil)
-	return React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(Padding, _attributes_3), React.createElement(Corners, {
+	return React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(Padding, _attributes_2), React.createElement(Corners, {
 		radius = theme.components.box.cornerRadius,
 	}), props.children)
 end)
