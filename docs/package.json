@@ -38,6 +38,7 @@
     "typescript": "^6.0.3"
   },
   "overrides": {
-    "@loom-dev/runtime": "npm:@shadercloud/loom-runtime@0.11.0-shadercloud.2"
+    "@loom-dev/runtime": "npm:@shadercloud/loom-runtime@0.11.0-shadercloud.2",
+    "@loom-dev/renderer": "$@loom-dev/renderer"
   }
 }
