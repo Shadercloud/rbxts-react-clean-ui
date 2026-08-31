@@ -30,6 +30,7 @@
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
+    "@loom-dev/renderer": "npm:@shadercloud/loom-runtime@0.11.0-shadercloud.2",
     "@types/react-dom": "^19.2.3",
     "loom-dev": "^0.11.0",
     "postcss": "^8.5.17",
@@ -37,6 +38,6 @@
     "typescript": "^6.0.3"
   },
   "overrides": {
-    "@loom-dev/runtime": "npm:@shadercloud/loom-runtime@0.11.0-shadercloud.1"
+    "@loom-dev/runtime": "npm:@shadercloud/loom-runtime@0.11.0-shadercloud.2"
   }
 }
