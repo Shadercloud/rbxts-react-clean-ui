@@ -21,7 +21,7 @@ function DropZone(props: {
         props.hovered.guiObject ===
         context.registration.guiObject;
 
-    return <Box Size={UDim2.fromScale(1, 1)}
+    return <Box 
         box-shadow="0"
         BackgroundColor3={theme.components.draggable.placeholder.backgroundColor}
         BackgroundTransparency={isHovered ? 0 : 1}>
