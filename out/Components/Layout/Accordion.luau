@@ -5,6 +5,7 @@ local useTween = TS.import(script, TS.getModule(script, "@rbxts", "react-ripple"
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
+local CssHelper = _Helpers.CssHelper
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
@@ -148,6 +149,9 @@ local function RenderedAccordionItem(props)
 	local defaultColors = ColorHelper:getIntentColors(theme, "primary", if props.disabled then "disabled" else "default", theme.components.accordion.header.intents)
 	local hoverColors = ColorHelper:getIntentColors(theme, "primary", "hover", theme.components.accordion.header.intents)
 	local focusColors = ColorHelper:getIntentColors(theme, "primary", "focus", theme.components.accordion.header.intents)
+	local defaultBackgroundImage = CssHelper:resolveBackgroundImage(defaultColors.backgroundImage)
+	local hoverBackgroundImage = CssHelper:resolveBackgroundImage(hoverColors.backgroundImage)
+	local focusBackgroundImage = CssHelper:resolveBackgroundImage(focusColors.backgroundImage)
 	local _condition = not props.first
 	if _condition then
 		local _attributes = {
@@ -169,7 +173,6 @@ local function RenderedAccordionItem(props)
 		AutoButtonColor = false,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.fromScale(1, 0),
-		ImageTransparency = 1,
 		BackgroundColor3 = defaultColors.backgroundColor,
 	}
 	local _left = "BackgroundTransparency"
@@ -179,6 +182,13 @@ local function RenderedAccordionItem(props)
 	end
 	_object[_left] = _condition_1
 	_object.BorderSizePixel = 0
+	_object.Image = defaultBackgroundImage.Image
+	_object.ImageColor3 = defaultBackgroundImage.ImageColor3
+	_object.ImageTransparency = defaultBackgroundImage.ImageTransparency
+	_object.ScaleType = defaultBackgroundImage.ScaleType
+	_object.SliceCenter = defaultBackgroundImage.SliceCenter
+	_object.SliceScale = defaultBackgroundImage.SliceScale
+	_object.TileSize = defaultBackgroundImage.TileSize
 	_object.Event = {
 		Activated = props.onActivate,
 	}
@@ -192,6 +202,13 @@ local function RenderedAccordionItem(props)
 		_condition_2 = 0
 	end
 	_object_1[_left_1] = _condition_2
+	_object_1.Image = hoverBackgroundImage.Image
+	_object_1.ImageColor3 = hoverBackgroundImage.ImageColor3
+	_object_1.ImageTransparency = hoverBackgroundImage.ImageTransparency
+	_object_1.ScaleType = hoverBackgroundImage.ScaleType
+	_object_1.SliceCenter = hoverBackgroundImage.SliceCenter
+	_object_1.SliceScale = hoverBackgroundImage.SliceScale
+	_object_1.TileSize = hoverBackgroundImage.TileSize
 	_attributes.hover = _object_1
 	local _object_2 = {
 		BackgroundColor3 = focusColors.backgroundColor,
@@ -202,6 +219,13 @@ local function RenderedAccordionItem(props)
 		_condition_3 = 0
 	end
 	_object_2[_left_2] = _condition_3
+	_object_2.Image = focusBackgroundImage.Image
+	_object_2.ImageColor3 = focusBackgroundImage.ImageColor3
+	_object_2.ImageTransparency = focusBackgroundImage.ImageTransparency
+	_object_2.ScaleType = focusBackgroundImage.ScaleType
+	_object_2.SliceCenter = focusBackgroundImage.SliceCenter
+	_object_2.SliceScale = focusBackgroundImage.SliceScale
+	_object_2.TileSize = focusBackgroundImage.TileSize
 	_attributes.focus = _object_2
 	return React.createElement(Container, {
 		width = "100%",

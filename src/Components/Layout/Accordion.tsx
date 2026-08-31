@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useTween } from "@rbxts/react-ripple";
 import { CleanThemeContext } from "../../Contexts";
-import { ColorHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { IconName, PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { Corners, Padding } from "../Decorator";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
@@ -135,6 +135,9 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
     const defaultColors = ColorHelper.getIntentColors(theme, "primary", props.disabled ? "disabled" : "default", theme.components.accordion.header.intents);
     const hoverColors = ColorHelper.getIntentColors(theme, "primary", "hover", theme.components.accordion.header.intents);
     const focusColors = ColorHelper.getIntentColors(theme, "primary", "focus", theme.components.accordion.header.intents);
+    const defaultBackgroundImage = CssHelper.resolveBackgroundImage(defaultColors.backgroundImage);
+    const hoverBackgroundImage = CssHelper.resolveBackgroundImage(hoverColors.backgroundImage);
+    const focusBackgroundImage = CssHelper.resolveBackgroundImage(focusColors.backgroundImage);
 
     return (
         <Container width="100%">
@@ -155,14 +158,40 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                         AutoButtonColor: false,
                         AutomaticSize: Enum.AutomaticSize.Y,
                         Size: UDim2.fromScale(1, 0),
-                        ImageTransparency: 1,
                         BackgroundColor3: defaultColors.backgroundColor,
                         BackgroundTransparency: defaultColors.backgroundTransparency ?? 0,
                         BorderSizePixel: 0,
+                        Image: defaultBackgroundImage.Image,
+                        ImageColor3: defaultBackgroundImage.ImageColor3,
+                        ImageTransparency: defaultBackgroundImage.ImageTransparency,
+                        ScaleType: defaultBackgroundImage.ScaleType,
+                        SliceCenter: defaultBackgroundImage.SliceCenter,
+                        SliceScale: defaultBackgroundImage.SliceScale,
+                        TileSize: defaultBackgroundImage.TileSize,
                         Event: { Activated: props.onActivate },
                     }}
-                    hover={{ BackgroundColor3: hoverColors.backgroundColor, BackgroundTransparency: hoverColors.backgroundTransparency ?? 0 }}
-                    focus={{ BackgroundColor3: focusColors.backgroundColor, BackgroundTransparency: focusColors.backgroundTransparency ?? 0 }}
+                    hover={{
+                        BackgroundColor3: hoverColors.backgroundColor,
+                        BackgroundTransparency: hoverColors.backgroundTransparency ?? 0,
+                        Image: hoverBackgroundImage.Image,
+                        ImageColor3: hoverBackgroundImage.ImageColor3,
+                        ImageTransparency: hoverBackgroundImage.ImageTransparency,
+                        ScaleType: hoverBackgroundImage.ScaleType,
+                        SliceCenter: hoverBackgroundImage.SliceCenter,
+                        SliceScale: hoverBackgroundImage.SliceScale,
+                        TileSize: hoverBackgroundImage.TileSize,
+                    }}
+                    focus={{
+                        BackgroundColor3: focusColors.backgroundColor,
+                        BackgroundTransparency: focusColors.backgroundTransparency ?? 0,
+                        Image: focusBackgroundImage.Image,
+                        ImageColor3: focusBackgroundImage.ImageColor3,
+                        ImageTransparency: focusBackgroundImage.ImageTransparency,
+                        ScaleType: focusBackgroundImage.ScaleType,
+                        SliceCenter: focusBackgroundImage.SliceCenter,
+                        SliceScale: focusBackgroundImage.SliceScale,
+                        TileSize: focusBackgroundImage.TileSize,
+                    }}
                 >
                     {props.first && (
                         <uicorner

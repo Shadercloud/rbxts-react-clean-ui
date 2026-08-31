@@ -56,6 +56,7 @@ Accordion defaults live under `theme.components.accordion`:
 - `borderColor`, `borderThickness`, and `cornerRadius` style the outer accordion and its items.
 - `spacing` controls spacing between accordion items.
 - `header.spacing`, `header.padding`, `header.typography`, and `header.intents` configure header padding (tier 2/3 of the shared [padding resolution](../index.md#padding-resolution); a per-header `padding`/`spacing`/`resolvedPadding` prop is the tier-4 override — see Composition), text, and default, hover, focus, and disabled states.
+- `header.intents.<intent>.<state>.backgroundImage` is supported the same way as other intent-driven components (e.g. Button, Card, Tabs): each header state resolves its own background image on top of `backgroundColor`/`backgroundTransparency`, so a theme can render a 9-slice background image per header state instead of a flat color.
 - `header.indicatorSize` and `header.indicatorColor` configure the expand indicator.
 - `content.spacing`, `content.padding`, `content.backgroundColor`, and `content.backgroundTransparency` configure the expanded content area (`content.spacing`/`content.padding` are the tier 2/3 padding overrides; a per-content padding prop is the tier-4 override).
 - `animation.duration` controls expand, collapse, and indicator-rotation duration. A duration of `0` disables animation.

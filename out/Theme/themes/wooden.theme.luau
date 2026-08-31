@@ -118,6 +118,51 @@ local WoodenTheme = createTheme({
 				},
 			},
 		},
+		accordion = {
+			borderColor = Color3.fromHex("#3D2712"),
+			borderThickness = 2,
+			cornerRadius = 0,
+			header = {
+				indicatorSize = 14,
+				indicatorColor = Color3.fromHex("#FFF7CF"),
+				intents = {
+					primary = {
+						default = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								image = 92016395170536,
+								slice = "10 5 240 40",
+								tintColor = Color3.fromHex("#7A4A20"),
+							},
+						},
+						hover = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							backgroundImage = {
+								tintColor = Color3.fromHex("#A16B30"),
+							},
+						},
+						focus = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							backgroundImage = {
+								tintColor = Color3.fromHex("#BA854A"),
+							},
+						},
+						disabled = {
+							textColor = Color3.fromHex("#a4a29f"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								transparency = 0.3,
+							},
+						},
+					},
+				},
+			},
+			content = {
+				backgroundColor = Color3.fromHex("#5C3A18"),
+				backgroundTransparency = 0,
+			},
+		},
 		tabs = {
 			list = {
 				borderThickness = 0,
