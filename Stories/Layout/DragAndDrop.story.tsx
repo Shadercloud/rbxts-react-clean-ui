@@ -59,9 +59,9 @@ function dragAndDrop() {
                 <VStack>
                     <Container>
                         <HStack valign="Center">
-                            <Icon icon="shopping-basket" />
-                            <Text text="Basket" variant="title" />
-                            <FlexItem align="Right">
+                            <Icon icon="shopping-basket" LayoutOrder={1} />
+                            <Text text="Basket" variant="title" LayoutOrder={2} />
+                            <FlexItem align="Right" LayoutOrder={3}>
                                 <Button icon="refresh" scale="sm" spacing="sm" Event={{
                                     Activated: () => {
                                         setBackpack([...initialBackpack]);
