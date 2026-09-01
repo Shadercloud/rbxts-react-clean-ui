@@ -18,21 +18,46 @@ export const Row = React.forwardRef<Frame, RowProps>(
         const breakpoints = props.breakpoints ?? theme.breakpoints;
         const padding = new UDim(0, SpacingHelper.GetPadding(theme, props.spacing))
 
+        const rowRef = React.useRef<Frame>();
+
+        const setRowRef = (instance: Frame | undefined) => {
+            rowRef.current = instance;
+            if (typeIs(ref, "function")) {
+                ref(instance);
+            } else if (ref !== undefined && typeIs(ref, "table")) {
+                ref.current = instance;
+            }
+        };
+
+        React.useEffect(() => {
+            const frame = rowRef.current;
+            if (!frame) return;
+
+            // Some renderers (e.g. the browser-based Loom scene preview) don't
+            // back this ref with an instance that supports property-changed
+            // signals, so guard the subscription instead of throwing and
+            // losing breakpoint width tracking.
+            let conn: RBXScriptConnection | undefined;
+            pcall(() => {
+                conn = frame.GetPropertyChangedSignal("AbsoluteSize").Connect(() => {
+                    const nextWidth = frame.AbsoluteSize.X;
+                    setWidth((currentWidth) =>
+                        currentWidth === nextWidth ? currentWidth : nextWidth
+                    );
+                });
+            });
+
+            return () => {
+                conn?.Disconnect();
+            };
+        }, []);
+
         return (
             <frame
-                ref={ref}
+                ref={setRowRef}
                 Size={UDim2.fromScale(1, 1)}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 BackgroundTransparency={1}
-                Change={{
-                    AbsoluteSize: (instance) => {
-                        const nextWidth = instance.AbsoluteSize.X;
-
-                        setWidth((currentWidth) =>
-                            currentWidth === nextWidth ? currentWidth : nextWidth
-                        );
-                    },
-                }}
             >
                 <uilistlayout
                     FillDirection={Enum.FillDirection.Horizontal}

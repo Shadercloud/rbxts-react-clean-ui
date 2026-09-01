@@ -380,6 +380,41 @@ local Card = React.forwardRef(function(props, ref)
 	local overlayHeader = _binding.overlayHeader
 	local overlayFooter = _binding.overlayFooter
 	local hasOverlay = overlayHeader ~= nil or overlayFooter ~= nil
+	React.useEffect(function()
+		if not hasOverlay then
+			return nil
+		end
+		local frame = overlayWrapperRef.current
+		if not frame then
+			return nil
+		end
+		-- Some renderers (e.g. the browser-based Loom scene preview) don't
+		-- back this ref with an instance that supports property-changed
+		-- signals, so guard the subscription instead of throwing and
+		-- losing overlay clearance tracking.
+		local positionConn
+		local sizeConn
+		pcall(function()
+			positionConn = frame:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
+				return setWrapperAbsoluteY(frame.AbsolutePosition.Y)
+			end)
+		end)
+		pcall(function()
+			sizeConn = frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+				return setWrapperAbsoluteSize(frame.AbsoluteSize)
+			end)
+		end)
+		return function()
+			local _result = positionConn
+			if _result ~= nil then
+				_result:Disconnect()
+			end
+			local _result_1 = sizeConn
+			if _result_1 ~= nil then
+				_result_1:Disconnect()
+			end
+		end
+	end, { hasOverlay })
 	-- How far the overlay header's bottom edge extends past the
 	-- wrapper's (i.e. the Box's) top edge — 0 when there's no overlap
 	-- (e.g. a small/no theme offset) or nothing has been measured yet.
@@ -500,14 +535,6 @@ local Card = React.forwardRef(function(props, ref)
 		AnchorPoint = SizeHelper:GetAnchor(wrapperPositionProps),
 		ZIndex = props.ZIndex,
 		LayoutOrder = props.LayoutOrder,
-		Change = {
-			AbsolutePosition = function(instance)
-				return setWrapperAbsoluteY(instance.AbsolutePosition.Y)
-			end,
-			AbsoluteSize = function(instance)
-				return setWrapperAbsoluteSize(instance.AbsoluteSize)
-			end,
-		},
 	}, cardBox, overlayHeader, overlayFooter)) else cardBox
 	local isCentered = props.center == true and props.Position == nil and props.AnchorPoint == nil
 	return React.createElement(CardContext.Provider, {

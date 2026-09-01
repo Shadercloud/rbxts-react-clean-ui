@@ -111,6 +111,35 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
     const [mounted, setMounted] = React.useState(props.open);
     const [height, heightTween] = useTween(0, { duration: props.duration });
 
+    const contentRef = React.useRef<Frame>();
+    const onContentSizeRef = React.useRef<(instance: Frame) => void>();
+    onContentSizeRef.current = (instance) => {
+        if (props.open) {
+            heightTween.setGoal(instance.AbsoluteSize.Y, { duration: props.duration });
+            if (props.duration === 0) heightTween.setPosition(instance.AbsoluteSize.Y);
+            heightTween.start();
+        }
+    };
+
+    React.useEffect(() => {
+        const frame = contentRef.current;
+        if (!frame) return;
+
+        // Some renderers (e.g. the browser-based Loom scene preview) don't back
+        // this ref with an instance that supports property-changed signals, so
+        // guard the subscription instead of throwing and losing height tracking.
+        let conn: RBXScriptConnection | undefined;
+        pcall(() => {
+            conn = frame.GetPropertyChangedSignal("AbsoluteSize").Connect(() => {
+                onContentSizeRef.current?.(frame);
+            });
+        });
+
+        return () => {
+            conn?.Disconnect();
+        };
+    }, [mounted]);
+
     React.useEffect(() => {
         if (props.open) {
             setMounted(true);
@@ -210,19 +239,11 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                         Size={height.map((value) => UDim2.fromScale(1, 0).add(UDim2.fromOffset(0, value)))}
                     >
                         <frame
+                            ref={contentRef}
                             BackgroundColor3={theme.components.accordion.content.backgroundColor}
                             BackgroundTransparency={theme.components.accordion.content.backgroundTransparency}
                             Size={UDim2.fromScale(1, 0)}
                             AutomaticSize={Enum.AutomaticSize.Y}
-                            Change={{
-                                AbsoluteSize: (instance) => {
-                                    if (props.open) {
-                                        heightTween.setGoal(instance.AbsoluteSize.Y, { duration: props.duration });
-                                        if (props.duration === 0) heightTween.setPosition(instance.AbsoluteSize.Y);
-                                        heightTween.start();
-                                    }
-                                }
-                            }}
                         >
                             <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props.contentProps, theme.components.accordion.content.spacing, theme.components.accordion.content.padding)} />
                             {props.contentText !== undefined

@@ -38,9 +38,7 @@ function GroupElement(props: GroupElementProps) {
         };
     }, [enabled, context?.removeElement]);
 
-    if (!enabled) {
-        return props.children;
-    }
+    const elementRef = React.useRef<Frame>();
 
     const horizontalPadding =
         (props.padding?.left ?? 0) +
@@ -50,21 +48,42 @@ function GroupElement(props: GroupElementProps) {
         (props.padding?.top ?? 0) +
         (props.padding?.bottom ?? 0);
 
+    React.useEffect(() => {
+        if (!enabled) return;
+        const frame = elementRef.current;
+        if (!frame || !context) return;
+
+        // Some renderers (e.g. the browser-based Loom scene preview) don't
+        // back this ref with an instance that supports property-changed
+        // signals, so guard the subscription instead of throwing and
+        // losing size reporting.
+        let conn: RBXScriptConnection | undefined;
+        pcall(() => {
+            conn = frame.GetPropertyChangedSignal("AbsoluteSize").Connect(() => {
+                context.reportSize(
+                    id,
+                    new Vector2(
+                        frame.AbsoluteSize.X + horizontalPadding,
+                        frame.AbsoluteSize.Y + verticalPadding,
+                    ),
+                );
+            });
+        });
+
+        return () => {
+            conn?.Disconnect();
+        };
+    }, [enabled, context, id, horizontalPadding, verticalPadding]);
+
+    if (!enabled) {
+        return props.children;
+    }
+
     return (
         <frame
+            ref={elementRef}
             BackgroundTransparency={1}
             AutomaticSize={Enum.AutomaticSize.XY}
-            Change={{
-                AbsoluteSize: (instance) => {
-                    context.reportSize(
-                        id,
-                        new Vector2(
-                            instance.AbsoluteSize.X + horizontalPadding,
-                            instance.AbsoluteSize.Y + verticalPadding,
-                        ),
-                    );
-                },
-            }}
         >
             {props.children}
         </frame>

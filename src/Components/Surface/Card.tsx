@@ -342,6 +342,36 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
 
         const hasOverlay = overlayHeader !== undefined || overlayFooter !== undefined;
 
+        React.useEffect(() => {
+            if (!hasOverlay) return;
+            const frame = overlayWrapperRef.current;
+            if (!frame) return;
+
+            // Some renderers (e.g. the browser-based Loom scene preview) don't
+            // back this ref with an instance that supports property-changed
+            // signals, so guard the subscription instead of throwing and
+            // losing overlay clearance tracking.
+            let positionConn: RBXScriptConnection | undefined;
+            let sizeConn: RBXScriptConnection | undefined;
+
+            pcall(() => {
+                positionConn = frame
+                    .GetPropertyChangedSignal("AbsolutePosition")
+                    .Connect(() => setWrapperAbsoluteY(frame.AbsolutePosition.Y));
+            });
+
+            pcall(() => {
+                sizeConn = frame
+                    .GetPropertyChangedSignal("AbsoluteSize")
+                    .Connect(() => setWrapperAbsoluteSize(frame.AbsoluteSize));
+            });
+
+            return () => {
+                positionConn?.Disconnect();
+                sizeConn?.Disconnect();
+            };
+        }, [hasOverlay]);
+
         // How far the overlay header's bottom edge extends past the
         // wrapper's (i.e. the Box's) top edge — 0 when there's no overlap
         // (e.g. a small/no theme offset) or nothing has been measured yet.
@@ -448,10 +478,6 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
                 AnchorPoint={SizeHelper.GetAnchor(wrapperPositionProps)}
                 ZIndex={props.ZIndex}
                 LayoutOrder={props.LayoutOrder}
-                Change={{
-                    AbsolutePosition: (instance) => setWrapperAbsoluteY(instance.AbsolutePosition.Y),
-                    AbsoluteSize: (instance) => setWrapperAbsoluteSize(instance.AbsoluteSize),
-                }}
             >
                 {cardBox}
                 {overlayHeader}

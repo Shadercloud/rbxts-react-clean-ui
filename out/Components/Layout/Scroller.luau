@@ -19,11 +19,26 @@ local function Scroller(props)
 			setIsScrolling(frame.AbsoluteCanvasSize.Y > frame.AbsoluteWindowSize.Y)
 		end
 		updateScrolling()
-		local canvasConn = frame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(updateScrolling)
-		local windowConn = frame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(updateScrolling)
+		-- Some renderers (e.g. the browser-based Loom scene preview) don't back
+		-- this ref with an instance that supports property-changed signals, so
+		-- guard the subscription instead of throwing and losing overflow tracking.
+		local canvasConn
+		local windowConn
+		pcall(function()
+			canvasConn = frame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(updateScrolling)
+		end)
+		pcall(function()
+			windowConn = frame:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(updateScrolling)
+		end)
 		return function()
-			canvasConn:Disconnect()
-			windowConn:Disconnect()
+			local _result = canvasConn
+			if _result ~= nil then
+				_result:Disconnect()
+			end
+			local _result_1 = windowConn
+			if _result_1 ~= nil then
+				_result_1:Disconnect()
+			end
 		end
 	end, {})
 	local spacing = SpacingHelper:GetPadding(theme, props.spacing)

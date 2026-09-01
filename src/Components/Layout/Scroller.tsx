@@ -29,17 +29,27 @@ export function Scroller(props: ScrollerProps) {
 
         updateScrolling();
 
-        const canvasConn = frame
-            .GetPropertyChangedSignal("AbsoluteCanvasSize")
-            .Connect(updateScrolling);
+        // Some renderers (e.g. the browser-based Loom scene preview) don't back
+        // this ref with an instance that supports property-changed signals, so
+        // guard the subscription instead of throwing and losing overflow tracking.
+        let canvasConn: RBXScriptConnection | undefined;
+        let windowConn: RBXScriptConnection | undefined;
 
-        const windowConn = frame
-            .GetPropertyChangedSignal("AbsoluteWindowSize")
-            .Connect(updateScrolling);
+        pcall(() => {
+            canvasConn = frame
+                .GetPropertyChangedSignal("AbsoluteCanvasSize")
+                .Connect(updateScrolling);
+        });
+
+        pcall(() => {
+            windowConn = frame
+                .GetPropertyChangedSignal("AbsoluteWindowSize")
+                .Connect(updateScrolling);
+        });
 
         return () => {
-            canvasConn.Disconnect();
-            windowConn.Disconnect();
+            canvasConn?.Disconnect();
+            windowConn?.Disconnect();
         };
     }, []);
 
