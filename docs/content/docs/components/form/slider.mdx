@@ -131,7 +131,7 @@ The `highlight` prop controls which part of the slider track is highlighted.
 
 ## Native properties
 
-`Slider` extends `ContainerProps`, so it accepts the same native `Frame` properties as [`Container`](/components/layout/container), including `Position`, `AnchorPoint`, `BackgroundColor3`, `ZIndex`, `Change`, and `Event`.
+`Slider` is built on [`Container`](/components/layout/container)'s sizing and positioning props (`SizeElementProps`, `PositionElementProps`), but its root is a native Roblox `Frame` rather than `Container`'s `ImageLabel`, so it accepts native `Frame` properties directly, including `Position`, `AnchorPoint`, `BackgroundColor3`, `ZIndex`, `Change`, and `Event`.
 
 ```tsx
 <Slider
@@ -155,7 +155,7 @@ The `highlight` prop controls which part of the slider track is highlighted.
 | --- | --- | --- | --- |
 | `max-value` | `number` | Required | Maximum slider value. |
 | `min-value` | `number` | `0` | Minimum slider value. |
-| `value` | `number \| Vector2` | Minimum value | Current or initial slider value. |
+| `value` | `number \| Vector2` | Minimum value | Current or initial slider value. Defaults to `min-value` (or `Vector2(min-value, max-value)` when `range` is set). |
 | `step` | `number` | — | Increment used when snapping values. |
 | `controlled` | `boolean` | `false` | Reads the rendered value directly from `value`. |
 | `range` | `boolean` | `false` | Enables two-handle range selection using a `Vector2`. |
@@ -165,7 +165,7 @@ The `highlight` prop controls which part of the slider track is highlighted.
 
 ### Shared props
 
-The slider also supports props inherited from `ContainerProps`, the same interface used by [`Container`](/components/layout/container).
+The slider also supports the sizing and positioning props used by [`Container`](/components/layout/container).
 
 | Interface | Purpose |
 | --- | --- |
@@ -173,3 +173,13 @@ The slider also supports props inherited from `ContainerProps`, the same interfa
 | `PositionElementProps` | Configures `Position`, `AnchorPoint`, `center`, and edge offsets. |
 | `ZIndexElementProps` | Configures the slider's `ZIndex`. |
 | `React.InstanceProps<Frame>` | Accepts native `Frame` properties, including `Change` and `Event`. |
+
+## Theme values
+
+The slider uses values from `theme.components.slider` for:
+
+* Overall height (used when `Size`/`height` is not provided)
+* The track bar's height, internal padding, border, corner radius, background, and highlight colours
+* The handle's border, corner radius, background, box shadow (shown while hovered or dragged), and aspect ratio
+
+These values can be changed by providing a custom Clean UI theme.

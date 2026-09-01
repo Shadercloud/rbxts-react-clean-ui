@@ -52,6 +52,24 @@ export class SpacingHelper {
         };
     }
 
+    // Tier-3-only: the theme's explicit component-level padding, with no
+    // fallback to the global spacing scale (unlike GetResolvedPadding, which
+    // always produces a value). Returns undefined when the theme doesn't set
+    // an explicit padding for this component at all — for a caller that
+    // wants an opt-in floor value that must stay a no-op for every theme
+    // that doesn't specifically configure it (e.g. Card's wood-frame-clearance
+    // floor, which should only ever engage for a theme like wooden that
+    // gives Box a real padding for its decorative background image).
+    public static GetExplicitPadding(componentPadding: ScaledCssPadding | undefined, key: ScaleSize): ResolvedPadding | undefined {
+        if (componentPadding === undefined) return undefined;
+
+        const quad = typeIs(componentPadding, "table")
+            ? (componentPadding as ScaleSizeValue<CssPadding>)[key]
+            : componentPadding as CssPadding;
+
+        return quad !== undefined ? CssHelper.parseCssQuad(quad) : undefined;
+    }
+
     public static ResolveNumberPadding(value: number): ResolvedPadding {
         return {
             top: value,

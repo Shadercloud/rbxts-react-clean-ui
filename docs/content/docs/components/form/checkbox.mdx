@@ -194,7 +194,7 @@ The checkbox also supports props inherited from the following interfaces.
 
 | Interface                | Purpose                                        |
 | ------------------------ | ---------------------------------------------- |
-| `IntentElementProps`     | Configures the component's base intent.        |
+| `IntentElementProps`     | Configures the checkbox's base background intent, independent of `intent-checked`/`intent-unchecked`. |
 | `PaddingProps`           | Configures individual padding values.          |
 | `BackgroundElementProps` | Configures background colour and transparency. |
 | `SpacedElementProps`     | Configures theme-based internal spacing.       |
@@ -219,7 +219,9 @@ false → true → false
 The checkbox uses values from `theme.components.checkbox` for:
 
 * Corner radius
-* Default spacing
-* Intent colours
+* Border thickness and transparency
+* Border and icon colours, based on the checked/unchecked intent
+* Default spacing/padding
+* Background image
 
-The background transparency and border thickness use the values from `theme.components.button`.
+The solid background colour (based on the `intent` prop's `default` state) and background transparency fall back to the values from `theme.components.button`.

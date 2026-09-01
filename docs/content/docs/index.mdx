@@ -113,7 +113,7 @@ These values are translated into the Roblox types required by the rendered insta
 Responsive values and breakpoint-aware layout components make it easier to create interfaces that adapt to different viewport sizes.
 
 ```tsx
-<Row gap={12}>
+<Row spacing="md">
     <Column span={{ xs: 12, md: 6, lg: 4 }}>
         <Box />
     </Column>
@@ -210,7 +210,7 @@ Start by exploring the component examples, then create a small interface using a
 A typical first screen might use:
 
 ```tsx
-<ThemeProvider>
+<ThemeProvider theme={DefaultTheme}>
     <Container>
         <Box>
             <VStack>

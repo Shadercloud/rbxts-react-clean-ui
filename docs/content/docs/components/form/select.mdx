@@ -72,7 +72,7 @@ The `Select` component can be combined with a `Fieldset` to provide a label and 
 
 ## Handling Selection Changes
 
-Use the `onChange` callback to receive the index of the selected option.
+Use the `onChange` callback to receive the index of the selected option. If the selected `Select.Option` has a `value` prop, it's passed as the second argument.
 
 ```tsx
 function CountrySelect() {
@@ -319,9 +319,9 @@ The `backgroundImage` prop accepts a `CssBackgroundImage` object. Its fields mat
 
 When `backgroundImage` is not provided, the select uses `theme.components.select.backgroundImage` if the active theme defines one. A directly supplied prop overrides the theme value for that select instance.
 
-## Native Frame Properties
+## Native ImageLabel Properties
 
-`Select` renders its root as a [`Container`](/components/layout/container), so it extends `React.InstanceProps<Frame>` and accepts native Roblox `Frame` properties directly, rather than the `TextBox` properties its underlying control might suggest.
+`Select` renders its root as a [`Container`](/components/layout/container), so it extends `React.InstanceProps<ImageLabel>` and accepts native Roblox `ImageLabel` properties directly, rather than the `TextBox` properties its underlying control might suggest.
 
 ```tsx
 <Select
@@ -333,7 +333,9 @@ When `backgroundImage` is not provided, the select uses `theme.components.select
 </Select>
 ```
 
-See the `Container` documentation for the full set of native `Frame` properties `Select` accepts, such as `AnchorPoint`, `LayoutOrder`, `Visible`, `Change`, and `Event`.
+See the `Container` documentation for the full set of native `ImageLabel` properties `Select` accepts, such as `AnchorPoint`, `LayoutOrder`, `Visible`, `Change`, and `Event`.
+
+`Size` and `AutomaticSize` are fixed internally (`UDim2.fromScale(1, 0)` with `AutomaticSize.Y` — full available width, height fit to content) and are not honored if passed in.
 
 ## Select Properties
 
@@ -342,7 +344,7 @@ See the `Container` documentation for the full set of native `Frame` properties 
 | Property     | Type                       | Default       | Description                                                           |
 | ------------ | --------------------------- | ------------- | --------------------------------------------------------------------- |
 | `selected`   | `number`                    | `0`           | The zero-based index of the selected option.                          |
-| `onChange`   | `(value: number) => void`   | —             | Called when an option is selected.                                    |
+| `onChange`   | `(selected: number, value?: string) => void` | — | Called when an option is selected, with the option's index and its `value` (if set). |
 | `scale`      | `ScaleSize`                 | Theme default | Controls the typography scale used by the select.                     |
 | `spacing`    | `SpaceSize`                 | Theme default | Controls the internal padding of the select.                          |
 | `max-height` | `CssSize`                   | Theme default | Sets the maximum height of the dropdown before it becomes scrollable. |
@@ -353,10 +355,10 @@ See the `Container` documentation for the full set of native `Frame` properties 
 
 | Property   | Type                              | Default | Description                                                                    |
 | ---------- | ---------------------------------- | ------- | -------------------------------------------------------------------------------- |
-| `Event`    | `React.InstanceEvent<Frame>`       | —       | Native Roblox events for the underlying `Frame`.                                |
-| `Change`   | `React.InstanceChangeEvent<Frame>` | —       | Native property-changed handlers for the underlying `Frame`.                    |
+| `Event`    | `React.InstanceEvent<ImageLabel>`       | —       | Native Roblox events for the underlying `ImageLabel`.                                |
+| `Change`   | `React.InstanceChangeEvent<ImageLabel>` | —       | Native property-changed handlers for the underlying `ImageLabel`.                    |
 
-All other compatible native `Frame` properties inherited from `React.InstanceProps<Frame>` are also accepted—see [Native Frame Properties](#native-frame-properties) above.
+All other compatible native `ImageLabel` properties inherited from `React.InstanceProps<ImageLabel>` are also accepted—see [Native ImageLabel Properties](#native-imagelabel-properties) above.
 
 ## Select.Option Properties
 
@@ -364,6 +366,7 @@ All other compatible native `Frame` properties inherited from `React.InstancePro
 | ------------------ | ---------------------------------- | ------------ | ------------------------------------------------------- |
 | `text`             | `string`                           | —            | The option label and the value displayed when selected. |
 | `children`         | `React.ReactNode`                  | —            | Additional custom content rendered inside the option.   |
+| `value`            | `string`                           | `undefined`  | Passed as the second argument to `Select`'s `onChange` when this option is selected. |
 | `Event`            | `React.InstanceEvent<ImageButton>` | —            | Roblox events for the option button.                    |
 | `BackgroundColor3` | `Color3`                           | Theme colour | Overrides the option's base background colour.          |
 
@@ -443,4 +446,4 @@ export function SettingsForm() {
 
 ## Theme Values
 
-The select's appearance is controlled by `theme.components.select`. Its `backgroundImage` value supplies the closed control's background image when the `backgroundImage` prop is omitted. Existing select theme values continue to control typography, spacing, borders, corner radius, dropdown height, dropdown colour, and option intent colours.
+The select's appearance is controlled by `theme.components.select`. Its `backgroundImage` value supplies the closed control's background image when the `backgroundImage` prop is omitted. Existing select theme values continue to control typography, borders, corner radius, dropdown height, dropdown colour, and option intent colours. Internal padding (the `spacing` prop) is resolved from the global `theme.spacing` scale rather than a select-specific value.

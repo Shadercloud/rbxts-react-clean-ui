@@ -1,0 +1,107 @@
+---
+title: Scroller
+description: A vertically scrollable container for content that overflows its available space.
+icon: ArrowDownUp
+---
+
+`Scroller` wraps Roblox's native [`ScrollingFrame`](https://create.roblox.com/docs/reference/engine/classes/ScrollingFrame) to display content taller than the space available to it, with an automatically sized scrolling canvas and a themed scrollbar.
+
+## Import
+
+```tsx
+import { Scroller } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Layout/Scroller.loom.tsx" previewHeight={340} screenshot="/images/screenshots/Layout/Scroller.png">
+```tsx
+import React from "@rbxts/react";
+import { Box, Scroller, VStack, Text } from "@rbxts/react-clean-ui";
+
+export function ScrollerExample() {
+    return (
+        <Box width="320">
+            <Scroller width="100%" height="200" spacing="sm">
+                <VStack spacing="sm">
+                    <Text text="Item 1" />
+                    <Text text="Item 2" />
+                    <Text text="Item 3" />
+                    <Text text="Item 4" />
+                    <Text text="Item 5" />
+                    <Text text="Item 6" />
+                    <Text text="Item 7" />
+                    <Text text="Item 8" />
+                    <Text text="Item 9" />
+                    <Text text="Item 10" />
+                </VStack>
+            </Scroller>
+        </Box>
+    );
+}
+```
+</Demo>
+
+## Sizing
+
+`Scroller` accepts the shared `width` and `height` props. When omitted, it fills the available space of its parent.
+
+```tsx
+<Scroller width="100%" height="300">
+    ...
+</Scroller>
+```
+
+Give it a fixed height whenever it sits inside a container that doesn't already constrain its own height, so there's a bounded window for content to scroll within.
+
+## Spacing
+
+The `spacing` prop reserves room for the scrollbar so it doesn't overlap the content. When the scrollbar is visible, the content area is inset by the scrollbar's thickness plus this spacing value.
+
+```tsx
+<Scroller height="200" spacing="sm">
+    ...
+</Scroller>
+```
+
+## Automatic size parent
+
+Roblox doesn't recalculate a parent's `AutomaticSize` correctly when its only child is a `ScrollingFrame`. Set `AutomaticSizeParent` to work around this by rendering an internal `UIListLayout` inside the scroller.
+
+```tsx
+<Scroller AutomaticSizeParent>
+    ...
+</Scroller>
+```
+
+## Props
+
+### Scroller-specific props
+
+| Prop                  | Type              | Default     | Description                                                                                       |
+| --------------------- | ----------------- | ----------- | --------------------------------------------------------------------------------------------------- |
+| `children`            | `React.ReactNode` | `undefined` | Content rendered inside the scrolling area.                                                        |
+| `AutomaticSizeParent` | `boolean`         | `false`     | Adds an internal `UIListLayout` so an ancestor using `AutomaticSize` can size around the scroller. |
+
+### Shared props
+
+The scroller also supports props inherited from the following interfaces.
+
+| Interface             | Purpose                                                              |
+| ---------------------- | --------------------------------------------------------------------- |
+| `SizeElementProps`     | Configures the scroller's `width`, `height`, and native `Size`.      |
+| `SpacedElementProps`   | Reserves space between the content and the scrollbar.                |
+| `PositionElementProps` | Configures the scroller's position, anchor point, and centering.     |
+
+## Behaviour
+
+* Scrolling is vertical only (`ScrollingDirection.Y`); content wider than the scroller is not scrollable horizontally.
+* The scrolling canvas grows automatically to fit its content (`AutomaticCanvasSize.Y`); it does not need a fixed content height.
+* Without an explicit `width`/`height`, the scroller fills 100% of its parent's size.
+* The scrollbar is only rendered when the content's height exceeds the scroller's visible window; it disappears automatically once content shrinks below that threshold.
+* The scrollbar is 12 pixels thick and inset within the scrolling frame.
+* The scroller's own background is fully transparent and has no border.
+
+## Theme values
+
+The scroller uses `theme.components.scroller.barColor` to set the scrollbar's colour (`ScrollBarImageColor3`). This value can be changed by providing a custom Clean UI theme.

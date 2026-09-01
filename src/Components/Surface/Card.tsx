@@ -380,14 +380,30 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
             }
             : props;
 
+        // When there's no footer at all, footerClearance is always 0 (there's
+        // nothing to measure an overlap against), so fall back to the Box's
+        // own explicit theme.components.box.padding bottom inset — if the
+        // theme sets one — as a floor instead. This keeps content clear of a
+        // themed Box's decorative border image (e.g. wooden's wood-frame art,
+        // which needs a real bottom inset) even when there's no footer to
+        // reserve that space via measured overlap. Themes that don't set an
+        // explicit box padding (GetExplicitPadding returns undefined) resolve
+        // this floor to 0, so behavior there is unchanged. When a footer IS
+        // present, footerClearance (its real measured overlap) is used as-is
+        // exactly as before — this floor never applies then, since the
+        // footer's own overlap already reserves whatever space it needs.
+        const explicitBoxBottomFloor = overlayFooter === undefined
+            ? SpacingHelper.GetExplicitPadding(theme.components.box.padding, theme.default.spacing)?.bottom ?? 0
+            : 0;
+
         // When an overlay header and/or footer measurably overlaps into the
-        // Box (headerClearance/footerClearance > 0), reserve that much extra
-        // top/bottom padding via resolvedPadding — this takes over Box's own
-        // outer padding, which is harmless since Card always forces
-        // spacing="None" on Box below anyway (so it was always 0/0/0/0 until
-        // now).
-        const boxPropsWithOverlayClearance = headerClearance > 0 || footerClearance > 0
-            ? { ...boxProps, resolvedPadding: { top: headerClearance, bottom: footerClearance, left: 0, right: 0 } as ResolvedPadding }
+        // Box (headerClearance/footerClearance > 0), or the footer-absent
+        // floor above is nonzero, reserve that much extra top/bottom padding
+        // via resolvedPadding — this takes over Box's own outer padding,
+        // which is otherwise 0/0/0/0 since Card always forces spacing="None"
+        // on Box below.
+        const boxPropsWithOverlayClearance = headerClearance > 0 || footerClearance > 0 || explicitBoxBottomFloor > 0
+            ? { ...boxProps, resolvedPadding: { top: headerClearance, bottom: math.max(footerClearance, explicitBoxBottomFloor), left: 0, right: 0 } as ResolvedPadding }
             : boxProps;
 
         const cardBox = (

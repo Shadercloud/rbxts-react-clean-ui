@@ -119,6 +119,14 @@ do
 		_object[_left_3] = _result_4
 		return _object
 	end
+	function SpacingHelper:GetExplicitPadding(componentPadding, key)
+		if componentPadding == nil then
+			return nil
+		end
+		local _componentPadding = componentPadding
+		local quad = if type(_componentPadding) == "table" then componentPadding[key] else componentPadding
+		return if quad ~= nil then CssHelper:parseCssQuad(quad) else nil
+	end
 	function SpacingHelper:ResolveNumberPadding(value)
 		return {
 			top = value,

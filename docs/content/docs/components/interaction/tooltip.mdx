@@ -47,7 +47,13 @@ Use the `placement` prop to control where the tooltip appears relative to its ta
 <Tooltip content="Right" placement="Right">
     <Button text="Right" />
 </Tooltip>
+
+<Tooltip content="Centered" placement="Center">
+    <Button text="Center" />
+</Tooltip>
 ```
+
+`"Center"` positions the tooltip directly over the middle of its target instead of pointing at an edge, and hides the pointer arrow.
 
 ## Intent
 
@@ -89,10 +95,10 @@ The `content` prop can contain any React element, allowing you to build richer t
 
 ## Props
 
-| Prop        | Type           | Description                                         |
-| ----------- | -------------- | --------------------------------------------------- |
-| `content`   | `string`       | `React.ReactNode`                                    | The content displayed inside the tooltip. |
-| `placement` | `"Top"`        | "Bottom"                                            | `"Left"`  | `"Right"` | Controls where the tooltip appears. Defaults to `"Top"`. |
-| `intent`    | `Intent`       | Applies one of the standard intent color schemes.   |
-| `spacing`   | `Spacing`      | Controls the internal padding of the tooltip.       |
-| `children`  | `ReactElement` | The element that triggers the tooltip when hovered. |
+| Prop        | Type                                                          | Default     | Description                                          |
+| ----------- | -------------------------------------------------------------- | ----------- | ----------------------------------------------------- |
+| `content`   | `string \| React.ReactNode`                                    | Required    | The content displayed inside the tooltip.              |
+| `placement` | `"Top"` \| `"Bottom"` \| `"Left"` \| `"Right"` \| `"Center"`   | `"Top"`     | Controls where the tooltip appears.                    |
+| `intent`    | `Intent`                                                       | `"primary"` | Applies one of the standard intent color schemes.      |
+| `spacing`   | `Spacing`                                                      | Theme default | Controls the internal padding of the tooltip.        |
+| `children`  | `React.ReactElement`                                           | Required    | The element that triggers the tooltip when hovered.    |

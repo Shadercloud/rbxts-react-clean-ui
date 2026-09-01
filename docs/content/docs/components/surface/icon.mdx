@@ -89,7 +89,7 @@ Use the `color` prop to change the icon color.
 />
 ```
 
-By default, icons are rendered in white.
+By default, icons use `theme.colors.intents.primary.default.textColor`.
 
 ### Scale
 
@@ -236,14 +236,14 @@ Some properties are managed internally by the component, including:
 * `Size`, set from `scale` unless a `Size` is provided directly.
 * `Rotation`, animated internally when `spinning` is enabled.
 
-`spinning` icons also forward every prop, including native `ImageLabel` properties, to the underlying `Icon`.
+When `spinning` is enabled, only `icon`, `color`, `scale`, and `Size` are forwarded to the underlying icon — other native `ImageLabel` properties (such as `Position`, `AnchorPoint`, `ZIndex`, `Visible`, `Change`, and `Event`) are not applied to a spinning icon, and any `Rotation` prop is overridden by the internal animation.
 
 ## Props
 
 | Prop                      | Type                        | Default                     | Description                                                                           |
 | ------------------------- | --------------------------- | ---------------------------- | --------------------------------------------------------------------------------------- |
 | `icon`                    | `IconName`                  | `undefined`                 | The name of the icon to display.                                                      |
-| `color`                   | `Color3`                    | `Color3.fromHex("#FFFFFF")` | The color applied to the icon image.                                                  |
+| `color`                   | `Color3`                    | `theme.colors.intents.primary.default.textColor` | The color applied to the icon image.                                                  |
 | `scale`                   | `ScaleSize`                 | `theme.default.scale`       | Selects the icon size from `theme.iconSize`.                                          |
 | `Size`                    | `UDim2`                     | Theme icon size             | Overrides the size calculated from `scale`.                                           |
 | `Rotation`                | `number \| Binding<number>` | `0`                         | Rotates the icon in degrees or binds it to an animated value.                         |
@@ -251,7 +251,7 @@ Some properties are managed internally by the component, including:
 | `speed`                   | `number`                    | `1`                         | Duration, in seconds, of one complete rotation. Only used when `spinning` is enabled. |
 | `BackgroundTransparency`  | `number`                    | `1`                         | Overrides the icon's background transparency.                                         |
 
-All other compatible native `ImageLabel` properties, such as `ZIndex`, `Visible`, `Position`, `ImageTransparency`, `ScaleType`, `Change`, and `Event`, are also accepted.
+All other compatible native `ImageLabel` properties, such as `ZIndex`, `Visible`, `Position`, `ImageTransparency`, `ScaleType`, `Change`, and `Event`, are also accepted when `spinning` is not enabled (see the spinning caveat above).
 
 ## Icon resolution
 
@@ -396,7 +396,7 @@ Some commonly used icons include:
 * When `icon` is `undefined`, the underlying `Image` property is also `undefined`.
 * `Size` overrides the size provided by the theme.
 * `speed` only affects icons with `spinning` enabled.
-* Native `ImageLabel` properties, including `Change` and `Event`, are forwarded to the underlying instance whether or not `spinning` is enabled.
+* Native `ImageLabel` properties, including `Change` and `Event`, are forwarded to the underlying instance when `spinning` is not enabled. A spinning icon only forwards `icon`, `color`, `scale`, and `Size` to the underlying icon; other native properties are not applied.
 * A spinning icon uses an infinite linear tween from `0` to `360` degrees.
 * Theme icon overrides automatically fall back to `DefaultIconSet`.
 * Use `circle-o-notch`, `spinner`, `refresh`, or `cog` for common spinning indicators.

@@ -258,17 +258,22 @@ The shared `spacing` prop controls the internal padding around the text:
 />
 ```
 
-You can also control individual sides:
+## Controlled input
+
+By default, `Input` manages its own text internally after mounting with `value` as the initial text; further changes to `value` from the parent are ignored. Set `controlled` to always display `value` directly, mirroring the usual controlled-input pattern.
 
 ```tsx
-<Input
-    value=""
-    placeholder="Custom padding"
-    left="lg"
-    right="lg"
-    top="sm"
-    bottom="sm"
-/>
+function ControlledInput() {
+    const [text, setText] = React.useState("Hello");
+
+    return (
+        <Input
+            controlled
+            value={text}
+            onChange={setText}
+        />
+    );
+}
 ```
 
 ## Native TextBox Properties
@@ -290,6 +295,7 @@ Some properties are managed internally by the component, including:
 * `Text`
 * `FontFace`
 * `FontSize`
+* `LineHeight`
 * `BackgroundTransparency`
 * `ClearTextOnFocus`
 * `AutomaticSize`
@@ -318,6 +324,7 @@ A `Change` handler can also be supplied to react to native property-changed even
 | `min`               | `number`                                  | `undefined`              | Minimum value allowed when `validation` is `"Number"` or `"Int"`. Enforced on blur, not while typing. |
 | `max`               | `number`                                  | `undefined`              | Maximum value allowed when `validation` is `"Number"` or `"Int"`. Enforced on blur, not while typing. |
 | `onChange`          | `(value: string) => void`                 | `undefined`              | Called whenever the input value changes.                           |
+| `controlled`        | `boolean`                                 | `false`                  | Displays `value` directly instead of managing text internally.     |
 | `Event`             | `React.InstanceEvent<TextBox>`            | `undefined`              | Native Roblox event handlers for the underlying `TextBox`.         |
 | `scale`             | `ScaleSize`                               | Theme default            | Controls the typography scale.                                     |
 | `spacing`           | `SpaceSize`                               | Theme default            | Controls the internal padding.                                     |
@@ -341,12 +348,14 @@ theme.components.input.typography
 theme.components.input.borderThickness
 theme.components.input.borderColor
 theme.components.input.cornerRadius
+theme.components.input.backgroundImage
+theme.components.input.placeholder
 ```
 
-The default text color is resolved from:
+The default text color is resolved from `theme.components.input.typography`'s color. If that doesn't specify a color, it falls back to:
 
 ```ts
-theme.colors.intents.primary.text
+theme.colors.intents.primary.default.textColor
 ```
 
 These values can be changed by providing a custom Clean UI theme.

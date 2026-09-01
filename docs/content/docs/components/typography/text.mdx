@@ -155,6 +155,7 @@ Some properties are managed internally by the component, including:
 | `RichText`                | `boolean`                             | `true`                                                  | Enables or disables Roblox rich text tags in `text`.                        |
 | `TextScaled`               | `boolean`                             | `false`                                                 | Scales the text to fit its container.                                       |
 | `BackgroundTransparency`   | `number`                             | `1`                                                     | Overrides the label's background transparency.                              |
+| `letterSpacing`            | `number`                             | The resolved typography style's `letterSpacing`         | Adds spacing, in pixels, between characters. See [Behaviour](#behaviour) for how it's implemented. |
 
 ### Shared props
 
@@ -173,12 +174,13 @@ All other compatible native `TextLabel` properties, such as `AnchorPoint`, `Visi
 * `FontFace` and `FontSize` are always derived from `variant`/`typography` and `weight`, and cannot be overridden directly, even though they are technically part of `React.InstanceProps<TextLabel>`.
 * Without `variant` or `typography`, the theme's `body` typography style is used.
 * The background is fully transparent by default (`BackgroundTransparency={1}`).
+* When a nonzero `letterSpacing` is set (directly or via the typography style), Roblox has no native letter-spacing property, so the text is instead split into one `TextLabel` per character laid out in a `UIListLayout` row. In this mode, `RichText` is forced off (markup can't survive being split apart), wrapping/truncation don't apply since each character auto-sizes to itself, and native properties other than `TextColor3`, `TextStrokeColor3`, `TextStrokeTransparency`, and `TextTransparency` — including `Change` and `Event` — are not forwarded to the underlying instances.
 
 ## Theme values
 
 `Text` reads from the active theme for:
 
-* `theme.typography.<variant>` — the `font`, `size`, `weight`, and `lineHeight` for each of `display`, `title`, `heading`, `body`, `label`, and `caption`.
+* `theme.typography.<variant>` — the `font`, `size`, `weight`, `lineHeight`, and `letterSpacing` for each of `display`, `title`, `heading`, `body`, `label`, and `caption`.
 * `theme.colors.intents.primary.default.textColor` — the default text color when `TextColor3` is not provided.
 
 These values can be changed by providing a custom Clean UI theme.

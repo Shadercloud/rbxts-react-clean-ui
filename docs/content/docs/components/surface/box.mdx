@@ -128,16 +128,19 @@ To tile an image instead of stretching it, pair `size: Enum.ScaleType.Tile` with
 
 ## Props
 
-| Prop                     | Type        | Description                                                  |
-| ------------------------ | ----------- | ------------------------------------------------------------ |
-| `width`                  | `CssSize`   | Width of the box.                                            |
-| `height`                 | `CssSize`   | Height of the box.                                           |
-| `Size`                   | `UDim2`     | Overrides `width` and `height` with an explicit Roblox size. |
-| `spacing`                | `SpaceSize` | Controls the internal padding.                               |
-| `BackgroundColor3`       | `Color3`    | Overrides the themed background colour.                      |
-| `BackgroundTransparency` | `number`    | Overrides the themed background transparency.                |
-| `box-shadow`             | `CssShadow` | Overrides the default shadow.                                |
-| `ZIndex`                 | `number`    | Sets the rendering order.                                    |
+| Prop                     | Type                     | Description                                                  |
+| ------------------------ | ------------------------ | ------------------------------------------------------------ |
+| `width`                  | `CssSize`                | Width of the box.                                            |
+| `height`                 | `CssSize`                | Height of the box.                                           |
+| `Size`                   | `UDim2`                  | Overrides `width` and `height` with an explicit Roblox size. |
+| `spacing`                | `ScaleSize \| "None"`    | Controls the internal padding.                               |
+| `BackgroundColor3`       | `Color3`                 | Overrides the themed background colour.                      |
+| `BackgroundTransparency` | `number`                 | Overrides the themed background transparency.                |
+| `box-shadow`             | `CssShadow`              | Overrides the default shadow.                                |
+| `border-thickness`       | `number`                 | Overrides the themed border thickness.                       |
+| `border-color`           | `Color3`                 | Overrides the themed border colour.                          |
+| `background-image`       | `CssBackgroundImage`     | Overrides the themed background image for this instance.     |
+| `ZIndex`                 | `number`                 | Sets the rendering order.                                    |
 
 ## Notes
 

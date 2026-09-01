@@ -69,12 +69,17 @@ A `Tabs` component is made from the following child components:
 
 Only `Tabs.Tab` children are read directly by `Tabs`. Each tab must contain a `Tabs.Title` to be included.
 
+## Tabs
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `backgroundImage` | `CssBackgroundImage` | Theme value | Overrides the background image of the selected tab's content panel. |
+
 ## Tabs.Title
 
 | Prop | Type | Description |
 | --- | --- | --- |
 | `text` | `string` | Text displayed in the tab button. |
-| `children` | `React.ReactNode` | Optional children. |
 
 ## Tabs.Content
 

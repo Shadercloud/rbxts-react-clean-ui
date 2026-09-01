@@ -1,0 +1,120 @@
+---
+title: FlexItem
+description: Grow, shrink, or fill space inside a parent's flex layout.
+icon: StretchHorizontal
+---
+
+`FlexItem` is a [`Container`](/components/layout/container) that additionally renders a Roblox [`UIFlexItem`](https://create.roblox.com/docs/reference/engine/classes/UIFlexItem), letting it grow, shrink, or fill leftover space when placed inside a parent governed by a `UIListLayout` — for example `HStack`, `VStack`, `Row`/`Column`, or a raw frame with its own `uilistlayout`. It also lays out its own children in a horizontal row, so it doubles as a small flex container in its own right.
+
+## Import
+
+```tsx
+import { FlexItem } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+```tsx
+import React from "@rbxts/react";
+import { Button, Container, FlexItem, HStack, Icon, Text } from "@rbxts/react-clean-ui";
+
+export function FlexItemExample() {
+    return (
+        <Container width="300">
+            <HStack valign="Center">
+                <Icon icon="shopping-basket" LayoutOrder={1} />
+                <Text text="Basket" variant="title" LayoutOrder={2} />
+                <FlexItem align="Right" LayoutOrder={3}>
+                    <Button icon="refresh" scale="sm" />
+                </FlexItem>
+            </HStack>
+        </Container>
+    );
+}
+```
+
+Since `mode` defaults to `"Grow"`, the `FlexItem` expands to consume the header's remaining width inside the `HStack`. Setting `align="Right"` then pushes its own content — the refresh button — to the right edge of that expanded space, giving a classic "title on the left, action on the right" header.
+
+## Requires a flex-layout parent
+
+The underlying `UIFlexItem` only affects layout while `FlexItem` sits as a direct child of a frame governed by a `UIListLayout` — such as `HStack`, `VStack`, `Row`, or a raw frame with its own `uilistlayout`. Used outside of one, `mode`, `GrowRatio`, and `ShrinkRatio` have no visible effect; `FlexItem` still renders its own children horizontally, but doesn't grow or shrink relative to siblings.
+
+## Flex modes
+
+Use `mode` to choose how the item behaves within its parent's flex layout:
+
+* `"Grow"` (the default) — expands beyond its automatic size to consume any leftover space, proportioned against other growing siblings by `GrowRatio`.
+* `"Shrink"` — allows the item to shrink below its automatic size when there isn't enough room, proportioned against other shrinking siblings by `ShrinkRatio`.
+* `"Fill"` — combines growing and shrinking so the item stretches or compresses to exactly fill the space available to it.
+* `"Custom"` — hands sizing entirely to `GrowRatio`/`ShrinkRatio`, without the automatic-size-based constraints the other modes apply.
+* `"None"` — the item is unaffected by the parent's flex layout.
+
+See Roblox's [`UIFlexMode`](https://create.roblox.com/docs/reference/engine/enum/UIFlexMode) reference for the full behavior of each mode.
+
+## Fixed and flexible columns
+
+`mode="Custom"` combined with explicit `GrowRatio`/`ShrinkRatio` values is useful for pinning one item to its content size while letting a sibling absorb the remaining space — the same pattern `Fieldset.Label` and `Fieldset.Control` use internally.
+
+```tsx
+import React from "@rbxts/react";
+import { FlexItem, HStack, Input, Text } from "@rbxts/react-clean-ui";
+
+export function FixedLabelExample() {
+    return (
+        <HStack valign="Center" HorizontalFlex={Enum.UIFlexAlignment.Fill}>
+            <FlexItem mode="Custom" GrowRatio={0} ShrinkRatio={0}>
+                <Text text="Email address" />
+            </FlexItem>
+            <FlexItem mode="Custom" GrowRatio={1} ShrinkRatio={1}>
+                <Input placeholder="you@example.com" />
+            </FlexItem>
+        </HStack>
+    );
+}
+```
+
+The label's `FlexItem` neither grows nor shrinks, so it always stays at its natural content width, while the input's `FlexItem` grows and shrinks to fill whatever space remains.
+
+## Aligning a FlexItem's own children
+
+`FlexItem` arranges its own `children` using an internal horizontal `UIListLayout`. Use `align` to control how those children line up along that row — independent of how the `FlexItem` itself is positioned by its parent's layout.
+
+```tsx
+<FlexItem align="Right">
+    <Button icon="refresh" />
+</FlexItem>
+```
+
+Use `HorizontalFlex` to distribute space between multiple children placed inside a single `FlexItem`, the same way the `HorizontalFlex` prop works on `HStack`.
+
+## Props
+
+### FlexItem-specific props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | `Enum.UIFlexMode \| "Grow" \| "None" \| "Shrink" \| "Fill" \| "Custom" \| Binding<Enum.UIFlexMode>` | `"Grow"` | Sets `UIFlexItem.FlexMode`, controlling how the item grows or shrinks within its parent's `UIListLayout`. |
+| `GrowRatio` | `number` | Roblox default (`1`) | Sets `UIFlexItem.GrowRatio` — the item's share of extra space relative to other growing siblings, used when `mode` is `"Grow"`, `"Fill"`, or `"Custom"`. |
+| `ShrinkRatio` | `number` | Roblox default (`1`) | Sets `UIFlexItem.ShrinkRatio` — the item's share of shrinkage relative to other shrinking siblings, used when `mode` is `"Shrink"`, `"Fill"`, or `"Custom"`. |
+| `align` | `Enum.HorizontalAlignment \| "Right" \| "Left" \| "Center" \| Binding<Enum.HorizontalAlignment>` | Roblox default (`Left`) | Horizontal alignment applied to `FlexItem`'s own children, via its internal `UIListLayout`. |
+| `HorizontalFlex` | `Enum.UIFlexAlignment \| "None" \| "SpaceAround" \| "Fill" \| Binding<Enum.UIFlexAlignment>` | Roblox default (`None`) | Space distribution applied between `FlexItem`'s own children, via its internal `UIListLayout`. |
+| `children` | `React.ReactNode` | `undefined` | Content laid out horizontally inside the `FlexItem`. |
+
+### Shared props
+
+`FlexItem` extends `ContainerProps` and forwards every prop it receives straight to an underlying [`Container`](/components/layout/container), including the interfaces below.
+
+| Interface | Purpose |
+| --- | --- |
+| `SizeElementProps` | Configures `width`, `height`, and automatic sizing (inherited via `Container`). |
+| `PositionElementProps` | Configures position, anchoring, and centering (inherited via `Container`). |
+| `ZIndexElementProps` | Configures render order via `ZIndex` (inherited via `Container`). |
+| `React.InstanceProps<ImageLabel>` | Native `ImageLabel` properties, including `Event` and `Change` (inherited via `Container`). |
+
+`Container`-only props such as `group` and `backgroundImage` are also inherited and forwarded unchanged — see [Container](/components/layout/container) for details.
+
+## Behaviour
+
+* `FlexItem` always renders a `UIFlexItem` and a horizontal `UIListLayout` as siblings of `children`, inside the `Container` it wraps. This means multiple children passed to a single `FlexItem` are laid out in a row, not stacked as they would be without it.
+* The `UIFlexItem` only has a visible effect while `FlexItem` is a direct child of a frame governed by a `UIListLayout`. Placed elsewhere, `mode`/`GrowRatio`/`ShrinkRatio` are inert.
+* Enabling `group` (inherited from `Container`) moves `FlexItem`'s children — including its own `UIFlexItem` and internal `UIListLayout` — onto the inner measurement frame that `Container` creates for grouped sizing, rather than leaving them on the outer frame that actually participates in the parent's layout. In this combination `mode`/`GrowRatio`/`ShrinkRatio` most likely stop applying to the object the parent layout actually sees, so avoid combining `group` with flex sizing on the same `FlexItem`.

@@ -193,6 +193,8 @@ The label does not grow or shrink, so it remains sized to its content.
 
 The control is allowed to grow and shrink, causing it to fill the remaining width of the fieldset.
 
+When the parent `Fieldset` has `checkbox` set, `Fieldset.Control` instead keeps its own content size (matching `Fieldset.Label`'s behaviour), which is what `Checkbox` relies on to sit naturally next to its label. See [`Checkbox`](/components/form/checkbox) for an example.
+
 `Fieldset.Control` must be used inside a `Fieldset`.
 
 ## Complete example
@@ -225,6 +227,7 @@ The control is allowed to grow and shrink, causing it to fill the remaining widt
 | Prop          | Type                      | Default     | Description                                                     |
 | ------------- | ------------------------- | ----------- | --------------------------------------------------------------- |
 | `disabled`    | `boolean`                 | `false`     | Provides a disabled state to the fieldset context.              |
+| `checkbox`    | `boolean`                 | `false`     | Marks the fieldset as pairing a checkbox with its label, so `Fieldset.Control` sizes to its content instead of growing/shrinking. |
 | `wrap`        | `Breakpoint`              | `"lg"`      | The highest breakpoint at which the label and control may wrap. |
 | `breakpoints` | `BreakpointValue<number>` | Theme value | Overrides the theme breakpoint widths.                          |
 | `children`    | `React.ReactNode`         | —           | The fieldset label and control slots.                           |

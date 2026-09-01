@@ -240,17 +240,17 @@ Each menu manages its collapsed state independently.
 
 ## Menu.Item Props
 
-`Menu.Item` extends the props supported by `Button`.
+`Menu.Item`'s prop type extends `ButtonProps`, but only the props below are currently forwarded to the underlying `Button`.
 
 | Prop     | Type                               | Default       | Description                                                                                |
 | -------- | ---------------------------------- | ------------- | ------------------------------------------------------------------------------------------ |
 | `title`  | `string`                           | Required      | The text displayed by the item while the menu is expanded.                                 |
 | `icon`   | `IconName`                         | `undefined`   | The icon displayed by the menu item. The icon remains visible while the menu is collapsed. |
 | `Event`  | `React.InstanceEvent<ImageButton>` | `undefined`   | Roblox events attached to the underlying button.                                           |
-| `intent` | `Intent`                           | Theme default | Controls the visual intent of the underlying button.                                       |
-| `group`  | `boolean`                          | Enabled       | Controls participation in the menu's shared button sizing group.                           |
 
-All other supported `Button` props can also be passed to `Menu.Item`.
+The underlying button is always rendered with `group` enabled, so a `Menu.Item` always participates in the menu's shared sizing group — this is not configurable per item.
+
+Other `ButtonProps` fields (such as `intent`, `spacing`, `group`, or `disabled`) type-check because `Menu.Item`'s prop type extends `ButtonProps`, but they are not currently forwarded to the underlying `Button` and have no effect.
 
 ## Collapsed Behaviour
 

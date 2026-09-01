@@ -128,7 +128,7 @@ The increment also supports props inherited from the following interfaces.
 | `IntentElementProps`          | Forwards `intent` to the minus/plus `Button`s. Has no effect on the numeric field.            |
 | `SpacedElementProps`          | Configures the gap between the three parts and each part's own internal padding.              |
 | `ScalableElementProps`        | Configures the scale forwarded to the minus/plus `Button`s and the `Input`.                   |
-| `React.InstanceProps<Frame>`  | Accepts native `Frame` properties on the root `Container`.                                    |
+| `React.InstanceProps<ImageLabel>` | Accepts native `ImageLabel` properties on the root `Container`.                            |
 
 ## Behaviour
 
@@ -137,13 +137,14 @@ The increment also supports props inherited from the following interfaces.
 * Activating the minus/plus `Button` computes `current - step`/`current + step`, clamps it to `[min, max]`, updates internal state (unless `controlled`), and calls `onChange` with the clamped value.
 * If the value is already at `min` (minus) or `max` (plus), activating that button is a no-op — neither internal state nor `onChange` fire.
 * Typing into the field is forwarded straight through as a number without clamping mid-edit. Only the field's `FocusLost` handling (inherited from `Input`) clamps an out-of-range value once focus is lost, at which point `onChange` fires again with the corrected value.
-* `Button` has no disabled visual state, so the minus/plus buttons render identically whether or not they're at a bound — only their activation is guarded.
+* The minus/plus buttons are rendered with `disabled` set once the value reaches `min`/`max`, so they also switch to the intent's `disabled` colours (when defined in the theme), in addition to their activation being guarded.
 
 ## Theme values
 
-`Increment` has no `theme.components.increment` entry of its own. Its appearance is entirely driven by:
+`theme.components.increment` only exposes a `button` override, which is forwarded as `styleOverride` to the minus/plus `Button`s. Otherwise, `Increment`'s appearance is driven by:
 
-* `theme.components.button` — used by the minus and plus `Button`s.
+* `theme.components.increment.button` — overrides theme values (colours, corners, border, etc.) for the minus/plus `Button`s only.
+* `theme.components.button` — used by the minus and plus `Button`s when no `theme.components.increment.button` override is set.
 * `theme.components.input` — used by the numeric field.
 
 The gap between the three parts falls back to `theme.default.spacing` when `spacing` is omitted, the same default `HStack` and `Button` use elsewhere.

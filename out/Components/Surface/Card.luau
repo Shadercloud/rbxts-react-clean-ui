@@ -412,27 +412,54 @@ local Card = React.forwardRef(function(props, ref)
 		_result = props
 	end
 	local boxProps = _result
-	-- When an overlay header and/or footer measurably overlaps into the
-	-- Box (headerClearance/footerClearance > 0), reserve that much extra
-	-- top/bottom padding via resolvedPadding — this takes over Box's own
-	-- outer padding, which is harmless since Card always forces
-	-- spacing="None" on Box below anyway (so it was always 0/0/0/0 until
-	-- now).
+	-- When there's no footer at all, footerClearance is always 0 (there's
+	-- nothing to measure an overlap against), so fall back to the Box's
+	-- own explicit theme.components.box.padding bottom inset — if the
+	-- theme sets one — as a floor instead. This keeps content clear of a
+	-- themed Box's decorative border image (e.g. wooden's wood-frame art,
+	-- which needs a real bottom inset) even when there's no footer to
+	-- reserve that space via measured overlap. Themes that don't set an
+	-- explicit box padding (GetExplicitPadding returns undefined) resolve
+	-- this floor to 0, so behavior there is unchanged. When a footer IS
+	-- present, footerClearance (its real measured overlap) is used as-is
+	-- exactly as before — this floor never applies then, since the
+	-- footer's own overlap already reserves whatever space it needs.
 	local _result_1
-	if headerClearance > 0 or footerClearance > 0 then
+	if overlayFooter == nil then
+		local _result_2 = SpacingHelper:GetExplicitPadding(theme.components.box.padding, theme.default.spacing)
+		if _result_2 ~= nil then
+			_result_2 = _result_2.bottom
+		end
+		local _condition = _result_2
+		if _condition == nil then
+			_condition = 0
+		end
+		_result_1 = _condition
+	else
+		_result_1 = 0
+	end
+	local explicitBoxBottomFloor = _result_1
+	-- When an overlay header and/or footer measurably overlaps into the
+	-- Box (headerClearance/footerClearance > 0), or the footer-absent
+	-- floor above is nonzero, reserve that much extra top/bottom padding
+	-- via resolvedPadding — this takes over Box's own outer padding,
+	-- which is otherwise 0/0/0/0 since Card always forces spacing="None"
+	-- on Box below.
+	local _result_2
+	if headerClearance > 0 or footerClearance > 0 or explicitBoxBottomFloor > 0 then
 		local _object = table.clone(boxProps)
 		setmetatable(_object, nil)
 		_object.resolvedPadding = {
 			top = headerClearance,
-			bottom = footerClearance,
+			bottom = math.max(footerClearance, explicitBoxBottomFloor),
 			left = 0,
 			right = 0,
 		}
-		_result_1 = _object
+		_result_2 = _object
 	else
-		_result_1 = boxProps
+		_result_2 = boxProps
 	end
-	local boxPropsWithOverlayClearance = _result_1
+	local boxPropsWithOverlayClearance = _result_2
 	local _attributes = table.clone(boxPropsWithOverlayClearance)
 	setmetatable(_attributes, nil)
 	_attributes.ref = ref

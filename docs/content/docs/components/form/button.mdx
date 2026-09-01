@@ -106,16 +106,12 @@ The shared `spacing` prop controls the gap between the icon and text, as well as
 <Button icon="star" text="Spacious" spacing="lg" />
 ```
 
-Individual padding sides can also be set directly.
+## Disabled state
+
+Set `disabled` to prevent interaction. The button switches to the intent's `disabled` colors (when defined in the theme) and ignores hover and click events.
 
 ```tsx
-<Button
-    text="Custom padding"
-    left="lg"
-    right="lg"
-    top="sm"
-    bottom="sm"
-/>
+<Button text="Disabled" intent="primary" disabled />
 ```
 
 ## Grouped buttons
@@ -138,14 +134,17 @@ import { Button, Group, VStack } from "@rbxts/react-clean-ui";
 
 ### Button-specific props
 
-| Prop         | Type                            | Default     | Description                                                     |
-| ------------ | -------------------------------- | ----------- | ----------------------------------------------------------------- |
-| `text`       | `string`                         | `undefined` | Renders a label using the button's typography and intent color. |
-| `icon`       | `IconName`                       | `undefined` | Renders a leading icon using the button's intent color.         |
-| `fontWeight` | `Enum.FontWeight`                | `undefined` | Overrides the font weight used by the label.                    |
-| `children`   | `React.ReactNode`                | `undefined` | Custom content rendered after the automatic icon/label row.     |
-| `group`      | `boolean`                        | `false`     | Matches this button's width to the widest button in its `Group`.|
-| `Event`      | `React.InstanceEvent<ImageButton>` | `undefined` | Native Roblox event handlers, including `Activated`.             |
+| Prop           | Type                                | Default     | Description                                                        |
+| -------------- | ------------------------------------ | ----------- | ------------------------------------------------------------------- |
+| `text`         | `string`                             | `undefined` | Renders a label using the button's typography and intent color.   |
+| `icon`         | `IconName`                           | `undefined` | Renders a leading icon using the button's intent color.           |
+| `fontWeight`   | `Enum.FontWeight`                    | `undefined` | Overrides the font weight used by the label.                      |
+| `children`     | `React.ReactNode`                    | `undefined` | Custom content rendered after the automatic icon/label row.       |
+| `group`        | `boolean`                            | `false`     | Matches this button's width to the widest button in its `Group`.  |
+| `disabled`     | `boolean`                            | `false`     | Disables hover/click interaction and switches to disabled colors. |
+| `LayoutOrder`  | `number`                             | `undefined` | Native Roblox layout order.                                        |
+| `styleOverride`| `ButtonStyleOverride`                | `undefined` | Overrides theme values (colors, corners, border, etc.) for this instance only. |
+| `Event`        | `React.InstanceEvent<ImageButton>`   | `undefined` | Native Roblox event handlers, including `Activated`.               |
 
 ### Shared props
 
@@ -155,7 +154,6 @@ The button also supports props inherited from the following interfaces.
 | ------------------------ | ----------------------------------------------- |
 | `IntentElementProps`     | Configures the button's base intent.            |
 | `IconElementProps`       | Configures the `icon` prop's accepted values.   |
-| `PaddingProps`           | Configures individual padding values.           |
 | `BackgroundElementProps` | Configures background colour and transparency.  |
 | `SpacedElementProps`     | Configures theme-based internal spacing.        |
 | `ScalableElementProps`   | Configures the label and icon scale.            |
@@ -166,6 +164,7 @@ The button also supports props inherited from the following interfaces.
 
 * The button automatically grows to fit its content (`AutomaticSize.XY`).
 * Hovering the button switches its background, border, and text/icon colours to the intent's `hover` state.
+* Setting `disabled` sets `Active={false}`, ignores hover and `Activated` events, and switches colours to the intent's `disabled` state (when defined in the theme).
 * When `group` is set and a `Group` ancestor is present, the button's width is fixed to the widest button reporting into that `Group`; its height still grows automatically.
 * Without `text`, `icon`, or `children`, the button renders with no content.
 
@@ -178,6 +177,6 @@ The button uses values from `theme.components.button` for:
 * Background transparency
 * Typography
 * Box shadow
-* Per-intent background, border, and text/icon colours for the `default` and `hover` states
+* Per-intent background, border, and text/icon colours for the `default`, `hover`, and `disabled` states
 
 These values can be changed by providing a custom Clean UI theme.
