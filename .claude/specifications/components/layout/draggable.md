@@ -24,7 +24,7 @@
 
 ## Drag lifecycle
 
-- Dragging starts on `InputBegan` on a `Draggable.Handle`-wrapped element, for `MouseButton1` or `Touch` input only.
+- Dragging starts on `InputBegan` on a `Draggable.Handle`-wrapped element, for `MouseButton1` or `Touch` input only. If that input point is over a descendant `GuiButton` or `TextBox` within the handle, drag start is suppressed so the nested interactive control can complete its own input lifecycle normally.
 - Before starting, `Draggable` checks every other draggable registered in the registry; if any of them reports itself as currently dragging, the new drag is rejected outright (no state changes, `onStartDrag` is not called). This enforces that only one `Draggable` can be mid-drag at a time.
 - On a successful start: the component records the input's start position, the root's starting absolute position, and starting `Position`; calls `onStartDrag`; and enters the dragging state.
 - While dragging, `Draggable.Handle` listens globally for `InputChanged` (mouse movement or touch) and forwards it to update the drag, and for `InputEnded` (`MouseButton1` or `Touch`) to end the drag. These listeners are attached for the lifetime of the handle, not just during an active drag, and become live regardless of which draggable started the drag (a handle can therefore begin updating a different draggable's drag if that draggable is the active one — in practice this is used to have exactly one active drag at a time, per the check above).

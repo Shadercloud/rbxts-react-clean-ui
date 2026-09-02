@@ -321,14 +321,24 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
         // Everything else renders in place, in its original order.
         const { flowChildren, overlayHeader, overlayFooter } = React.useMemo(() => {
             const flow: Exclude<React.ReactNode, undefined>[] = [];
-            let header: React.ReactElement<CardHeaderProps> | undefined;
+            let header: React.ReactNode;
             let footer: React.ReactElement<CardFooterProps> | undefined;
             React.Children.forEach(props.children, (child) => {
                 if (child === undefined) return;
-                if (React.isValidElement(child) && child.type === CardHeader && header === undefined) {
-                    const headerElement = child as React.ReactElement<CardHeaderProps>;
+                const directHeader = React.isValidElement(child) && child.type === CardHeader
+                    ? child as React.ReactElement<CardHeaderProps>
+                    : undefined;
+                const wrappedChild = React.isValidElement(child)
+                    ? (child.props as { children?: React.ReactNode }).children
+                    : undefined;
+                const wrappedHeader = React.isValidElement(wrappedChild) && wrappedChild.type === CardHeader
+                    ? wrappedChild as React.ReactElement<CardHeaderProps>
+                    : undefined;
+                const headerElement = directHeader ?? wrappedHeader;
+
+                if (headerElement !== undefined && header === undefined) {
                     if (headerElement.props.overlay ?? (theme.components.card.header.position?.position === "absolute")) {
-                        header = headerElement;
+                        header = child;
                         return;
                     }
                 }

@@ -580,6 +580,16 @@ local DefaultTheme = {
 				},
 			},
 		},
+		modal = {
+			fadeDuration = 0.2,
+			baseZIndex = 1000,
+			zIndexStep = 10,
+			width = 420,
+			backdrop = {
+				backgroundColor = Color3.fromRGB(0, 0, 0),
+				backgroundTransparency = 0.5,
+			},
+		},
 		charts = {
 			colors = { Color3.fromHex("#2E9D63"), Color3.fromHex("#D64545"), Color3.fromHex("#E7A92F"), Color3.fromHex("#3187C8"), Color3.fromHex("#8E5AD7"), Color3.fromHex("#2FA7A1"), Color3.fromHex("#F26D4F"), Color3.fromHex("#D94F9D"), Color3.fromHex("#6B7C93"), Color3.fromHex("#7CB342") },
 			pie = {

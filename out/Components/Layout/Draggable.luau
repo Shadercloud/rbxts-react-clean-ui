@@ -13,6 +13,23 @@ local OverlayConsumer = _Contexts.OverlayConsumer
 local createPortal = TS.import(script, TS.getModule(script, "@rbxts", "react-roblox")).createPortal
 local Corners = TS.import(script, script.Parent.Parent, "Decorator").Corners
 local CustomInputService = TS.import(script, script.Parent.Parent.Parent, "Helpers").CustomInputService
+local function isInteractiveDescendantAtInput(handle, input)
+	local point = Vector2.new(input.Position.X, input.Position.Y)
+	local _exp = GuiHelper:getGuiObjectsAtPosition(handle, point)
+	-- ▼ ReadonlyArray.some ▼
+	local _result = false
+	local _callback = function(guiObject)
+		return guiObject ~= handle and guiObject:IsDescendantOf(handle) and (guiObject:IsA("GuiButton") or guiObject:IsA("TextBox"))
+	end
+	for _k, _v in _exp do
+		if _callback(_v, _k - 1, _exp) then
+			_result = true
+			break
+		end
+	end
+	-- ▲ ReadonlyArray.some ▲
+	return _result
+end
 local function DragHandle(_param)
 	local children = _param.children
 	local draggable = React.useContext(DraggableContext)
@@ -53,7 +70,7 @@ local function DragHandle(_param)
 				_result(instance, input)
 			end
 		end
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and not isInteractiveDescendantAtInput(instance, input) then
 			draggable.beginDrag(input, instance)
 		end
 	end

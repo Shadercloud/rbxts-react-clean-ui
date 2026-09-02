@@ -1,0 +1,241 @@
+---
+title: Modal
+description: Display dismissible content in an overlay above the rest of the interface.
+icon: PictureInPicture
+---
+
+`Modal` renders a full-screen backdrop (a Roblox [`ImageButton`](https://create.roblox.com/docs/reference/engine/classes/ImageButton)) behind a fading [`CanvasGroup`](https://create.roblox.com/docs/reference/engine/classes/CanvasGroup) panel that contains a [`Card`](/components/surface/card). It is rendered through the library's overlay system — the same portal mechanism used by `Select`'s dropdown and `Tooltip` — so it always appears above the rest of the interface regardless of where it is declared in the component tree.
+
+<Callout type="info">
+    `Modal` requires the app to be wrapped in `CleanUiProvider`. If your app already uses this library's other overlay-based components (`Select`, `Tooltip`), no extra setup is needed.
+</Callout>
+
+## Import
+
+```tsx
+import { Modal, Card, useModalClose } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+Compose the modal's content from `Card.Header`, `Card.Body`, and `Card.Footer` — the same sections documented on the [`Card`](/components/surface/card) page. `Modal` does not expose its own `Modal.Header`/`Modal.Body`/`Modal.Footer`.
+
+<Demo preview="Scenes/Interaction/Modal.loom.tsx" previewHeight={360}>
+```tsx
+import React from "@rbxts/react";
+import { Button, Card, HStack, Modal, Text } from "@rbxts/react-clean-ui";
+
+export function ModalExample() {
+    const [open, setOpen] = React.useState(false);
+
+    return (
+        <>
+            <Button text="Open Modal" Event={{ Activated: () => setOpen(true) }} />
+
+            <Modal open={open} onOpenChange={setOpen}>
+                <Card.Header>
+                    <Text variant="heading" text="Confirm Action" />
+                </Card.Header>
+                <Card.Body>
+                    <Text text="Are you sure you want to continue? This cannot be undone." />
+                </Card.Body>
+                <Card.Footer>
+                    <HStack>
+                        <Button text="Cancel" Event={{ Activated: () => setOpen(false) }} />
+                        <Button text="Confirm" intent="danger" Event={{ Activated: () => setOpen(false) }} />
+                    </HStack>
+                </Card.Footer>
+            </Modal>
+        </>
+    );
+}
+```
+</Demo>
+
+## Sizing
+
+Use the inherited `Size`, `width`, and `height` props to size the panel. `Size` takes precedence over `width` and `height`. Without `Size`, `width` defaults to `theme.components.modal.width` and height sizes automatically to the panel's content unless `height` is provided.
+
+Percentage values such as `width="60%"` and `height="50%"`, along with scale components in a `UDim2` supplied through `Size`, resolve against the full overlay. Automatic axes continue to size to their content according to `AutomaticSize`.
+
+## Repositioning the panel
+
+Set `draggable` to allow the modal to be repositioned by dragging a direct `Card.Header` child. Releasing the header keeps the panel at its dropped position instead of snapping it back to the center, including through ordinary rerenders while that modal remains mounted and open. Interactions that begin elsewhere in the panel do not start a drag, so body and footer controls remain usable normally.
+
+```tsx
+<Modal open={open} onOpenChange={setOpen} draggable>
+    <Card.Header>
+        <Text variant="heading" text="Drag this header" />
+    </Card.Header>
+    <Card.Body>
+        <Text text="The panel remains where you drop it." />
+    </Card.Body>
+</Modal>
+```
+
+## Controlled vs. uncontrolled
+
+Supplying `open` makes the modal controlled — its visibility follows the prop, and `onOpenChange` is called whenever the modal wants to change (a backdrop click, Escape, gamepad B, or a close button calling `useModalClose()`), but the modal only actually opens or closes once you update `open` in response.
+
+```tsx
+const [open, setOpen] = React.useState(false);
+
+<Modal open={open} onOpenChange={setOpen}>
+    {/* ... */}
+</Modal>
+```
+
+Omit `open` for an uncontrolled modal that manages its own visibility internally, optionally starting open via `defaultOpen`.
+
+```tsx
+<Modal defaultOpen onOpenChange={(open) => print(`Modal is now ${open}`)}>
+    {/* ... */}
+</Modal>
+```
+
+## Closing from within content
+
+Use `useModalClose()` inside a `Modal`'s children to close the nearest enclosing modal, without threading a close handler down manually. This is useful for a header close button.
+
+```tsx
+import { Card, Icon, Modal, Text, useModalClose } from "@rbxts/react-clean-ui";
+
+function ModalCloseButton() {
+    const close = useModalClose();
+
+    return <Icon icon="times" Event={{ Activated: () => close() }} />;
+}
+
+<Modal open={open} onOpenChange={setOpen}>
+    <Card.Header>
+        <Text variant="heading" text="Settings" />
+        <ModalCloseButton />
+    </Card.Header>
+    <Card.Body>
+        <Text text="Modal content goes here." />
+    </Card.Body>
+</Modal>
+```
+
+## Dismissal
+
+By default the modal closes when the dimmed backdrop outside the panel is clicked, or when Escape (or the gamepad B button) is pressed. Clicking anywhere inside the panel, including non-interactive text or background areas, does not dismiss the modal. Set `closeOnBackdropClick` or `closeOnEscape` to `false` to disable either behavior individually — useful for a modal that must be dismissed through an explicit action.
+
+```tsx
+<Modal
+    open={open}
+    onOpenChange={setOpen}
+    closeOnBackdropClick={false}
+    closeOnEscape={false}
+>
+    <Card.Header>
+        <Text variant="heading" text="Processing..." />
+    </Card.Header>
+    <Card.Body>
+        <Text text="Please wait, this dialog cannot be dismissed." />
+    </Card.Body>
+</Modal>
+```
+
+## Initial focus
+
+Pass a `React.RefObject<GuiObject>` as `initialFocus` to control where gamepad/keyboard selection moves when the modal opens. When omitted, selection moves to the modal panel itself. On close, selection is restored to whatever was selected before the modal opened.
+
+```tsx
+const confirmRef = React.useRef<TextButton>();
+
+<Modal open={open} onOpenChange={setOpen} initialFocus={confirmRef}>
+    <Card.Body>
+        <Text text="Delete this item?" />
+    </Card.Body>
+    <Card.Footer>
+        <HStack>
+            <Button text="Cancel" Event={{ Activated: () => setOpen(false) }} />
+            <Button ref={confirmRef} text="Delete" intent="danger" Event={{ Activated: () => setOpen(false) }} />
+        </HStack>
+    </Card.Footer>
+</Modal>
+```
+
+## Stacking modals
+
+Nest a `<Modal>` inside another modal's content to open a second modal on top of the first. Each layer stacks visually above the last, and Escape or the gamepad B button only ever closes the topmost modal.
+
+```tsx
+function NestedModalExample() {
+    const [outerOpen, setOuterOpen] = React.useState(false);
+    const [innerOpen, setInnerOpen] = React.useState(false);
+
+    return (
+        <>
+            <Button text="Open" Event={{ Activated: () => setOuterOpen(true) }} />
+
+            <Modal open={outerOpen} onOpenChange={setOuterOpen}>
+                <Card.Header>
+                    <Text variant="heading" text="Step 1" />
+                </Card.Header>
+                <Card.Body>
+                    <Button text="Continue" Event={{ Activated: () => setInnerOpen(true) }} />
+                </Card.Body>
+
+                <Modal open={innerOpen} onOpenChange={setInnerOpen}>
+                    <Card.Header>
+                        <Text variant="heading" text="Step 2" />
+                    </Card.Header>
+                    <Card.Body>
+                        <Text text="Pressing Escape here only closes this modal." />
+                    </Card.Body>
+                </Modal>
+            </Modal>
+        </>
+    );
+}
+```
+
+## Props
+
+### Modal-specific props
+
+| Prop                   | Type                             | Default     | Description                                                                                                    |
+| ---------------------- | --------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------- |
+| `open`                 | `boolean`                        | `undefined` | Makes the modal controlled. When set, visibility follows this value instead of internal state.                 |
+| `defaultOpen`          | `boolean`                        | `false`     | Initial visibility for an uncontrolled modal.                                                                    |
+| `onOpenChange`         | `(open: boolean) => void`        | `undefined` | Called whenever the modal wants to open or close (backdrop click, Escape, gamepad B, or `useModalClose()`).      |
+| `closeOnBackdropClick` | `boolean`                        | `true`      | Whether clicking the dimmed area outside the panel closes the modal.                                             |
+| `closeOnEscape`        | `boolean`                        | `true`      | Whether Escape or the gamepad B button closes the modal. Only ever closes the topmost modal in a stack.          |
+| `draggable`            | `boolean`                        | `false`     | Enables dragging by direct `Card.Header` children and retains the dropped position while mounted and open.       |
+| `initialFocus`         | `React.RefObject<GuiObject>`     | `undefined` | Element to select when the modal opens. Defaults to the modal panel itself.                                     |
+| `children`             | `React.ReactNode`                 | `undefined` | Modal content, composed from `Card.Header`, `Card.Body`, and `Card.Footer`.                                     |
+
+### Shared props
+
+The modal also supports props inherited from the following interfaces, forwarded to its internal `Card`.
+
+| Interface             | Purpose                                                                                       |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| `BoxProps`             | Configures the panel's sizing, spacing, background, border, shadow, and position. `Size` takes precedence over `width`/`height`; percentage and scale sizes resolve against the full overlay. |
+| `IntentElementProps`   | Configures the intent applied to the panel's `Card`.                                          |
+
+## Behaviour
+
+* Requires the app to be wrapped in `CleanUiProvider`, which supplies both the shared overlay layer and the modal stack.
+* Renders through a portal into the app's overlay layer, so it appears above normal page content regardless of where it is declared in the tree.
+* Backdrop dismissal only responds to clicks outside the panel; clicks within the panel do not reach the backdrop, including clicks on non-interactive content.
+* Panel percentage and scale sizes resolve against the full overlay, while axes selected by `AutomaticSize` size to the panel's content.
+* When `draggable` is enabled, dragging a direct `Card.Header` child repositions the panel and retains the dropped position through ordinary rerenders while the modal remains mounted and open; dragging elsewhere in the panel has no effect. Without a direct `Card.Header`, the modal has no drag handle.
+* Fades the backdrop and panel in and out over `theme.components.modal.fadeDuration` seconds; the portal content stays mounted for the duration of the closing fade before actually unmounting. A duration of `0` skips the fade and unmounts immediately.
+* Supports multiple simultaneously open modals by nesting a `<Modal>` inside another's children — each additional layer renders with a higher `ZIndex` than the last, so it visually stacks above it.
+* Escape and the gamepad B button only ever close the topmost visible modal in the stack, never a modal beneath it.
+* On open, gamepad/keyboard selection moves to `initialFocus` (if provided) or otherwise the modal panel itself. On close, selection is restored to whatever was selected immediately before that modal opened — scoped per instance, so nested modals restore focus independently.
+* When `open` is not provided, the modal manages its own visibility starting from `defaultOpen`.
+
+## Theme values
+
+The modal uses values from `theme.components.modal` for:
+
+* The fade-in/fade-out duration for the backdrop and panel
+* The base `ZIndex` of the first modal layer, and the increment added per additional stacked layer
+* The panel's default width (used when `width` isn't set on the `Modal`)
+* The backdrop's background color and transparency
+
+These values can be changed by providing a custom Clean UI theme.

@@ -22,6 +22,16 @@ interface DragHandleProps {
     children: GuiElement;
 }
 
+function isInteractiveDescendantAtInput(handle: GuiObject, input: InputObject): boolean {
+    const point = new Vector2(input.Position.X, input.Position.Y);
+
+    return GuiHelper.getGuiObjectsAtPosition(handle, point).some((guiObject) =>
+        guiObject !== handle &&
+        guiObject.IsDescendantOf(handle) &&
+        (guiObject.IsA("GuiButton") || guiObject.IsA("TextBox")),
+    );
+}
+
 
 function DragHandle({ children }: DragHandleProps) {
     const draggable = React.useContext(DraggableContext);
@@ -77,10 +87,11 @@ function DragHandle({ children }: DragHandleProps) {
                 childEvents?.InputBegan?.(instance, input);
 
                 if (
-                    input.UserInputType ===
-                    Enum.UserInputType.MouseButton1 ||
-                    input.UserInputType ===
-                    Enum.UserInputType.Touch
+                    (input.UserInputType ===
+                        Enum.UserInputType.MouseButton1 ||
+                        input.UserInputType ===
+                        Enum.UserInputType.Touch) &&
+                    !isInteractiveDescendantAtInput(instance, input)
                 ) {
                     draggable.beginDrag(input, instance);
                 }

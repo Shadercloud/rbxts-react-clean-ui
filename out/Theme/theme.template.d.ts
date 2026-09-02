@@ -255,6 +255,16 @@ export interface ThemeTemplate {
             cornerRadius: CssSize;
             intents?: Partial<Record<Intent, Partial<IntentScheme>>>;
         };
+        modal: {
+            fadeDuration: number;
+            baseZIndex: number;
+            zIndexStep: number;
+            width?: CssSize;
+            backdrop: {
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+            };
+        };
         charts: {
             colors: Color3[];
             pie: {

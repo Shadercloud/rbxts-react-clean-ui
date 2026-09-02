@@ -13,10 +13,10 @@ interface GroupElementProps {
     children?: React.ReactNode;
     name?: string;
 }
-declare function GroupElement(props: GroupElementProps): boolean | React.JSX.Element | ReadonlyMap<React.Key, React.ReactNode> | {
+declare function GroupElement(props: GroupElementProps): boolean | ReadonlyMap<React.Key, React.ReactNode> | {
     readonly [key: string]: React.ReactNode;
     readonly [key: number]: React.ReactNode;
-} | readonly React.ReactNode[] | undefined;
+} | readonly React.ReactNode[] | React.JSX.Element | undefined;
 interface GroupProps {
     children?: React.ReactNode;
     BackgroundTransparency?: number;

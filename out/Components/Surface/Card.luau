@@ -346,8 +346,11 @@ local Card = React.forwardRef(function(props, ref)
 			if child == nil then
 				return nil
 			end
-			if React.isValidElement(child) and child.type == CardHeader and header == nil then
-				local headerElement = child
+			local directHeader = if React.isValidElement(child) and child.type == CardHeader then child else nil
+			local wrappedChild = if React.isValidElement(child) then (child.props).children else nil
+			local wrappedHeader = if React.isValidElement(wrappedChild) and wrappedChild.type == CardHeader then wrappedChild else nil
+			local headerElement = directHeader or wrappedHeader
+			if headerElement ~= nil and header == nil then
 				local _condition = headerElement.props.overlay
 				if _condition == nil then
 					local _result = theme.components.card.header.position
@@ -357,7 +360,7 @@ local Card = React.forwardRef(function(props, ref)
 					_condition = (_result == "absolute")
 				end
 				if _condition then
-					header = headerElement
+					header = child
 					return nil
 				end
 			end

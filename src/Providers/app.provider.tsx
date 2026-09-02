@@ -4,6 +4,7 @@ import { ToastContainer } from "../Components/Interaction/Toast";
 import { RegistryProvider } from "./registry.provider";
 import { ThemeProvider } from "./theme.provider";
 import { OverlayProvider } from "./overlay.provider";
+import { ModalProvider } from "./modal.provider";
 import { ToastProvider } from "./toast.provider";
 
 interface CleanUiProviderProps {
@@ -17,10 +18,12 @@ export function CleanUiProvider({ children, theme, toasts = true }: CleanUiProvi
         <RegistryProvider>
             <ThemeProvider theme={theme}>
                 <OverlayProvider>
-                    <ToastProvider>
-                        {children}
-                        {toasts && <ToastContainer />}
-                    </ToastProvider>
+                    <ModalProvider>
+                        <ToastProvider>
+                            {children}
+                            {toasts && <ToastContainer />}
+                        </ToastProvider>
+                    </ModalProvider>
                 </OverlayProvider>
             </ThemeProvider>
         </RegistryProvider>

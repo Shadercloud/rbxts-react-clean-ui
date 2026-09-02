@@ -600,6 +600,16 @@ export const DefaultTheme: ThemeTemplate = {
             }
 
         },
+        modal: {
+            fadeDuration: 0.2,
+            baseZIndex: 1000,
+            zIndexStep: 10,
+            width: 420,
+            backdrop: {
+                backgroundColor: Color3.fromRGB(0, 0, 0),
+                backgroundTransparency: 0.5,
+            },
+        },
         charts: {
             colors: [
                 Color3.fromHex("#2E9D63"), // Green

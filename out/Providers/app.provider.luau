@@ -5,6 +5,7 @@ local ToastContainer = TS.import(script, script.Parent.Parent, "Components", "In
 local RegistryProvider = TS.import(script, script.Parent, "registry.provider").RegistryProvider
 local ThemeProvider = TS.import(script, script.Parent, "theme.provider").ThemeProvider
 local OverlayProvider = TS.import(script, script.Parent, "overlay.provider").OverlayProvider
+local ModalProvider = TS.import(script, script.Parent, "modal.provider").ModalProvider
 local ToastProvider = TS.import(script, script.Parent, "toast.provider").ToastProvider
 local function CleanUiProvider(_param)
 	local children = _param.children
@@ -15,7 +16,7 @@ local function CleanUiProvider(_param)
 	end
 	return React.createElement(RegistryProvider, nil, React.createElement(ThemeProvider, {
 		theme = theme,
-	}, React.createElement(OverlayProvider, nil, React.createElement(ToastProvider, nil, children, toasts and React.createElement(ToastContainer)))))
+	}, React.createElement(OverlayProvider, nil, React.createElement(ModalProvider, nil, React.createElement(ToastProvider, nil, children, toasts and React.createElement(ToastContainer))))))
 end
 return {
 	CleanUiProvider = CleanUiProvider,

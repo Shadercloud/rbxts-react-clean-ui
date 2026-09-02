@@ -7,6 +7,9 @@ end
 for _k, _v in TS.import(script, script, "droppable.context") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "modal.context") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "navigation.context") or {} do
 	exports[_k] = _v
 end
