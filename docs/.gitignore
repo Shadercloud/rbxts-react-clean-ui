@@ -1,5 +1,6 @@
 # deps
 /node_modules
+/vendor/loom-runtime
 
 # generated content
 .source

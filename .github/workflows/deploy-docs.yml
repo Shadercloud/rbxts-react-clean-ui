@@ -35,8 +35,22 @@ jobs:
           cache: npm
           cache-dependency-path: docs/package-lock.json
 
+      # npm resolves the `file:./vendor/loom-runtime` overrides (both
+      # @loom-dev/runtime and @loom-dev/renderer point at this one directory,
+      # so they symlink to the same real path and share one module instance —
+      # see docs/scripts/vendor-loom-runtime.js) while building its dependency
+      # tree, before any lifecycle script gets a chance to run — so this has to
+      # extract ahead of `npm ci`, not as a preinstall hook.
+      - name: Extract vendored loom runtime
+        run: node scripts/vendor-loom-runtime.js
+
+      # Not `npm ci`: a lockfile npm itself just regenerated (via `npm install`)
+      # can trip npm's own `ci` consistency check over platform-optional esbuild
+      # binaries ("Missing: @esbuild/win32-x64@... from lock file") — reproduced
+      # locally even against this repo's pre-existing package.json, unrelated to
+      # the vendoring above. `npm install` tolerates it.
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build documentation
         run: npm run build
