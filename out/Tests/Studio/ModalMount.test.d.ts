@@ -1,5 +1,5 @@
 declare class ModalMountValidation {
-    rendersBackdropAndPanelWhenOpenInsideCleanUiProvider(): void;
+    rendersBackdropAndPanelWithExplicitModalProviders(): void;
     wrapsThePanelInAContentSizedButtonThatShieldsTheBackdrop(): void;
     resolvesPercentageAndScalePanelSizesAgainstTheOverlay(): void;
     defaultsToANonDraggableCenteredPanel(): void;

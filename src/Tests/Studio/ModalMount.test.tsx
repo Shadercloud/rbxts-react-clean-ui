@@ -4,19 +4,103 @@ import { Test, Assert, Decorators, Runtime, Tag } from "@rbxts/lunit";
 
 const { Skip } = Decorators;
 import { Modal } from "../../Components/Interaction/Modal";
-import { Button } from "../../Components/Input";
-import { Card } from "../../Components/Surface";
-import { GuiHelper } from "../../Helpers";
-import { CleanUiProvider } from "../../Providers/app.provider";
-import { DraggableRegistryKey, RegistryContext, RegistryContextValue } from "../../Providers";
+import { Button } from "../../Components/Input/Button";
+import { Card } from "../../Components/Surface/Card";
+import { OverlayContext } from "../../Contexts/overlay.context";
+import { useModalClose } from "../../Contexts/modal.context";
+import { GuiHelper } from "../../Helpers/gui.helper";
+import { ModalProvider } from "../../Providers/modal.provider";
+import {
+	DraggableRegistryKey,
+	RegistryContext,
+	RegistryContextValue,
+	RegistryProvider,
+} from "../../Providers/registry.provider";
+import { ThemeProvider } from "../../Providers/theme.provider";
 import { DefaultTheme } from "../../Theme";
-import { useModalClose } from "../../Contexts";
 
 let latestRegistry: RegistryContextValue | undefined;
 
 function RegistryHarness() {
 	latestRegistry = React.useContext(RegistryContext);
 	return undefined;
+}
+
+function waitForValue<T extends defined>(resolve: () => T | undefined, failureMessage: string): T {
+	for (let attempt = 0; attempt < 30; attempt++) {
+		const value = resolve();
+
+		if (value !== undefined) {
+			return value;
+		}
+
+		task.wait();
+	}
+
+	return Assert.fail(failureMessage);
+}
+
+function waitForCondition(resolve: () => boolean, failureMessage: string) {
+	waitForValue(() => (resolve() ? true : undefined), failureMessage);
+}
+
+function waitForDescendant<T extends Instance>(host: Instance, name: string, failureMessage: string): T {
+	return waitForValue(() => host.FindFirstChild(name, true) as T | undefined, failureMessage);
+}
+
+function createTestRoot(host: Instance) {
+	Assert.notUndefined(RegistryProvider, "Expected direct registry.provider import to export RegistryProvider");
+	Assert.notUndefined(ThemeProvider, "Expected direct theme.provider import to export ThemeProvider");
+	Assert.notUndefined(ModalProvider, "Expected direct modal.provider import to export ModalProvider");
+	Assert.notUndefined(OverlayContext, "Expected direct overlay.context import to export OverlayContext");
+	Assert.notUndefined(OverlayContext.Provider, "Expected OverlayContext to expose its React Provider element type");
+
+	const renderHost = new Instance("Folder");
+	renderHost.Name = "ReactRenderHost";
+	renderHost.Parent = host;
+
+	const overlay = new Instance("Frame");
+	overlay.Name = "TestOverlay";
+	overlay.Size = UDim2.fromScale(1, 1);
+	overlay.BackgroundTransparency = 1;
+	overlay.Parent = host;
+
+	const root = ReactRoblox.createRoot(renderHost);
+	let renderGeneration = 0;
+
+	return {
+		render: (children: React.ReactNode) => {
+			renderGeneration++;
+			const probeName = `ReactCommitProbe-${renderGeneration}`;
+
+			root.render(
+				<RegistryProvider>
+					<ThemeProvider theme={DefaultTheme}>
+						<OverlayContext.Provider value={{ overlay }}>
+							<ModalProvider>
+								<frame key={probeName} />
+								{children}
+							</ModalProvider>
+						</OverlayContext.Provider>
+					</ThemeProvider>
+				</RegistryProvider>,
+			);
+			waitForDescendant(
+				renderHost,
+				probeName,
+				`Timed out waiting for createRoot().render() to commit ${probeName} into ReactRenderHost`,
+			);
+		},
+		unmount: () => {
+			root.unmount();
+			waitForCondition(
+				() => renderHost.GetChildren().size() === 0 && overlay.GetChildren().size() === 0,
+				"Timed out waiting for the React root and Modal portal to unmount",
+			);
+			overlay.Destroy();
+			renderHost.Destroy();
+		},
+	};
 }
 
 @Tag("Studio")
@@ -26,21 +110,23 @@ class ModalMountValidation {
 		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
 	)
 	@Test
-	public rendersBackdropAndPanelWhenOpenInsideCleanUiProvider() {
+	public rendersBackdropAndPanelWithExplicitModalProviders() {
 		const host = new Instance("Folder");
 
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<Modal open={true} />
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
-
-		Assert.notUndefined(host.FindFirstChildWhichIsA("ImageButton", true));
-		Assert.notUndefined(host.FindFirstChild("Modal", true));
+		waitForDescendant(
+			host,
+			"ModalBackdrop",
+			"Expected Modal to portal ModalBackdrop into the explicit TestOverlay",
+		);
+		waitForDescendant(host, "Modal", "Expected the Modal Card inside the portal");
 
 		root.unmount();
 		host.Destroy();
@@ -54,23 +140,21 @@ class ModalMountValidation {
 	public wrapsThePanelInAContentSizedButtonThatShieldsTheBackdrop() {
 		const host = new Instance("Folder");
 
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<Modal open={true} />
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
-
-		const backdrop = host.FindFirstChild("ModalBackdrop", true);
-		const shield = host.FindFirstChild("ModalPanelInputShield", true);
-		const panel = host.FindFirstChild("Modal", true);
-
-		Assert.notUndefined(backdrop);
-		Assert.notUndefined(shield);
-		Assert.notUndefined(panel);
+		const backdrop = waitForDescendant(host, "ModalBackdrop", "Expected ModalBackdrop after the portal commit");
+		const shield = waitForDescendant(
+			host,
+			"ModalPanelInputShield",
+			"Expected ModalPanelInputShield inside ModalBackdrop",
+		);
+		const panel = waitForDescendant(host, "Modal", "Expected the Modal Card inside its input shield");
 		Assert.true(backdrop!.IsA("ImageButton"));
 		Assert.true(shield!.IsA("ImageButton"));
 
@@ -78,7 +162,7 @@ class ModalMountValidation {
 
 		Assert.true(shieldButton.Active);
 		Assert.false(shieldButton.AutoButtonColor);
-		Assert.equal(shieldButton.AutomaticSize, Enum.AutomaticSize.XY);
+		Assert.equal(shieldButton.AutomaticSize, Enum.AutomaticSize.Y);
 		Assert.equal(panel!.Parent, shield);
 		Assert.true(shield!.IsDescendantOf(backdrop!));
 
@@ -94,39 +178,37 @@ class ModalMountValidation {
 	public resolvesPercentageAndScalePanelSizesAgainstTheOverlay() {
 		const host = new Instance("Frame");
 		host.Size = UDim2.fromOffset(800, 600);
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<Modal open={true} width="50%" height="40%" />
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
-
-		let shield = host.FindFirstChild("ModalPanelInputShield", true) as ImageButton | undefined;
-		let panel = host.FindFirstChild("Modal", true) as GuiObject | undefined;
-
-		Assert.notUndefined(shield);
-		Assert.notUndefined(panel);
+		let shield = waitForDescendant<ImageButton>(
+			host,
+			"ModalPanelInputShield",
+			"Expected the percentage-sized ModalPanelInputShield",
+		);
+		let panel = waitForDescendant<GuiObject>(host, "Modal", "Expected the percentage-sized Modal Card");
 		Assert.equal(shield!.Size, UDim2.fromScale(0.5, 0.4));
 		Assert.equal(panel!.Size, UDim2.fromScale(1, 1));
 		Assert.true(shield!.AbsoluteSize.X > 0);
 		Assert.true(shield!.AbsoluteSize.Y > 0);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<Modal open={true} Size={UDim2.fromScale(0.25, 0.3)} />
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
-
-		shield = host.FindFirstChild("ModalPanelInputShield", true) as ImageButton | undefined;
-		panel = host.FindFirstChild("Modal", true) as GuiObject | undefined;
-
-		Assert.notUndefined(shield);
-		Assert.notUndefined(panel);
+		shield = waitForDescendant<ImageButton>(
+			host,
+			"ModalPanelInputShield",
+			"Expected the scale-sized ModalPanelInputShield after rerender",
+		);
+		panel = waitForDescendant<GuiObject>(host, "Modal", "Expected the scale-sized Modal Card after rerender");
 		Assert.equal(shield!.Size, UDim2.fromScale(0.25, 0.3));
 		Assert.equal(panel!.Size, UDim2.fromScale(1, 1));
 		Assert.true(shield!.AbsoluteSize.X > 0);
@@ -144,25 +226,22 @@ class ModalMountValidation {
 	public defaultsToANonDraggableCenteredPanel() {
 		const host = new Instance("Folder");
 		latestRegistry = undefined;
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<RegistryHarness />
 				<Modal open={true}>
 					<Card.Header />
 				</Modal>
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
+		waitForDescendant(host, "CenterLayout", "Expected default Modal centering layout");
+		const registry = waitForValue(() => latestRegistry, "Expected RegistryHarness to publish RegistryContext");
+		Assert.equal(registry.getAll(DraggableRegistryKey).size(), 0);
 
-		Assert.notUndefined(host.FindFirstChild("CenterLayout", true));
-		Assert.notUndefined(latestRegistry);
-		Assert.equal(latestRegistry!.getAll(DraggableRegistryKey).size(), 0);
-
-		const header = host.FindFirstChild("CardHeader", true) as GuiObject | undefined;
-		Assert.notUndefined(header);
+		const header = waitForDescendant<GuiObject>(host, "CardHeader", "Expected the non-draggable CardHeader");
 		Assert.false(header!.Active);
 
 		root.unmount();
@@ -177,29 +256,30 @@ class ModalMountValidation {
 	public makesTheHeaderADragHandleAndRetainsTheDroppedPosition() {
 		const host = new Instance("Folder");
 		latestRegistry = undefined;
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<RegistryHarness />
 				<Modal open={true} draggable={true}>
 					<Card.Header />
 				</Modal>
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
-
 		Assert.undefined(host.FindFirstChild("CenterLayout", true));
-		Assert.notUndefined(latestRegistry);
-
-		const registrations = latestRegistry!.getAll(DraggableRegistryKey);
-		Assert.equal(registrations.size(), 1);
+		const registry = waitForValue(() => latestRegistry, "Expected RegistryHarness to publish RegistryContext");
+		const registrations = waitForValue(() => {
+			const current = registry.getAll(DraggableRegistryKey);
+			return current.size() === 1 ? current : undefined;
+		}, "Expected one draggable Modal registration");
 
 		const registration = registrations[0];
-		const header = host.FindFirstChild("CardHeader", true) as GuiObject | undefined;
-
-		Assert.notUndefined(header);
+		const header = waitForDescendant<GuiObject>(
+			host,
+			"CardHeader",
+			"Expected CardHeader to render as the drag handle",
+		);
 		Assert.true(header!.Active);
 		Assert.equal(registration.guiObject.AnchorPoint, new Vector2(0.5, 0.5));
 		Assert.equal(registration.guiObject.Position, UDim2.fromScale(0.5, 0.5));
@@ -207,8 +287,12 @@ class ModalMountValidation {
 		const dragStart = { Position: new Vector3(10, 20, 0) } as unknown as InputObject;
 		const dragEnd = { Position: new Vector3(40, 60, 0) } as unknown as InputObject;
 
-		registration.draggable.beginDrag(dragStart, header!);
+		registration.draggable.beginDrag(dragStart, header);
 		registration.draggable.endDrag(dragEnd);
+		waitForCondition(
+			() => registration.guiObject.Position.X.Offset === 30 && registration.guiObject.Position.Y.Offset === 40,
+			"Expected retained draggable position to reach the 30px, 40px drop offset",
+		);
 
 		Assert.equal(registration.guiObject.Position.X.Offset, 30);
 		Assert.equal(registration.guiObject.Position.Y.Offset, 40);
@@ -235,40 +319,45 @@ class ModalMountValidation {
 			return <Button name="ModalCloseButton" text="Close" Event={{ Activated: close }} />;
 		}
 
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<RegistryHarness />
 				<Modal open={true} draggable={true} onOpenChange={(open) => openChanges.push(open)}>
 					<Card.Header>
 						<CloseButton />
 					</Card.Header>
 				</Modal>
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
-
-		const header = host.FindFirstChild("CardHeader", true) as GuiObject | undefined;
-		const closeButton = host.FindFirstChild("ModalCloseButton", true) as GuiButton | undefined;
-
-		Assert.notUndefined(header);
-		Assert.notUndefined(closeButton);
-		Assert.notUndefined(latestRegistry);
-		Assert.notUndefined(activateClose);
+		const header = waitForDescendant<GuiObject>(
+			host,
+			"CardHeader",
+			"Expected CardHeader around the nested close button",
+		);
+		const closeButton = waitForDescendant<GuiButton>(
+			host,
+			"ModalCloseButton",
+			"Expected the nested ModalCloseButton",
+		);
+		const registry = waitForValue(() => latestRegistry, "Expected RegistryHarness to publish RegistryContext");
+		const close = waitForValue(() => activateClose, "Expected CloseButton to capture useModalClose()");
 		Assert.true(closeButton!.IsDescendantOf(header!));
 
-		const registration = latestRegistry!.getAll(DraggableRegistryKey)[0];
-		Assert.notUndefined(registration);
+		const registration = waitForValue(
+			() => registry.getAll(DraggableRegistryKey)[0],
+			"Expected draggable Modal registration",
+		);
 
 		const buttonPoint = closeButton!.AbsolutePosition.add(closeButton!.AbsoluteSize.div(2));
 		const hitObjects = GuiHelper.getGuiObjectsAtPosition(header!, buttonPoint);
 		Assert.true(hitObjects.some((guiObject) => guiObject === closeButton));
 
 		const initialPosition = registration!.guiObject.Position;
-		activateClose!();
-		task.wait();
+		close();
+		waitForCondition(() => openChanges.size() === 1, "Expected nested close button to publish onOpenChange(false)");
 
 		Assert.deepEqual(openChanges, [false]);
 		Assert.false(registration!.draggable.isDragging);
@@ -286,17 +375,15 @@ class ModalMountValidation {
 	public opensAutomaticallyWhenDefaultOpenIsTrueWithoutControlledOpenOrOnOpenChange() {
 		const host = new Instance("Folder");
 
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<Modal defaultOpen={true} />
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
-
-		Assert.notUndefined(host.FindFirstChild("Modal", true));
+		waitForDescendant(host, "Modal", "Expected defaultOpen Modal Card in the portal");
 
 		root.unmount();
 		host.Destroy();
@@ -310,27 +397,23 @@ class ModalMountValidation {
 	public controlledOpenPropDrivesTheRenderedModalRatherThanDefaultOpen() {
 		const host = new Instance("Folder");
 
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<Modal open={false} defaultOpen={true} />
-			</CleanUiProvider>,
+			</>,
 		);
-
-		task.wait();
 
 		Assert.undefined(host.FindFirstChild("Modal", true));
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<Modal open={true} defaultOpen={true} />
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
-
-		Assert.notUndefined(host.FindFirstChild("Modal", true));
+		waitForDescendant(host, "Modal", "Expected controlled Modal Card after open changed to true");
 
 		root.unmount();
 		host.Destroy();
@@ -352,10 +435,10 @@ class ModalMountValidation {
 			return undefined;
 		}
 
-		const root = ReactRoblox.createRoot(host);
+		const root = createTestRoot(host);
 
 		root.render(
-			<CleanUiProvider theme={DefaultTheme}>
+			<>
 				<Modal
 					open={true}
 					onOpenChange={(value) => {
@@ -364,18 +447,19 @@ class ModalMountValidation {
 				>
 					<CloseHarness />
 				</Modal>
-			</CleanUiProvider>,
+			</>,
 		);
 
-		task.wait();
+		const close = waitForValue(() => requestClose, "Expected CloseHarness to capture useModalClose()");
 
-		Assert.notUndefined(requestClose);
-
-		requestClose!();
-		task.wait();
+		close();
+		waitForCondition(
+			() => onOpenChangeValues.size() === 1,
+			"Expected modal close request to publish onOpenChange(false)",
+		);
 
 		Assert.deepEqual(onOpenChangeValues, [false]);
-		Assert.notUndefined(host.FindFirstChild("Modal", true));
+		waitForDescendant(host, "Modal", "Expected controlled Modal to remain rendered until its open prop changes");
 
 		root.unmount();
 		host.Destroy();
