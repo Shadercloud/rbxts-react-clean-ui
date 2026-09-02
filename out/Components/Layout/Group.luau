@@ -34,7 +34,9 @@ local function GroupElement(props)
 		_result_1 = _result_1.removeElement
 	end
 	React.useEffect(_exp, { enabled, _result_1 })
-	local elementRef = React.useRef()
+	if not enabled then
+		return props.children
+	end
 	local _result_2 = props.padding
 	if _result_2 ~= nil then
 		_result_2 = _result_2.left
@@ -69,38 +71,14 @@ local function GroupElement(props)
 		_condition_4 = 0
 	end
 	local verticalPadding = _condition_3 + _condition_4
-	React.useEffect(function()
-		if not enabled then
-			return nil
-		end
-		local frame = elementRef.current
-		if not frame or not context then
-			return nil
-		end
-		-- Some renderers (e.g. the browser-based Loom scene preview) don't
-		-- back this ref with an instance that supports property-changed
-		-- signals, so guard the subscription instead of throwing and
-		-- losing size reporting.
-		local conn
-		pcall(function()
-			conn = frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-				context.reportSize(id, Vector2.new(frame.AbsoluteSize.X + horizontalPadding, frame.AbsoluteSize.Y + verticalPadding))
-			end)
-		end)
-		return function()
-			local _result_6 = conn
-			if _result_6 ~= nil then
-				_result_6:Disconnect()
-			end
-		end
-	end, { enabled, context, id, horizontalPadding, verticalPadding })
-	if not enabled then
-		return props.children
-	end
 	return React.createElement("frame", {
-		ref = elementRef,
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.XY,
+		Change = {
+			AbsoluteSize = function(instance)
+				context.reportSize(id, Vector2.new(instance.AbsoluteSize.X + horizontalPadding, instance.AbsoluteSize.Y + verticalPadding))
+			end,
+		},
 	}, props.children)
 end
 local function getMaxVector2(map)

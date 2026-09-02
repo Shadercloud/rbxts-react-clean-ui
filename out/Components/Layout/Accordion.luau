@@ -118,43 +118,6 @@ local function RenderedAccordionItem(props)
 	local height, heightTween = useTween(0, {
 		duration = props.duration,
 	})
-	local contentRef = React.useRef()
-	local onContentSizeRef = React.useRef()
-	onContentSizeRef.current = function(instance)
-		if props.open then
-			heightTween:setGoal(instance.AbsoluteSize.Y, {
-				duration = props.duration,
-			})
-			if props.duration == 0 then
-				heightTween:setPosition(instance.AbsoluteSize.Y)
-			end
-			heightTween:start()
-		end
-	end
-	React.useEffect(function()
-		local frame = contentRef.current
-		if not frame then
-			return nil
-		end
-		-- Some renderers (e.g. the browser-based Loom scene preview) don't back
-		-- this ref with an instance that supports property-changed signals, so
-		-- guard the subscription instead of throwing and losing height tracking.
-		local conn
-		pcall(function()
-			conn = frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-				local _result = onContentSizeRef.current
-				if _result ~= nil then
-					_result(frame)
-				end
-			end)
-		end)
-		return function()
-			local _result = conn
-			if _result ~= nil then
-				_result:Disconnect()
-			end
-		end
-	end, { mounted })
 	React.useEffect(function()
 		if props.open then
 			setMounted(true)
@@ -287,11 +250,23 @@ local function RenderedAccordionItem(props)
 			return _exp + _arg0
 		end),
 	}, React.createElement("frame", {
-		ref = contentRef,
 		BackgroundColor3 = theme.components.accordion.content.backgroundColor,
 		BackgroundTransparency = theme.components.accordion.content.backgroundTransparency,
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
+		Change = {
+			AbsoluteSize = function(instance)
+				if props.open then
+					heightTween:setGoal(instance.AbsoluteSize.Y, {
+						duration = props.duration,
+					})
+					if props.duration == 0 then
+						heightTween:setPosition(instance.AbsoluteSize.Y)
+					end
+					heightTween:start()
+				end
+			end,
+		},
 	}, React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props.contentProps, theme.components.accordion.content.spacing, theme.components.accordion.content.padding),
 	}), if props.contentText ~= nil then React.createElement(Text, {

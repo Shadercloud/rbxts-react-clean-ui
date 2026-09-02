@@ -95,37 +95,6 @@ const Fieldset = React.forwardRef<ImageLabel, FieldsetProps>(
             };
         }, []);
 
-        const containerRef = React.useRef<ImageLabel>();
-
-        const setContainerRef = (instance: ImageLabel | undefined) => {
-            containerRef.current = instance;
-            if (typeIs(ref, "function")) {
-                ref(instance);
-            } else if (ref !== undefined && typeIs(ref, "table")) {
-                ref.current = instance;
-            }
-        };
-
-        React.useEffect(() => {
-            const frame = containerRef.current;
-            if (!frame) return;
-
-            // Some renderers (e.g. the browser-based Loom scene preview) don't
-            // back this ref with an instance that supports property-changed
-            // signals, so guard the subscription instead of throwing and
-            // losing breakpoint width tracking.
-            let conn: RBXScriptConnection | undefined;
-            pcall(() => {
-                conn = frame
-                    .GetPropertyChangedSignal("AbsoluteSize")
-                    .Connect(() => setWidth(frame.AbsoluteSize.X));
-            });
-
-            return () => {
-                conn?.Disconnect();
-            };
-        }, []);
-
         const fieldsetContext = React.useMemo<FieldsetContextValue>(() => {
             return {
                 disabled: props.disabled ?? false,
@@ -141,7 +110,12 @@ const Fieldset = React.forwardRef<ImageLabel, FieldsetProps>(
         return (
             <FieldsetContext.Provider value={fieldsetContext}>
                 <Container
-                    ref={setContainerRef}>
+                    ref={ref}
+                    Change={{
+                        AbsoluteSize: (instance) => {
+                            setWidth(instance.AbsoluteSize.X);
+                        },
+                    }}>
                     <HStack
                         Wraps={wrap}
                         valign="Center"

@@ -45,45 +45,6 @@ local Fieldset = React.forwardRef(function(props, ref)
 			labelActivated:Destroy()
 		end
 	end, {})
-	local containerRef = React.useRef()
-	local setContainerRef = function(instance)
-		containerRef.current = instance
-		local _ref = ref
-		if type(_ref) == "function" then
-			ref(instance)
-		else
-			local _condition = ref ~= nil
-			if _condition then
-				local _ref_1 = ref
-				_condition = type(_ref_1) == "table"
-			end
-			if _condition then
-				ref.current = instance
-			end
-		end
-	end
-	React.useEffect(function()
-		local frame = containerRef.current
-		if not frame then
-			return nil
-		end
-		-- Some renderers (e.g. the browser-based Loom scene preview) don't
-		-- back this ref with an instance that supports property-changed
-		-- signals, so guard the subscription instead of throwing and
-		-- losing breakpoint width tracking.
-		local conn
-		pcall(function()
-			conn = frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-				return setWidth(frame.AbsoluteSize.X)
-			end)
-		end)
-		return function()
-			local _result = conn
-			if _result ~= nil then
-				_result:Disconnect()
-			end
-		end
-	end, {})
 	local fieldsetContext = React.useMemo(function()
 		local _object = {}
 		local _left = "disabled"
@@ -107,7 +68,12 @@ local Fieldset = React.forwardRef(function(props, ref)
 	return React.createElement(FieldsetContext.Provider, {
 		value = fieldsetContext,
 	}, React.createElement(Container, {
-		ref = setContainerRef,
+		ref = ref,
+		Change = {
+			AbsoluteSize = function(instance)
+				setWidth(instance.AbsoluteSize.X)
+			end,
+		},
 	}, React.createElement(HStack, {
 		Wraps = wrap,
 		valign = "Center",
