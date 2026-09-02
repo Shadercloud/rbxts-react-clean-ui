@@ -14,32 +14,56 @@ const themeWithBackgroundImage = createTheme({
     },
 });
 
-function CountrySelect() {
+function CountrySelect(props: { searchable?: boolean; grouped?: boolean }) {
     return (
-        <SelectComponent max-height="200px">
-            <SelectComponent.Option text="United Kingdom" />
-            <SelectComponent.Option text="United States" />
-            <SelectComponent.Option text="Canada">
-                <HStack>
-                    <Icon icon="leaf" color={Color3.fromHex("#000000")} />
-                    <Text text="Canada" />
-                </HStack>
-            </SelectComponent.Option>
-            <SelectComponent.Option text="Germany" />
-            <SelectComponent.Option text="France" />
+        <SelectComponent max-height="200px" searchable={props.searchable}>
+            {props.grouped ? (
+                <>
+                    <SelectComponent.OptGroup label="Europe">
+                        <SelectComponent.Option text="United Kingdom" />
+                        <SelectComponent.Option text="Germany" />
+                        <SelectComponent.Option text="France" />
+                    </SelectComponent.OptGroup>
+                    <SelectComponent.OptGroup label="North America">
+                        <SelectComponent.Option text="United States" />
+                        <SelectComponent.Option text="Canada">
+                            <HStack>
+                                <Icon icon="leaf" color={Color3.fromHex("#000000")} />
+                                <Text text="Canada" />
+                            </HStack>
+                        </SelectComponent.Option>
+                    </SelectComponent.OptGroup>
+                </>
+            ) : (
+                <>
+                    <SelectComponent.Option text="United Kingdom" />
+                    <SelectComponent.Option text="United States" />
+                    <SelectComponent.Option text="Canada">
+                        <HStack>
+                            <Icon icon="leaf" color={Color3.fromHex("#000000")} />
+                            <Text text="Canada" />
+                        </HStack>
+                    </SelectComponent.Option>
+                    <SelectComponent.Option text="Germany" />
+                    <SelectComponent.Option text="France" />
+                </>
+            )}
         </SelectComponent>
     );
 }
 
-function Select(props: { screenshot?: boolean } = {}) {
+function Select(props: { screenshot?: boolean; searchable?: boolean; grouped?: boolean } = {}) {
+    const searchable = props.searchable ?? false;
+    const grouped = props.grouped ?? false;
+
     const content = (
         <Container width={320}>
             <VStack>
                 <Text text="Default Select" />
-                <CountrySelect />
+                <CountrySelect searchable={searchable} grouped={grouped} />
                 <Text text="Select with theme.components.select.backgroundImage" />
                 <ThemeProvider theme={themeWithBackgroundImage}>
-                    <CountrySelect />
+                    <CountrySelect searchable={searchable} grouped={grouped} />
                 </ThemeProvider>
             </VStack>
         </Container>

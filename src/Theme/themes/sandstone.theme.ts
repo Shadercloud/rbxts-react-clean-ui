@@ -226,6 +226,7 @@ export const SandstoneTheme = createTheme({
             borderColor: Color3.fromHex("#CDBFA8"),
             borderThickness: 1,
             cornerRadius: 4,
+            iconColor: Color3.fromHex("#8A7A61"),
         },
 
         select: {
@@ -249,6 +250,25 @@ export const SandstoneTheme = createTheme({
                         borderColor: Color3.fromHex("#376A63"),
                         backgroundColor: Color3.fromHex("#4E8179"),
                     },
+                },
+            },
+            optGroup: {
+                textColor: Color3.fromHex("#8A7A61"),
+                spacing: {
+                    xs: 4,
+                    sm: 6,
+                    md: 8,
+                    lg: 10,
+                    xl: 12,
+                },
+            },
+            search: {
+                spacing: {
+                    xs: 4,
+                    sm: 6,
+                    md: 8,
+                    lg: 10,
+                    xl: 12,
                 },
             },
         },

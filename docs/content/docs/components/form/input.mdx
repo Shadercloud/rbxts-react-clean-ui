@@ -57,6 +57,20 @@ You can also use the native Roblox `PlaceholderText` prop:
 
 When both are provided, `PlaceholderText` takes priority over `placeholder`.
 
+## Icon
+
+Set the `icon` prop to render a leading icon before the text field.
+
+```tsx
+<Input
+    value=""
+    icon="search"
+    placeholder="Search..."
+/>
+```
+
+The icon is vertically centered alongside the text and does not wrap onto its own line. Its color is controlled by `theme.components.input.iconColor`, falling back to the same default text color as the input itself when the theme doesn't define one.
+
 ## Validation
 
 The `validation` prop can restrict which values may be entered.
@@ -324,6 +338,7 @@ A `Change` handler can also be supplied to react to native property-changed even
 | `min`               | `number`                                  | `undefined`              | Minimum value allowed when `validation` is `"Number"` or `"Int"`. Enforced on blur, not while typing. |
 | `max`               | `number`                                  | `undefined`              | Maximum value allowed when `validation` is `"Number"` or `"Int"`. Enforced on blur, not while typing. |
 | `onChange`          | `(value: string) => void`                 | `undefined`              | Called whenever the input value changes.                           |
+| `icon`              | `IconName`                                | `undefined`              | Renders a leading icon before the text field.                      |
 | `controlled`        | `boolean`                                 | `false`                  | Displays `value` directly instead of managing text internally.     |
 | `Event`             | `React.InstanceEvent<TextBox>`            | `undefined`              | Native Roblox event handlers for the underlying `TextBox`.         |
 | `scale`             | `ScaleSize`                               | Theme default            | Controls the typography scale.                                     |
@@ -350,7 +365,10 @@ theme.components.input.borderColor
 theme.components.input.cornerRadius
 theme.components.input.backgroundImage
 theme.components.input.placeholder
+theme.components.input.iconColor
 ```
+
+`iconColor` is optional and only affects the leading icon rendered when the `icon` prop is set. If the theme doesn't define it, the icon falls back to the same default text color as the input.
 
 The default text color is resolved from `theme.components.input.typography`'s color. If that doesn't specify a color, it falls back to:
 

@@ -211,6 +211,7 @@ export const DefaultTheme: ThemeTemplate = {
             placeholder: {
                 color: Color3.fromHex("#8A8A8A"),
             },
+            iconColor: Color3.fromHex("#8A8A8A"),
         },
         select: {
             dropDownBackgroundColor: Color3.fromHex("#FFFFFF"),
@@ -232,6 +233,25 @@ export const DefaultTheme: ThemeTemplate = {
                         backgroundColor: Color3.fromHex("#3187C8")
                     }
                 }
+            },
+            optGroup: {
+                textColor: Color3.fromHex("#5C6577"),
+                spacing: {
+                    xs: 4,
+                    sm: 6,
+                    md: 8,
+                    lg: 10,
+                    xl: 12,
+                },
+            },
+            search: {
+                spacing: {
+                    xs: 4,
+                    sm: 6,
+                    md: 8,
+                    lg: 10,
+                    xl: 12,
+                },
             },
         },
         checkbox: {

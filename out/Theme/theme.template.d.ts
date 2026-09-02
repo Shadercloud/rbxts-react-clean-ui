@@ -72,6 +72,7 @@ export interface ThemeTemplate {
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             backgroundImage?: CssBackgroundImage;
             placeholder?: Partial<TypographyStyle> | ScaledTypographyStyle;
+            iconColor?: Color3;
         };
         select: {
             borderColor: Color3;
@@ -82,6 +83,18 @@ export interface ThemeTemplate {
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
             maxDropDownHeight: number;
+            optGroup: {
+                textColor: Color3;
+                typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                backgroundColor?: Color3;
+                backgroundTransparency?: number;
+                spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
+            };
+            search: {
+                spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
+            };
         };
         checkbox: {
             borderColor: Color3;

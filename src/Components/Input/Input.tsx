@@ -1,10 +1,11 @@
 import React, { useRef, useState } from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
 import { CssHelper, TypographyHelper } from "../../Helpers";
-import { ScalableElementProps, SpacedElementProps } from "../../Interfaces";
+import { IconName, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 import { TypographyStyle } from "../../Theme";
 import { Corners, Padding } from "../Decorator";
-import { FieldsetContext } from "../Layout";
+import { FieldsetContext, FlexItem, HStack } from "../Layout";
+import { Icon } from "../Surface";
 import { resolveClampedText, resolveValidatedText } from "./Input.validation";
 
 export interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
@@ -16,6 +17,7 @@ export interface InputProps extends ScalableElementProps, SpacedElementProps, Re
     onChange?: (value: string) => void;
     Event?: React.InstanceEvent<TextBox>;
     controlled?: boolean;
+    icon?: IconName;
 }
 
 export function Input(props: InputProps) {
@@ -87,88 +89,95 @@ export function Input(props: InputProps) {
 
             <Corners radius={theme.components.input.cornerRadius} />
             <Padding {...props} />
-            <textbox
-                ref={ref}
-                Size={UDim2.fromScale(1, 0)}
-                BackgroundTransparency={1}
-                AutomaticSize={Enum.AutomaticSize.Y}
-                TextXAlignment={props.TextXAlignment ?? Enum.TextXAlignment.Left}
-                FontFace={Font.fromName(typography.font.Name, typography.weight ?? Enum.FontWeight.Regular)}
-                FontSize={typography.size}
-                PlaceholderText={props.PlaceholderText ?? props.placeholder}
-                PlaceholderColor3={props.PlaceholderColor3 ?? placeholderTypography.color}
-                TextScaled={props.TextScaled}
-                LineHeight={typography.lineHeight}
-                Text={props.controlled ? props.value : value}
-                TextColor3={props.TextColor3 ?? typography.color ?? theme.colors.intents.primary.default.textColor}
-                TextTransparency={props.TextTransparency ?? typography.transparency}
+            <HStack valign="Center" Wraps={false}>
+                {props.icon !== undefined && (
+                    <Icon icon={props.icon} color={theme.components.input.iconColor} />
+                )}
+                <FlexItem>
+                    <textbox
+                        ref={ref}
+                        Size={UDim2.fromScale(1, 0)}
+                        BackgroundTransparency={1}
+                        AutomaticSize={Enum.AutomaticSize.Y}
+                        TextXAlignment={props.TextXAlignment ?? Enum.TextXAlignment.Left}
+                        FontFace={Font.fromName(typography.font.Name, typography.weight ?? Enum.FontWeight.Regular)}
+                        FontSize={typography.size}
+                        PlaceholderText={props.PlaceholderText ?? props.placeholder}
+                        PlaceholderColor3={props.PlaceholderColor3 ?? placeholderTypography.color}
+                        TextScaled={props.TextScaled}
+                        LineHeight={typography.lineHeight}
+                        Text={props.controlled ? props.value : value}
+                        TextColor3={props.TextColor3 ?? typography.color ?? theme.colors.intents.primary.default.textColor}
+                        TextTransparency={props.TextTransparency ?? typography.transparency}
 
-                Active={props.Active}
-                Archivable={props.Archivable}
-                BorderColor3={props.BorderColor3}
-                BorderMode={props.BorderMode}
-                BorderSizePixel={props.BorderSizePixel}
-                ClipsDescendants={props.ClipsDescendants}
-                Rotation={props.Rotation}
-                Selectable={props.Selectable}
-                SelectionImageObject={props.SelectionImageObject}
-                SizeConstraint={props.SizeConstraint}
-                Tag={props.Tag}
-                AutoLocalize={props.AutoLocalize}
-                RootLocalizationTable={props.RootLocalizationTable}
-                NextSelectionDown={props.NextSelectionDown}
-                NextSelectionLeft={props.NextSelectionLeft}
-                NextSelectionRight={props.NextSelectionRight}
-                NextSelectionUp={props.NextSelectionUp}
-                SelectionGroup={props.SelectionGroup}
-                SelectionOrder={props.SelectionOrder}
+                        Active={props.Active}
+                        Archivable={props.Archivable}
+                        BorderColor3={props.BorderColor3}
+                        BorderMode={props.BorderMode}
+                        BorderSizePixel={props.BorderSizePixel}
+                        ClipsDescendants={props.ClipsDescendants}
+                        Rotation={props.Rotation}
+                        Selectable={props.Selectable}
+                        SelectionImageObject={props.SelectionImageObject}
+                        SizeConstraint={props.SizeConstraint}
+                        Tag={props.Tag}
+                        AutoLocalize={props.AutoLocalize}
+                        RootLocalizationTable={props.RootLocalizationTable}
+                        NextSelectionDown={props.NextSelectionDown}
+                        NextSelectionLeft={props.NextSelectionLeft}
+                        NextSelectionRight={props.NextSelectionRight}
+                        NextSelectionUp={props.NextSelectionUp}
+                        SelectionGroup={props.SelectionGroup}
+                        SelectionOrder={props.SelectionOrder}
 
-                ClearTextOnFocus={props.ClearTextOnFocus ?? false}
-                CursorPosition={props.CursorPosition}
-                MultiLine={props.MultiLine}
-                SelectionStart={props.SelectionStart}
-                ShowNativeInput={props.ShowNativeInput}
-                TextEditable={props.TextEditable}
-                TextTruncate={props.TextTruncate}
-                RichText={props.RichText}
+                        ClearTextOnFocus={props.ClearTextOnFocus ?? false}
+                        CursorPosition={props.CursorPosition}
+                        MultiLine={props.MultiLine}
+                        SelectionStart={props.SelectionStart}
+                        ShowNativeInput={props.ShowNativeInput}
+                        TextEditable={props.TextEditable}
+                        TextTruncate={props.TextTruncate}
+                        RichText={props.RichText}
 
-                Event={{
-                    ...props.Event,
-                    FocusLost: (rbx, enterPressed, inputThatCausedFocusLoss) => {
+                        Event={{
+                            ...props.Event,
+                            FocusLost: (rbx, enterPressed, inputThatCausedFocusLoss) => {
 
-                        const clampedText = resolveClampedText(props.validation, rbx.Text, props.min, props.max);
+                                const clampedText = resolveClampedText(props.validation, rbx.Text, props.min, props.max);
 
-                        if (clampedText !== undefined) {
-                            ref.current!.Text = clampedText;
-                            lastValidText.current = clampedText;
-                            setValue(clampedText);
-                            props.onChange?.(clampedText);
-                        }
+                                if (clampedText !== undefined) {
+                                    ref.current!.Text = clampedText;
+                                    lastValidText.current = clampedText;
+                                    setValue(clampedText);
+                                    props.onChange?.(clampedText);
+                                }
 
-                        props.Event?.FocusLost?.(rbx, enterPressed, inputThatCausedFocusLoss);
-                    },
-                }}
-                Change={{
-                    ...props.Change,
-                    Text: (rbx) => {
+                                props.Event?.FocusLost?.(rbx, enterPressed, inputThatCausedFocusLoss);
+                            },
+                        }}
+                        Change={{
+                            ...props.Change,
+                            Text: (rbx) => {
 
-                        const resolved = resolveValidatedText(props.validation, rbx.Text, lastValidText.current);
+                                const resolved = resolveValidatedText(props.validation, rbx.Text, lastValidText.current);
 
-                        if (resolved !== rbx.Text) {
-                            ref.current!.Text = resolved;
-                            return;
-                        }
+                                if (resolved !== rbx.Text) {
+                                    ref.current!.Text = resolved;
+                                    return;
+                                }
 
-                        lastValidText.current = rbx.Text;
-                        setValue(rbx.Text)
-                        props.onChange?.(rbx.Text)
+                                lastValidText.current = rbx.Text;
+                                setValue(rbx.Text)
+                                props.onChange?.(rbx.Text)
 
-                        props.Change?.Text?.(rbx);
-                    },
-                }}
-            >
+                                props.Change?.Text?.(rbx);
+                            },
+                        }}
+                    >
 
-            </textbox>
+                    </textbox>
+                </FlexItem>
+            </HStack>
         </imagelabel>
     );
 }

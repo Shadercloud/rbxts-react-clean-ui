@@ -292,6 +292,7 @@ local WoodenTheme = createTheme({
 			placeholder = {
 				color = Color3.fromHex("#546b8a"),
 			},
+			iconColor = Color3.fromHex("#FFF7CF"),
 		},
 		card = {
 			borderThickness = 0,
@@ -439,6 +440,27 @@ local WoodenTheme = createTheme({
 						textColor = Color3.fromHex("#FFF7CF"),
 						backgroundColor = Color3.fromHex("#1F477D"),
 					},
+				},
+			},
+			optGroup = {
+				textColor = Color3.fromHex("#FFF7CF"),
+				backgroundColor = Color3.fromHex("#1F477D"),
+				backgroundTransparency = 0,
+				spacing = {
+					xs = 4,
+					sm = 6,
+					md = 8,
+					lg = 10,
+					xl = 12,
+				},
+			},
+			search = {
+				spacing = {
+					xs = 4,
+					sm = 6,
+					md = 8,
+					lg = 10,
+					xl = 12,
 				},
 			},
 		},

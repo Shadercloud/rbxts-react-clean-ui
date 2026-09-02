@@ -229,6 +229,7 @@ export const DarkTheme = createTheme({
             placeholder: {
                 color: Color3.fromHex("#697386"),
             },
+            iconColor: Color3.fromHex("#697386"),
         },
 
         select: {
@@ -252,6 +253,25 @@ export const DarkTheme = createTheme({
                         backgroundColor: Color3.fromHex("#365FAF"),
                         borderColor: Color3.fromHex("#6B96F0"),
                     },
+                },
+            },
+            optGroup: {
+                textColor: Color3.fromHex("#8892A6"),
+                spacing: {
+                    xs: 4,
+                    sm: 6,
+                    md: 8,
+                    lg: 10,
+                    xl: 12,
+                },
+            },
+            search: {
+                spacing: {
+                    xs: 4,
+                    sm: 6,
+                    md: 8,
+                    lg: 10,
+                    xl: 12,
                 },
             },
         },

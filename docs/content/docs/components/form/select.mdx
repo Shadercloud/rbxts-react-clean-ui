@@ -9,7 +9,7 @@ icon: Rows3
 
 The `<Select>` component displays a dropdown menu containing a list of selectable options.
 
-Use `<Select.Option>` components as direct children of `<Select>` to define the available choices.
+Use `<Select.Option>` components as direct children of `<Select>` to define the available choices. Related options can be grouped under a heading with `<Select.OptGroup>`, and the dropdown can expose a search box to filter options with the `searchable` property.
 
 ## Import
 
@@ -168,6 +168,83 @@ The value shown in the closed select control is taken from the selected option's
 
 For this reason, options should normally provide `text`, even when they also contain custom children.
 
+## Grouping Options
+
+Wrap a run of `Select.Option` components in `Select.OptGroup` to render a section header above them in the dropdown.
+
+```tsx
+<Select>
+    <Select.OptGroup label="Europe">
+        <Select.Option text="United Kingdom" />
+        <Select.Option text="Germany" />
+        <Select.Option text="France" />
+    </Select.OptGroup>
+
+    <Select.OptGroup label="North America">
+        <Select.Option text="United States" />
+        <Select.Option text="Canada" />
+    </Select.OptGroup>
+</Select>
+```
+
+`Select.OptGroup` must be a direct child of `Select`. Selection is still index-based via `selected`/`onChange`, and indexes are assigned across all options in document order regardless of grouping. In the example above, the "Europe" options are indexes `0`-`2` and the "North America" options are indexes `3`-`4`.
+
+A `Select.OptGroup` with no `Select.Option` children doesn't render a header.
+
+`Select.Option` and `Select.OptGroup` can also be mixed with ungrouped options:
+
+```tsx
+<Select>
+    <Select.Option text="United Kingdom" />
+
+    <Select.OptGroup label="North America">
+        <Select.Option text="United States" />
+        <Select.Option text="Canada" />
+    </Select.OptGroup>
+</Select>
+```
+
+## Searchable Options
+
+Set `searchable` to render a filter textbox above the option list. The search box is a standard [`Input`](/components/form/input) field, complete with its own border and corner radius, with a search icon prepended, inset with margin at the top of the dropdown. Typing filters options by a case-insensitive substring match against each option's `text` property.
+
+```tsx
+<Select searchable>
+    <Select.Option text="United Kingdom" />
+    <Select.Option text="United States" />
+    <Select.Option text="Canada" />
+</Select>
+```
+
+Options that only use `children`, without a `text` property, can't be matched against the search text and are always shown.
+
+Use `searchPlaceholder` to customize the search box's placeholder text, which defaults to `"Search"`.
+
+```tsx
+<Select searchable searchPlaceholder="Search countries...">
+    <Select.Option text="United Kingdom" />
+    <Select.Option text="United States" />
+    <Select.Option text="Canada" />
+</Select>
+```
+
+When `searchable` is combined with `Select.OptGroup`, a group's header is hidden if every option inside that group is filtered out. If no option anywhere matches the search text, the dropdown shows a "No Results" row instead of the option list.
+
+```tsx
+<Select searchable>
+    <Select.OptGroup label="Europe">
+        <Select.Option text="United Kingdom" />
+        <Select.Option text="Germany" />
+        <Select.Option text="France" />
+    </Select.OptGroup>
+
+    <Select.OptGroup label="North America">
+        <Select.Option text="United States" />
+        <Select.Option text="Canada" />
+    </Select.OptGroup>
+</Select>
+```
+
 ## Option Events
 
 `Select.Option` accepts Roblox instance events through the `Event` property.
@@ -278,15 +355,19 @@ When a `Select` is opened without an available overlay, the component emits a wa
 
 ## Direct Children
 
-`Select.Option` components must be direct children of `Select`.
+`Select.Option` components must be direct children of `Select`, or direct children of a `Select.OptGroup` that is itself a direct child of `Select`. Only this single level of nesting is supported—a `Select.OptGroup` nested inside another `Select.OptGroup` is not supported, and its contents are silently ignored.
 
 ```tsx
 <Select>
     <Select.Option text="Valid Option" />
+
+    <Select.OptGroup label="Valid Group">
+        <Select.Option text="Also Valid" />
+    </Select.OptGroup>
 </Select>
 ```
 
-Avoid wrapping options inside another component or frame:
+Avoid wrapping options inside another component or frame, other than the sanctioned `Select.OptGroup`:
 
 ```tsx
 <Select>
@@ -349,7 +430,9 @@ See the `Container` documentation for the full set of native `ImageLabel` proper
 | `spacing`    | `SpaceSize`                 | Theme default | Controls the internal padding of the select.                          |
 | `max-height` | `CssSize`                   | Theme default | Sets the maximum height of the dropdown before it becomes scrollable. |
 | `backgroundImage` | `CssBackgroundImage`       | Theme default | Sets the image layered over the closed select control's background.   |
-| `children`   | `React.ReactNode`           | —             | The `Select.Option` components displayed in the dropdown.             |
+| `searchable` | `boolean`                   | `false`       | Renders a filter textbox above the option list when the dropdown is open. |
+| `searchPlaceholder` | `string`              | `"Search"`    | Placeholder text for the search textbox. Only used when `searchable` is `true`. |
+| `children`   | `React.ReactNode`           | —             | The `Select.Option` and `Select.OptGroup` components displayed in the dropdown. |
 
 ### Shared and native properties
 
@@ -371,6 +454,13 @@ All other compatible native `ImageLabel` properties inherited from `React.Instan
 | `BackgroundColor3` | `Color3`                           | Theme colour | Overrides the option's base background colour.          |
 
 The `index` property is assigned internally by `Select` and should not be set manually.
+
+## Select.OptGroup Properties
+
+| Property   | Type               | Default | Description                                              |
+| ---------- | ------------------ | ------- | ---------------------------------------------------------- |
+| `label`    | `string`           | —       | The heading text rendered above the group's options.       |
+| `children` | `React.ReactNode`  | —       | The `Select.Option` components that belong to this group.  |
 
 ## Controlled Selection
 
@@ -447,3 +537,16 @@ export function SettingsForm() {
 ## Theme Values
 
 The select's appearance is controlled by `theme.components.select`. Its `backgroundImage` value supplies the closed control's background image when the `backgroundImage` prop is omitted. Existing select theme values continue to control typography, borders, corner radius, dropdown height, dropdown colour, and option intent colours. Internal padding (the `spacing` prop) is resolved from the global `theme.spacing` scale rather than a select-specific value.
+
+`theme.components.select.optGroup` controls the appearance of `Select.OptGroup` headers:
+
+* `textColor` (required) — colour of the group's label text
+* `typography` — typography used for the group's label text
+* `backgroundColor` and `backgroundTransparency` — background of the group header row
+* `spacing` and `padding` — internal padding of the group header row
+
+The search row rendered when `searchable` is `true` is a standard [`Input`](/components/form/input) with a `search` icon, so its typography, placeholder, and icon colour come from `theme.components.input` rather than a select-specific value. See the [`Input` theme styling](/components/form/input#theme-styling) documentation for those fields.
+
+`theme.components.select.search` only controls the outer margin around that `Input` within the dropdown:
+
+* `spacing` and `padding` — margin around the search row's `Input`

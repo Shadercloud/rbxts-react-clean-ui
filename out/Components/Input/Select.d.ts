@@ -6,6 +6,9 @@ export interface SelectProps extends ScalableElementProps, SpacedElementProps, R
     'max-height'?: CssSize;
     backgroundImage?: CssBackgroundImage;
     onChange?: (selected: number, value?: string) => void;
+    name?: string;
+    searchable?: boolean;
+    searchPlaceholder?: string;
 }
 interface SelectOptionProps {
     text?: string;
@@ -16,8 +19,14 @@ interface SelectOptionProps {
     BackgroundColor3?: Color3;
 }
 declare function SelectOption(props: SelectOptionProps): React.JSX.Element;
+interface SelectOptGroupProps {
+    label: string;
+    children?: React.ReactNode;
+}
+declare function SelectOptGroup(_props: SelectOptGroupProps): undefined;
 type SelectComponent = React.ForwardRefExoticComponent<SelectProps & React.RefAttributes<ImageLabel>> & {
     Option: typeof SelectOption;
+    OptGroup: typeof SelectOptGroup;
 };
 declare const Select: SelectComponent;
 export { Select };

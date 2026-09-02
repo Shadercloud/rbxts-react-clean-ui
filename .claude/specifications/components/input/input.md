@@ -11,7 +11,9 @@
   - `min?`, `max?: number` — only enforced when `validation` is `"Number"` or `"Int"`.
   - `onChange?: (value: string) => void`.
   - `controlled?: boolean`.
+  - `icon?: IconName` — when set, renders an `Icon` before the text field in the same row.
 - Several native `TextBox` properties are managed internally and cannot be meaningfully overridden: `Text`, `FontFace`, `FontSize`, `BackgroundTransparency` (fixed at `1`), `ClearTextOnFocus` (defaults to `false` unless overridden), and `AutomaticSize`.
+- Internally, the icon and the `TextBox` sit in a single non-wrapping `HStack` (`Wraps={false}`, matching the convention used by `Button`/`Increment`/`Accordion` for icon+content rows) with the `TextBox` wrapped in a `FlexItem` so it fills the remaining width; when `icon` is omitted, the `HStack` renders with only the `FlexItem`+`TextBox` child, unchanged from the pre-`icon` layout.
 
 ## Controlled vs. uncontrolled
 
@@ -39,5 +41,6 @@ Per the [Input](./index.md) convention, when rendered inside a `Fieldset`, activ
 - `cornerRadius`.
 - `backgroundImage` (a flat `CssBackgroundImage`, matching `theme.components.box.backgroundImage`/`theme.components.checkbox.backgroundImage`) is resolved unconditionally and rendered as the root element's `Image`/`ImageColor3`/`ImageTransparency`/`ScaleType`/`SliceCenter`/`SliceScale`/`TileSize`. `Input`'s root element is an `ImageLabel` (the `TextBox` ref stays on the inner `<textbox>`), so the background image is drawn directly on the root rather than a separate overlay layer.
 - `placeholder?: Partial<TypographyStyle> | ScaledTypographyStyle` — same shape and resolution mechanism as `typography` (`TypographyHelper.getTypography(theme, props.scale, theme.components.input.placeholder)`), for API symmetry with the main text field. **Only `.color` from the resolved result is actually applied**, as `PlaceholderColor3`. This is intentional, not a bug: Roblox's `TextBox` exposes no `PlaceholderTransparency`, and font/size/weight/lineHeight are shared between `Text` and `PlaceholderText` (no separate placeholder-specific property exists), so `.transparency`, `.font`, `.size`, `.weight`, and `.lineHeight` on `placeholder` are accepted by the type but have no visual effect.
+- `iconColor?: Color3` — the color passed to the prepended `Icon` when `props.icon` is set. Falls back to `Icon`'s own default (`theme.colors.intents.primary.default.textColor`) when unset.
 
 `TextColor3` resolves as `props.TextColor3 ?? typography.color ?? theme.colors.intents.primary.default.textColor`. `TextTransparency` resolves as `props.TextTransparency ?? typography.transparency` (no further fallback — `undefined` leaves Roblox's own default). `PlaceholderColor3` resolves as `props.PlaceholderColor3 ?? placeholderTypography.color`, with no further fallback beyond that — if neither is set, Roblox's built-in default placeholder color is used.

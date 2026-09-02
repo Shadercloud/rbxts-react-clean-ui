@@ -11,7 +11,11 @@ local TypographyHelper = _Helpers.TypographyHelper
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
-local FieldsetContext = TS.import(script, script.Parent.Parent, "Layout").FieldsetContext
+local _Layout = TS.import(script, script.Parent.Parent, "Layout")
+local FieldsetContext = _Layout.FieldsetContext
+local FlexItem = _Layout.FlexItem
+local HStack = _Layout.HStack
+local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
 local _Input_validation = TS.import(script, script.Parent, "Input.validation")
 local resolveClampedText = _Input_validation.resolveClampedText
 local resolveValidatedText = _Input_validation.resolveValidatedText
@@ -56,6 +60,10 @@ local function Input(props)
 	local _attributes = table.clone(props)
 	setmetatable(_attributes, nil)
 	local _exp_2 = React.createElement(Padding, _attributes)
+	local _exp_3 = props.icon ~= nil and (React.createElement(Icon, {
+		icon = props.icon,
+		color = theme.components.input.iconColor,
+	}))
 	local _attributes_1 = {
 		ref = ref,
 		Size = UDim2.fromScale(1, 0),
@@ -182,7 +190,10 @@ local function Input(props)
 		SliceCenter = backgroundImage.SliceCenter,
 		SliceScale = backgroundImage.SliceScale,
 		TileSize = backgroundImage.TileSize,
-	}, _exp, _exp_1, _exp_2, React.createElement("textbox", _attributes_1))
+	}, _exp, _exp_1, _exp_2, React.createElement(HStack, {
+		valign = "Center",
+		Wraps = false,
+	}, _exp_3, React.createElement(FlexItem, nil, React.createElement("textbox", _attributes_1))))
 end
 return {
 	Input = Input,

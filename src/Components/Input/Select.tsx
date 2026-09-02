@@ -4,10 +4,11 @@ import {
     CleanThemeContext,
     OverlayContext,
 } from "../../Contexts";
-import { ColorHelper, SizeHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import {
     CssSize,
     ScalableElementProps,
+    ScaleSize,
     SpacedElementProps,
 } from "../../Interfaces";
 import { CssBackgroundImage } from "../../Theme";
@@ -15,6 +16,7 @@ import { Corners, Padding } from "../Decorator";
 import { Container, FieldsetContext, FlexItem, HStack, Scroller, VStack } from "../Layout";
 import { Text } from "../Typography";
 import { Icon } from "../Surface";
+import { Input } from "./Input";
 
 export interface SelectProps
     extends ScalableElementProps,
@@ -24,6 +26,9 @@ export interface SelectProps
     'max-height'?: CssSize;
     backgroundImage?: CssBackgroundImage;
     onChange?: (selected: number, value?: string) => void;
+    name?: string;
+    searchable?: boolean;
+    searchPlaceholder?: string;
 }
 
 
@@ -63,7 +68,7 @@ function SelectOption(props: SelectOptionProps) {
         "Select.Option must be used inside a Select",
     );
 
-    assert(props.index !== undefined, "Select.Option must be a direct child of Select",);
+    assert(props.index !== undefined, "Select.Option must be a direct child of Select or Select.OptGroup",);
 
     return (
         <imagebutton
@@ -112,10 +117,163 @@ function SelectOption(props: SelectOptionProps) {
     );
 }
 
+interface SelectOptGroupProps {
+    label: string;
+    children?: React.ReactNode;
+}
+
+function SelectOptGroup(_props: SelectOptGroupProps) {
+    return undefined;
+}
+
+interface ParsedOption {
+    index: number;
+    element: React.ReactElement<SelectOptionProps>;
+    text?: string;
+}
+
+interface ParsedGroup {
+    key: string;
+    label: string;
+    options: ParsedOption[];
+}
+
+type ParsedSection =
+    | { kind: "option"; option: ParsedOption }
+    | { kind: "group"; group: ParsedGroup }
+    | { kind: "node"; key: string; node: React.ReactNode };
+
+interface ParsedSelectChildren {
+    sections: ParsedSection[];
+    // flatOptions[i].index === i always, gap-free
+    flatOptions: ParsedOption[];
+}
+
+function parseSelectChildren(children: React.ReactNode): ParsedSelectChildren {
+    const sections = new Array<ParsedSection>();
+    const flatOptions = new Array<ParsedOption>();
+
+    let index = 0;
+    let nodeCount = 0;
+    let groupCount = 0;
+
+    // Fragment-wrapped children (`<>...</>`) are unwrapped/recursed into so
+    // consumers can conditionally compose Option/OptGroup lists (a common
+    // React pattern) without breaking option indexing.
+    const collectGroupOptions = (node: React.ReactNode, options: ParsedOption[]) => {
+        React.Children.forEach(node, (groupChild) => {
+            if (React.isValidElement(groupChild) && groupChild.type === React.Fragment) {
+                collectGroupOptions((groupChild.props as { children?: React.ReactNode }).children, options);
+                return;
+            }
+
+            if (!React.isValidElement<SelectOptionProps>(groupChild) || groupChild.type !== SelectOption) {
+                return;
+            }
+
+            const option: ParsedOption = { index: index++, element: groupChild, text: groupChild.props.text };
+            options.push(option);
+            flatOptions.push(option);
+        });
+    };
+
+    const visit = (child: React.ReactNode) => {
+        if (React.isValidElement(child) && child.type === React.Fragment) {
+            React.Children.forEach((child.props as { children?: React.ReactNode }).children, visit);
+            return;
+        }
+
+        if (React.isValidElement<SelectOptionProps>(child) && child.type === SelectOption) {
+            const option: ParsedOption = { index: index++, element: child, text: child.props.text };
+            sections.push({ kind: "option", option });
+            flatOptions.push(option);
+            return;
+        }
+
+        if (React.isValidElement<SelectOptGroupProps>(child) && child.type === SelectOptGroup) {
+            const options = new Array<ParsedOption>();
+
+            collectGroupOptions(child.props.children, options);
+
+            sections.push({ kind: "group", group: { key: `group-${groupCount++}`, label: child.props.label, options } });
+            return;
+        }
+
+        sections.push({ kind: "node", key: `node-${nodeCount++}`, node: child });
+    };
+
+    React.Children.forEach(children, visit);
+
+    return { sections, flatOptions };
+}
+
+function optionMatchesQuery(option: ParsedOption, normalizedQuery: string): boolean {
+    if (normalizedQuery === "") return true;
+    if (option.text === undefined) return true;
+
+    // Plain-text/literal find (the trailing `true`) avoids treating Lua
+    // pattern characters in the query (e.g. `%`, `-`) as patterns.
+    return option.text.lower().find(normalizedQuery, 1, true)[0] !== undefined;
+}
+
+interface SelectSearchInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+    scale?: ScaleSize;
+}
+
+function SelectSearchInput(props: SelectSearchInputProps) {
+    const theme = React.useContext(CleanThemeContext);
+
+    return (
+        <frame Size={UDim2.fromScale(1, 0)} AutomaticSize={Enum.AutomaticSize.Y} BackgroundTransparency={1}>
+            <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.select.search.spacing, theme.components.select.search.padding)} />
+            <Input
+                icon="search"
+                controlled
+                value={props.value}
+                onChange={props.onChange}
+                placeholder={props.placeholder ?? "Search"}
+                scale={props.scale}
+            />
+        </frame>
+    );
+}
+
+interface SelectGroupHeaderProps {
+    label: string;
+    scale?: ScaleSize;
+}
+
+function SelectGroupHeader(props: SelectGroupHeaderProps) {
+    const theme = React.useContext(CleanThemeContext);
+
+    const typography = TypographyHelper.getTypography(
+        theme,
+        props.scale,
+        theme.components.select.optGroup.typography,
+    );
+
+    return (
+        <frame
+            Size={UDim2.fromScale(1, 0)}
+            AutomaticSize={Enum.AutomaticSize.Y}
+            BackgroundColor3={theme.components.select.optGroup.backgroundColor}
+            BackgroundTransparency={theme.components.select.optGroup.backgroundTransparency ?? 1}
+            BorderSizePixel={0}
+        >
+            <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.select.optGroup.spacing, theme.components.select.optGroup.padding)} />
+            <Text text={props.label} TextColor3={theme.components.select.optGroup.textColor} typography={typography} />
+        </frame>
+    );
+}
+
 type SelectComponent = React.ForwardRefExoticComponent<
     SelectProps & React.RefAttributes<ImageLabel>
 > & {
     Option: typeof SelectOption;
+    OptGroup: typeof SelectOptGroup;
 };
 
 
@@ -133,6 +291,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         UDim2.fromOffset(0, 0),
     );
     const [contentHeight, setContentHeight] = React.useState(0);
+    const [query, setQuery] = React.useState("");
 
     const buttonRef = React.useRef<ImageButton>();
 
@@ -175,11 +334,53 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         theme.components.select.typography,
     );
 
-    const children = React.Children.toArray(props.children);
+    const { sections, flatOptions } = React.useMemo(() => parseSelectChildren(props.children), [props.children]);
 
-    const selectedOption = (
-        children[selected] ?? children[0]
-    ) as React.ReactElement<SelectOptionProps> | undefined;
+    const selectedOption = flatOptions[selected]?.element ?? flatOptions[0]?.element;
+
+    React.useEffect(() => {
+        if (!open) setQuery("");
+    }, [open]);
+
+    const normalizedQuery = props.searchable ? query.lower() : "";
+
+    const renderOption = (option: ParsedOption) =>
+        React.cloneElement(option.element, { index: option.index, key: `option-${option.index}` });
+
+    const renderSections = () => sections.map((section) => {
+        if (section.kind === "node") {
+            return section.node;
+        }
+
+        if (section.kind === "option") {
+            if (props.searchable && !optionMatchesQuery(section.option, normalizedQuery)) {
+                return undefined;
+            }
+
+            return renderOption(section.option);
+        }
+
+        if (section.group.options.size() === 0) {
+            return undefined;
+        }
+
+        const visibleOptions = props.searchable
+            ? section.group.options.filter((option) => optionMatchesQuery(option, normalizedQuery))
+            : section.group.options;
+
+        if (props.searchable && query !== "" && visibleOptions.size() === 0) {
+            return undefined;
+        }
+
+        return (
+            <React.Fragment key={section.group.key}>
+                <SelectGroupHeader label={section.group.label} scale={props.scale} />
+                {visibleOptions.map(renderOption)}
+            </React.Fragment>
+        );
+    });
+
+    const hasVisibleOptions = !props.searchable || query === "" || flatOptions.some((option) => optionMatchesQuery(option, normalizedQuery));
 
     const dropdownHeight = math.min(
         contentHeight,
@@ -237,6 +438,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
 
     return (
         <Container
+            name={props.name ?? "Select"}
             ref={ref}
             {...props}
             Size={UDim2.fromScale(1, 0)}
@@ -285,29 +487,30 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                                 <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={theme.components.select.borderColor} />
 
                                 <Corners radius={theme.components.select.cornerRadius} />
-                                <Scroller Size={new UDim2(1, 0, 0, dropdownHeight)} spacing="None">
 
-                                    <VStack
-                                        spacing="None"
-                                        Change={{
-                                            AbsoluteContentSize: (layout) => {
-                                                setContentHeight(layout.AbsoluteContentSize.Y);
-                                            },
-                                        }}>
-                                        {React.Children.map(props.children, (child, childIndex) => {
-                                            if (!React.isValidElement<SelectOptionProps>(child)) {
-                                                return child;
-                                            }
-
-                                            // React.Children.map uses a 1-based index in roblox-ts.
-                                            const optionIndex = childIndex - 1;
-
-                                            return React.cloneElement(child, {
-                                                index: optionIndex,
-                                            });
-                                        })}
-                                    </VStack>
-                                </Scroller>
+                                <VStack spacing="None">
+                                    {props.searchable && (
+                                        <SelectSearchInput
+                                            value={query}
+                                            onChange={setQuery}
+                                            placeholder={props.searchPlaceholder}
+                                            scale={props.scale}
+                                        />
+                                    )}
+                                    <Scroller Size={new UDim2(1, 0, 0, dropdownHeight)} spacing="None">
+                                        <VStack
+                                            spacing="None"
+                                            Change={{
+                                                AbsoluteContentSize: (layout) => {
+                                                    setContentHeight(layout.AbsoluteContentSize.Y);
+                                                },
+                                            }}>
+                                            {hasVisibleOptions
+                                                ? renderSections()
+                                                : <Text text="No Results" typography={typography} />}
+                                        </VStack>
+                                    </Scroller>
+                                </VStack>
                             </frame>,
                             overlay.overlay,
                         )}
@@ -318,4 +521,5 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
 }) as SelectComponent;
 
 Select.Option = SelectOption;
+Select.OptGroup = SelectOptGroup;
 export { Select }
