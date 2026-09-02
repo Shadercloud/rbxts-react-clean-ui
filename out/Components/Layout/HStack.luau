@@ -8,7 +8,9 @@ local function HStack(props)
 	return React.createElement(React.Fragment, nil, React.createElement("uilistlayout", {
 		FillDirection = Enum.FillDirection.Horizontal,
 		HorizontalFlex = props.HorizontalFlex,
-		VerticalAlignment = props.valign,
+		HorizontalAlignment = props.HorizontalAlignment,
+		VerticalAlignment = props.valign or props.VerticalAlignment,
+		VerticalFlex = props.VerticalFlex,
 		Padding = props.Padding or UDim.new(0, math.ceil(SpacingHelper:GetPadding(theme, props.spacing) / 2)),
 		Wraps = if props.Wraps == nil then true else props.Wraps,
 		SortOrder = Enum.SortOrder.LayoutOrder,

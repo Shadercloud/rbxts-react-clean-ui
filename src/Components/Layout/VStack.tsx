@@ -7,11 +7,13 @@ interface VStackProps extends SpacedElementProps {
     valign?: Enum.VerticalAlignment | "Center" | "Top" | "Bottom" | React.Binding<Enum.VerticalAlignment> | undefined;
     children?: React.ReactNode;
     HorizontalFlex?: Enum.UIFlexAlignment;
+    HorizontalAlignment?: Enum.HorizontalAlignment;
     VerticalFlex?: Enum.UIFlexAlignment;
     VerticalAlignment?: Enum.VerticalAlignment;
     Event?: React.InstanceEvent<UIListLayout>;
     Change?: React.InstanceChangeEvent<UIListLayout>;
     Padding?: UDim | Binding<UDim>;
+    Wraps?: boolean;
 }
 
 export function VStack(props: VStackProps) {
@@ -24,10 +26,12 @@ export function VStack(props: VStackProps) {
                 HorizontalFlex={props.HorizontalFlex ?? Enum.UIFlexAlignment.Fill}
                 VerticalFlex={props.VerticalFlex}
                 VerticalAlignment={props.VerticalAlignment ?? props.valign}
+                HorizontalAlignment={props.HorizontalAlignment}
                 Padding={
                     props.Padding ??
                     new UDim(0, SpacingHelper.GetPadding(theme, props.spacing))
                 }
+                Wraps={props.Wraps}
                 SortOrder={Enum.SortOrder.LayoutOrder}
                 Change={props.Change}
                 Event={props.Event}
