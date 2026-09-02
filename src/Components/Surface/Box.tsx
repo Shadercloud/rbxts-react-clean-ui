@@ -25,9 +25,10 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
 
         const borderThickness = props['border-thickness'] ?? theme.components.box.borderThickness;
 
+        const name = props.name ?? "Box";
         return (
             <Container
-                name={props.name ?? "Box"}
+                name={name}
                 ref={ref}
                 {...props}
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 1))}
@@ -52,7 +53,11 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
                         Color={props['border-color'] ?? theme.components.box.borderColor}
                     />
                 )}
-                <BoxShadow {...props} value={theme.components.box.boxShadow} />
+                <BoxShadow
+                    {...props}
+                    value={theme.components.box.boxShadow}
+                    name={`${name}BoxShadow`}
+                />
                 <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.box.spacing, theme.components.box.padding)} />
 
                 <Corners radius={theme.components.box.cornerRadius} />

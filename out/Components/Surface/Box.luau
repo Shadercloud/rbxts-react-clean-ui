@@ -17,13 +17,15 @@ local Box = React.forwardRef(function(props, ref)
 		_condition = theme.components.box.borderThickness
 	end
 	local borderThickness = _condition
-	local _attributes = {}
 	local _condition_1 = props.name
 	if _condition_1 == nil then
 		_condition_1 = "Box"
 	end
-	_attributes.name = _condition_1
-	_attributes.ref = ref
+	local name = _condition_1
+	local _attributes = {
+		name = name,
+		ref = ref,
+	}
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
@@ -47,6 +49,7 @@ local Box = React.forwardRef(function(props, ref)
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	_attributes_1.value = theme.components.box.boxShadow
+	_attributes_1.name = `{name}BoxShadow`
 	return React.createElement(Container, _attributes, _exp, React.createElement(BoxShadow, _attributes_1), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.box.spacing, theme.components.box.padding),
 	}), React.createElement(Corners, {
