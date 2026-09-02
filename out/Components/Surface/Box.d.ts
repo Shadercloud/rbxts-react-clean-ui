@@ -5,5 +5,6 @@ export interface BoxProps extends SpacedElementProps, ShadowElementProps, Backgr
     'border-thickness'?: number;
     'border-color'?: Color3;
     'background-image'?: CssBackgroundImage;
+    name?: string;
 }
 export declare const Box: React.ForwardRefExoticComponent<Omit<BoxProps, "ref"> & React.RefAttributes<ImageLabel>>;

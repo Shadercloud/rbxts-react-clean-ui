@@ -18,15 +18,14 @@ local TypographyHelper = _Helpers.TypographyHelper
 local _HoverButton = TS.import(script, script.Parent.Parent, "Input", "HoverButton")
 local HoverButton = _HoverButton.HoverButton
 local HoverButtonContext = _HoverButton.HoverButtonContext
-local function Tab(_props)
-	return nil
-end
-local function TabTitle(_props)
-	return nil
-end
-local function TabContent(props)
-	return nil
-end
+-- Selection only — Tabs.List/Tabs.Body/Tabs.Title/Tabs.Content each render
+-- themselves for real (see Card.tsx's CardHeader/CardFooter for the same
+-- "Root provides Context, subparts consume it independently" pattern), so
+-- there's nothing here to scan or harvest from children.
+local TabsContext = React.createContext({
+	selected = nil,
+	setSelected = function() end,
+})
 local function TabButtonContent(props)
 	local theme = React.useContext(CleanThemeContext)
 	local hover = React.useContext(HoverButtonContext)
@@ -57,52 +56,99 @@ local function TabButtonContent(props)
 		typography = TypographyHelper:getTypography(theme, nil, intent.typography),
 	}))
 end
-local Tabs = React.forwardRef(function(props, ref)
+-- The real per-tab button — derives its own default/hover/focus color scheme
+-- from the theme (same per-instance derivation Card.Header/Card.Footer use,
+-- not hoisted to Root) and drives selection itself via TabsContext.
+local function TabTitle(props)
 	local theme = React.useContext(CleanThemeContext)
-	local selected, setSelected = React.useState(0)
-	local tabs = React.useMemo(function()
-		local tabs = {}
-		React.Children.forEach(props.children, function(child)
-			if not React.isValidElement(child) or child.type ~= Tab then
-				return nil
-			end
-			local title
-			local content
-			local tab = child
-			React.Children.forEach(tab.props.children, function(tabChild)
-				if not React.isValidElement(tabChild) then
-					return nil
-				end
-				if tabChild.type == TabTitle then
-					title = (tabChild.props)
-				elseif tabChild.type == TabContent then
-					content = (tabChild.props).children
-				end
-			end)
-			if title ~= nil then
-				local _arg0 = {
-					title = title,
-					content = content,
-				}
-				table.insert(tabs, _arg0)
-			end
-		end)
-		return tabs
-	end, { props.children })
-	local tabCount = #tabs
+	local _binding = React.useContext(TabsContext)
+	local selected = _binding.selected
+	local setSelected = _binding.setSelected
+	local isSelected = selected == props.value
+	-- The first-mounted Tabs.Title claims the selection if none is set yet,
+	-- preserving "first tab selected by default" now that nothing scans the
+	-- tab list up front. Known limitation: if the currently-selected tab's
+	-- Tabs.Title unmounts, selection isn't automatically reassigned.
 	React.useEffect(function()
-		if selected >= tabCount then
-			setSelected(math.max(0, tabCount - 1))
+		if selected == nil then
+			setSelected(props.value)
 		end
-	end, { selected, tabCount })
-	local selectedTab = tabs[selected + 1]
+	end, {})
 	local buttonDefault = ColorHelper:getIntentColors(theme, "primary", "default", theme.components.tabs.button.intents)
 	local buttonHover = ColorHelper:getIntentColors(theme, "primary", "hover", theme.components.tabs.button.intents)
 	local buttonFocus = ColorHelper:getIntentColors(theme, "primary", "focus", theme.components.tabs.button.intents)
 	local buttonDefaultBackgroundImage = CssHelper:resolveBackgroundImage(buttonDefault.backgroundImage)
 	local buttonHoverBackgroundImage = CssHelper:resolveBackgroundImage(buttonHover.backgroundImage)
 	local buttonFocusBackgroundImage = CssHelper:resolveBackgroundImage(buttonFocus.backgroundImage)
+	local _attributes = table.clone(props)
+	setmetatable(_attributes, nil)
+	return React.createElement(HoverButton, {
+		isSelected = isSelected,
+		default = {
+			Size = UDim2.fromScale(0, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			BackgroundColor3 = buttonDefault.backgroundColor,
+			BackgroundTransparency = buttonDefault.backgroundTransparency,
+			BorderSizePixel = 0,
+			AutoButtonColor = false,
+			Image = buttonDefaultBackgroundImage.Image,
+			ImageColor3 = buttonDefaultBackgroundImage.ImageColor3,
+			ImageTransparency = buttonDefaultBackgroundImage.ImageTransparency,
+			ScaleType = buttonDefaultBackgroundImage.ScaleType,
+			SliceCenter = buttonDefaultBackgroundImage.SliceCenter,
+			SliceScale = buttonDefaultBackgroundImage.SliceScale,
+			TileSize = buttonDefaultBackgroundImage.TileSize,
+			Event = {
+				Activated = function()
+					setSelected(props.value)
+				end,
+			},
+		},
+		hover = {
+			BackgroundColor3 = buttonHover.backgroundColor,
+			BackgroundTransparency = buttonHover.backgroundTransparency,
+			Image = buttonHoverBackgroundImage.Image,
+			ImageColor3 = buttonHoverBackgroundImage.ImageColor3,
+			ImageTransparency = buttonHoverBackgroundImage.ImageTransparency,
+			ScaleType = buttonHoverBackgroundImage.ScaleType,
+			SliceCenter = buttonHoverBackgroundImage.SliceCenter,
+			SliceScale = buttonHoverBackgroundImage.SliceScale,
+			TileSize = buttonHoverBackgroundImage.TileSize,
+		},
+		focus = {
+			BackgroundColor3 = buttonFocus.backgroundColor,
+			BackgroundTransparency = buttonFocus.backgroundTransparency,
+			Image = buttonFocusBackgroundImage.Image,
+			ImageColor3 = buttonFocusBackgroundImage.ImageColor3,
+			ImageTransparency = buttonFocusBackgroundImage.ImageTransparency,
+			ScaleType = buttonFocusBackgroundImage.ScaleType,
+			SliceCenter = buttonFocusBackgroundImage.SliceCenter,
+			SliceScale = buttonFocusBackgroundImage.SliceScale,
+			TileSize = buttonFocusBackgroundImage.TileSize,
+		},
+	}, React.createElement(TabButtonContent, _attributes))
+end
+-- Always mounted — visibility is toggled rather than the panel being
+-- unmounted/remounted, so per-tab local state (e.g. a Scroller's scroll
+-- position) survives switching tabs. Roblox excludes a GuiObject with
+-- Visible=false from its ancestors' AutomaticSize/UIListLayout
+-- content-size calculations, so the hidden panels don't inflate Tabs.Body's
+-- own AutomaticSize; since only one panel is ever visible at a time, the
+-- default (unset) Position/AnchorPoint every panel shares never causes a
+-- visible overlap either.
+local function TabContent(props)
+	local _binding = React.useContext(TabsContext)
+	local selected = _binding.selected
+	return React.createElement(Container, {
+		name = `TabContent_{props.value}`,
+		width = "100%",
+		Visible = selected == props.value,
+	}, props.children)
+end
+local TabsList = React.forwardRef(function(props, ref)
+	local theme = React.useContext(CleanThemeContext)
 	local _attributes = {
+		name = "TabsList",
 		ref = ref,
 		BackgroundColor3 = theme.components.tabs.list.backgroundColor,
 		width = "100%",
@@ -113,89 +159,55 @@ local Tabs = React.forwardRef(function(props, ref)
 	end
 	_attributes.BackgroundTransparency = _condition
 	_attributes.backgroundImage = theme.components.tabs.list.backgroundImage
-	local _exp = React.createElement(Corners, {
+	return React.createElement(Container, _attributes, React.createElement(Corners, {
 		radius = theme.components.tabs.list.cornerRadius,
-	})
-	local _exp_1 = React.createElement(Padding, {
+	}), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing, theme.components.tabs.list.padding),
-	})
-	-- ▼ ReadonlyArray.map ▼
-	local _newValue = table.create(#tabs)
-	local _callback = function(tab, index)
-		local _attributes_1 = table.clone(tab.title)
-		setmetatable(_attributes_1, nil)
-		return React.createElement(HoverButton, {
-			isSelected = selected == index,
-			default = {
-				Size = UDim2.fromScale(0, 0),
-				AutomaticSize = Enum.AutomaticSize.XY,
-				BackgroundColor3 = buttonDefault.backgroundColor,
-				BackgroundTransparency = buttonDefault.backgroundTransparency,
-				BorderSizePixel = 0,
-				AutoButtonColor = false,
-				Image = buttonDefaultBackgroundImage.Image,
-				ImageColor3 = buttonDefaultBackgroundImage.ImageColor3,
-				ImageTransparency = buttonDefaultBackgroundImage.ImageTransparency,
-				ScaleType = buttonDefaultBackgroundImage.ScaleType,
-				SliceCenter = buttonDefaultBackgroundImage.SliceCenter,
-				SliceScale = buttonDefaultBackgroundImage.SliceScale,
-				TileSize = buttonDefaultBackgroundImage.TileSize,
-				Event = {
-					Activated = function()
-						setSelected(index)
-					end,
-				},
-			},
-			hover = {
-				BackgroundColor3 = buttonHover.backgroundColor,
-				BackgroundTransparency = buttonHover.backgroundTransparency,
-				Image = buttonHoverBackgroundImage.Image,
-				ImageColor3 = buttonHoverBackgroundImage.ImageColor3,
-				ImageTransparency = buttonHoverBackgroundImage.ImageTransparency,
-				ScaleType = buttonHoverBackgroundImage.ScaleType,
-				SliceCenter = buttonHoverBackgroundImage.SliceCenter,
-				SliceScale = buttonHoverBackgroundImage.SliceScale,
-				TileSize = buttonHoverBackgroundImage.TileSize,
-			},
-			focus = {
-				BackgroundColor3 = buttonFocus.backgroundColor,
-				BackgroundTransparency = buttonFocus.backgroundTransparency,
-				Image = buttonFocusBackgroundImage.Image,
-				ImageColor3 = buttonFocusBackgroundImage.ImageColor3,
-				ImageTransparency = buttonFocusBackgroundImage.ImageTransparency,
-				ScaleType = buttonFocusBackgroundImage.ScaleType,
-				SliceCenter = buttonFocusBackgroundImage.SliceCenter,
-				SliceScale = buttonFocusBackgroundImage.SliceScale,
-				TileSize = buttonFocusBackgroundImage.TileSize,
-			},
-		}, React.createElement(TabButtonContent, _attributes_1))
-	end
-	for _k, _v in tabs do
-		_newValue[_k] = _callback(_v, _k - 1, tabs)
-	end
-	-- ▲ ReadonlyArray.map ▲
-	local _exp_2 = React.createElement(Container, _attributes, _exp, _exp_1, React.createElement(HStack, nil, _newValue))
-	local _exp_3 = React.createElement("uistroke", {
+	}), React.createElement(HStack, nil, props.children))
+end)
+local TabsBody = React.forwardRef(function(props, ref)
+	local theme = React.useContext(CleanThemeContext)
+	return React.createElement(Container, {
+		name = "TabsBody",
+		ref = ref,
+		width = "100%",
+		backgroundImage = props.backgroundImage or theme.components.tabs.backgroundImage,
+	}, React.createElement("uistroke", {
 		Thickness = theme.components.tabs.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.tabs.borderColor,
-	})
-	local _exp_4 = React.createElement(Padding, {
+	}), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding),
-	})
-	local _exp_5 = React.createElement(Corners, {
+	}), React.createElement(Corners, {
 		radius = theme.components.tabs.cornerRadius,
-	})
-	local _result = selectedTab
-	if _result ~= nil then
-		_result = _result.content
-	end
-	return React.createElement(VStack, nil, _exp_2, React.createElement(Container, {
-		backgroundImage = props.backgroundImage or theme.components.tabs.backgroundImage,
-	}, _exp_3, _exp_4, _exp_5, _result))
+	}), props.children)
 end)
+-- Root doesn't render a real Roblox Instance of its own (just a Context
+-- Provider around a VStack, itself just a Fragment) — see Group.tsx for the
+-- same shape. It's still wrapped in React.forwardRef, not a plain function,
+-- because roblox-ts compiles a bare arrow function to an actual Lua
+-- `function` value, and Lua functions can't have table-style properties
+-- (Tabs.List = ...) assigned onto them — forwardRef's return value compiles
+-- to a table instead. The ref itself is genuinely unused: there's no
+-- sensible Instance for it to point at, so RefAttributes<Frame> below is a
+-- type-level placeholder to keep this consistent with every other compound
+-- component's shape, not a real forwarded ref — Tabs does not support a
+-- `ref` prop in practice.
+local Tabs = React.forwardRef(function(props, _ref)
+	local selected, setSelected = React.useState(props.defaultValue)
+	local contextValue = React.useMemo(function()
+		return {
+			selected = selected,
+			setSelected = setSelected,
+		}
+	end, { selected })
+	return React.createElement(TabsContext.Provider, {
+		value = contextValue,
+	}, React.createElement(VStack, nil, props.children))
+end)
+Tabs.List = TabsList
+Tabs.Body = TabsBody
 Tabs.Title = TabTitle
-Tabs.Tab = Tab
 Tabs.Content = TabContent
 return {
 	Tabs = Tabs,

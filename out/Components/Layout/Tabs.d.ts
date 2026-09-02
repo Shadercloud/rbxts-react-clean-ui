@@ -1,23 +1,32 @@
 import React from "@rbxts/react";
 import { PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { CssBackgroundImage } from "../../Theme";
-interface TabProps {
-    children?: React.ReactNode;
-}
-declare function Tab(_props: TabProps): undefined;
 interface TabTitleProps extends PaddingProps {
+    value: string;
     text: string;
 }
-declare function TabTitle(_props: TabTitleProps): undefined;
+declare function TabTitle(props: TabTitleProps): React.JSX.Element;
 interface TabContentProps {
+    value: string;
     children?: React.ReactNode;
 }
-declare function TabContent(props: TabContentProps): undefined;
-interface TabsProps extends ScalableElementProps {
-    backgroundImage?: CssBackgroundImage;
+declare function TabContent(props: TabContentProps): React.JSX.Element;
+interface TabsListProps extends ScalableElementProps {
+    children?: React.ReactNode;
 }
-type TabsComponent = React.ForwardRefExoticComponent<TabsProps & React.RefAttributes<ImageLabel>> & {
-    Tab: typeof Tab;
+declare const TabsList: React.ForwardRefExoticComponent<TabsListProps & React.RefAttributes<ImageLabel>>;
+interface TabsBodyProps extends ScalableElementProps {
+    backgroundImage?: CssBackgroundImage;
+    children?: React.ReactNode;
+}
+declare const TabsBody: React.ForwardRefExoticComponent<TabsBodyProps & React.RefAttributes<ImageLabel>>;
+export interface TabsProps {
+    children?: React.ReactNode;
+    defaultValue?: string;
+}
+type TabsComponent = React.ForwardRefExoticComponent<TabsProps & React.RefAttributes<Frame>> & {
+    List: typeof TabsList;
+    Body: typeof TabsBody;
     Title: typeof TabTitle;
     Content: typeof TabContent;
 };

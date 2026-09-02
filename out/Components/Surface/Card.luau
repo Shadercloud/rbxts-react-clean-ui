@@ -165,6 +165,7 @@ local CardHeader = React.forwardRef(function(props, ref)
 	local overlay = _binding.overlay
 	local positionProps = _binding.positionProps
 	local _attributes = {
+		name = "CardHeader",
 		ref = ref,
 	}
 	for _k, _v in props do
@@ -217,6 +218,7 @@ local CardBody = React.forwardRef(function(props, ref)
 	-- against `theme.components.card.body`'s own tiers.
 	local paddingSourceProps = props
 	local _attributes = {
+		name = "CardBody",
 		ref = ref,
 		Size = SizeHelper:GetSize(props, UDim2.fromScale(0, 0)),
 	}
@@ -246,6 +248,7 @@ local CardFooter = React.forwardRef(function(props, ref)
 	local overlay = _binding.overlay
 	local positionProps = _binding.positionProps
 	local _attributes = {
+		name = "CardFooter",
 		ref = ref,
 	}
 	for _k, _v in props do
@@ -462,6 +465,11 @@ local Card = React.forwardRef(function(props, ref)
 	local boxPropsWithOverlayClearance = _result_2
 	local _attributes = table.clone(boxPropsWithOverlayClearance)
 	setmetatable(_attributes, nil)
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Card"
+	end
+	_attributes.name = _condition
 	_attributes.ref = ref
 	_attributes.center = nil
 	_attributes.spacing = "None"
@@ -490,25 +498,36 @@ local Card = React.forwardRef(function(props, ref)
 	setmetatable(_object, nil)
 	_object.center = nil
 	local wrapperPositionProps = _object
-	local boxWithOverlay = if hasOverlay then (React.createElement("frame", {
-		ref = overlayWrapperRef,
-		BackgroundTransparency = 1,
-		ClipsDescendants = false,
-		Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1)),
-		AutomaticSize = SizeHelper:GetAutoSize(props),
-		Position = SizeHelper:GetPosition(wrapperPositionProps),
-		AnchorPoint = SizeHelper:GetAnchor(wrapperPositionProps),
-		ZIndex = props.ZIndex,
-		LayoutOrder = props.LayoutOrder,
-		Change = {
+	local _result_3
+	if hasOverlay then
+		local _attributes_1 = {}
+		local _condition_1 = props.name
+		if _condition_1 == nil then
+			_condition_1 = "CardOverlayWrapper"
+		end
+		_attributes_1.key = _condition_1
+		_attributes_1.ref = overlayWrapperRef
+		_attributes_1.BackgroundTransparency = 1
+		_attributes_1.ClipsDescendants = false
+		_attributes_1.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1))
+		_attributes_1.AutomaticSize = SizeHelper:GetAutoSize(props)
+		_attributes_1.Position = SizeHelper:GetPosition(wrapperPositionProps)
+		_attributes_1.AnchorPoint = SizeHelper:GetAnchor(wrapperPositionProps)
+		_attributes_1.ZIndex = props.ZIndex
+		_attributes_1.LayoutOrder = props.LayoutOrder
+		_attributes_1.Change = {
 			AbsolutePosition = function(instance)
 				return setWrapperAbsoluteY(instance.AbsolutePosition.Y)
 			end,
 			AbsoluteSize = function(instance)
 				return setWrapperAbsoluteSize(instance.AbsoluteSize)
 			end,
-		},
-	}, cardBox, overlayHeader, overlayFooter)) else cardBox
+		}
+		_result_3 = (React.createElement("frame", _attributes_1, cardBox, overlayHeader, overlayFooter))
+	else
+		_result_3 = cardBox
+	end
+	local boxWithOverlay = _result_3
 	local isCentered = props.center == true and props.Position == nil and props.AnchorPoint == nil
 	return React.createElement(CardContext.Provider, {
 		value = contextValue,

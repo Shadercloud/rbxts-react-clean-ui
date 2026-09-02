@@ -16,6 +16,7 @@ export interface BoxProps extends SpacedElementProps,
     'border-thickness'?: number;
     'border-color'?: Color3;
     'background-image'?: CssBackgroundImage;
+    name?: string;
 }
 
 export const Box = React.forwardRef<ImageLabel, BoxProps>(
@@ -26,6 +27,7 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
 
         return (
             <Container
+                name={props.name ?? "Box"}
                 ref={ref}
                 {...props}
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 1))}

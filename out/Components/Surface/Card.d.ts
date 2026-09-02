@@ -23,6 +23,7 @@ type CardComponent = React.ForwardRefExoticComponent<CardProps & React.RefAttrib
     Header: typeof CardHeader;
     Footer: typeof CardFooter;
     Body: typeof CardBody;
+    name?: string;
 };
 declare const Card: CardComponent;
 export { Card };

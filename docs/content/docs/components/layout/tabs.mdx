@@ -16,19 +16,18 @@ import { Tabs, Text } from "@rbxts/react-clean-ui";
 export function TabsExample() {
     return (
         <Tabs>
-            <Tabs.Tab>
-                <Tabs.Title text="First Tab" />
-                <Tabs.Content>
+            <Tabs.List>
+                <Tabs.Title value="first" text="First Tab" />
+                <Tabs.Title value="second" text="Second Tab" />
+            </Tabs.List>
+            <Tabs.Body>
+                <Tabs.Content value="first">
                     <Text text="Content for the first tab." />
                 </Tabs.Content>
-            </Tabs.Tab>
-
-            <Tabs.Tab>
-                <Tabs.Title text="Second Tab" />
-                <Tabs.Content>
+                <Tabs.Content value="second">
                     <Text text="Content for the second tab." />
                 </Tabs.Content>
-            </Tabs.Tab>
+            </Tabs.Body>
         </Tabs>
     );
 }
@@ -46,47 +45,123 @@ import { Scroller, Tabs, Text } from "@rbxts/react-clean-ui";
 export function ScrollableTabsExample() {
     return (
         <Tabs>
-            <Tabs.Tab>
-                <Tabs.Title text="Scrollable" />
-                <Tabs.Content>
+            <Tabs.List>
+                <Tabs.Title value="scrollable" text="Scrollable" />
+            </Tabs.List>
+            <Tabs.Body>
+                <Tabs.Content value="scrollable">
                     <Scroller height="200">
                         <Text text="Long scrollable content..." />
                     </Scroller>
                 </Tabs.Content>
-            </Tabs.Tab>
+            </Tabs.Body>
         </Tabs>
     );
 }
 ```
 
+Because a `Tabs.Content` panel stays mounted while hidden rather than unmounting, a `Scroller`'s scroll position is preserved when switching away from its tab and back.
+
+## Placing tabs in a card header
+
+`Tabs.List` and `Tabs.Body` don't need to be siblings — each reads the current selection from `Tabs` via context wherever it's mounted, so the button bar and the content panel can live in entirely different parts of the layout. This makes it possible to put the buttons in a `Card.Header` while the panel content lives in the `Card.Body`:
+
+```tsx
+import React from "@rbxts/react";
+import { Card, Tabs, Text } from "@rbxts/react-clean-ui";
+
+export function TabsInCardHeaderExample() {
+    return (
+        <Tabs>
+            <Card>
+                <Card.Header>
+                    <Tabs.List>
+                        <Tabs.Title value="profile" text="Profile" />
+                        <Tabs.Title value="settings" text="Settings" />
+                    </Tabs.List>
+                </Card.Header>
+                <Card.Body>
+                    <Tabs.Body>
+                        <Tabs.Content value="profile">
+                            <Text text="Profile content..." />
+                        </Tabs.Content>
+                        <Tabs.Content value="settings">
+                            <Text text="Settings content..." />
+                        </Tabs.Content>
+                    </Tabs.Body>
+                </Card.Body>
+            </Card>
+        </Tabs>
+    );
+}
+```
+
+The only rule is that a `Tabs.Title` and the `Tabs.Content` it should reveal share the same `value`; nesting and rendering order don't matter.
+
 ## Structure
 
-A `Tabs` component is made from the following child components:
+`Tabs` is composed from four independent child components:
 
-- `Tabs.Tab` defines a single tab.
-- `Tabs.Title` defines the tab button text.
-- `Tabs.Content` defines the content displayed when the tab is selected.
+- `Tabs.List` is the themed button bar. It renders whatever children it's given — typically one or more `Tabs.Title` elements.
+- `Tabs.Title` is a single tab button. Its `value` is matched against a `Tabs.Content`'s `value` to pair them.
+- `Tabs.Body` is the themed content panel. It renders whatever children it's given — typically one or more `Tabs.Content` elements.
+- `Tabs.Content` renders its `children` only while its `value` matches the currently selected `Tabs.Title`.
 
-Only `Tabs.Tab` children are read directly by `Tabs`. Each tab must contain a `Tabs.Title` to be included.
+`Tabs` itself wraps its children in a `VStack`, so the default buttons-above-content layout doesn't need an extra wrapper around `Tabs.List` and `Tabs.Body`.
 
 ## Tabs
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `backgroundImage` | `CssBackgroundImage` | Theme value | Overrides the background image of the selected tab's content panel. |
+| `defaultValue` | `string` | First mounted tab | Sets which tab's `value` starts selected. |
+
+## Tabs.List
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `React.ReactNode` | `Tabs.Title` elements rendered as the button bar. |
+
+### Shared props
+
+| Interface | Purpose |
+| --- | --- |
+| `ScalableElementProps` | Configures the scale used when resolving the button bar's theme values. |
 
 ## Tabs.Title
 
 | Prop | Type | Description |
 | --- | --- | --- |
+| `value` | `string` | Identifies this tab. Must match a `Tabs.Content`'s `value` to pair them. |
 | `text` | `string` | Text displayed in the tab button. |
+
+### Shared props
+
+| Interface | Purpose |
+| --- | --- |
+| `PaddingProps` | Configures individual padding values for the tab button. |
+
+## Tabs.Body
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `backgroundImage` | `CssBackgroundImage` | Theme value | Overrides the background image of the content panel. |
+| `children` | `React.ReactNode` | — | `Tabs.Content` elements rendered inside the panel. |
+
+### Shared props
+
+| Interface | Purpose |
+| --- | --- |
+| `ScalableElementProps` | Configures the scale used when resolving the content panel's theme values. |
 
 ## Tabs.Content
 
 | Prop | Type | Description |
 | --- | --- | --- |
-| `children` | `React.ReactNode` | Content displayed while the tab is selected. |
+| `value` | `string` | Matches this panel to the `Tabs.Title` with the same `value`. |
+| `children` | `React.ReactNode` | Content displayed while this tab is selected. |
 
-## Default selection
+## Behaviour
 
-The first tab is selected by default.
+- The first `Tabs.Title` to mount is selected by default. Set `defaultValue` on `Tabs` to choose a different initial tab.
+- Every `Tabs.Content` stays mounted at all times — switching tabs toggles visibility rather than mounting and unmounting, so a panel's local state (such as a `Scroller`'s scroll position) is preserved when switching away and back.
+- Hovering or selecting a `Tabs.Title` switches its background, border, and text colors to the theme's `hover`/`focus` intent states.

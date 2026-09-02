@@ -17,19 +17,23 @@ local Box = React.forwardRef(function(props, ref)
 		_condition = theme.components.box.borderThickness
 	end
 	local borderThickness = _condition
-	local _attributes = {
-		ref = ref,
-	}
+	local _attributes = {}
+	local _condition_1 = props.name
+	if _condition_1 == nil then
+		_condition_1 = "Box"
+	end
+	_attributes.name = _condition_1
+	_attributes.ref = ref
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
 	_attributes.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1))
 	_attributes.AutomaticSize = SizeHelper:GetAutoSize(props)
-	local _condition_1 = props.BackgroundTransparency
-	if _condition_1 == nil then
-		_condition_1 = theme.components.box.backgroundTransparency
+	local _condition_2 = props.BackgroundTransparency
+	if _condition_2 == nil then
+		_condition_2 = theme.components.box.backgroundTransparency
 	end
-	_attributes.BackgroundTransparency = _condition_1
+	_attributes.BackgroundTransparency = _condition_2
 	_attributes.BackgroundColor3 = props.BackgroundColor3 or theme.components.box.backgroundColor
 	_attributes.ZIndex = props.ZIndex
 	_attributes.Event = props.Event

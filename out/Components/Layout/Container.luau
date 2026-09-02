@@ -13,20 +13,24 @@ local Container = React.forwardRef(function(props, ref)
 	local isAutoSizeActive = autoSize ~= Enum.AutomaticSize.None and autoSize ~= "None"
 	local centerViaLayout = props.center == true and props.Position == nil and props.AnchorPoint == nil and isAutoSizeActive
 	local backgroundImage = CssHelper:resolveBackgroundImage(props.backgroundImage)
-	local _attributes = {
-		ref = ref,
-		Archivable = props.Archivable,
-		Tag = props.Tag,
-		Active = props.Active,
-		AnchorPoint = if centerViaLayout then Vector2.zero else SizeHelper:GetAnchor(props),
-		AutomaticSize = autoSize,
-		BackgroundColor3 = props.BackgroundColor3,
-	}
-	local _condition = props.BackgroundTransparency
+	local _attributes = {}
+	local _condition = props.name
 	if _condition == nil then
-		_condition = 1
+		_condition = "Container"
 	end
-	_attributes.BackgroundTransparency = _condition
+	_attributes.key = _condition
+	_attributes.ref = ref
+	_attributes.Archivable = props.Archivable
+	_attributes.Tag = props.Tag
+	_attributes.Active = props.Active
+	_attributes.AnchorPoint = if centerViaLayout then Vector2.zero else SizeHelper:GetAnchor(props)
+	_attributes.AutomaticSize = autoSize
+	_attributes.BackgroundColor3 = props.BackgroundColor3
+	local _condition_1 = props.BackgroundTransparency
+	if _condition_1 == nil then
+		_condition_1 = 1
+	end
+	_attributes.BackgroundTransparency = _condition_1
 	_attributes.BorderColor3 = props.BorderColor3
 	_attributes.BorderMode = props.BorderMode
 	_attributes.BorderSizePixel = props.BorderSizePixel
@@ -53,11 +57,11 @@ local Container = React.forwardRef(function(props, ref)
 				_result_1 = _result_1.X
 			end
 		end
-		local _condition_1 = _result_1
-		if _condition_1 == nil then
-			_condition_1 = 0
+		local _condition_2 = _result_1
+		if _condition_2 == nil then
+			_condition_2 = 0
 		end
-		_result = _condition_1
+		_result = _condition_2
 	else
 		_result = 0
 	end

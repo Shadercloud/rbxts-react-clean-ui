@@ -15,6 +15,7 @@ export interface ContainerProps
     React.InstanceProps<ImageLabel> {
     group?: boolean;
     backgroundImage?: Partial<CssBackgroundImage>;
+    name?: string;
 }
 
 export const Container = React.forwardRef<ImageLabel, ContainerProps>(
@@ -34,6 +35,7 @@ export const Container = React.forwardRef<ImageLabel, ContainerProps>(
 
         const content = (
             <imagelabel
+                key={props.name ?? "Container"}
                 ref={ref}
                 Archivable={props.Archivable}
                 Tag={props.Tag}

@@ -170,6 +170,7 @@ export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
         const corners = CssHelper.parseCssSize(theme.components.card.cornerRadius);
         const { overlay, positionProps } = resolveOverlayPosition(props, theme.components.card.header.position);
         return <Container
+            name="CardHeader"
             ref={ref}
             {...props}
             {...positionProps}
@@ -210,6 +211,7 @@ export const CardBody = React.forwardRef<ImageLabel, CardBodyProps>(
 
         return <FlexItem>
             <Container
+                name="CardBody"
                 ref={ref}
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(0, 0))}
                 {...props}
@@ -235,6 +237,7 @@ export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
         const corners = CssHelper.parseCssSize(theme.components.card.cornerRadius);
         const { overlay, positionProps } = resolveOverlayPosition(props, theme.components.card.footer.position);
         return <Container
+            name="CardFooter"
             ref={ref}
             {...props}
             {...positionProps}
@@ -267,6 +270,7 @@ type CardComponent = React.ForwardRefExoticComponent<
     Header: typeof CardHeader;
     Footer: typeof CardFooter;
     Body: typeof CardBody;
+    name?: string;
 };
 
 const Card = React.forwardRef<ImageLabel, CardProps>(
@@ -408,6 +412,7 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
 
         const cardBox = (
             <Box {...boxPropsWithOverlayClearance}
+                name={props.name ?? "Card"}
                 ref={ref}
                 center={undefined}
                 spacing="None"
@@ -439,6 +444,7 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
 
         const boxWithOverlay = hasOverlay ? (
             <frame
+                key={props.name ?? "CardOverlayWrapper"}
                 ref={overlayWrapperRef}
                 BackgroundTransparency={1}
                 ClipsDescendants={false}
