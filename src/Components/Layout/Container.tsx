@@ -100,12 +100,14 @@ export const Container = React.forwardRef<ImageLabel, ContainerProps>(
 
         return (
             <frame
+                key={props.name !== undefined ? `${props.name}CenterWrapper` : "ContainerCenterWrapper"}
                 Size={UDim2.fromScale(1, 1)}
                 BackgroundTransparency={1}
                 ZIndex={props.ZIndex}
                 LayoutOrder={props.LayoutOrder}
             >
                 <uilistlayout
+                    key="CenterLayout"
                     FillDirection={Enum.FillDirection.Horizontal}
                     HorizontalAlignment={Enum.HorizontalAlignment.Center}
                     VerticalAlignment={Enum.VerticalAlignment.Center}

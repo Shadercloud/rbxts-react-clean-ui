@@ -14,6 +14,7 @@ interface HStackProps extends SpacedElementProps {
     Event?: React.InstanceEvent<UIListLayout>;
     Change?: React.InstanceChangeEvent<UIListLayout>;
     Padding?: UDim | Binding<UDim>;
+    name?: string;
 }
 
 export function HStack(props: HStackProps) {
@@ -22,6 +23,7 @@ export function HStack(props: HStackProps) {
     return (
         <>
             <uilistlayout
+                key={props.name ?? "HStack"}
                 FillDirection={Enum.FillDirection.Horizontal}
                 HorizontalFlex={props.HorizontalFlex}
                 HorizontalAlignment={props.HorizontalAlignment}

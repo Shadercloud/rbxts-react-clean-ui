@@ -71,15 +71,20 @@ local function GroupElement(props)
 		_condition_4 = 0
 	end
 	local verticalPadding = _condition_3 + _condition_4
-	return React.createElement("frame", {
-		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.XY,
-		Change = {
-			AbsoluteSize = function(instance)
-				context.reportSize(id, Vector2.new(instance.AbsoluteSize.X + horizontalPadding, instance.AbsoluteSize.Y + verticalPadding))
-			end,
-		},
-	}, props.children)
+	local _attributes = {}
+	local _condition_5 = props.name
+	if _condition_5 == nil then
+		_condition_5 = "GroupElement"
+	end
+	_attributes.key = _condition_5
+	_attributes.BackgroundTransparency = 1
+	_attributes.AutomaticSize = Enum.AutomaticSize.XY
+	_attributes.Change = {
+		AbsoluteSize = function(instance)
+			context.reportSize(id, Vector2.new(instance.AbsoluteSize.X + horizontalPadding, instance.AbsoluteSize.Y + verticalPadding))
+		end,
+	}
+	return React.createElement("frame", _attributes, props.children)
 end
 local function getMaxVector2(map)
 	local max

@@ -32,7 +32,9 @@ local function SelectOption(props)
 	assert(_arg0, "Select.Option must be used inside a Select")
 	local _arg0_1 = props.index ~= nil
 	assert(_arg0_1, "Select.Option must be a direct child of Select or Select.OptGroup")
-	local _attributes = {}
+	local _attributes = {
+		key = "Option",
+	}
 	local _object = {}
 	local _spread = props.Event
 	if _spread then
@@ -73,6 +75,7 @@ local function SelectOption(props)
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	return React.createElement("imagebutton", _attributes, React.createElement(Padding, _attributes_1), props.text ~= nil and props.children == nil and React.createElement(Text, {
+		name = "OptionText",
 		text = props.text,
 		TextColor3 = ColorHelper:getIntentColors(theme, "primary", if context.selected == props.index then "focus" elseif hover then "hover" else "default", theme.components.select.intents).textColor,
 	}), props.children)
@@ -199,6 +202,7 @@ local function SelectSearchInput(props)
 	_attributes.placeholder = _condition
 	_attributes.scale = props.scale
 	return React.createElement("frame", {
+		key = "SearchInput",
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
@@ -208,6 +212,7 @@ local function SelectGroupHeader(props)
 	local theme = React.useContext(CleanThemeContext)
 	local typography = TypographyHelper:getTypography(theme, props.scale, theme.components.select.optGroup.typography)
 	local _attributes = {
+		key = "OptGroupHeader",
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = theme.components.select.optGroup.backgroundColor,
@@ -221,6 +226,7 @@ local function SelectGroupHeader(props)
 	return React.createElement("frame", _attributes, React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.select.optGroup.spacing, theme.components.select.optGroup.padding),
 	}), React.createElement(Text, {
+		name = "OptGroupLabel",
 		text = props.label,
 		TextColor3 = theme.components.select.optGroup.textColor,
 		typography = typography,
@@ -432,6 +438,7 @@ local Select = React.forwardRef(function(props, ref)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes.backgroundImage = props.backgroundImage or theme.components.select.backgroundImage
 	local _exp_1 = React.createElement("uistroke", {
+		key = "Stroke",
 		Thickness = theme.components.select.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.select.borderColor,
@@ -442,7 +449,9 @@ local Select = React.forwardRef(function(props, ref)
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	local _exp_3 = React.createElement(Padding, _attributes_1)
-	local _attributes_2 = {}
+	local _attributes_2 = {
+		name = "SelectedText",
+	}
 	local _result_2 = selectedOption
 	if _result_2 ~= nil then
 		_result_2 = _result_2.props.text
@@ -454,12 +463,14 @@ local Select = React.forwardRef(function(props, ref)
 	_attributes_2.text = _condition_4
 	_attributes_2.typography = typography
 	local _exp_4 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_2)), React.createElement(Icon, {
+		name = "SelectCaret",
 		icon = "caret-down",
 		color = theme.colors.intents.primary.default.textColor,
 	}))
 	local _condition_5 = open and overlay.overlay ~= nil
 	if _condition_5 then
 		local _attributes_3 = {
+			key = "SelectDropdown",
 			BackgroundTransparency = 0,
 			BackgroundColor3 = theme.components.select.dropDownBackgroundColor,
 			AnchorPoint = Vector2.zero,
@@ -470,6 +481,7 @@ local Select = React.forwardRef(function(props, ref)
 		_attributes_3.AutomaticSize = Enum.AutomaticSize.Y
 		_attributes_3.ClipsDescendants = true
 		_condition_5 = ReactRoblox.createPortal(React.createElement("frame", _attributes_3, React.createElement("uistroke", {
+			key = "Stroke",
 			Thickness = theme.components.select.borderThickness,
 			BorderStrokePosition = Enum.BorderStrokePosition.Outer,
 			Color = theme.components.select.borderColor,
@@ -493,6 +505,7 @@ local Select = React.forwardRef(function(props, ref)
 				end,
 			},
 		}, if hasVisibleOptions then renderSections() else React.createElement(Text, {
+			name = "NoResultsText",
 			text = "No Results",
 			typography = typography,
 		}))))), overlay.overlay)
@@ -500,6 +513,7 @@ local Select = React.forwardRef(function(props, ref)
 	return React.createElement(Container, _attributes, React.createElement(SelectContext.Provider, {
 		value = context,
 	}, React.createElement("imagebutton", {
+		key = "SelectButton",
 		ref = buttonRef,
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,

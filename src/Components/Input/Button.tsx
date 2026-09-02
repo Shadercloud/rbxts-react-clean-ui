@@ -35,6 +35,7 @@ export interface ButtonProps extends
     disabled?: boolean;
     LayoutOrder?: number;
     styleOverride?: ButtonStyleOverride;
+    name?: string;
 }
 
 export interface ButtonTextProps extends ScalableElementProps, IntentElementProps {
@@ -49,6 +50,7 @@ function ButtonText(props: ButtonTextProps) {
 
     return (
         <Text
+            name="ButtonText"
             text={props.text}
             typography={TypographyHelper.getTypography(
                 theme,
@@ -76,6 +78,7 @@ export interface ButtonIconProps extends IconProps, IntentElementProps {
 function ButtonIcon(props: ButtonIconProps) {
     const theme = React.useContext(CleanThemeContext);
     return <Icon
+        name={props.name ?? "ButtonIcon"}
         scale={props.scale}
         icon={props.icon}
         spinning={props.spinning}
@@ -128,6 +131,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
 
         return (
             <imagebutton
+                key={props.name ?? "Button"}
                 ref={ref}
                 Active={!props.disabled}
                 Event={{
@@ -181,6 +185,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 <Corners radius={props.styleOverride?.cornerRadius ?? theme.components.button.cornerRadius} />
 
                 <uistroke
+                    key="Stroke"
                     Thickness={props.styleOverride?.borderThickness ?? theme.components.button.borderThickness}
                     BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                     Color={intentColors.borderColor}

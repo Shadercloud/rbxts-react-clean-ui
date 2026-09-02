@@ -14,13 +14,15 @@ export const FlexItem = React.forwardRef<ImageLabel, FlexItemProps>(
     (props, ref) => {
 
         return (
-            <Container {...props} ref={ref}>
+            <Container {...props} ref={ref} name={props.name ?? "FlexItem"}>
                 <uiflexitem
+                    key="FlexItemConstraint"
                     FlexMode={props.mode ?? "Grow"}
                     GrowRatio={props.GrowRatio}
                     ShrinkRatio={props.ShrinkRatio}
                 />
                 <uilistlayout
+                    key="FlexItemLayout"
                     HorizontalFlex={props.HorizontalFlex}
                     FillDirection={Enum.FillDirection.Horizontal}
                     HorizontalAlignment={props.align} />

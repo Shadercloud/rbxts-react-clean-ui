@@ -248,19 +248,23 @@ local Slider = React.forwardRef(function(props, ref)
 		}
 		table.insert(handles, _arg0)
 	end
-	local _attributes = {
-		ref = ref,
-		Archivable = props.Archivable,
-		Tag = props.Tag,
-		Active = props.Active,
-		AnchorPoint = SizeHelper:GetAnchor(props),
-		BackgroundColor3 = props.BackgroundColor3,
-	}
-	local _condition_1 = props.BackgroundTransparency
+	local _attributes = {}
+	local _condition_1 = props.name
 	if _condition_1 == nil then
-		_condition_1 = 1
+		_condition_1 = "Slider"
 	end
-	_attributes.BackgroundTransparency = _condition_1
+	_attributes.key = _condition_1
+	_attributes.ref = ref
+	_attributes.Archivable = props.Archivable
+	_attributes.Tag = props.Tag
+	_attributes.Active = props.Active
+	_attributes.AnchorPoint = SizeHelper:GetAnchor(props)
+	_attributes.BackgroundColor3 = props.BackgroundColor3
+	local _condition_2 = props.BackgroundTransparency
+	if _condition_2 == nil then
+		_condition_2 = 1
+	end
+	_attributes.BackgroundTransparency = _condition_2
 	_attributes.BorderColor3 = props.BorderColor3
 	_attributes.BorderMode = props.BorderMode
 	_attributes.BorderSizePixel = props.BorderSizePixel
@@ -287,18 +291,22 @@ local Slider = React.forwardRef(function(props, ref)
 	_attributes.Change = props.Change
 	_attributes.Event = props.Event
 	local _exp = React.createElement("frame", {
+		key = "Bar",
 		Size = UDim2.new(UDim.new(1, 0), SizeHelper:toUDim(theme.bar.height)),
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundTransparency = theme.bar.backgroundTransparency,
 		BackgroundColor3 = theme.bar.backgroundColor,
 	}, React.createElement("uistroke", {
+		key = "Stroke",
 		Thickness = theme.bar.borderThickness,
 		Color = theme.bar.borderColor,
 	}), React.createElement("uicorner", {
+		key = "Corners",
 		CornerRadius = SizeHelper:toUDim(theme.bar.cornerRadius),
 	}))
 	local _attributes_1 = {
+		key = "HandleContainer",
 		ref = containerRef,
 	}
 	local _exp_1 = UDim2.fromScale(1, 1)
@@ -307,9 +315,10 @@ local Slider = React.forwardRef(function(props, ref)
 	_attributes_1.BackgroundTransparency = 1
 	_attributes_1.Position = UDim2.fromScale(0.5, 0.5)
 	_attributes_1.AnchorPoint = Vector2.new(0.5, 0.5)
-	local _condition_2 = props.highlight ~= nil
-	if _condition_2 then
+	local _condition_3 = props.highlight ~= nil
+	if _condition_3 then
 		local _attributes_2 = {
+			key = "Highlight",
 			BackgroundColor3 = theme.bar.highlight.backgroundColor,
 			BackgroundTransparency = theme.bar.highlight.backgroundTransparency,
 		}
@@ -339,27 +348,29 @@ local Slider = React.forwardRef(function(props, ref)
 		else
 			local _result_2
 			if props.highlight == "end" then
-				local _condition_3 = secondPosition
-				if _condition_3 == nil then
-					_condition_3 = firstPosition
+				local _condition_4 = secondPosition
+				if _condition_4 == nil then
+					_condition_4 = firstPosition
 				end
-				local _uDim2_1 = UDim2.new(UDim.new(1 - _condition_3, 0), SizeHelper:toUDim(theme.bar.height))
+				local _uDim2_1 = UDim2.new(UDim.new(1 - _condition_4, 0), SizeHelper:toUDim(theme.bar.height))
 				local _uDim2_2 = UDim2.new(padding, UDim.new(0, 0))
 				_result_2 = _uDim2_1 + _uDim2_2
 			else
-				local _condition_3 = secondPosition
-				if _condition_3 == nil then
-					_condition_3 = 0
+				local _condition_4 = secondPosition
+				if _condition_4 == nil then
+					_condition_4 = 0
 				end
-				_result_2 = UDim2.new(UDim.new(_condition_3 - firstPosition, 0), SizeHelper:toUDim(theme.bar.height))
+				_result_2 = UDim2.new(UDim.new(_condition_4 - firstPosition, 0), SizeHelper:toUDim(theme.bar.height))
 			end
 			_result_1 = _result_2
 		end
 		_attributes_2.Size = _result_1
-		_condition_2 = (React.createElement("frame", _attributes_2, React.createElement("uistroke", {
+		_condition_3 = (React.createElement("frame", _attributes_2, React.createElement("uistroke", {
+			key = "Stroke",
 			Thickness = theme.bar.borderThickness,
 			Color = theme.bar.highlight.borderColor,
 		}), React.createElement("uicorner", {
+			key = "Corners",
 			CornerRadius = SizeHelper:toUDim(theme.bar.cornerRadius),
 		})))
 	end
@@ -369,25 +380,29 @@ local Slider = React.forwardRef(function(props, ref)
 		local index = _param.index
 		local position = _param.position
 		local _exp_2 = React.createElement("uistroke", {
+			key = "Stroke",
 			Thickness = theme.handle.borderThickness,
 			Color = theme.handle.borderColor,
 		})
 		local _exp_3 = React.createElement("uicorner", {
+			key = "Corners",
 			CornerRadius = SizeHelper:toUDim(theme.handle.cornerRadius),
 		})
 		local _exp_4 = (hoveredHandle == index or (dragging and activeHandleRef.current == index)) and (React.createElement(BoxShadow, {
 			["box-shadow"] = theme.handle.boxShadow,
 		}))
-		local _attributes_2 = {}
-		local _condition_3 = theme.handle.aspectRatio
-		if _condition_3 == nil then
-			_condition_3 = 1
+		local _attributes_2 = {
+			key = "AspectRatio",
+		}
+		local _condition_4 = theme.handle.aspectRatio
+		if _condition_4 == nil then
+			_condition_4 = 1
 		end
-		_attributes_2.AspectRatio = _condition_3
+		_attributes_2.AspectRatio = _condition_4
 		_attributes_2.DominantAxis = Enum.DominantAxis.Height
 		_attributes_2.AspectType = Enum.AspectType.ScaleWithParentSize
 		return React.createElement("frame", {
-			key = index,
+			key = `Handle-{index}`,
 			Position = UDim2.fromScale(position, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Size = UDim2.fromScale(0, 1),
@@ -413,7 +428,7 @@ local Slider = React.forwardRef(function(props, ref)
 		_newValue[_k] = _callback(_v, _k - 1, handles)
 	end
 	-- ▲ ReadonlyArray.map ▲
-	return React.createElement("frame", _attributes, _exp, React.createElement("frame", _attributes_1, _condition_2, _newValue))
+	return React.createElement("frame", _attributes, _exp, React.createElement("frame", _attributes_1, _condition_3, _newValue))
 end)
 return {
 	Slider = Slider,

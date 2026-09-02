@@ -13,13 +13,32 @@ local Row = React.forwardRef(function(props, ref)
 	local width, setWidth = React.useState(0)
 	local breakpoints = props.breakpoints or theme.breakpoints
 	local padding = UDim.new(0, SpacingHelper:GetPadding(theme, props.spacing))
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Row"
+	end
+	_attributes.key = _condition
+	_attributes.ref = ref
+	_attributes.Size = UDim2.fromScale(1, 1)
+	_attributes.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes.BackgroundTransparency = 1
+	_attributes.Change = {
+		AbsoluteSize = function(instance)
+			local nextWidth = instance.AbsoluteSize.X
+			setWidth(function(currentWidth)
+				return if currentWidth == nextWidth then currentWidth else nextWidth
+			end)
+		end,
+	}
 	local _exp = React.createElement("uilistlayout", {
+		key = "RowLayout",
 		FillDirection = Enum.FillDirection.Horizontal,
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		Padding = padding,
 		Wraps = true,
 	})
-	local _attributes = {}
+	local _attributes_1 = {}
 	local _object = {
 		width = width,
 	}
@@ -41,21 +60,8 @@ local Row = React.forwardRef(function(props, ref)
 	_object[_left] = #_newValue
 	_object.padding = padding
 	_object.breakpoint = BreakpointHelper:getBreakpoint(width, breakpoints)
-	_attributes.value = _object
-	return React.createElement("frame", {
-		ref = ref,
-		Size = UDim2.fromScale(1, 1),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-		Change = {
-			AbsoluteSize = function(instance)
-				local nextWidth = instance.AbsoluteSize.X
-				setWidth(function(currentWidth)
-					return if currentWidth == nextWidth then currentWidth else nextWidth
-				end)
-			end,
-		},
-	}, _exp, React.createElement(RowContext.Provider, _attributes, props.children))
+	_attributes_1.value = _object
+	return React.createElement("frame", _attributes, _exp, React.createElement(RowContext.Provider, _attributes_1, props.children))
 end)
 return {
 	Row = Row,

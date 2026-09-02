@@ -186,8 +186,8 @@ export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
             } : undefined}
         >
             <Padding resolvedPadding={padding} />
-            <uistroke Thickness={theme.components.card.header.borderThickness ?? theme.components.card.borderThickness} Color={intent.borderColor} BorderStrokePosition={Enum.BorderStrokePosition.Inner} />
-            <uicorner TopLeftRadius={corners} TopRightRadius={corners} BottomLeftRadius={new UDim(0, 0)} BottomRightRadius={new UDim(0, 0)} />
+            <uistroke key="Stroke" Thickness={theme.components.card.header.borderThickness ?? theme.components.card.borderThickness} Color={intent.borderColor} BorderStrokePosition={Enum.BorderStrokePosition.Inner} />
+            <uicorner key="Corners" TopLeftRadius={corners} TopRightRadius={corners} BottomLeftRadius={new UDim(0, 0)} BottomRightRadius={new UDim(0, 0)} />
             {props.children}
         </Container>
     });
@@ -253,8 +253,8 @@ export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
             } : undefined}
         >
             <Padding resolvedPadding={padding} />
-            <uistroke Thickness={theme.components.card.footer.borderThickness ?? theme.components.card.borderThickness} Color={intent.borderColor} BorderStrokePosition={Enum.BorderStrokePosition.Inner} />
-            <uicorner TopLeftRadius={new UDim(0, 0)} TopRightRadius={new UDim(0, 0)} BottomLeftRadius={corners} BottomRightRadius={corners} />
+            <uistroke key="Stroke" Thickness={theme.components.card.footer.borderThickness ?? theme.components.card.borderThickness} Color={intent.borderColor} BorderStrokePosition={Enum.BorderStrokePosition.Inner} />
+            <uicorner key="Corners" TopLeftRadius={new UDim(0, 0)} TopRightRadius={new UDim(0, 0)} BottomLeftRadius={corners} BottomRightRadius={corners} />
             {props.children}
         </Container>
     });
@@ -472,8 +472,9 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
         return (
             <CardContext.Provider value={contextValue}>
                 {isCentered ? (
-                    <Container Size={UDim2.fromScale(1, 1)} ZIndex={props.ZIndex} LayoutOrder={props.LayoutOrder}>
+                    <Container name="CardCenterWrapper" Size={UDim2.fromScale(1, 1)} ZIndex={props.ZIndex} LayoutOrder={props.LayoutOrder}>
                         <uilistlayout
+                            key="CenterLayout"
                             FillDirection={Enum.FillDirection.Horizontal}
                             HorizontalAlignment={Enum.HorizontalAlignment.Center}
                             VerticalAlignment={Enum.VerticalAlignment.Center}

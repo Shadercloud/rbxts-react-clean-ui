@@ -21,6 +21,7 @@ export function Toast({
     duration = 3,
     dismissible = true,
     children = undefined,
+    name = undefined,
     onDismiss,
 }: ToastProps) {
     const theme = React.useContext(CleanThemeContext);
@@ -108,6 +109,7 @@ export function Toast({
 
     return (
         <canvasgroup
+            key={name ?? "Toast"}
             Size={UDim2.fromScale(0, 0)}
             AutomaticSize={Enum.AutomaticSize.XY}
             BackgroundTransparency={1}
@@ -115,18 +117,20 @@ export function Toast({
         >
 
             <Box
+                name="ToastBox"
                 border-color={boxStyles.borderColor}
                 BackgroundColor3={boxStyles.backgroundColor}
                 BackgroundTransparency={boxStyles.backgroundTransparency}
             >
                 {children !== undefined && children ||
                     <VStack spacing="None">
-                        <Container>
+                        <Container name="ToastHeader">
 
                             <HStack valign="Center">
                                 {icon !== undefined &&
-                                    <Icon icon={icon} scale="sm" color={boxStyles.textColor} />}
+                                    <Icon name="ToastIcon" icon={icon} scale="sm" color={boxStyles.textColor} />}
                                 <Text
+                                    name="ToastTitle"
                                     TextColor3={boxStyles.textColor}
                                     text={title ?? ""}
                                     typography={TypographyHelper.getTypography(
@@ -139,13 +143,14 @@ export function Toast({
                                 {dismissible && (
                                     <FlexItem align="Right">
                                         <Button
+                                            name="ToastDismissButton"
                                             intent={intent}
                                             spacing="xs"
                                             Event={{
                                                 Activated: beginDismiss,
                                             }}
                                         >
-                                            <Button.Icon intent={intent} icon="times" scale="sm" />
+                                            <Button.Icon name="ToastDismissIcon" intent={intent} icon="times" scale="sm" />
                                         </Button>
                                     </FlexItem>
                                 )}
@@ -154,8 +159,8 @@ export function Toast({
                         </Container>
 
                         {description !== undefined && (
-                            <Container>
-                                <Text text={description} TextColor3={boxStyles.textColor} />
+                            <Container name="ToastDescriptionContainer">
+                                <Text name="ToastDescription" text={description} TextColor3={boxStyles.textColor} />
                             </Container>
                         )}
                     </VStack>
@@ -163,6 +168,7 @@ export function Toast({
             </Box>
             {statusBarTheme !== undefined &&
                 <><frame
+                    key="StatusBar"
                     Size={progress.map((value) => new UDim2(new UDim(value, 0), SizeHelper.toUDim(statusBarTheme.height)))}
                     BackgroundColor3={ColorHelper.getIntentColors(theme, intent, "default", statusBarTheme.intents).backgroundColor}
                     BackgroundTransparency={ColorHelper.getIntentColors(theme, intent, "default", statusBarTheme.intents).backgroundTransparency}
@@ -177,7 +183,9 @@ export function Toast({
     );
 }
 
-interface ToastContainerProps extends SizeElementProps { }
+interface ToastContainerProps extends SizeElementProps {
+    name?: string;
+}
 
 export function ToastContainer(props: ToastContainerProps) {
     const { toasts, dismiss } = useToast();
@@ -197,6 +205,7 @@ export function ToastContainer(props: ToastContainerProps) {
 
     return (
         <Container
+            name={props.name ?? "ToastContainer"}
             Size={SizeHelper.GetSize(
                 props,
                 new UDim2(

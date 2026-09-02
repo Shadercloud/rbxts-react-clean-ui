@@ -27,23 +27,30 @@ local function Scroller(props)
 		end
 	end, {})
 	local spacing = SpacingHelper:GetPadding(theme, props.spacing)
-	return React.createElement("scrollingframe", {
-		ref = ref,
-		AnchorPoint = SizeHelper:GetAnchor(props),
-		AutomaticSize = SizeHelper:GetAutoSize(props, Enum.AutomaticSize.None),
-		Position = SizeHelper:GetPosition(props),
-		Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1)),
-		BorderSizePixel = 0,
-		ScrollingDirection = Enum.ScrollingDirection.Y,
-		ScrollBarImageColor3 = theme.components.scroller.barColor,
-		CanvasSize = UDim2.fromScale(1, 0),
-		BackgroundTransparency = 1,
-		ScrollBarThickness = thickness,
-		VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
-		AutomaticCanvasSize = Enum.AutomaticSize.Y,
-	}, props.AutomaticSizeParent and React.createElement("uilistlayout", {
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Scroller"
+	end
+	_attributes.key = _condition
+	_attributes.ref = ref
+	_attributes.AnchorPoint = SizeHelper:GetAnchor(props)
+	_attributes.AutomaticSize = SizeHelper:GetAutoSize(props, Enum.AutomaticSize.None)
+	_attributes.Position = SizeHelper:GetPosition(props)
+	_attributes.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1))
+	_attributes.BorderSizePixel = 0
+	_attributes.ScrollingDirection = Enum.ScrollingDirection.Y
+	_attributes.ScrollBarImageColor3 = theme.components.scroller.barColor
+	_attributes.CanvasSize = UDim2.fromScale(1, 0)
+	_attributes.BackgroundTransparency = 1
+	_attributes.ScrollBarThickness = thickness
+	_attributes.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+	_attributes.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	return React.createElement("scrollingframe", _attributes, props.AutomaticSizeParent and React.createElement("uilistlayout", {
+		key = "AutomaticSizeLayout",
 		FillDirection = Enum.FillDirection.Horizontal,
 	}), React.createElement("frame", {
+		key = "ScrollerContent",
 		Size = UDim2.new(1, if isScrolling then -thickness - spacing else 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,

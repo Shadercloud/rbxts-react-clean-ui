@@ -11,6 +11,7 @@ interface HoverButtonProps {
     focus?: ImageButtonProps;
     isSelected?: boolean;
     children?: React.ReactNode;
+    name?: string;
 }
 export declare function HoverButton(propSet: HoverButtonProps): React.JSX.Element;
 export {};

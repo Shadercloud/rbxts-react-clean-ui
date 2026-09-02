@@ -6,5 +6,6 @@ export interface IconProps extends IconElementProps, ScalableElementProps, React
     spinning?: boolean;
     speed?: number;
     Rotation?: number | Binding<number>;
+    name?: string;
 }
 export declare function Icon(props: IconProps): React.JSX.Element;

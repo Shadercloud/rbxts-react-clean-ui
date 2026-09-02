@@ -47,6 +47,7 @@ export interface AccordionProps extends ScalableElementProps {
     defaultValue?: string;
     value?: string;
     onValueChange?: (value: string | undefined) => void;
+    name?: string;
 }
 
 interface ParsedItem {
@@ -84,16 +85,17 @@ function AccordionHeaderVisual(props: {
         <>
             <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props.header, theme.components.accordion.header.spacing, theme.components.accordion.header.padding)} />
             <HStack valign="Center" Wraps={false} HorizontalFlex={Enum.UIFlexAlignment.Fill}>
-                {props.header.icon !== undefined && <Icon icon={props.header.icon} color={colors.textColor} />}
-                <Container Size={new UDim2(1, theme.components.accordion.header.indicatorSize, 0, 0)} AutomaticSize={Enum.AutomaticSize.Y} >
+                {props.header.icon !== undefined && <Icon name="AccordionHeaderIcon" icon={props.header.icon} color={colors.textColor} />}
+                <Container name="AccordionHeaderTextContainer" Size={new UDim2(1, theme.components.accordion.header.indicatorSize, 0, 0)} AutomaticSize={Enum.AutomaticSize.Y} >
                     {props.header.text !== undefined
-                        ? <Text text={props.header.text} TextColor3={colors.textColor} typography={TypographyHelper.getTypography(theme, undefined, colors.typography ?? theme.components.accordion.header.typography)} />
+                        ? <Text name="AccordionHeaderText" text={props.header.text} TextColor3={colors.textColor} typography={TypographyHelper.getTypography(theme, undefined, colors.typography ?? theme.components.accordion.header.typography)} />
                         : typeIs(props.header.children, "string")
-                            ? <Text text={props.header.children} TextColor3={colors.textColor} typography={TypographyHelper.getTypography(theme, undefined, colors.typography ?? theme.components.accordion.header.typography)} />
+                            ? <Text name="AccordionHeaderText" text={props.header.children} TextColor3={colors.textColor} typography={TypographyHelper.getTypography(theme, undefined, colors.typography ?? theme.components.accordion.header.typography)} />
                             : props.header.children}
                 </Container>
-                <Container>
+                <Container name="AccordionChevronContainer">
                     <Icon
+                        name="AccordionChevronIcon"
                         icon="chevron-down"
                         color={props.disabled ? colors.textColor : theme.components.accordion.header.indicatorColor}
                         Size={UDim2.fromOffset(theme.components.accordion.header.indicatorSize, theme.components.accordion.header.indicatorSize)}
@@ -140,10 +142,11 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
     const focusBackgroundImage = CssHelper.resolveBackgroundImage(focusColors.backgroundImage);
 
     return (
-        <Container width="100%">
+        <Container name={`AccordionItem-${props.value}`} width="100%">
             <VStack spacing="None">
                 {!props.first && (
                     <frame
+                        key="Divider"
                         BackgroundColor3={theme.components.accordion.borderColor}
                         BackgroundTransparency={0}
                         BorderSizePixel={0}
@@ -151,6 +154,7 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                     />
                 )}
                 <HoverButton
+                    name={`AccordionHeaderButton-${props.value}`}
                     isSelected={props.open}
                     default={{
                         Active: !props.disabled && (props.content !== undefined || props.contentText !== undefined),
@@ -195,6 +199,7 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                 >
                     {props.first && (
                         <uicorner
+                            key="Corners"
                             TopLeftRadius={SizeHelper.toUDim(theme.components.accordion.cornerRadius)}
                             TopRightRadius={SizeHelper.toUDim(theme.components.accordion.cornerRadius)}
                             BottomLeftRadius={new UDim(0, 0)}
@@ -205,11 +210,13 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                 </HoverButton>
                 {mounted && (
                     <frame
+                        key="ContentClip"
                         BackgroundTransparency={1}
                         ClipsDescendants
                         Size={height.map((value) => UDim2.fromScale(1, 0).add(UDim2.fromOffset(0, value)))}
                     >
                         <frame
+                            key="Content"
                             BackgroundColor3={theme.components.accordion.content.backgroundColor}
                             BackgroundTransparency={theme.components.accordion.content.backgroundTransparency}
                             Size={UDim2.fromScale(1, 0)}
@@ -226,7 +233,7 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                         >
                             <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props.contentProps, theme.components.accordion.content.spacing, theme.components.accordion.content.padding)} />
                             {props.contentText !== undefined
-                                ? <Text text={props.contentText} />
+                                ? <Text name="AccordionContentText" text={props.contentText} />
                                 : props.content}
                         </frame>
                     </frame>
@@ -302,12 +309,13 @@ const Accordion = React.forwardRef<ImageLabel, AccordionProps>((props, ref) => {
 
     return (
         <Container ref={ref}
+            name={props.name ?? "Accordion"}
             width="100%"
             height="100%"
             ClipsDescendants
         >
             <Corners radius={theme.components.accordion.cornerRadius} />
-            <uistroke Color={theme.components.accordion.borderColor}
+            <uistroke key="Stroke" Color={theme.components.accordion.borderColor}
                 Thickness={theme.components.accordion.borderThickness}
                 BorderStrokePosition={Enum.BorderStrokePosition.Outer} />
             <VStack Padding={new UDim(0, SpacingHelper.GetPadding(theme, props.scale, theme.components.accordion.spacing))}>

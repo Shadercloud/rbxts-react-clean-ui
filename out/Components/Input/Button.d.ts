@@ -12,6 +12,7 @@ export interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIn
     disabled?: boolean;
     LayoutOrder?: number;
     styleOverride?: ButtonStyleOverride;
+    name?: string;
 }
 export interface ButtonTextProps extends ScalableElementProps, IntentElementProps {
     children?: string;

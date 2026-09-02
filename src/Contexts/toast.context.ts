@@ -10,6 +10,7 @@ export interface ToastOptions {
     duration?: number;
     dismissible?: boolean;
     children?: React.ReactNode;
+    name?: string;
 }
 
 export interface ToastRecord extends ToastOptions {

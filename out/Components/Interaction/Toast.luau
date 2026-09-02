@@ -49,6 +49,10 @@ local function Toast(_param)
 	if children == nil then
 		children = nil
 	end
+	local name = _param.name
+	if name == nil then
+		name = nil
+	end
 	local onDismiss = _param.onDismiss
 	local theme = React.useContext(CleanThemeContext)
 	local dismissRef = React.useRef(onDismiss)
@@ -109,53 +113,69 @@ local function Toast(_param)
 		end
 	end, {})
 	local boxStyles = ColorHelper:getIntentColors(theme, intent, "default", theme.components.toast.intents)
-	local _condition = children ~= nil and children
-	if not _condition then
+	local _attributes = {}
+	local _condition = name
+	if _condition == nil then
+		_condition = "Toast"
+	end
+	_attributes.key = _condition
+	_attributes.Size = UDim2.fromScale(0, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.XY
+	_attributes.BackgroundTransparency = 1
+	_attributes.GroupTransparency = groupTransparency
+	local _condition_1 = children ~= nil and children
+	if not _condition_1 then
 		local _exp = icon ~= nil and React.createElement(Icon, {
+			name = "ToastIcon",
 			icon = icon,
 			scale = "sm",
 			color = boxStyles.textColor,
 		})
-		local _attributes = {
+		local _attributes_1 = {
+			name = "ToastTitle",
 			TextColor3 = boxStyles.textColor,
 		}
-		local _condition_1 = title
-		if _condition_1 == nil then
-			_condition_1 = ""
+		local _condition_2 = title
+		if _condition_2 == nil then
+			_condition_2 = ""
 		end
-		_attributes.text = _condition_1
-		_attributes.typography = TypographyHelper:getTypography(theme, nil, theme.components.toast.header.typography)
-		_condition = React.createElement(VStack, {
+		_attributes_1.text = _condition_2
+		_attributes_1.typography = TypographyHelper:getTypography(theme, nil, theme.components.toast.header.typography)
+		_condition_1 = React.createElement(VStack, {
 			spacing = "None",
-		}, React.createElement(Container, nil, React.createElement(HStack, {
+		}, React.createElement(Container, {
+			name = "ToastHeader",
+		}, React.createElement(HStack, {
 			valign = "Center",
-		}, _exp, React.createElement(Text, _attributes), dismissible and (React.createElement(FlexItem, {
+		}, _exp, React.createElement(Text, _attributes_1), dismissible and (React.createElement(FlexItem, {
 			align = "Right",
 		}, React.createElement(Button, {
+			name = "ToastDismissButton",
 			intent = intent,
 			spacing = "xs",
 			Event = {
 				Activated = beginDismiss,
 			},
 		}, React.createElement(Button.Icon, {
+			name = "ToastDismissIcon",
 			intent = intent,
 			icon = "times",
 			scale = "sm",
-		})))))), description ~= nil and (React.createElement(Container, nil, React.createElement(Text, {
+		})))))), description ~= nil and (React.createElement(Container, {
+			name = "ToastDescriptionContainer",
+		}, React.createElement(Text, {
+			name = "ToastDescription",
 			text = description,
 			TextColor3 = boxStyles.textColor,
 		}))))
 	end
-	return React.createElement("canvasgroup", {
-		Size = UDim2.fromScale(0, 0),
-		AutomaticSize = Enum.AutomaticSize.XY,
-		BackgroundTransparency = 1,
-		GroupTransparency = groupTransparency,
-	}, React.createElement(Box, {
+	return React.createElement("canvasgroup", _attributes, React.createElement(Box, {
+		name = "ToastBox",
 		["border-color"] = boxStyles.borderColor,
 		BackgroundColor3 = boxStyles.backgroundColor,
 		BackgroundTransparency = boxStyles.backgroundTransparency,
-	}, _condition), statusBarTheme ~= nil and React.createElement(React.Fragment, nil, React.createElement("frame", {
+	}, _condition_1), statusBarTheme ~= nil and React.createElement(React.Fragment, nil, React.createElement("frame", {
+		key = "StatusBar",
 		Size = progress:map(function(value)
 			return UDim2.new(UDim.new(value, 0), SizeHelper:toUDim(statusBarTheme.height))
 		end),
@@ -179,29 +199,34 @@ local function ToastContainer(props)
 	end
 	local position = if theme.components.toast.position then SizeHelper:GetPosition(theme.components.toast.position) else UDim2.fromOffset(5, 5)
 	local anchor = if theme.components.toast.position then SizeHelper:GetAnchor(theme.components.toast.position) else Vector2.new(0, 0)
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "ToastContainer"
+	end
+	_attributes.name = _condition
+	_attributes.Size = SizeHelper:GetSize(props, UDim2.new(SizeHelper:toUDim(theme.components.toast.width), UDim.new(0, 0)))
+	_attributes.Position = position
+	_attributes.AnchorPoint = anchor
 	-- ▼ ReadonlyArray.map ▼
 	local _newValue = table.create(#toasts)
 	local _callback = function(toast)
-		local _attributes = {
+		local _attributes_1 = {
 			key = toast.id,
 		}
 		for _k, _v in toast do
-			_attributes[_k] = _v
+			_attributes_1[_k] = _v
 		end
-		_attributes.onDismiss = function()
+		_attributes_1.onDismiss = function()
 			return dismiss(toast.id)
 		end
-		return React.createElement(Toast, _attributes)
+		return React.createElement(Toast, _attributes_1)
 	end
 	for _k, _v in toasts do
 		_newValue[_k] = _callback(_v, _k - 1, toasts)
 	end
 	-- ▲ ReadonlyArray.map ▲
-	return React.createElement(Container, {
-		Size = SizeHelper:GetSize(props, UDim2.new(SizeHelper:toUDim(theme.components.toast.width), UDim.new(0, 0))),
-		Position = position,
-		AnchorPoint = anchor,
-	}, React.createElement(VStack, {
+	return React.createElement(Container, _attributes, React.createElement(VStack, {
 		spacing = "xs",
 	}, _newValue))
 end

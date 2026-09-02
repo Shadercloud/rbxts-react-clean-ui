@@ -18,6 +18,7 @@ export interface InputProps extends ScalableElementProps, SpacedElementProps, Re
     Event?: React.InstanceEvent<TextBox>;
     controlled?: boolean;
     icon?: IconName;
+    name?: string;
 }
 
 export function Input(props: InputProps) {
@@ -64,6 +65,7 @@ export function Input(props: InputProps) {
 
     return (
         <imagelabel
+            key={props.name ?? "Input"}
             Size={props.Size ?? UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
             BackgroundTransparency={1}
@@ -82,6 +84,7 @@ export function Input(props: InputProps) {
             TileSize={backgroundImage.TileSize}
         >
             <uistroke
+                key="Stroke"
                 Thickness={theme.components.input.borderThickness}
                 BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                 Color={theme.components.input.borderColor}
@@ -91,10 +94,11 @@ export function Input(props: InputProps) {
             <Padding {...props} />
             <HStack valign="Center" Wraps={false}>
                 {props.icon !== undefined && (
-                    <Icon icon={props.icon} color={theme.components.input.iconColor} />
+                    <Icon name="InputIcon" icon={props.icon} color={theme.components.input.iconColor} />
                 )}
                 <FlexItem>
                     <textbox
+                        key="TextBox"
                         ref={ref}
                         Size={UDim2.fromScale(1, 0)}
                         BackgroundTransparency={1}

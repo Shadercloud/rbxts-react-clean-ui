@@ -49,7 +49,29 @@ local function Input(props)
 			return connection:Disconnect()
 		end
 	end, { labelActivated, ref })
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Input"
+	end
+	_attributes.key = _condition
+	_attributes.Size = props.Size or UDim2.fromScale(1, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes.BackgroundTransparency = 1
+	_attributes.AnchorPoint = props.AnchorPoint
+	_attributes.Position = props.Position
+	_attributes.LayoutOrder = props.LayoutOrder
+	_attributes.Visible = props.Visible
+	_attributes.ZIndex = props.ZIndex
+	_attributes.Image = backgroundImage.Image
+	_attributes.ImageColor3 = backgroundImage.ImageColor3
+	_attributes.ImageTransparency = backgroundImage.ImageTransparency
+	_attributes.ScaleType = backgroundImage.ScaleType
+	_attributes.SliceCenter = backgroundImage.SliceCenter
+	_attributes.SliceScale = backgroundImage.SliceScale
+	_attributes.TileSize = backgroundImage.TileSize
 	local _exp = React.createElement("uistroke", {
+		key = "Stroke",
 		Thickness = theme.components.input.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.input.borderColor,
@@ -57,14 +79,16 @@ local function Input(props)
 	local _exp_1 = React.createElement(Corners, {
 		radius = theme.components.input.cornerRadius,
 	})
-	local _attributes = table.clone(props)
-	setmetatable(_attributes, nil)
-	local _exp_2 = React.createElement(Padding, _attributes)
+	local _attributes_1 = table.clone(props)
+	setmetatable(_attributes_1, nil)
+	local _exp_2 = React.createElement(Padding, _attributes_1)
 	local _exp_3 = props.icon ~= nil and (React.createElement(Icon, {
+		name = "InputIcon",
 		icon = props.icon,
 		color = theme.components.input.iconColor,
 	}))
-	local _attributes_1 = {
+	local _attributes_2 = {
+		key = "TextBox",
 		ref = ref,
 		Size = UDim2.fromScale(1, 0),
 		BackgroundTransparency = 1,
@@ -73,52 +97,52 @@ local function Input(props)
 		FontFace = Font.fromName(typography.font.Name, typography.weight or Enum.FontWeight.Regular),
 		FontSize = typography.size,
 	}
-	local _condition = props.PlaceholderText
-	if _condition == nil then
-		_condition = props.placeholder
-	end
-	_attributes_1.PlaceholderText = _condition
-	_attributes_1.PlaceholderColor3 = props.PlaceholderColor3 or placeholderTypography.color
-	_attributes_1.TextScaled = props.TextScaled
-	_attributes_1.LineHeight = typography.lineHeight
-	_attributes_1.Text = if props.controlled then props.value else value
-	_attributes_1.TextColor3 = props.TextColor3 or typography.color or theme.colors.intents.primary.default.textColor
-	local _condition_1 = props.TextTransparency
+	local _condition_1 = props.PlaceholderText
 	if _condition_1 == nil then
-		_condition_1 = typography.transparency
+		_condition_1 = props.placeholder
 	end
-	_attributes_1.TextTransparency = _condition_1
-	_attributes_1.Active = props.Active
-	_attributes_1.Archivable = props.Archivable
-	_attributes_1.BorderColor3 = props.BorderColor3
-	_attributes_1.BorderMode = props.BorderMode
-	_attributes_1.BorderSizePixel = props.BorderSizePixel
-	_attributes_1.ClipsDescendants = props.ClipsDescendants
-	_attributes_1.Rotation = props.Rotation
-	_attributes_1.Selectable = props.Selectable
-	_attributes_1.SelectionImageObject = props.SelectionImageObject
-	_attributes_1.SizeConstraint = props.SizeConstraint
-	_attributes_1.Tag = props.Tag
-	_attributes_1.AutoLocalize = props.AutoLocalize
-	_attributes_1.RootLocalizationTable = props.RootLocalizationTable
-	_attributes_1.NextSelectionDown = props.NextSelectionDown
-	_attributes_1.NextSelectionLeft = props.NextSelectionLeft
-	_attributes_1.NextSelectionRight = props.NextSelectionRight
-	_attributes_1.NextSelectionUp = props.NextSelectionUp
-	_attributes_1.SelectionGroup = props.SelectionGroup
-	_attributes_1.SelectionOrder = props.SelectionOrder
-	local _condition_2 = props.ClearTextOnFocus
+	_attributes_2.PlaceholderText = _condition_1
+	_attributes_2.PlaceholderColor3 = props.PlaceholderColor3 or placeholderTypography.color
+	_attributes_2.TextScaled = props.TextScaled
+	_attributes_2.LineHeight = typography.lineHeight
+	_attributes_2.Text = if props.controlled then props.value else value
+	_attributes_2.TextColor3 = props.TextColor3 or typography.color or theme.colors.intents.primary.default.textColor
+	local _condition_2 = props.TextTransparency
 	if _condition_2 == nil then
-		_condition_2 = false
+		_condition_2 = typography.transparency
 	end
-	_attributes_1.ClearTextOnFocus = _condition_2
-	_attributes_1.CursorPosition = props.CursorPosition
-	_attributes_1.MultiLine = props.MultiLine
-	_attributes_1.SelectionStart = props.SelectionStart
-	_attributes_1.ShowNativeInput = props.ShowNativeInput
-	_attributes_1.TextEditable = props.TextEditable
-	_attributes_1.TextTruncate = props.TextTruncate
-	_attributes_1.RichText = props.RichText
+	_attributes_2.TextTransparency = _condition_2
+	_attributes_2.Active = props.Active
+	_attributes_2.Archivable = props.Archivable
+	_attributes_2.BorderColor3 = props.BorderColor3
+	_attributes_2.BorderMode = props.BorderMode
+	_attributes_2.BorderSizePixel = props.BorderSizePixel
+	_attributes_2.ClipsDescendants = props.ClipsDescendants
+	_attributes_2.Rotation = props.Rotation
+	_attributes_2.Selectable = props.Selectable
+	_attributes_2.SelectionImageObject = props.SelectionImageObject
+	_attributes_2.SizeConstraint = props.SizeConstraint
+	_attributes_2.Tag = props.Tag
+	_attributes_2.AutoLocalize = props.AutoLocalize
+	_attributes_2.RootLocalizationTable = props.RootLocalizationTable
+	_attributes_2.NextSelectionDown = props.NextSelectionDown
+	_attributes_2.NextSelectionLeft = props.NextSelectionLeft
+	_attributes_2.NextSelectionRight = props.NextSelectionRight
+	_attributes_2.NextSelectionUp = props.NextSelectionUp
+	_attributes_2.SelectionGroup = props.SelectionGroup
+	_attributes_2.SelectionOrder = props.SelectionOrder
+	local _condition_3 = props.ClearTextOnFocus
+	if _condition_3 == nil then
+		_condition_3 = false
+	end
+	_attributes_2.ClearTextOnFocus = _condition_3
+	_attributes_2.CursorPosition = props.CursorPosition
+	_attributes_2.MultiLine = props.MultiLine
+	_attributes_2.SelectionStart = props.SelectionStart
+	_attributes_2.ShowNativeInput = props.ShowNativeInput
+	_attributes_2.TextEditable = props.TextEditable
+	_attributes_2.TextTruncate = props.TextTruncate
+	_attributes_2.RichText = props.RichText
 	local _object = {}
 	local _spread = props.Event
 	if _spread then
@@ -145,7 +169,7 @@ local function Input(props)
 			end
 		end
 	end
-	_attributes_1.Event = _object
+	_attributes_2.Event = _object
 	local _object_1 = {}
 	local _spread_1 = props.Change
 	if _spread_1 then
@@ -173,27 +197,11 @@ local function Input(props)
 			end
 		end
 	end
-	_attributes_1.Change = _object_1
-	return React.createElement("imagelabel", {
-		Size = props.Size or UDim2.fromScale(1, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-		AnchorPoint = props.AnchorPoint,
-		Position = props.Position,
-		LayoutOrder = props.LayoutOrder,
-		Visible = props.Visible,
-		ZIndex = props.ZIndex,
-		Image = backgroundImage.Image,
-		ImageColor3 = backgroundImage.ImageColor3,
-		ImageTransparency = backgroundImage.ImageTransparency,
-		ScaleType = backgroundImage.ScaleType,
-		SliceCenter = backgroundImage.SliceCenter,
-		SliceScale = backgroundImage.SliceScale,
-		TileSize = backgroundImage.TileSize,
-	}, _exp, _exp_1, _exp_2, React.createElement(HStack, {
+	_attributes_2.Change = _object_1
+	return React.createElement("imagelabel", _attributes, _exp, _exp_1, _exp_2, React.createElement(HStack, {
 		valign = "Center",
 		Wraps = false,
-	}, _exp_3, React.createElement(FlexItem, nil, React.createElement("textbox", _attributes_1))))
+	}, _exp_3, React.createElement(FlexItem, nil, React.createElement("textbox", _attributes_2))))
 end
 return {
 	Input = Input,

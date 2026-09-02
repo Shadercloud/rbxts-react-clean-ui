@@ -7,6 +7,7 @@ export declare function MenuItem(props: MenuItemProps): React.JSX.Element;
 interface MenuProps {
     title: string;
     collapsed?: boolean;
+    name?: string;
 }
 type MenuComponent = React.ForwardRefExoticComponent<MenuProps & React.RefAttributes<ImageLabel>> & {
     Item: typeof MenuItem;

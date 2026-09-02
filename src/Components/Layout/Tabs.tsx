@@ -38,6 +38,7 @@ function TabButtonContent(props: TabTitleProps) {
         <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding)} />
         <BoxShadow value={intent.boxShadow} />
         <Text
+            name="TabTitleText"
             TextColor3={intent.textColor}
             text={props.text}
             typography={TypographyHelper.getTypography(theme, undefined, intent.typography)}
@@ -90,6 +91,7 @@ function TabTitle(props: TabTitleProps) {
 
     return (
         <HoverButton isSelected={isSelected}
+            name={`TabButton-${props.value}`}
             default={{
                 Size: UDim2.fromScale(0, 0),
                 AutomaticSize: Enum.AutomaticSize.XY,
@@ -202,6 +204,7 @@ const TabsBody = React.forwardRef<ImageLabel, TabsBodyProps>(
                 width="100%"
                 backgroundImage={props.backgroundImage ?? theme.components.tabs.backgroundImage}>
                 <uistroke
+                    key="Stroke"
                     Thickness={theme.components.tabs.borderThickness}
                     BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                     Color={theme.components.tabs.borderColor}

@@ -30,6 +30,7 @@ local function Segment(props)
 		anchor = Vector2.new(0.5, 0)
 	end
 	return React.createElement("frame", {
+		key = "SegmentWedge",
 		Size = UDim2.fromScale(sizeX, sizeY),
 		AnchorPoint = anchor,
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -38,14 +39,17 @@ local function Segment(props)
 		BackgroundTransparency = 1,
 		BackgroundColor3 = Color3.fromHex("#FFFFFF"),
 	}, React.createElement("frame", {
+		key = "SegmentFill",
 		BackgroundColor3 = props.color,
 		Size = UDim2.fromScale(if sizeX == 1 then 1 else 2, if sizeY == 1 then 1 else 2),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		BorderSizePixel = 0,
 		Position = UDim2.fromScale(anchor.X, anchor.Y),
 	}, React.createElement("uicorner", {
+		key = "Corners",
 		CornerRadius = UDim.new(0.5, 0),
 	}), React.createElement("uigradient", {
+		key = "Gradient",
 		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.4999, 1), NumberSequenceKeypoint.new(0.5, 0), NumberSequenceKeypoint.new(1, 0) }),
 		Rotation = zeroed + props.fill * 180,
 	})))
@@ -146,6 +150,7 @@ local function Pie(props)
 				local background = if not (type(label) == "string") and label.BackgroundColor3 ~= nil then label.BackgroundColor3 else theme.components.charts.pie.labels.backgroundColor or theme.components.box.backgroundColor
 				local border = if not (type(label) == "string") and label.BorderColor3 ~= nil then label.BorderColor3 else theme.components.charts.pie.labels.borderColor or theme.components.box.borderColor
 				local _attributes = {
+					key = `PieLabel-{index}`,
 					Size = UDim2.fromScale(0, 0),
 					AutomaticSize = Enum.AutomaticSize.XY,
 					AnchorPoint = Vector2.new(0.5, 0.5),
@@ -158,6 +163,7 @@ local function Pie(props)
 				end
 				_attributes.BackgroundTransparency = _condition_1
 				local _exp_2 = React.createElement(Text, {
+					name = "PieLabelText",
 					text = text,
 					typography = TypographyHelper:getTypography(theme, "md", theme.components.charts.pie.labels.typography),
 				})
@@ -168,7 +174,9 @@ local function Pie(props)
 				end
 				_attributes_1.radius = _condition_2
 				local _exp_3 = React.createElement(Corners, _attributes_1)
-				local _attributes_2 = {}
+				local _attributes_2 = {
+					key = "Stroke",
+				}
 				local _condition_3 = theme.components.charts.pie.labels.borderThickness
 				if _condition_3 == nil then
 					_condition_3 = theme.components.box.borderThickness
@@ -182,6 +190,7 @@ local function Pie(props)
 				table.insert(labels, _arg0_1)
 			elseif label.content ~= nil then
 				local _arg0_1 = React.createElement("frame", {
+					key = `PieLabel-{index}`,
 					Size = UDim2.fromScale(0, 0),
 					AutomaticSize = Enum.AutomaticSize.XY,
 					AnchorPoint = Vector2.new(0.5, 0.5),
@@ -214,10 +223,16 @@ local function Pie(props)
 			end
 		end
 	end
-	return React.createElement("canvasgroup", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-	}, shadowPadding, React.createElement("frame", {
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Pie"
+	end
+	_attributes.key = _condition
+	_attributes.BackgroundTransparency = 1
+	_attributes.Size = UDim2.fromScale(1, 1)
+	return React.createElement("canvasgroup", _attributes, shadowPadding, React.createElement("frame", {
+		key = "HitArea",
 		BackgroundTransparency = 1,
 		Size = UDim2.fromScale(1, 1),
 		Event = {
@@ -273,6 +288,7 @@ local function Pie(props)
 	}, segments, labels, theme.components.charts.pie.boxShadow ~= nil and React.createElement(BoxShadow, {
 		completeShadow = theme.components.charts.pie.boxShadow,
 	}), React.createElement("uicorner", {
+		key = "Corners",
 		CornerRadius = UDim.new(1, 0),
 	})))
 end

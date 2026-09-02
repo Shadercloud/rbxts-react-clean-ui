@@ -46,6 +46,7 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
             >
                 {borderThickness > 0 && (
                     <uistroke
+                        key="Stroke"
                         Thickness={borderThickness}
                         BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                         Color={props['border-color'] ?? theme.components.box.borderColor}

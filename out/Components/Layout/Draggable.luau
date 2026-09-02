@@ -62,11 +62,16 @@ local function DragHandle(_param)
 end
 local function Placeholder(props)
 	local theme = React.useContext(CleanThemeContext)
-	local _attributes = table.clone(props)
-	setmetatable(_attributes, nil)
+	local _attributes = {
+		key = "DraggablePlaceholder",
+	}
+	for _k, _v in props do
+		_attributes[_k] = _v
+	end
 	_attributes.BackgroundTransparency = theme.components.draggable.placeholder.backgroundTransparency
 	_attributes.BackgroundColor3 = theme.components.draggable.placeholder.backgroundColor
 	return React.createElement("frame", _attributes, React.createElement("uistroke", {
+		key = "Stroke",
 		Thickness = theme.components.draggable.placeholder.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.draggable.placeholder.borderColor,

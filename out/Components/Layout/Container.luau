@@ -87,11 +87,13 @@ local Container = React.forwardRef(function(props, ref)
 		return content
 	end
 	return React.createElement("frame", {
+		key = if props.name ~= nil then `{props.name}CenterWrapper` else "ContainerCenterWrapper",
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 		ZIndex = props.ZIndex,
 		LayoutOrder = props.LayoutOrder,
 	}, React.createElement("uilistlayout", {
+		key = "CenterLayout",
 		FillDirection = Enum.FillDirection.Horizontal,
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		VerticalAlignment = Enum.VerticalAlignment.Center,

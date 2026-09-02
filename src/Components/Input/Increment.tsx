@@ -21,6 +21,7 @@ export interface IncrementProps
     min?: number;
     max?: number;
     controlled?: boolean;
+    name?: string;
 }
 
 export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
@@ -59,6 +60,7 @@ export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
 
         return (
             <Container
+                name={props.name ?? "Increment"}
                 ref={ref}
                 {...props}
                 Size={UDim2.fromScale(1, 0)}
@@ -66,6 +68,7 @@ export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
             >
                 <HStack Wraps={false} valign="Center" spacing={props.spacing}>
                     <Button
+                        name="DecrementButton"
                         icon="minus"
                         intent={props.intent}
                         scale={props.scale}
@@ -94,6 +97,7 @@ export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
 
                     <FlexItem HorizontalFlex="Fill" LayoutOrder={1}>
                         <Input
+                            name="IncrementInput"
                             Size={UDim2.fromScale(0, 0)}
                             scale={props.scale}
                             spacing={props.spacing}
@@ -116,6 +120,7 @@ export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
                     </FlexItem>
 
                     <Button
+                        name="IncrementButton"
                         icon="plus"
                         intent={props.intent}
                         scale={props.scale}

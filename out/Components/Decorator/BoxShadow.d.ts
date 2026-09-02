@@ -6,6 +6,7 @@ interface BoxShadowProps extends ShadowElementProps {
     color?: Color3;
     transparency?: number;
     zindex?: number;
+    name?: string;
 }
 export declare function BoxShadow(props: BoxShadowProps): React.JSX.Element | undefined;
 export {};

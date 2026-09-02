@@ -191,7 +191,9 @@ local CardHeader = React.forwardRef(function(props, ref)
 	local _exp = React.createElement(Padding, {
 		resolvedPadding = padding,
 	})
-	local _attributes_1 = {}
+	local _attributes_1 = {
+		key = "Stroke",
+	}
 	local _condition = theme.components.card.header.borderThickness
 	if _condition == nil then
 		_condition = theme.components.card.borderThickness
@@ -200,6 +202,7 @@ local CardHeader = React.forwardRef(function(props, ref)
 	_attributes_1.Color = intent.borderColor
 	_attributes_1.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 	return React.createElement(Container, _attributes, _exp, React.createElement("uistroke", _attributes_1), React.createElement("uicorner", {
+		key = "Corners",
 		TopLeftRadius = corners,
 		TopRightRadius = corners,
 		BottomLeftRadius = UDim.new(0, 0),
@@ -274,7 +277,9 @@ local CardFooter = React.forwardRef(function(props, ref)
 	local _exp = React.createElement(Padding, {
 		resolvedPadding = padding,
 	})
-	local _attributes_1 = {}
+	local _attributes_1 = {
+		key = "Stroke",
+	}
 	local _condition = theme.components.card.footer.borderThickness
 	if _condition == nil then
 		_condition = theme.components.card.borderThickness
@@ -283,6 +288,7 @@ local CardFooter = React.forwardRef(function(props, ref)
 	_attributes_1.Color = intent.borderColor
 	_attributes_1.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 	return React.createElement(Container, _attributes, _exp, React.createElement("uistroke", _attributes_1), React.createElement("uicorner", {
+		key = "Corners",
 		TopLeftRadius = UDim.new(0, 0),
 		TopRightRadius = UDim.new(0, 0),
 		BottomLeftRadius = corners,
@@ -532,10 +538,12 @@ local Card = React.forwardRef(function(props, ref)
 	return React.createElement(CardContext.Provider, {
 		value = contextValue,
 	}, if isCentered then (React.createElement(Container, {
+		name = "CardCenterWrapper",
 		Size = UDim2.fromScale(1, 1),
 		ZIndex = props.ZIndex,
 		LayoutOrder = props.LayoutOrder,
 	}, React.createElement("uilistlayout", {
+		key = "CenterLayout",
 		FillDirection = Enum.FillDirection.Horizontal,
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		VerticalAlignment = Enum.VerticalAlignment.Center,

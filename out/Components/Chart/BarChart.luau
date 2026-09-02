@@ -409,9 +409,18 @@ local function BarChart(props)
 			animationTween:setGoal(1)
 		end
 	end, { animationTween, barTheme.tweenTime })
+	local _attributes = {}
+	local _condition_6 = props.name
+	if _condition_6 == nil then
+		_condition_6 = "BarChart"
+	end
+	_attributes.name = _condition_6
+	_attributes.Size = UDim2.fromScale(1, 1)
 	local _exp_3 = showYAxis and React.createElement(Container, {
+		name = "YAxisContainer",
 		Size = UDim2.new(0, yAxisSize, 1, -xAxisSize),
 	}, React.createElement("frame", {
+		key = "YAxisLine",
 		Size = UDim2.new(0, getLineThickness(yLine, barTheme.axis), 1, 0),
 		Position = UDim2.new(1, -yAxisSpacing, 0, 0),
 		AnchorPoint = Vector2.new(1, 0),
@@ -419,57 +428,61 @@ local function BarChart(props)
 		BackgroundColor3 = getLineColor(yLine, barTheme.axis),
 		BackgroundTransparency = getLineTransparency(yLine, barTheme.axis),
 	}))
-	local _condition_6 = showYAxis and chartRange > 0
-	if _condition_6 then
+	local _condition_7 = showYAxis and chartRange > 0
+	if _condition_7 then
 		-- ▼ ReadonlyArray.map ▼
 		local _newValue_2 = table.create(#gridValues)
 		local _callback_4 = function(value)
-			local _attributes = {}
+			local _attributes_1 = {
+				key = "Tick",
+			}
 			local _result_13 = yAxis
 			if _result_13 ~= nil then
 				_result_13 = _result_13.tickSize
 			end
-			local _condition_7 = _result_13
-			if _condition_7 == nil then
-				_condition_7 = barTheme.yAxis.tickSize
+			local _condition_8 = _result_13
+			if _condition_8 == nil then
+				_condition_8 = barTheme.yAxis.tickSize
 			end
 			local _result_14 = yAxis
 			if _result_14 ~= nil then
 				_result_14 = _result_14.tickThickness
 			end
-			local _condition_8 = _result_14
-			if _condition_8 == nil then
-				_condition_8 = barTheme.yAxis.tickThickness
+			local _condition_9 = _result_14
+			if _condition_9 == nil then
+				_condition_9 = barTheme.yAxis.tickThickness
 			end
-			_attributes.Size = UDim2.new(0, _condition_7, 0, _condition_8)
-			_attributes.Position = UDim2.new(0, -yAxisSpacing, 0, 0)
-			_attributes.AnchorPoint = Vector2.new(1, 0)
-			_attributes.BorderSizePixel = 0
+			_attributes_1.Size = UDim2.new(0, _condition_8, 0, _condition_9)
+			_attributes_1.Position = UDim2.new(0, -yAxisSpacing, 0, 0)
+			_attributes_1.AnchorPoint = Vector2.new(1, 0)
+			_attributes_1.BorderSizePixel = 0
 			local _result_15 = yAxis
 			if _result_15 ~= nil then
 				_result_15 = _result_15.tickColor
 			end
-			local _condition_9 = _result_15
-			if _condition_9 == nil then
-				_condition_9 = barTheme.yAxis.tickColor
+			local _condition_10 = _result_15
+			if _condition_10 == nil then
+				_condition_10 = barTheme.yAxis.tickColor
 			end
-			_attributes.BackgroundColor3 = _condition_9
+			_attributes_1.BackgroundColor3 = _condition_10
 			local _result_16 = yAxis
 			if _result_16 ~= nil then
 				_result_16 = _result_16.tickTransparency
 			end
-			local _condition_10 = _result_16
-			if _condition_10 == nil then
-				_condition_10 = barTheme.yAxis.tickTransparency
+			local _condition_11 = _result_16
+			if _condition_11 == nil then
+				_condition_11 = barTheme.yAxis.tickTransparency
 			end
-			_attributes.BackgroundTransparency = _condition_10
+			_attributes_1.BackgroundTransparency = _condition_11
 			return React.createElement("frame", {
+				key = `GridLine-{value}`,
 				Size = UDim2.new(1, 0, 0, getLineThickness(gridStyle or {}, barTheme.gridLines)),
 				Position = UDim2.new(0, 0, getYPosition(value), 0),
 				BorderSizePixel = 0,
 				BackgroundColor3 = getLineColor(gridStyle or {}, barTheme.gridLines),
 				BackgroundTransparency = getLineTransparency(gridStyle or {}, barTheme.gridLines),
-			}, React.createElement("frame", _attributes), React.createElement(Text, {
+			}, React.createElement("frame", _attributes_1), React.createElement(Text, {
+				name = "GridLineLabel",
 				text = `{value}`,
 				TextWrap = false,
 				AnchorPoint = Vector2.new(1, 0.5),
@@ -480,10 +493,10 @@ local function BarChart(props)
 			_newValue_2[_k] = _callback_4(_v, _k - 1, gridValues)
 		end
 		-- ▲ ReadonlyArray.map ▲
-		_condition_6 = _newValue_2
+		_condition_7 = _newValue_2
 	end
-	local _condition_7 = chartRange > 0
-	if _condition_7 then
+	local _condition_8 = chartRange > 0
+	if _condition_8 then
 		local _exp_4 = props.data.labels
 		-- ▼ ReadonlyArray.map ▼
 		local _newValue_2 = table.create(#_exp_4)
@@ -494,20 +507,20 @@ local function BarChart(props)
 				-- ▼ ReadonlyArray.map ▼
 				local _newValue_3 = table.create(#_exp_5)
 				local _callback_5 = function(dataset, datasetIndex)
-					local _condition_8 = dataset.values[index + 1]
-					if _condition_8 == nil then
-						_condition_8 = 0
+					local _condition_9 = dataset.values[index + 1]
+					if _condition_9 == nil then
+						_condition_9 = 0
 					end
-					local value = _condition_8
+					local value = _condition_9
 					local _result_14 = dataset.labels
 					if _result_14 ~= nil then
 						_result_14 = _result_14[index + 1]
 					end
-					local _condition_9 = _result_14
-					if _condition_9 == nil then
-						_condition_9 = label
+					local _condition_10 = _result_14
+					if _condition_10 == nil then
+						_condition_10 = label
 					end
-					local tooltipLabel = _condition_9
+					local tooltipLabel = _condition_10
 					local _exp_6 = props.data.datasets
 					-- ▼ ReadonlyArray.reduce ▼
 					local _result_15 = 0
@@ -515,11 +528,11 @@ local function BarChart(props)
 						if previousIndex >= datasetIndex then
 							return sum
 						end
-						local _condition_10 = previousDataset.values[index + 1]
-						if _condition_10 == nil then
-							_condition_10 = 0
+						local _condition_11 = previousDataset.values[index + 1]
+						if _condition_11 == nil then
+							_condition_11 = 0
 						end
-						local previousValue = _condition_10
+						local previousValue = _condition_11
 						return if (value >= 0) == (previousValue >= 0) then sum + previousValue else sum
 					end
 					for _i = 1, #_exp_6 do
@@ -535,15 +548,15 @@ local function BarChart(props)
 						-- ▼ ReadonlyArray.some ▼
 						local _result_17 = false
 						local _callback_7 = function(otherDataset, otherIndex)
-							local _condition_10 = otherIndex > datasetIndex
-							if _condition_10 then
-								local _condition_11 = otherDataset.values[index + 1]
-								if _condition_11 == nil then
-									_condition_11 = 0
+							local _condition_11 = otherIndex > datasetIndex
+							if _condition_11 then
+								local _condition_12 = otherDataset.values[index + 1]
+								if _condition_12 == nil then
+									_condition_12 = 0
 								end
-								_condition_10 = _condition_11 > 0
+								_condition_11 = _condition_12 > 0
 							end
-							return _condition_10
+							return _condition_11
 						end
 						for _k, _v in _exp_7 do
 							if _callback_7(_v, _k - 1, _exp_7) then
@@ -554,21 +567,21 @@ local function BarChart(props)
 						-- ▲ ReadonlyArray.some ▲
 						_result_16 = not _result_17
 					else
-						local _condition_10 = positiveSums[index + 1] <= 0 and value < 0
-						if _condition_10 then
+						local _condition_11 = positiveSums[index + 1] <= 0 and value < 0
+						if _condition_11 then
 							local _exp_7 = props.data.datasets
 							-- ▼ ReadonlyArray.some ▼
 							local _result_17 = false
 							local _callback_7 = function(otherDataset, otherIndex)
-								local _condition_11 = otherIndex < datasetIndex
-								if _condition_11 then
-									local _condition_12 = otherDataset.values[index + 1]
-									if _condition_12 == nil then
-										_condition_12 = 0
+								local _condition_12 = otherIndex < datasetIndex
+								if _condition_12 then
+									local _condition_13 = otherDataset.values[index + 1]
+									if _condition_13 == nil then
+										_condition_13 = 0
 									end
-									_condition_11 = _condition_12 < 0
+									_condition_12 = _condition_13 < 0
 								end
-								return _condition_11
+								return _condition_12
 							end
 							for _k, _v in _exp_7 do
 								if _callback_7(_v, _k - 1, _exp_7) then
@@ -577,12 +590,14 @@ local function BarChart(props)
 								end
 							end
 							-- ▲ ReadonlyArray.some ▲
-							_condition_10 = not _result_17
+							_condition_11 = not _result_17
 						end
-						_result_16 = _condition_10
+						_result_16 = _condition_11
 					end
 					local isTopSegment = _result_16
 					local segment = React.createElement(Container, {
+						key = `Segment-{datasetIndex}`,
+						name = `Segment-{datasetIndex}`,
 						Size = animationProgress:map(function(progress)
 							return UDim2.fromScale(1, math.abs(value) / chartRange * progress)
 						end),
@@ -592,10 +607,12 @@ local function BarChart(props)
 						BackgroundTransparency = 0,
 						BackgroundColor3 = getBarColor(dataset, datasetIndex, index),
 					}, React.createElement("uistroke", {
+						key = "Stroke",
 						Color = barTheme.borderColor,
 						Thickness = barTheme.borderThickness,
 						ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 					}), isTopSegment and React.createElement("uicorner", {
+						key = "Corners",
 						TopLeftRadius = barCornerRadius,
 						TopRightRadius = barCornerRadius,
 						BottomLeftRadius = UDim.new(0, 0),
@@ -611,11 +628,13 @@ local function BarChart(props)
 				end
 				-- ▲ ReadonlyArray.map ▲
 				_result_13 = React.createElement(Container, {
+					name = "StackedBar",
 					Size = UDim2.fromScale(1, 1),
 				}, _newValue_3, combinedTooltips and React.createElement(Tooltip, {
 					content = getCombinedTooltip(index),
 					placement = "Center",
 				}, React.createElement(Container, {
+					name = "CombinedTooltipTarget",
 					Size = animationProgress:map(function(progress)
 						return UDim2.fromScale(1, (positiveExtents[index + 1] - negativeExtents[index + 1]) / chartRange * progress)
 					end),
@@ -629,34 +648,34 @@ local function BarChart(props)
 				-- ▼ ReadonlyArray.map ▼
 				local _newValue_3 = table.create(#_exp_5)
 				local _callback_5 = function(dataset, datasetIndex)
-					local _condition_8 = dataset.values[index + 1]
-					if _condition_8 == nil then
-						_condition_8 = 0
+					local _condition_9 = dataset.values[index + 1]
+					if _condition_9 == nil then
+						_condition_9 = 0
 					end
-					local value = _condition_8
+					local value = _condition_9
 					local _result_14 = dataset.labels
 					if _result_14 ~= nil then
 						_result_14 = _result_14[index + 1]
 					end
-					local _condition_9 = _result_14
-					if _condition_9 == nil then
-						_condition_9 = label
+					local _condition_10 = _result_14
+					if _condition_10 == nil then
+						_condition_10 = label
 					end
-					local tooltipLabel = _condition_9
+					local tooltipLabel = _condition_10
 					local magnitude = math.abs(value)
 					local _exp_6 = props.data.datasets
 					-- ▼ ReadonlyArray.some ▼
 					local _result_15 = false
 					local _callback_6 = function(otherDataset, otherIndex)
-						local _condition_10 = otherIndex > datasetIndex
-						if _condition_10 then
-							local _condition_11 = otherDataset.values[index + 1]
-							if _condition_11 == nil then
-								_condition_11 = 0
+						local _condition_11 = otherIndex > datasetIndex
+						if _condition_11 then
+							local _condition_12 = otherDataset.values[index + 1]
+							if _condition_12 == nil then
+								_condition_12 = 0
 							end
-							_condition_10 = _condition_11 == value
+							_condition_11 = _condition_12 == value
 						end
-						return _condition_10
+						return _condition_11
 					end
 					for _k, _v in _exp_6 do
 						if _callback_6(_v, _k - 1, _exp_6) then
@@ -673,11 +692,11 @@ local function BarChart(props)
 					-- ▼ ReadonlyArray.reduce ▼
 					local _result_16 = 0
 					local _callback_7 = function(covered, otherDataset)
-						local _condition_10 = otherDataset.values[index + 1]
-						if _condition_10 == nil then
-							_condition_10 = 0
+						local _condition_11 = otherDataset.values[index + 1]
+						if _condition_11 == nil then
+							_condition_11 = 0
 						end
-						local otherValue = _condition_10
+						local otherValue = _condition_11
 						local otherMagnitude = math.abs(otherValue)
 						local sameDirection = (value >= 0) == (otherValue >= 0)
 						return if sameDirection and otherMagnitude < magnitude then math.max(covered, otherMagnitude) else covered
@@ -692,11 +711,11 @@ local function BarChart(props)
 					-- ▼ ReadonlyArray.filter ▼
 					local _newValue_4 = {}
 					local _callback_8 = function(otherDataset)
-						local _condition_10 = otherDataset.values[index + 1]
-						if _condition_10 == nil then
-							_condition_10 = 0
+						local _condition_11 = otherDataset.values[index + 1]
+						if _condition_11 == nil then
+							_condition_11 = 0
 						end
-						return math.abs(_condition_10) > magnitude
+						return math.abs(_condition_11) > magnitude
 					end
 					local _length = 0
 					for _k, _v in _exp_8 do
@@ -712,11 +731,11 @@ local function BarChart(props)
 					-- ▼ ReadonlyArray.some ▼
 					local _result_17 = false
 					local _callback_9 = function(otherDataset)
-						local _condition_10 = otherDataset.values[index + 1]
-						if _condition_10 == nil then
-							_condition_10 = 0
+						local _condition_11 = otherDataset.values[index + 1]
+						if _condition_11 == nil then
+							_condition_11 = 0
 						end
-						local otherValue = _condition_10
+						local otherValue = _condition_11
 						return (value >= 0) == (otherValue >= 0) and math.abs(otherValue) > magnitude
 					end
 					for _k, _v in _exp_9 do
@@ -728,6 +747,8 @@ local function BarChart(props)
 					-- ▲ ReadonlyArray.some ▲
 					local isTallest = not _result_17
 					local visibleSection = React.createElement(Container, {
+						key = `Segment-{datasetIndex}`,
+						name = `Segment-{datasetIndex}`,
 						Size = animationProgress:map(function(progress)
 							return UDim2.fromScale(1, visibleMagnitude / chartRange * progress)
 						end),
@@ -738,10 +759,12 @@ local function BarChart(props)
 						BackgroundTransparency = unstackedTransparency,
 						BackgroundColor3 = getBarColor(dataset, datasetIndex, index),
 					}, React.createElement("uistroke", {
+						key = "Stroke",
 						Color = barTheme.borderColor,
 						Thickness = barTheme.borderThickness,
 						ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 					}), isTallest and React.createElement("uicorner", {
+						key = "Corners",
 						TopLeftRadius = barCornerRadius,
 						TopRightRadius = barCornerRadius,
 						BottomLeftRadius = UDim.new(0, 0),
@@ -757,11 +780,13 @@ local function BarChart(props)
 				end
 				-- ▲ ReadonlyArray.map ▲
 				_result_13 = React.createElement(Container, {
+					name = "UnstackedBar",
 					Size = UDim2.fromScale(1, 1),
 				}, _newValue_3, combinedTooltips and React.createElement(Tooltip, {
 					content = getCombinedTooltip(index),
 					placement = "Center",
 				}, React.createElement(Container, {
+					name = "CombinedTooltipTarget",
 					Size = animationProgress:map(function(progress)
 						return UDim2.fromScale(1, (positiveExtents[index + 1] - negativeExtents[index + 1]) / chartRange * progress)
 					end),
@@ -772,6 +797,8 @@ local function BarChart(props)
 				})))
 			end
 			return React.createElement(Container, {
+				key = `BarGroup-{index}`,
+				name = `BarGroup-{index}`,
 				Size = UDim2.fromScale(0, 1),
 			}, _result_13)
 		end
@@ -779,7 +806,8 @@ local function BarChart(props)
 			_newValue_2[_k] = _callback_4(_v, _k - 1, _exp_4)
 		end
 		-- ▲ ReadonlyArray.map ▲
-		_condition_7 = React.createElement(Container, {
+		_condition_8 = React.createElement(Container, {
+			name = "BarsContainer",
 			Size = UDim2.fromScale(1, 1),
 		}, React.createElement(HStack, {
 			HorizontalFlex = Enum.UIFlexAlignment.Fill,
@@ -788,11 +816,13 @@ local function BarChart(props)
 		}, _newValue_2))
 	end
 	local _exp_4 = React.createElement(Container, {
+		name = "ChartArea",
 		Size = UDim2.new(1, 0, 1, -xAxisSize),
-	}, _condition_6, _condition_7)
-	local _condition_8 = showXAxis
-	if _condition_8 then
+	}, _condition_7, _condition_8)
+	local _condition_9 = showXAxis
+	if _condition_9 then
 		local _exp_5 = React.createElement("frame", {
+			key = "XAxisLine",
 			Size = UDim2.new(1, 0, 0, getLineThickness(xLine, barTheme.axis)),
 			Position = UDim2.new(0, 0, 0, xAxisSpacing),
 			BorderSizePixel = 0,
@@ -802,51 +832,57 @@ local function BarChart(props)
 		local _exp_6 = props.data.labels
 		-- ▼ ReadonlyArray.map ▼
 		local _newValue_2 = table.create(#_exp_6)
-		local _callback_4 = function(label)
-			local _attributes = {}
+		local _callback_4 = function(label, index)
+			local _attributes_1 = {
+				key = "Tick",
+			}
 			local _result_13 = xAxis
 			if _result_13 ~= nil then
 				_result_13 = _result_13.tickThickness
 			end
-			local _condition_9 = _result_13
-			if _condition_9 == nil then
-				_condition_9 = barTheme.xAxis.tickThickness
+			local _condition_10 = _result_13
+			if _condition_10 == nil then
+				_condition_10 = barTheme.xAxis.tickThickness
 			end
 			local _result_14 = xAxis
 			if _result_14 ~= nil then
 				_result_14 = _result_14.tickSize
 			end
-			local _condition_10 = _result_14
-			if _condition_10 == nil then
-				_condition_10 = barTheme.xAxis.tickSize
+			local _condition_11 = _result_14
+			if _condition_11 == nil then
+				_condition_11 = barTheme.xAxis.tickSize
 			end
-			_attributes.Size = UDim2.new(0, _condition_9, 0, _condition_10)
-			_attributes.Position = UDim2.new(0.5, 0, 0, xAxisSpacing)
-			_attributes.AnchorPoint = Vector2.new(0.5, 0)
-			_attributes.BorderSizePixel = 0
+			_attributes_1.Size = UDim2.new(0, _condition_10, 0, _condition_11)
+			_attributes_1.Position = UDim2.new(0.5, 0, 0, xAxisSpacing)
+			_attributes_1.AnchorPoint = Vector2.new(0.5, 0)
+			_attributes_1.BorderSizePixel = 0
 			local _result_15 = xAxis
 			if _result_15 ~= nil then
 				_result_15 = _result_15.tickColor
 			end
-			local _condition_11 = _result_15
-			if _condition_11 == nil then
-				_condition_11 = barTheme.xAxis.tickColor
+			local _condition_12 = _result_15
+			if _condition_12 == nil then
+				_condition_12 = barTheme.xAxis.tickColor
 			end
-			_attributes.BackgroundColor3 = _condition_11
+			_attributes_1.BackgroundColor3 = _condition_12
 			local _result_16 = xAxis
 			if _result_16 ~= nil then
 				_result_16 = _result_16.tickTransparency
 			end
-			local _condition_12 = _result_16
-			if _condition_12 == nil then
-				_condition_12 = barTheme.xAxis.tickTransparency
+			local _condition_13 = _result_16
+			if _condition_13 == nil then
+				_condition_13 = barTheme.xAxis.tickTransparency
 			end
-			_attributes.BackgroundTransparency = _condition_12
+			_attributes_1.BackgroundTransparency = _condition_13
 			return React.createElement(Container, {
+				key = `XAxisTick-{index}`,
+				name = `XAxisTick-{index}`,
 				Size = UDim2.fromScale(0, 1),
-			}, React.createElement("frame", _attributes), React.createElement(Container, {
+			}, React.createElement("frame", _attributes_1), React.createElement(Container, {
+				name = "XAxisLabel",
 				center = true,
 			}, React.createElement(Text, {
+				name = "XAxisLabelText",
 				text = label,
 				TextWrapped = false,
 			})))
@@ -855,25 +891,26 @@ local function BarChart(props)
 			_newValue_2[_k] = _callback_4(_v, _k - 1, _exp_6)
 		end
 		-- ▲ ReadonlyArray.map ▲
-		_condition_8 = React.createElement(Container, {
+		_condition_9 = React.createElement(Container, {
+			name = "XAxisContainer",
 			Size = UDim2.new(1, 0, 0, xAxisSize),
 		}, _exp_5, React.createElement(Container, {
+			name = "XAxisLabels",
 			Size = UDim2.fromScale(1, 1),
 		}, React.createElement(HStack, {
 			HorizontalFlex = Enum.UIFlexAlignment.Fill,
 			Padding = barSpacing,
 		}, _newValue_2)))
 	end
-	return React.createElement(Container, {
-		Size = UDim2.fromScale(1, 1),
-	}, React.createElement(HStack, {
+	return React.createElement(Container, _attributes, React.createElement(HStack, {
 		HorizontalFlex = Enum.UIFlexAlignment.Fill,
 		spacing = "None",
 	}, _exp_3, React.createElement(Container, {
+		name = "PlotArea",
 		Size = UDim2.new(1, -yAxisSize, 1, 0),
 	}, React.createElement(VStack, {
 		spacing = "None",
-	}, _exp_4, _condition_8))))
+	}, _exp_4, _condition_9))))
 end
 return {
 	BarChart = BarChart,

@@ -120,10 +120,12 @@ local function Switch(props)
 	return React.createElement("imagebutton", _attributes, React.createElement(Corners, {
 		radius = switchTheme.cornerRadius,
 	}), React.createElement("uistroke", {
+		key = "TrackStroke",
 		Thickness = switchTheme.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = trackBorderColor,
 	}), React.createElement("frame", {
+		key = "Thumb",
 		Position = thumbPosition,
 		AnchorPoint = Vector2.new(0, 0.5),
 		Size = UDim2.new(thumbDiameter, thumbDiameter),
@@ -131,6 +133,7 @@ local function Switch(props)
 		BackgroundTransparency = if props.disabled then switchTheme.disabledTransparency else switchTheme.thumb.backgroundTransparency,
 		BorderSizePixel = 0,
 	}, React.createElement("uistroke", {
+		key = "ThumbStroke",
 		Thickness = switchTheme.thumb.borderThickness,
 		Color = switchTheme.thumb.borderColor,
 	}), React.createElement(Corners, {

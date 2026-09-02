@@ -22,6 +22,7 @@ type PieValue = {
 
 interface PieProps {
     key?: string;
+    name?: string;
     values: PieValue[];
     ['label-distance']?: number;
     ['label-hover']?: boolean;
@@ -52,6 +53,7 @@ function Segment(props: { section: Section; color: Color3; fill: number }) {
 
     return (
         <frame
+            key="SegmentWedge"
             Size={UDim2.fromScale(sizeX, sizeY)}
             AnchorPoint={anchor}
             Position={UDim2.fromScale(0.5, 0.5)}
@@ -61,14 +63,16 @@ function Segment(props: { section: Section; color: Color3; fill: number }) {
             BackgroundColor3={Color3.fromHex("#FFFFFF")}
         >
             <frame
+                key="SegmentFill"
                 BackgroundColor3={props.color}
                 Size={UDim2.fromScale(sizeX === 1 ? 1 : 2, sizeY === 1 ? 1 : 2)}
                 AnchorPoint={new Vector2(0.5, 0.5)}
                 BorderSizePixel={0}
                 Position={UDim2.fromScale(anchor.X, anchor.Y)}
             >
-                <uicorner CornerRadius={new UDim(0.5, 0)} />
+                <uicorner key="Corners" CornerRadius={new UDim(0.5, 0)} />
                 <uigradient
+                    key="Gradient"
                     Transparency={
                         new NumberSequence([
                             new NumberSequenceKeypoint(0, 1),
@@ -156,6 +160,7 @@ export function Pie(props: PieProps) {
 
                 labels.push(
                     <frame
+                        key={`PieLabel-${index}`}
                         Size={UDim2.fromScale(0, 0)}
                         AutomaticSize={Enum.AutomaticSize.XY}
                         AnchorPoint={new Vector2(0.5, 0.5)}
@@ -167,6 +172,7 @@ export function Pie(props: PieProps) {
                         }
                     >
                         <Text
+                            name="PieLabelText"
                             text={text}
                             typography={TypographyHelper.getTypography(
                                 theme,
@@ -183,6 +189,7 @@ export function Pie(props: PieProps) {
                         />
 
                         <uistroke
+                            key="Stroke"
                             Thickness={
                                 theme.components.charts.pie.labels.borderThickness ??
                                 theme.components.box.borderThickness
@@ -207,6 +214,7 @@ export function Pie(props: PieProps) {
             } else if (label.content !== undefined) {
                 labels.push(
                     <frame
+                        key={`PieLabel-${index}`}
                         Size={UDim2.fromScale(0, 0)}
                         AutomaticSize={Enum.AutomaticSize.XY}
                         AnchorPoint={new Vector2(0.5, 0.5)}
@@ -241,11 +249,13 @@ export function Pie(props: PieProps) {
 
     return (
         <canvasgroup
+            key={props.name ?? "Pie"}
             BackgroundTransparency={1}
             Size={UDim2.fromScale(1, 1)}
         >
             {shadowPadding}
             <frame
+                key="HitArea"
                 BackgroundTransparency={1}
                 Size={UDim2.fromScale(1, 1)}
                 Event={{
@@ -314,7 +324,7 @@ export function Pie(props: PieProps) {
                 {theme.components.charts.pie.boxShadow !== undefined &&
                     <BoxShadow completeShadow={theme.components.charts.pie.boxShadow} />
                 }
-                <uicorner CornerRadius={new UDim(1, 0)} />
+                <uicorner key="Corners" CornerRadius={new UDim(1, 0)} />
             </frame>
         </canvasgroup>
     );

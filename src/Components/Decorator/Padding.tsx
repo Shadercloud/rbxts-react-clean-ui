@@ -4,13 +4,14 @@ import { CleanThemeContext } from "../../Contexts/";
 import { SpacingHelper } from "../../Helpers";
 
 
-export function Padding(props: PaddingProps) {
+export function Padding(props: PaddingProps & { name?: string }) {
     const theme = React.useContext(CleanThemeContext);
 
     const padding = SpacingHelper.GetResolvedPadding(theme, props);
 
     return (
         <uipadding
+            key={props.name ?? "Padding"}
             PaddingTop={new UDim(0, padding.top)}
             PaddingBottom={new UDim(0, padding.bottom)}
             PaddingLeft={new UDim(0, padding.left)}

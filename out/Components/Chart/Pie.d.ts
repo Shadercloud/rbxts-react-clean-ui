@@ -14,6 +14,7 @@ type PieValue = {
 };
 interface PieProps {
     key?: string;
+    name?: string;
     values: PieValue[];
     ['label-distance']?: number;
     ['label-hover']?: boolean;

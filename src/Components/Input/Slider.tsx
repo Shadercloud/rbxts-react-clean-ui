@@ -338,6 +338,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
 
         return (
             <frame
+                key={props.name ?? "Slider"}
                 ref={ref}
                 Archivable={props.Archivable}
                 Tag={props.Tag}
@@ -375,6 +376,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                 Event={props.Event}
             >
                 <frame
+                    key="Bar"
                     Size={new UDim2(new UDim(1, 0), SizeHelper.toUDim(theme.bar.height))}
                     Position={UDim2.fromScale(0.5, 0.5)}
                     AnchorPoint={new Vector2(0.5, 0.5)}
@@ -382,16 +384,19 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                     BackgroundColor3={theme.bar.backgroundColor}
                 >
                     <uistroke
+                        key="Stroke"
                         Thickness={theme.bar.borderThickness}
                         Color={theme.bar.borderColor}
                     />
 
                     <uicorner
+                        key="Corners"
                         CornerRadius={SizeHelper.toUDim(theme.bar.cornerRadius)}
                     />
                 </frame>
 
                 <frame
+                    key="HandleContainer"
                     ref={containerRef}
                     Size={UDim2.fromScale(1, 1).sub(new UDim2(padding.add(padding), new UDim(0, 0)))}
                     BackgroundTransparency={1}
@@ -400,6 +405,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                 >
                     {props.highlight !== undefined && (
                         <frame
+                            key="Highlight"
                             BackgroundColor3={theme.bar.highlight.backgroundColor}
                             BackgroundTransparency={theme.bar.highlight.backgroundTransparency}
                             Position={
@@ -418,17 +424,18 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                             }
                         >
                             <uistroke
+                                key="Stroke"
                                 Thickness={theme.bar.borderThickness}
                                 Color={theme.bar.highlight.borderColor}
                             />
 
-                            <uicorner CornerRadius={SizeHelper.toUDim(theme.bar.cornerRadius)} />
+                            <uicorner key="Corners" CornerRadius={SizeHelper.toUDim(theme.bar.cornerRadius)} />
                         </frame>
                     )}
 
                     {handles.map(({ index, position }) => (
                         <frame
-                            key={index}
+                            key={`Handle-${index}`}
                             Position={UDim2.fromScale(position, 0.5)}
                             AnchorPoint={new Vector2(0.5, 0.5)}
                             Size={UDim2.fromScale(0, 1)}
@@ -452,17 +459,19 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                             }}
                         >
                             <uistroke
+                                key="Stroke"
                                 Thickness={theme.handle.borderThickness}
                                 Color={theme.handle.borderColor}
                             />
 
-                            <uicorner CornerRadius={SizeHelper.toUDim(theme.handle.cornerRadius)} />
+                            <uicorner key="Corners" CornerRadius={SizeHelper.toUDim(theme.handle.cornerRadius)} />
 
                             {(hoveredHandle === index || (dragging && activeHandleRef.current === index)) && (
                                 <BoxShadow box-shadow={theme.handle.boxShadow} />
                             )}
 
                             <uiaspectratioconstraint
+                                key="AspectRatio"
                                 AspectRatio={theme.handle.aspectRatio ?? 1}
                                 DominantAxis={Enum.DominantAxis.Height}
                                 AspectType={

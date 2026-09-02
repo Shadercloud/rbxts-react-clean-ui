@@ -39,6 +39,7 @@ local Box = React.forwardRef(function(props, ref)
 	_attributes.Event = props.Event
 	_attributes.backgroundImage = props["background-image"] or theme.components.box.backgroundImage
 	local _exp = borderThickness > 0 and (React.createElement("uistroke", {
+		key = "Stroke",
 		Thickness = borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = props["border-color"] or theme.components.box.borderColor,

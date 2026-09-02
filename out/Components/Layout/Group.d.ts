@@ -11,11 +11,12 @@ interface GroupElementProps {
     enabled?: boolean;
     padding?: ResolvedPadding;
     children?: React.ReactNode;
+    name?: string;
 }
-declare function GroupElement(props: GroupElementProps): boolean | ReadonlyMap<React.Key, React.ReactNode> | {
+declare function GroupElement(props: GroupElementProps): boolean | React.JSX.Element | ReadonlyMap<React.Key, React.ReactNode> | {
     readonly [key: string]: React.ReactNode;
     readonly [key: number]: React.ReactNode;
-} | readonly React.ReactNode[] | React.JSX.Element | undefined;
+} | readonly React.ReactNode[] | undefined;
 interface GroupProps {
     children?: React.ReactNode;
     BackgroundTransparency?: number;

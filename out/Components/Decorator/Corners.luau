@@ -10,9 +10,14 @@ local function Corners(props)
 	if radius.Scale == 0 and radius.Offset == 0 then
 		return nil
 	end
-	return React.createElement("uicorner", {
-		CornerRadius = radius,
-	})
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Corners"
+	end
+	_attributes.key = _condition
+	_attributes.CornerRadius = radius
+	return React.createElement("uicorner", _attributes)
 end
 return {
 	Corners = Corners,

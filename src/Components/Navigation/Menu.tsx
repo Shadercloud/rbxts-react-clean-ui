@@ -11,13 +11,14 @@ interface MenuItemProps extends ButtonProps {
 export function MenuItem(props: MenuItemProps) {
     const context = React.useContext(NavigationContext);
     return (
-        <Button text={!context.collapsed ? props.title : undefined} icon={props.icon} Event={props.Event} group />
+        <Button name="MenuItem" text={!context.collapsed ? props.title : undefined} icon={props.icon} Event={props.Event} group />
     );
 }
 
 interface MenuProps {
     title: string;
     collapsed?: boolean;
+    name?: string;
 }
 
 type MenuComponent = React.ForwardRefExoticComponent<
@@ -36,17 +37,17 @@ const Menu = React.forwardRef<ImageLabel, MenuProps>(
             collapsed: collapsed
         }}>
 
-            <Container ref={ref}>
+            <Container name={props.name ?? "Menu"} ref={ref}>
                 <Group>
                     <VStack spacing="sm">
-                        <Container group >
+                        <Container name="MenuHeader" group >
                             <HStack valign="Center">
-                                <Button icon="bars" LayoutOrder={1} Event={{
+                                <Button name="MenuToggleButton" icon="bars" LayoutOrder={1} Event={{
                                     Activated: () => {
                                         setCollapsed(!collapsed);
                                     }
                                 }} />
-                                {!collapsed && <Text text={props.title} variant="heading" LayoutOrder={2} />}
+                                {!collapsed && <Text name="MenuTitle" text={props.title} variant="heading" LayoutOrder={2} />}
                             </HStack>
                         </Container>
                         <FlexItem mode="Fill">

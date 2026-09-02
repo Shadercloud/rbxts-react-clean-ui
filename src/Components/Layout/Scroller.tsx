@@ -7,6 +7,7 @@ import { SizeHelper, SpacingHelper } from "../../Helpers";
 interface ScrollerProps extends SizeElementProps, SpacedElementProps, PositionElementProps {
     children?: React.ReactNode;
     AutomaticSizeParent?: boolean;
+    name?: string;
 }
 
 export function Scroller(props: ScrollerProps) {
@@ -48,6 +49,7 @@ export function Scroller(props: ScrollerProps) {
     return (
 
         <scrollingframe
+            key={props.name ?? "Scroller"}
             ref={ref}
             AnchorPoint={SizeHelper.GetAnchor(props)}
             AutomaticSize={SizeHelper.GetAutoSize(props, Enum.AutomaticSize.None)}
@@ -64,9 +66,11 @@ export function Scroller(props: ScrollerProps) {
         >
             { /* Need this for the automaticSize of the parent to work (weird Roblox thing) */}
             {props.AutomaticSizeParent && <uilistlayout
+                key="AutomaticSizeLayout"
                 FillDirection={Enum.FillDirection.Horizontal}
             />}
             <frame
+                key="ScrollerContent"
                 Size={new UDim2(1, isScrolling ? -thickness - (spacing) : 0, 0, 0)}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 BackgroundTransparency={1}

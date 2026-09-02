@@ -9,6 +9,7 @@ interface TextProps extends React.InstanceProps<TextLabel> {
     align?: "Left" | "Right" | "Center";
     TextWrap?: boolean;
     letterSpacing?: number;
+    name?: string;
 }
 export declare const Text: React.ForwardRefExoticComponent<Omit<TextProps, "ref"> & React.RefAttributes<TextLabel>>;
 export {};

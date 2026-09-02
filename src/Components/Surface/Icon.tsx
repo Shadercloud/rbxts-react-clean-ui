@@ -10,6 +10,7 @@ export interface IconProps extends IconElementProps, ScalableElementProps, React
     spinning?: boolean;
     speed?: number;
     Rotation?: number | Binding<number>;
+    name?: string;
 }
 
 function SpinningIcon(props: IconProps) {
@@ -24,7 +25,7 @@ function SpinningIcon(props: IconProps) {
         tween.start()
 
     });
-    return <frame BackgroundTransparency={1} Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY}>
+    return <frame key={props.name ?? "Icon"} BackgroundTransparency={1} Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY}>
         <Icon Size={props.Size} color={props.color} icon={props.icon} scale={props.scale} Rotation={rotation} />
     </frame>
 }
@@ -43,6 +44,7 @@ export function Icon(props: IconProps) {
 
     return (
         <imagelabel
+            key={props.name ?? "Icon"}
             AnchorPoint={props.AnchorPoint}
             Rotation={props.Rotation}
             Size={props.Size ?? UDim2.fromOffset(size, size)}

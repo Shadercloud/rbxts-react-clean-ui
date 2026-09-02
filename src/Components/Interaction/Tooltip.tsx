@@ -110,6 +110,7 @@ function TooltipPopup(props: TooltipPopup) {
 
     return (
         <canvasgroup
+            key={props.name ?? "Tooltip"}
             Position={UDim2.fromOffset(position.X, position.Y)}
             AnchorPoint={anchor}
             Size={UDim2.fromOffset(0, 0)}
@@ -117,9 +118,10 @@ function TooltipPopup(props: TooltipPopup) {
             GroupTransparency={groupTransparency}
             BackgroundTransparency={1}
         >
-            <frame Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY} BackgroundTransparency={1}>
+            <frame key="ShadowPadding" Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY} BackgroundTransparency={1}>
                 <Padding resolvedPadding={resolvedPadding} />
                 <frame
+                    key="Content"
                     Size={UDim2.fromOffset(0, 0)}
                     AutomaticSize={Enum.AutomaticSize.XY}
                     BackgroundColor3={intent.backgroundColor}
@@ -129,17 +131,18 @@ function TooltipPopup(props: TooltipPopup) {
                     <Corners radius={theme.components.button.cornerRadius} />
                     <Padding {...props as PaddingProps} resolvedPadding={padding} />
                     <uistroke
+                        key="Stroke"
                         Thickness={props['border-thickness'] ?? theme.components.box.borderThickness}
                         BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                         Color={props['border-color'] ?? intent.borderColor}
                     />
 
                     {typeIs(props.content, "string")
-                        ? <Text text={props.content} TextColor3={intent.textColor} />
+                        ? <Text name="TooltipText" text={props.content} TextColor3={intent.textColor} />
                         : props.content}
                 </frame>
             </frame>
-            {pointerSize > 0 && <frame Size={UDim2.fromOffset(pointerSize, pointerSize)}
+            {pointerSize > 0 && <frame key="Pointer" Size={UDim2.fromOffset(pointerSize, pointerSize)}
                 AnchorPoint={pointerAnchor}
                 Position={pointerPosition}
                 BorderSizePixel={1}
@@ -149,6 +152,7 @@ function TooltipPopup(props: TooltipPopup) {
                 Rotation={45}
             >
                 <uigradient
+                    key="Gradient"
                     Transparency={
                         new NumberSequence([
                             new NumberSequenceKeypoint(0, 1),

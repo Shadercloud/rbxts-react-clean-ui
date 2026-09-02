@@ -92,11 +92,13 @@ function DragHandle({ children }: DragHandleProps) {
 function Placeholder(props: React.InstanceProps<Frame>) {
     const theme = React.useContext(CleanThemeContext)
     return <frame
+        key="DraggablePlaceholder"
         {...props}
         BackgroundTransparency={theme.components.draggable.placeholder.backgroundTransparency}
         BackgroundColor3={theme.components.draggable.placeholder.backgroundColor}
     >
         <uistroke
+            key="Stroke"
             Thickness={theme.components.draggable.placeholder.borderThickness}
             BorderStrokePosition={Enum.BorderStrokePosition.Inner}
             Color={theme.components.draggable.placeholder.borderColor}

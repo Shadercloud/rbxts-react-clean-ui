@@ -24,6 +24,7 @@ export interface AccordionProps extends ScalableElementProps {
     defaultValue?: string;
     value?: string;
     onValueChange?: (value: string | undefined) => void;
+    name?: string;
 }
 type AccordionComponent = React.ForwardRefExoticComponent<AccordionProps & React.RefAttributes<ImageLabel>> & {
     Item: typeof AccordionItem;

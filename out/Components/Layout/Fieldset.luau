@@ -16,6 +16,7 @@ local function FieldsetLabel(props)
 		ShrinkRatio = 0,
 		GrowRatio = 0,
 	}, React.createElement("imagebutton", {
+		key = "FieldsetLabelButton",
 		Size = UDim2.fromOffset(0, 0),
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.XY,
@@ -65,16 +66,21 @@ local Fieldset = React.forwardRef(function(props, ref)
 	local breakpoints = props.breakpoints or theme.breakpoints
 	local breakpoint = BreakpointHelper:getBreakpoint(width, breakpoints)
 	local wrap = BreakpointHelper:compare(breakpoint, "<=", props.wrap or "lg")
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Fieldset"
+	end
+	_attributes.name = _condition
+	_attributes.ref = ref
+	_attributes.Change = {
+		AbsoluteSize = function(instance)
+			setWidth(instance.AbsoluteSize.X)
+		end,
+	}
 	return React.createElement(FieldsetContext.Provider, {
 		value = fieldsetContext,
-	}, React.createElement(Container, {
-		ref = ref,
-		Change = {
-			AbsoluteSize = function(instance)
-				setWidth(instance.AbsoluteSize.X)
-			end,
-		},
-	}, React.createElement(HStack, {
+	}, React.createElement(Container, _attributes, React.createElement(HStack, {
 		Wraps = wrap,
 		valign = "Center",
 		HorizontalFlex = Enum.UIFlexAlignment.Fill,

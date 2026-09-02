@@ -11,6 +11,7 @@ interface TextProps extends React.InstanceProps<TextLabel> {
     align?: "Left" | "Right" | "Center";
     TextWrap?: boolean
     letterSpacing?: number;
+    name?: string;
 }
 export const Text = React.forwardRef<TextLabel, TextProps>(
     (props, ref) => {
@@ -41,6 +42,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
             }
 
             return <frame
+                key={props.name ?? "Text"}
                 Size={UDim2.fromScale(0, 0)}
                 AutomaticSize={Enum.AutomaticSize.XY}
                 AnchorPoint={props.AnchorPoint}
@@ -52,6 +54,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                 Rotation={props.Rotation}
             >
                 <uilistlayout
+                    key="LetterSpacing"
                     FillDirection={Enum.FillDirection.Horizontal}
                     SortOrder={Enum.SortOrder.LayoutOrder}
                     Padding={new UDim(0, letterSpacing)}
@@ -81,6 +84,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
         }
 
         return <textlabel
+            key={props.name ?? "Text"}
             ref={ref}
             Size={UDim2.fromScale(0, 0)}
             AutomaticSize={Enum.AutomaticSize.XY}

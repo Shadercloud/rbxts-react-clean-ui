@@ -6,6 +6,7 @@ import { BreakpointHelper } from "../../Helpers/";
 
 interface ColumnProps {
     span?: ResponsiveGridSpan | number | `${number}`;
+    name?: string;
 }
 
 function resolveSpan(
@@ -46,6 +47,7 @@ export const Column = React.forwardRef<Frame, ColumnProps>(
 
         return (
             <frame
+                key={props.name ?? "Column"}
                 ref={ref}
                 Size={new UDim2(widthScale, widthOffset, 0, 0)}
                 AutomaticSize={Enum.AutomaticSize.Y}

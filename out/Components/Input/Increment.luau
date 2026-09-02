@@ -34,9 +34,13 @@ local Increment = React.forwardRef(function(props, ref)
 			_result(nextValue)
 		end
 	end
-	local _attributes = {
-		ref = ref,
-	}
+	local _attributes = {}
+	local _condition_1 = props.name
+	if _condition_1 == nil then
+		_condition_1 = "Increment"
+	end
+	_attributes.name = _condition_1
+	_attributes.ref = ref
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
@@ -47,6 +51,7 @@ local Increment = React.forwardRef(function(props, ref)
 		valign = "Center",
 		spacing = props.spacing,
 	}, React.createElement(Button, {
+		name = "DecrementButton",
 		icon = "minus",
 		intent = props.intent,
 		scale = props.scale,
@@ -67,6 +72,7 @@ local Increment = React.forwardRef(function(props, ref)
 		HorizontalFlex = "Fill",
 		LayoutOrder = 1,
 	}, React.createElement(Input, {
+		name = "IncrementInput",
 		Size = UDim2.fromScale(0, 0),
 		scale = props.scale,
 		spacing = props.spacing,
@@ -84,6 +90,7 @@ local Increment = React.forwardRef(function(props, ref)
 			applyValue(parsed)
 		end,
 	})), React.createElement(Button, {
+		name = "IncrementButton",
 		icon = "plus",
 		intent = props.intent,
 		scale = props.scale,

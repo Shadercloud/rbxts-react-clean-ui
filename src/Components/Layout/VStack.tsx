@@ -14,6 +14,7 @@ interface VStackProps extends SpacedElementProps {
     Change?: React.InstanceChangeEvent<UIListLayout>;
     Padding?: UDim | Binding<UDim>;
     Wraps?: boolean;
+    name?: string;
 }
 
 export function VStack(props: VStackProps) {
@@ -22,6 +23,7 @@ export function VStack(props: VStackProps) {
     return (
         <>
             <uilistlayout
+                key={props.name ?? "VStack"}
                 FillDirection={Enum.FillDirection.Vertical}
                 HorizontalFlex={props.HorizontalFlex ?? Enum.UIFlexAlignment.Fill}
                 VerticalFlex={props.VerticalFlex}

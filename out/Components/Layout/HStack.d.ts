@@ -11,6 +11,7 @@ interface HStackProps extends SpacedElementProps {
     Event?: React.InstanceEvent<UIListLayout>;
     Change?: React.InstanceChangeEvent<UIListLayout>;
     Padding?: UDim | Binding<UDim>;
+    name?: string;
 }
 export declare function HStack(props: HStackProps): React.JSX.Element;
 export {};

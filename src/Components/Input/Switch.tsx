@@ -118,12 +118,14 @@ export function Switch(props: SwitchProps) {
         >
             <Corners radius={switchTheme.cornerRadius} />
             <uistroke
+                key="TrackStroke"
                 Thickness={switchTheme.borderThickness}
                 BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                 Color={trackBorderColor}
             />
 
             <frame
+                key="Thumb"
                 Position={thumbPosition}
                 AnchorPoint={new Vector2(0, 0.5)}
                 Size={new UDim2(thumbDiameter, thumbDiameter)}
@@ -136,6 +138,7 @@ export function Switch(props: SwitchProps) {
                 BorderSizePixel={0}
             >
                 <uistroke
+                    key="ThumbStroke"
                     Thickness={switchTheme.thumb.borderThickness}
                     Color={switchTheme.thumb.borderColor}
                 />

@@ -21,6 +21,7 @@ interface FieldsetProps extends BreakPointElementProps {
     disabled?: boolean;
     checkbox?: boolean;
     wrap?: Breakpoint;
+    name?: string;
 }
 
 interface FieldsetSlotProps {
@@ -41,7 +42,7 @@ function FieldsetLabel(props: FieldsetSlotProps) {
             ShrinkRatio={0}
             GrowRatio={0}
         >
-            <imagebutton Size={UDim2.fromOffset(0, 0)} BackgroundTransparency={1} AutomaticSize={Enum.AutomaticSize.XY}
+            <imagebutton key="FieldsetLabelButton" Size={UDim2.fromOffset(0, 0)} BackgroundTransparency={1} AutomaticSize={Enum.AutomaticSize.XY}
                 Event={{
                     Activated: () => {
                         context.labelActivated.Fire();
@@ -110,6 +111,7 @@ const Fieldset = React.forwardRef<ImageLabel, FieldsetProps>(
         return (
             <FieldsetContext.Provider value={fieldsetContext}>
                 <Container
+                    name={props.name ?? "Fieldset"}
                     ref={ref}
                     Change={{
                         AbsoluteSize: (instance) => {

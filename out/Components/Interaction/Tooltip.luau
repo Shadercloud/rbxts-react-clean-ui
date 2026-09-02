@@ -103,50 +103,61 @@ local function TooltipPopup(props)
 	until true
 	local intent = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.tooltip.intents)
 	local padding = SpacingHelper:ResolveNumberPadding(SpacingHelper:GetPadding(theme, props.spacing, theme.components.tooltip.spacing))
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Tooltip"
+	end
+	_attributes.key = _condition
+	_attributes.Position = UDim2.fromOffset(position.X, position.Y)
+	_attributes.AnchorPoint = anchor
+	_attributes.Size = UDim2.fromOffset(0, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.XY
+	_attributes.GroupTransparency = groupTransparency
+	_attributes.BackgroundTransparency = 1
 	local _exp_1 = React.createElement(Padding, {
 		resolvedPadding = resolvedPadding,
 	})
-	local _attributes = table.clone(props)
-	setmetatable(_attributes, nil)
-	_attributes.value = theme.components.tooltip.boxShadow
-	local _exp_2 = React.createElement(BoxShadow, _attributes)
+	local _attributes_1 = table.clone(props)
+	setmetatable(_attributes_1, nil)
+	_attributes_1.value = theme.components.tooltip.boxShadow
+	local _exp_2 = React.createElement(BoxShadow, _attributes_1)
 	local _exp_3 = React.createElement(Corners, {
 		radius = theme.components.button.cornerRadius,
 	})
-	local _attributes_1 = table.clone(props)
-	setmetatable(_attributes_1, nil)
-	_attributes_1.resolvedPadding = padding
-	local _exp_4 = React.createElement(Padding, _attributes_1)
-	local _attributes_2 = {}
-	local _condition = props["border-thickness"]
-	if _condition == nil then
-		_condition = theme.components.box.borderThickness
+	local _attributes_2 = table.clone(props)
+	setmetatable(_attributes_2, nil)
+	_attributes_2.resolvedPadding = padding
+	local _exp_4 = React.createElement(Padding, _attributes_2)
+	local _attributes_3 = {
+		key = "Stroke",
+	}
+	local _condition_1 = props["border-thickness"]
+	if _condition_1 == nil then
+		_condition_1 = theme.components.box.borderThickness
 	end
-	_attributes_2.Thickness = _condition
-	_attributes_2.BorderStrokePosition = Enum.BorderStrokePosition.Inner
-	_attributes_2.Color = props["border-color"] or intent.borderColor
-	local _exp_5 = React.createElement("uistroke", _attributes_2)
+	_attributes_3.Thickness = _condition_1
+	_attributes_3.BorderStrokePosition = Enum.BorderStrokePosition.Inner
+	_attributes_3.Color = props["border-color"] or intent.borderColor
+	local _exp_5 = React.createElement("uistroke", _attributes_3)
 	local _content = props.content
-	return React.createElement("canvasgroup", {
-		Position = UDim2.fromOffset(position.X, position.Y),
-		AnchorPoint = anchor,
-		Size = UDim2.fromOffset(0, 0),
-		AutomaticSize = Enum.AutomaticSize.XY,
-		GroupTransparency = groupTransparency,
-		BackgroundTransparency = 1,
-	}, React.createElement("frame", {
+	return React.createElement("canvasgroup", _attributes, React.createElement("frame", {
+		key = "ShadowPadding",
 		Size = UDim2.fromOffset(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
 	}, _exp_1, React.createElement("frame", {
+		key = "Content",
 		Size = UDim2.fromOffset(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundColor3 = intent.backgroundColor,
 		BackgroundTransparency = intent.backgroundTransparency,
 	}, _exp_2, _exp_3, _exp_4, _exp_5, if type(_content) == "string" then React.createElement(Text, {
+		name = "TooltipText",
 		text = props.content,
 		TextColor3 = intent.textColor,
 	}) else props.content)), pointerSize > 0 and React.createElement("frame", {
+		key = "Pointer",
 		Size = UDim2.fromOffset(pointerSize, pointerSize),
 		AnchorPoint = pointerAnchor,
 		Position = pointerPosition,
@@ -156,6 +167,7 @@ local function TooltipPopup(props)
 		BackgroundTransparency = intent.backgroundTransparency,
 		Rotation = 45,
 	}, React.createElement("uigradient", {
+		key = "Gradient",
 		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.4999, 1), NumberSequenceKeypoint.new(0.5, 0), NumberSequenceKeypoint.new(1, 0) }),
 		Rotation = pointerRotation,
 	})))

@@ -4,6 +4,7 @@ import { SizeHelper } from "../../Helpers/";
 
 interface CornerProps {
     radius?: CssSize
+    name?: string;
 }
 
 export function Corners(props: CornerProps) {
@@ -16,6 +17,7 @@ export function Corners(props: CornerProps) {
 
     return (
         <uicorner
+            key={props.name ?? "Corners"}
             CornerRadius={radius}
         />
     );

@@ -7,6 +7,7 @@ interface CheckboxProps extends IntentElementProps, PaddingProps, BackgroundElem
     'icon-unchecked'?: IconName;
     'intent-checked'?: Intent;
     'intent-unchecked'?: Intent;
+    name?: string;
 }
 export declare function Checkbox(props: CheckboxProps): React.JSX.Element;
 export {};

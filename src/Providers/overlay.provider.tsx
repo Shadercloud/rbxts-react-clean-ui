@@ -13,6 +13,7 @@ export function OverlayProvider(props: OverlayProviderProps) {
             {props.children}
 
             <frame
+                key="OverlayProvider"
                 ref={(instance) => {
                     setOverlay(instance);
                 }}

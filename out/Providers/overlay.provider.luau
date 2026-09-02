@@ -11,6 +11,7 @@ local function OverlayProvider(props)
 			overlay = overlay,
 		},
 	}, props.children, React.createElement("frame", {
+		key = "OverlayProvider",
 		ref = function(instance)
 			setOverlay(instance)
 		end,

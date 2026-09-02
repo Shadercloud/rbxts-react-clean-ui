@@ -28,12 +28,17 @@ local Column = React.forwardRef(function(props, ref)
 	local padding = context.padding
 	local widthScale = fraction + ((fraction - 1) * padding.Scale)
 	local widthOffset = (fraction - 1) * padding.Offset
-	return React.createElement("frame", {
-		ref = ref,
-		Size = UDim2.new(widthScale, widthOffset, 0, 0),
-		AutomaticSize = Enum.AutomaticSize.Y,
-		BackgroundTransparency = 1,
-	}, props.children)
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Column"
+	end
+	_attributes.key = _condition
+	_attributes.ref = ref
+	_attributes.Size = UDim2.new(widthScale, widthOffset, 0, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes.BackgroundTransparency = 1
+	return React.createElement("frame", _attributes, props.children)
 end)
 return {
 	Column = Column,

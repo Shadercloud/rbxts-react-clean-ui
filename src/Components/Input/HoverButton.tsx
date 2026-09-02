@@ -18,6 +18,7 @@ interface HoverButtonProps {
     focus?: ImageButtonProps;
     isSelected?: boolean;
     children?: React.ReactNode;
+    name?: string;
 }
 
 export function HoverButton(propSet: HoverButtonProps) {
@@ -49,6 +50,7 @@ export function HoverButton(propSet: HoverButtonProps) {
             isSelected: propSet.isSelected === true
         }}>
             <imagebutton
+                key={propSet.name ?? "HoverButton"}
                 Active={props.Active}
                 AnchorPoint={props.AnchorPoint}
                 Archivable={props.Archivable}

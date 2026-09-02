@@ -5,6 +5,7 @@ import { CleanThemeContext, RowContext } from "../../Contexts";
 import { BreakpointHelper, SpacingHelper } from "../../Helpers/";
 
 interface RowProps extends SpacedElementProps, BreakPointElementProps {
+    name?: string;
 }
 
 
@@ -20,6 +21,7 @@ export const Row = React.forwardRef<Frame, RowProps>(
 
         return (
             <frame
+                key={props.name ?? "Row"}
                 ref={ref}
                 Size={UDim2.fromScale(1, 1)}
                 AutomaticSize={Enum.AutomaticSize.Y}
@@ -35,6 +37,7 @@ export const Row = React.forwardRef<Frame, RowProps>(
                 }}
             >
                 <uilistlayout
+                    key="RowLayout"
                     FillDirection={Enum.FillDirection.Horizontal}
                     SortOrder={Enum.SortOrder.LayoutOrder}
                     Padding={padding}

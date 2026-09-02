@@ -18,6 +18,7 @@ interface GroupElementProps {
     enabled?: boolean;
     padding?: ResolvedPadding;
     children?: React.ReactNode;
+    name?: string;
 }
 
 function GroupElement(props: GroupElementProps) {
@@ -52,6 +53,7 @@ function GroupElement(props: GroupElementProps) {
 
     return (
         <frame
+            key={props.name ?? "GroupElement"}
             BackgroundTransparency={1}
             AutomaticSize={Enum.AutomaticSize.XY}
             Change={{

@@ -14,6 +14,7 @@ local NavigationContext = TS.import(script, script.Parent.Parent.Parent, "Contex
 local function MenuItem(props)
 	local context = React.useContext(NavigationContext)
 	return React.createElement(Button, {
+		name = "MenuItem",
 		text = if not context.collapsed then props.title else nil,
 		icon = props.icon,
 		Event = props.Event,
@@ -26,19 +27,26 @@ local Menu = React.forwardRef(function(props, ref)
 		_condition = false
 	end
 	local collapsed, setCollapsed = React.useState(_condition)
+	local _attributes = {}
+	local _condition_1 = props.name
+	if _condition_1 == nil then
+		_condition_1 = "Menu"
+	end
+	_attributes.name = _condition_1
+	_attributes.ref = ref
 	return React.createElement(NavigationContext.Provider, {
 		value = {
 			collapsed = collapsed,
 		},
-	}, React.createElement(Container, {
-		ref = ref,
-	}, React.createElement(Group, nil, React.createElement(VStack, {
+	}, React.createElement(Container, _attributes, React.createElement(Group, nil, React.createElement(VStack, {
 		spacing = "sm",
 	}, React.createElement(Container, {
+		name = "MenuHeader",
 		group = true,
 	}, React.createElement(HStack, {
 		valign = "Center",
 	}, React.createElement(Button, {
+		name = "MenuToggleButton",
 		icon = "bars",
 		LayoutOrder = 1,
 		Event = {
@@ -47,6 +55,7 @@ local Menu = React.forwardRef(function(props, ref)
 			end,
 		},
 	}), not collapsed and React.createElement(Text, {
+		name = "MenuTitle",
 		text = props.title,
 		variant = "heading",
 		LayoutOrder = 2,

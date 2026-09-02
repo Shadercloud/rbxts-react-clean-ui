@@ -50,13 +50,20 @@ local function BoxShadow(props)
 		_object[_left_3] = _condition_1
 		shadowProps = _object
 	end
-	local _attributes = table.clone(shadowProps)
-	setmetatable(_attributes, nil)
-	local _condition = props.zindex
+	local _attributes = {}
+	local _condition = props.name
 	if _condition == nil then
-		_condition = -1
+		_condition = "BoxShadow"
 	end
-	_attributes.ZIndex = _condition
+	_attributes.key = _condition
+	for _k, _v in shadowProps do
+		_attributes[_k] = _v
+	end
+	local _condition_1 = props.zindex
+	if _condition_1 == nil then
+		_condition_1 = -1
+	end
+	_attributes.ZIndex = _condition_1
 	return React.createElement("uishadow", _attributes)
 end
 return {

@@ -58,6 +58,7 @@ export interface BarChartData {
 
 export interface BarChartProps {
     data: BarChartData;
+    name?: string;
 }
 
 function niceStep(max: number, targetTicks = 5): number {
@@ -153,10 +154,11 @@ export function BarChart(props: BarChartProps) {
         if (barTheme.tweenTime > 0) animationTween.setGoal(1);
     }, [animationTween, barTheme.tweenTime]);
 
-    return <Container Size={UDim2.fromScale(1, 1)}>
+    return <Container name={props.name ?? "BarChart"} Size={UDim2.fromScale(1, 1)}>
         <HStack HorizontalFlex={Enum.UIFlexAlignment.Fill} spacing="None">
-            {showYAxis && <Container Size={new UDim2(0, yAxisSize, 1, -xAxisSize)}>
+            {showYAxis && <Container name="YAxisContainer" Size={new UDim2(0, yAxisSize, 1, -xAxisSize)}>
                 <frame
+                    key="YAxisLine"
                     Size={new UDim2(0, getLineThickness(yLine, barTheme.axis), 1, 0)}
                     Position={new UDim2(1, -yAxisSpacing, 0, 0)}
                     AnchorPoint={new Vector2(1, 0)}
@@ -165,10 +167,11 @@ export function BarChart(props: BarChartProps) {
                     BackgroundTransparency={getLineTransparency(yLine, barTheme.axis)}
                 />
             </Container>}
-            <Container Size={new UDim2(1, -yAxisSize, 1, 0)}>
+            <Container name="PlotArea" Size={new UDim2(1, -yAxisSize, 1, 0)}>
                 <VStack spacing="None">
-                    <Container Size={new UDim2(1, 0, 1, -xAxisSize)}>
+                    <Container name="ChartArea" Size={new UDim2(1, 0, 1, -xAxisSize)}>
                         {showYAxis && chartRange > 0 && gridValues.map(value => <frame
+                            key={`GridLine-${value}`}
                             Size={new UDim2(1, 0, 0, getLineThickness(gridStyle ?? {}, barTheme.gridLines))}
                             Position={new UDim2(0, 0, getYPosition(value), 0)}
                             BorderSizePixel={0}
@@ -176,6 +179,7 @@ export function BarChart(props: BarChartProps) {
                             BackgroundTransparency={getLineTransparency(gridStyle ?? {}, barTheme.gridLines)}
                         >
                             <frame
+                                key="Tick"
                                 Size={new UDim2(0, yAxis?.tickSize ?? barTheme.yAxis.tickSize, 0, yAxis?.tickThickness ?? barTheme.yAxis.tickThickness)}
                                 Position={new UDim2(0, -yAxisSpacing, 0, 0)}
                                 AnchorPoint={new Vector2(1, 0)}
@@ -183,12 +187,12 @@ export function BarChart(props: BarChartProps) {
                                 BackgroundColor3={yAxis?.tickColor ?? barTheme.yAxis.tickColor}
                                 BackgroundTransparency={yAxis?.tickTransparency ?? barTheme.yAxis.tickTransparency}
                             />
-                            <Text text={`${value}`} TextWrap={false} AnchorPoint={new Vector2(1, 0.5)} Position={new UDim2(0, -15 - yAxisSpacing, 0, 0)} />
+                            <Text name="GridLineLabel" text={`${value}`} TextWrap={false} AnchorPoint={new Vector2(1, 0.5)} Position={new UDim2(0, -15 - yAxisSpacing, 0, 0)} />
                         </frame>)}
-                        {chartRange > 0 && <Container Size={UDim2.fromScale(1, 1)}>
+                        {chartRange > 0 && <Container name="BarsContainer" Size={UDim2.fromScale(1, 1)}>
                             <HStack HorizontalFlex={Enum.UIFlexAlignment.Fill} valign="Bottom" Padding={barSpacing}>
-                                {props.data.labels.map((label, index) => <Container Size={UDim2.fromScale(0, 1)}>
-                                    {stacked ? <Container Size={UDim2.fromScale(1, 1)}>
+                                {props.data.labels.map((label, index) => <Container key={`BarGroup-${index}`} name={`BarGroup-${index}`} Size={UDim2.fromScale(0, 1)}>
+                                    {stacked ? <Container name="StackedBar" Size={UDim2.fromScale(1, 1)}>
                                         {props.data.datasets.map((dataset, datasetIndex) => {
                                             const value = dataset.values[index] ?? 0;
                                             const tooltipLabel = dataset.labels?.[index] ?? label;
@@ -207,17 +211,21 @@ export function BarChart(props: BarChartProps) {
                                                     otherIndex < datasetIndex && (otherDataset.values[index] ?? 0) < 0,
                                                 );
                                             const segment = <Container
+                                                    key={`Segment-${datasetIndex}`}
+                                                    name={`Segment-${datasetIndex}`}
                                                     Size={animationProgress.map(progress => UDim2.fromScale(1, math.abs(value) / chartRange * progress))}
                                                     Position={animationProgress.map(progress => UDim2.fromScale(0, getYPosition(top * progress)))}
                                                     BackgroundTransparency={0}
                                                     BackgroundColor3={getBarColor(dataset, datasetIndex, index)}
                                                 >
                                                     <uistroke
+                                                        key="Stroke"
                                                         Color={barTheme.borderColor}
                                                         Thickness={barTheme.borderThickness}
                                                         ApplyStrokeMode={Enum.ApplyStrokeMode.Border}
                                                     />
                                                     {isTopSegment && <uicorner
+                                                        key="Corners"
                                                         TopLeftRadius={barCornerRadius}
                                                         TopRightRadius={barCornerRadius}
                                                         BottomLeftRadius={new UDim(0, 0)}
@@ -230,6 +238,7 @@ export function BarChart(props: BarChartProps) {
                                         })}
                                         {combinedTooltips && <Tooltip content={getCombinedTooltip(index)} placement="Center">
                                             <Container
+                                                name="CombinedTooltipTarget"
                                                 Size={animationProgress.map(progress => UDim2.fromScale(
                                                     1,
                                                     (positiveExtents[index] - negativeExtents[index]) / chartRange * progress,
@@ -241,7 +250,7 @@ export function BarChart(props: BarChartProps) {
                                                 BackgroundTransparency={1}
                                             />
                                         </Tooltip>}
-                                    </Container> : <Container Size={UDim2.fromScale(1, 1)}>
+                                    </Container> : <Container name="UnstackedBar" Size={UDim2.fromScale(1, 1)}>
                                         {props.data.datasets.map((dataset, datasetIndex) => {
                                             const value = dataset.values[index] ?? 0;
                                             const tooltipLabel = dataset.labels?.[index] ?? label;
@@ -269,6 +278,8 @@ export function BarChart(props: BarChartProps) {
                                                 return (value >= 0) === (otherValue >= 0) && math.abs(otherValue) > magnitude;
                                             });
                                             const visibleSection = <Container
+                                                    key={`Segment-${datasetIndex}`}
+                                                    name={`Segment-${datasetIndex}`}
                                                     Size={animationProgress.map(progress => UDim2.fromScale(1, visibleMagnitude / chartRange * progress))}
                                                     Position={animationProgress.map(progress => UDim2.fromScale(0, getYPosition(top * progress)))}
                                                     ZIndex={zIndex}
@@ -276,11 +287,13 @@ export function BarChart(props: BarChartProps) {
                                                     BackgroundColor3={getBarColor(dataset, datasetIndex, index)}
                                                 >
                                                     <uistroke
+                                                        key="Stroke"
                                                         Color={barTheme.borderColor}
                                                         Thickness={barTheme.borderThickness}
                                                         ApplyStrokeMode={Enum.ApplyStrokeMode.Border}
                                                     />
                                                     {isTallest && <uicorner
+                                                        key="Corners"
                                                         TopLeftRadius={barCornerRadius}
                                                         TopRightRadius={barCornerRadius}
                                                         BottomLeftRadius={new UDim(0, 0)}
@@ -293,6 +306,7 @@ export function BarChart(props: BarChartProps) {
                                         })}
                                         {combinedTooltips && <Tooltip content={getCombinedTooltip(index)} placement="Center">
                                             <Container
+                                                name="CombinedTooltipTarget"
                                                 Size={animationProgress.map(progress => UDim2.fromScale(
                                                     1,
                                                     (positiveExtents[index] - negativeExtents[index]) / chartRange * progress,
@@ -309,18 +323,20 @@ export function BarChart(props: BarChartProps) {
                             </HStack>
                         </Container>}
                     </Container>
-                    {showXAxis && <Container Size={new UDim2(1, 0, 0, xAxisSize)}>
+                    {showXAxis && <Container name="XAxisContainer" Size={new UDim2(1, 0, 0, xAxisSize)}>
                         <frame
+                            key="XAxisLine"
                             Size={new UDim2(1, 0, 0, getLineThickness(xLine, barTheme.axis))}
                             Position={new UDim2(0, 0, 0, xAxisSpacing)}
                             BorderSizePixel={0}
                             BackgroundColor3={getLineColor(xLine, barTheme.axis)}
                             BackgroundTransparency={getLineTransparency(xLine, barTheme.axis)}
                         />
-                        <Container Size={UDim2.fromScale(1, 1)}>
+                        <Container name="XAxisLabels" Size={UDim2.fromScale(1, 1)}>
                             <HStack HorizontalFlex={Enum.UIFlexAlignment.Fill} Padding={barSpacing}>
-                                {props.data.labels.map(label => <Container Size={UDim2.fromScale(0, 1)}>
+                                {props.data.labels.map((label, index) => <Container key={`XAxisTick-${index}`} name={`XAxisTick-${index}`} Size={UDim2.fromScale(0, 1)}>
                                     <frame
+                                        key="Tick"
                                         Size={new UDim2(0, xAxis?.tickThickness ?? barTheme.xAxis.tickThickness, 0, xAxis?.tickSize ?? barTheme.xAxis.tickSize)}
                                         Position={new UDim2(0.5, 0, 0, xAxisSpacing)}
                                         AnchorPoint={new Vector2(0.5, 0)}
@@ -328,8 +344,8 @@ export function BarChart(props: BarChartProps) {
                                         BackgroundColor3={xAxis?.tickColor ?? barTheme.xAxis.tickColor}
                                         BackgroundTransparency={xAxis?.tickTransparency ?? barTheme.xAxis.tickTransparency}
                                     />
-                                    <Container center>
-                                        <Text text={label} TextWrapped={false} />
+                                    <Container name="XAxisLabel" center>
+                                        <Text name="XAxisLabelText" text={label} TextWrapped={false} />
                                     </Container>
                                 </Container>)}
                             </HStack>

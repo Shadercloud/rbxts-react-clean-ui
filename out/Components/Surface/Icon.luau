@@ -20,11 +20,16 @@ local function SpinningIcon(props)
 		tween:setGoal(360)
 		tween:start()
 	end)
-	return React.createElement("frame", {
-		BackgroundTransparency = 1,
-		Size = UDim2.fromOffset(0, 0),
-		AutomaticSize = Enum.AutomaticSize.XY,
-	}, React.createElement(Icon, {
+	local _attributes = {}
+	local _condition_1 = props.name
+	if _condition_1 == nil then
+		_condition_1 = "Icon"
+	end
+	_attributes.key = _condition_1
+	_attributes.BackgroundTransparency = 1
+	_attributes.Size = UDim2.fromOffset(0, 0)
+	_attributes.AutomaticSize = Enum.AutomaticSize.XY
+	return React.createElement("frame", _attributes, React.createElement(Icon, {
 		Size = props.Size,
 		color = props.color,
 		icon = props.icon,
@@ -51,19 +56,23 @@ function Icon(props)
 		setmetatable(_attributes, nil)
 		return React.createElement(SpinningIcon, _attributes)
 	end
-	local _attributes = {
-		AnchorPoint = props.AnchorPoint,
-		Rotation = props.Rotation,
-		Size = props.Size or UDim2.fromOffset(size, size),
-		Position = props.Position,
-		LayoutOrder = props.LayoutOrder,
-		Image = if iconId == nil then nil else `rbxassetid://{iconId}`,
-	}
-	local _condition = props.BackgroundTransparency
+	local _attributes = {}
+	local _condition = props.name
 	if _condition == nil then
-		_condition = 1
+		_condition = "Icon"
 	end
-	_attributes.BackgroundTransparency = _condition
+	_attributes.key = _condition
+	_attributes.AnchorPoint = props.AnchorPoint
+	_attributes.Rotation = props.Rotation
+	_attributes.Size = props.Size or UDim2.fromOffset(size, size)
+	_attributes.Position = props.Position
+	_attributes.LayoutOrder = props.LayoutOrder
+	_attributes.Image = if iconId == nil then nil else `rbxassetid://{iconId}`
+	local _condition_1 = props.BackgroundTransparency
+	if _condition_1 == nil then
+		_condition_1 = 1
+	end
+	_attributes.BackgroundTransparency = _condition_1
 	_attributes.ImageColor3 = props.color or theme.colors.intents.primary.default.textColor
 	_attributes.ZIndex = props.ZIndex
 	_attributes.Visible = props.Visible

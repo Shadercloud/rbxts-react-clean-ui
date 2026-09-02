@@ -43,5 +43,6 @@ export interface BarChartData {
 }
 export interface BarChartProps {
     data: BarChartData;
+    name?: string;
 }
 export declare function BarChart(props: BarChartProps): React.JSX.Element;

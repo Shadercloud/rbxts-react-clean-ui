@@ -11,6 +11,7 @@ interface VStackProps extends SpacedElementProps {
     Change?: React.InstanceChangeEvent<UIListLayout>;
     Padding?: UDim | Binding<UDim>;
     Wraps?: boolean;
+    name?: string;
 }
 export declare function VStack(props: VStackProps): React.JSX.Element;
 export {};

@@ -20,6 +20,7 @@ local GroupContext = _.GroupContext
 local function ButtonText(props)
 	local theme = React.useContext(CleanThemeContext)
 	local _attributes = {
+		name = "ButtonText",
 		text = props.text,
 	}
 	local _exp = props.scale
@@ -52,12 +53,16 @@ local function ButtonText(props)
 end
 local function ButtonIcon(props)
 	local theme = React.useContext(CleanThemeContext)
-	local _attributes = {
-		scale = props.scale,
-		icon = props.icon,
-		spinning = props.spinning,
-		speed = props.speed,
-	}
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "ButtonIcon"
+	end
+	_attributes.name = _condition
+	_attributes.scale = props.scale
+	_attributes.icon = props.icon
+	_attributes.spinning = props.spinning
+	_attributes.speed = props.speed
 	local _exp = props.intent
 	local _exp_1 = if props.disabled then "disabled" else "default"
 	local _exp_2 = theme.components.button.intents
@@ -87,10 +92,14 @@ local Button = React.forwardRef(function(props, ref)
 	end
 	local intentColors = ColorHelper:getIntentColors(theme, _exp, state, _exp_1, _result)
 	local backgroundImage = CssHelper:resolveBackgroundImage(intentColors.backgroundImage)
-	local _attributes = {
-		ref = ref,
-		Active = not props.disabled,
-	}
+	local _attributes = {}
+	local _condition = props.name
+	if _condition == nil then
+		_condition = "Button"
+	end
+	_attributes.key = _condition
+	_attributes.ref = ref
+	_attributes.Active = not props.disabled
 	local _object = {}
 	local _spread = props.Event
 	if _spread then
@@ -144,28 +153,28 @@ local Button = React.forwardRef(function(props, ref)
 				_result_2 = _result_2.X
 			end
 		end
-		local _condition = _result_2
-		if _condition == nil then
-			_condition = 0
+		local _condition_1 = _result_2
+		if _condition_1 == nil then
+			_condition_1 = 0
 		end
-		_result_1 = _condition
+		_result_1 = _condition_1
 	else
 		_result_1 = 0
 	end
 	_attributes.Size = UDim2.fromOffset(_result_1, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
-	local _condition = props.BackgroundTransparency
-	if _condition == nil then
+	local _condition_1 = props.BackgroundTransparency
+	if _condition_1 == nil then
 		local _result_2 = props.styleOverride
 		if _result_2 ~= nil then
 			_result_2 = _result_2.backgroundTransparency
 		end
-		_condition = _result_2
-		if _condition == nil then
-			_condition = theme.components.button.backgroundTransparency
+		_condition_1 = _result_2
+		if _condition_1 == nil then
+			_condition_1 = theme.components.button.backgroundTransparency
 		end
 	end
-	_attributes.BackgroundTransparency = _condition
+	_attributes.BackgroundTransparency = _condition_1
 	_attributes.BackgroundColor3 = intentColors.backgroundColor
 	_attributes.AutoButtonColor = false
 	_attributes.LayoutOrder = props.LayoutOrder
@@ -182,22 +191,24 @@ local Button = React.forwardRef(function(props, ref)
 	if _result_2 ~= nil then
 		_result_2 = _result_2.cornerRadius
 	end
-	local _condition_1 = _result_2
-	if _condition_1 == nil then
-		_condition_1 = theme.components.button.cornerRadius
+	local _condition_2 = _result_2
+	if _condition_2 == nil then
+		_condition_2 = theme.components.button.cornerRadius
 	end
-	_attributes_1.radius = _condition_1
+	_attributes_1.radius = _condition_2
 	local _exp_2 = React.createElement(Corners, _attributes_1)
-	local _attributes_2 = {}
+	local _attributes_2 = {
+		key = "Stroke",
+	}
 	local _result_3 = props.styleOverride
 	if _result_3 ~= nil then
 		_result_3 = _result_3.borderThickness
 	end
-	local _condition_2 = _result_3
-	if _condition_2 == nil then
-		_condition_2 = theme.components.button.borderThickness
+	local _condition_3 = _result_3
+	if _condition_3 == nil then
+		_condition_3 = theme.components.button.borderThickness
 	end
-	_attributes_2.Thickness = _condition_2
+	_attributes_2.Thickness = _condition_3
 	_attributes_2.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 	_attributes_2.Color = intentColors.borderColor
 	local _exp_3 = React.createElement("uistroke", _attributes_2)
@@ -207,11 +218,11 @@ local Button = React.forwardRef(function(props, ref)
 	if _result_4 ~= nil then
 		_result_4 = _result_4.boxShadow
 	end
-	local _condition_3 = _result_4
-	if _condition_3 == nil then
-		_condition_3 = theme.components.button.boxShadow
+	local _condition_4 = _result_4
+	if _condition_4 == nil then
+		_condition_4 = theme.components.button.boxShadow
 	end
-	_attributes_3.value = _condition_3
+	_attributes_3.value = _condition_4
 	local _exp_4 = React.createElement(BoxShadow, _attributes_3)
 	local _attributes_4 = table.clone(props)
 	setmetatable(_attributes_4, nil)

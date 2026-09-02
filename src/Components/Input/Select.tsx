@@ -72,6 +72,7 @@ function SelectOption(props: SelectOptionProps) {
 
     return (
         <imagebutton
+            key="Option"
             Event={{
                 ...props.Event,
 
@@ -105,7 +106,7 @@ function SelectOption(props: SelectOptionProps) {
             AutoButtonColor={false}
         >
             <Padding {...props} />
-            {props.text !== undefined && props.children === undefined && <Text text={props.text} TextColor3={ColorHelper.getIntentColors(
+            {props.text !== undefined && props.children === undefined && <Text name="OptionText" text={props.text} TextColor3={ColorHelper.getIntentColors(
                 theme,
                 "primary",
                 context.selected === props.index ? "focus" : hover ? "hover" : "default",
@@ -227,7 +228,7 @@ function SelectSearchInput(props: SelectSearchInputProps) {
     const theme = React.useContext(CleanThemeContext);
 
     return (
-        <frame Size={UDim2.fromScale(1, 0)} AutomaticSize={Enum.AutomaticSize.Y} BackgroundTransparency={1}>
+        <frame key="SearchInput" Size={UDim2.fromScale(1, 0)} AutomaticSize={Enum.AutomaticSize.Y} BackgroundTransparency={1}>
             <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.select.search.spacing, theme.components.select.search.padding)} />
             <Input
                 icon="search"
@@ -257,6 +258,7 @@ function SelectGroupHeader(props: SelectGroupHeaderProps) {
 
     return (
         <frame
+            key="OptGroupHeader"
             Size={UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
             BackgroundColor3={theme.components.select.optGroup.backgroundColor}
@@ -264,7 +266,7 @@ function SelectGroupHeader(props: SelectGroupHeaderProps) {
             BorderSizePixel={0}
         >
             <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.select.optGroup.spacing, theme.components.select.optGroup.padding)} />
-            <Text text={props.label} TextColor3={theme.components.select.optGroup.textColor} typography={typography} />
+            <Text name="OptGroupLabel" text={props.label} TextColor3={theme.components.select.optGroup.textColor} typography={typography} />
         </frame>
     );
 }
@@ -447,6 +449,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         >
             <SelectContext.Provider value={context}>
                 <imagebutton
+                    key="SelectButton"
                     ref={buttonRef}
                     Size={UDim2.fromScale(1, 0)}
                     AutomaticSize={Enum.AutomaticSize.Y}
@@ -455,7 +458,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                         Activated: activateSelect,
                     }}
                 >
-                    <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Inner} Color={theme.components.select.borderColor} />
+                    <uistroke key="Stroke" Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Inner} Color={theme.components.select.borderColor} />
 
                     <Corners radius={theme.components.select.cornerRadius} />
 
@@ -463,17 +466,19 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                     <HStack>
                         <FlexItem>
                             <Text
+                                name="SelectedText"
                                 text={selectedOption?.props.text ?? "No Options"}
                                 typography={typography}
                             />
                         </FlexItem>
-                        <Icon icon="caret-down" color={theme.colors.intents.primary.default.textColor} />
+                        <Icon name="SelectCaret" icon="caret-down" color={theme.colors.intents.primary.default.textColor} />
                     </HStack>
 
                     {open &&
                         overlay.overlay !== undefined &&
                         ReactRoblox.createPortal(
                             <frame
+                                key="SelectDropdown"
                                 BackgroundTransparency={0}
                                 BackgroundColor3={
                                     theme.components.select.dropDownBackgroundColor
@@ -484,7 +489,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                                 AutomaticSize={Enum.AutomaticSize.Y}
                                 ClipsDescendants={true}
                             >
-                                <uistroke Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={theme.components.select.borderColor} />
+                                <uistroke key="Stroke" Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={theme.components.select.borderColor} />
 
                                 <Corners radius={theme.components.select.cornerRadius} />
 
@@ -507,7 +512,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                                             }}>
                                             {hasVisibleOptions
                                                 ? renderSections()
-                                                : <Text text="No Results" typography={typography} />}
+                                                : <Text name="NoResultsText" text="No Results" typography={typography} />}
                                         </VStack>
                                     </Scroller>
                                 </VStack>

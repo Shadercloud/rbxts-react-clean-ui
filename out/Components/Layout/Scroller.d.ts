@@ -3,6 +3,7 @@ import { PositionElementProps, SizeElementProps, SpacedElementProps } from "../.
 interface ScrollerProps extends SizeElementProps, SpacedElementProps, PositionElementProps {
     children?: React.ReactNode;
     AutomaticSizeParent?: boolean;
+    name?: string;
 }
 export declare function Scroller(props: ScrollerProps): React.JSX.Element;
 export {};

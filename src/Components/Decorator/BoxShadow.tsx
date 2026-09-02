@@ -9,6 +9,7 @@ interface BoxShadowProps extends ShadowElementProps {
     color?: Color3;
     transparency?: number;
     zindex?: number;
+    name?: string;
 }
 
 export function BoxShadow(props: BoxShadowProps) {
@@ -43,6 +44,7 @@ export function BoxShadow(props: BoxShadowProps) {
 
     return (
         <uishadow
+            key={props.name ?? "BoxShadow"}
             {...shadowProps}
             ZIndex={props.zindex ?? -1}
         />

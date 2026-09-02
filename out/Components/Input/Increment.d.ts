@@ -7,5 +7,6 @@ export interface IncrementProps extends ScalableElementProps, SpacedElementProps
     min?: number;
     max?: number;
     controlled?: boolean;
+    name?: string;
 }
 export declare const Increment: React.ForwardRefExoticComponent<Omit<IncrementProps, "ref"> & React.RefAttributes<ImageLabel>>;

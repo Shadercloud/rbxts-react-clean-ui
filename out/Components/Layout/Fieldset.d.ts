@@ -10,6 +10,7 @@ interface FieldsetProps extends BreakPointElementProps {
     disabled?: boolean;
     checkbox?: boolean;
     wrap?: Breakpoint;
+    name?: string;
 }
 interface FieldsetSlotProps {
     children?: React.ReactNode;

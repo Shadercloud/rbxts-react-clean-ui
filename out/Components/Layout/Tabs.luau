@@ -51,6 +51,7 @@ local function TabButtonContent(props)
 	}), React.createElement(BoxShadow, {
 		value = intent.boxShadow,
 	}), React.createElement(Text, {
+		name = "TabTitleText",
 		TextColor3 = intent.textColor,
 		text = props.text,
 		typography = TypographyHelper:getTypography(theme, nil, intent.typography),
@@ -84,6 +85,7 @@ local function TabTitle(props)
 	setmetatable(_attributes, nil)
 	return React.createElement(HoverButton, {
 		isSelected = isSelected,
+		name = `TabButton-{props.value}`,
 		default = {
 			Size = UDim2.fromScale(0, 0),
 			AutomaticSize = Enum.AutomaticSize.XY,
@@ -173,6 +175,7 @@ local TabsBody = React.forwardRef(function(props, ref)
 		width = "100%",
 		backgroundImage = props.backgroundImage or theme.components.tabs.backgroundImage,
 	}, React.createElement("uistroke", {
+		key = "Stroke",
 		Thickness = theme.components.tabs.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.tabs.borderColor,
