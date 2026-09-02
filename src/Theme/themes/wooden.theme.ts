@@ -492,6 +492,48 @@ export const WoodenTheme = createTheme({
                 }
             },
         },
+        switch: {
+            track: {
+                backgroundColor: Color3.fromHex("#5C3A18"),
+                borderColor: Color3.fromHex("#3D2712"),
+                intents: {
+                    primary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#A16B30"),
+                            borderColor: Color3.fromHex("#3D2712"),
+                        },
+                    },
+                    success: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#4E6A24"),
+                            borderColor: Color3.fromHex("#3D2712"),
+                        },
+                    },
+                    info: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#2C5270"),
+                            borderColor: Color3.fromHex("#3D2712"),
+                        },
+                    },
+                    warning: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#A67A20"),
+                            borderColor: Color3.fromHex("#3D2712"),
+                        },
+                    },
+                    danger: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#7A3220"),
+                            borderColor: Color3.fromHex("#3D2712"),
+                        },
+                    },
+                },
+            },
+            thumb: {
+                backgroundColor: Color3.fromHex("#BA854A"),
+                borderColor: Color3.fromHex("#3D2712"),
+            },
+        },
         slider: {
             height: 20,
             bar: {

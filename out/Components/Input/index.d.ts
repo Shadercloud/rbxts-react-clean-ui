@@ -5,3 +5,4 @@ export * from './Increment';
 export * from './Input';
 export * from './Select';
 export * from './Slider';
+export * from './Switch';

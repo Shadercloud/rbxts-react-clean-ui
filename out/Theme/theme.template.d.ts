@@ -93,6 +93,31 @@ export interface ThemeTemplate {
             padding?: ScaledCssPadding;
             backgroundImage?: CssBackgroundImage;
         };
+        switch: {
+            width: CssSize;
+            height: CssSize;
+            cornerRadius: CssSize;
+            borderThickness: number;
+            disabledTransparency: number;
+            animation: {
+                duration: number;
+            };
+            track: {
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                borderColor: Color3;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+            };
+            thumb: {
+                inset: CssSize;
+                cornerRadius: CssSize;
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                borderColor: Color3;
+                borderThickness: number;
+                boxShadow?: CssShadow;
+            };
+        };
         tabs: {
             borderColor: Color3;
             backgroundColor: Color3;

@@ -1,0 +1,146 @@
+---
+title: Switch
+description: An on/off toggle with an animated sliding thumb and intent-driven colors.
+icon: ToggleRight
+---
+
+`Switch` is a themed on/off toggle built on Roblox's native [`ImageButton`](https://create.roblox.com/docs/reference/engine/classes/ImageButton): a pill-shaped track with a circular thumb that slides between an off (left) and on (right) position.
+
+## Import
+
+```tsx
+import { Switch } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Form/Switch.loom.tsx" previewHeight={240} screenshot="/images/screenshots/Input/Switch.png">
+```tsx
+import React from "@rbxts/react";
+import { Switch } from "@rbxts/react-clean-ui";
+
+export function SwitchExample() {
+    return (
+        <Switch
+            onChange={(checked) => {
+                print(`Checked: ${checked}`);
+            }}
+        />
+    );
+}
+```
+</Demo>
+
+The switch starts off by default.
+
+## Initial checked state
+
+Use the `checked` prop to specify the initial state of the switch.
+
+```tsx
+<Switch checked />
+```
+
+or
+
+```tsx
+<Switch checked={true} />
+```
+
+<Callout type="info">
+The `checked` prop is only used to determine the initial state when the component is created, matching `Checkbox`'s convention. After that, the switch manages its own state internally — changing the `checked` prop later has no further effect.
+</Callout>
+
+## With a fieldset
+
+Use `Fieldset.Control` and `Fieldset.Label` to associate the switch with a label.
+
+```tsx
+<Fieldset checkbox>
+    <Fieldset.Control>
+        <Switch
+            onChange={(checked) => {
+                print(`Checked: ${checked}`);
+            }}
+        />
+    </Fieldset.Control>
+
+    <Fieldset.Label>
+        <Text text="Enable notifications" />
+    </Fieldset.Label>
+</Fieldset>
+```
+
+When the user clicks either the switch or its label, the checked state toggles.
+
+## Intents
+
+Set `intent` to control the track's on-state (checked) background and border colors.
+
+```tsx
+<Switch checked intent="success" />
+<Switch checked intent="danger" />
+```
+
+The off-state track color is always the theme's static color, regardless of `intent`. There is no hover state.
+
+## Disabled state
+
+Set `disabled` to prevent interaction. The track and thumb render at a flat, dimmed transparency, and both clicking the switch and activating a paired `Fieldset.Label` are ignored.
+
+```tsx
+<Switch checked disabled />
+<Switch disabled />
+```
+
+## Props
+
+### Switch-specific props
+
+| Prop       | Type                        | Default     | Description                                                                              |
+| ---------- | --------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `checked`  | `boolean`                   | `false`     | The initial checked state of the switch.                                                  |
+| `onChange` | `(value: boolean) => void`  | `undefined` | Called once immediately after mount with the initial value, then again on every toggle.   |
+| `disabled` | `boolean`                   | `false`     | Disables interaction and renders a dimmed appearance.                                     |
+| `name`     | `string`                    | `"Switch"`  | Sets the rendered instance's `Name`.                                                      |
+
+### Shared props
+
+The switch also supports props inherited from the following interfaces.
+
+| Interface                | Purpose                                                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `IntentElementProps`     | Configures the intent used to resolve the on-state track/border colors.                                                                       |
+| `BackgroundElementProps` | Configures `BackgroundTransparency`. `BackgroundColor3` has no effect — the track color is always driven by the theme and animated by `intent`/checked state. `BackgroundTransparency` is ignored while `disabled`. |
+| `ZIndexElementProps`     | Configures the switch's `ZIndex`.                                                                                                              |
+
+## Behaviour
+
+* The switch is off by default.
+* Setting `checked` changes the initial state only; the switch is uncontrolled after mount.
+* Clicking the switch, or a paired `Fieldset.Label`, toggles the internal state, unless `disabled`.
+* `onChange` is called from an effect on the internal checked state, so it fires once immediately after mount with the initial value, in addition to firing on every subsequent toggle.
+* The thumb's horizontal position and the track's background/border colors animate together, driven by a single tween progress value, over `theme.components.switch.animation.duration` seconds. A duration of `0` snaps instantly instead of animating.
+* The on-state track/border colors are resolved from `intent` (layered over `theme.colors.intents`); the off-state colors are always the theme's static, non-intent colors.
+* When `disabled`, both the track and thumb render at a flat dimmed transparency, overriding rather than blending with their normal transparency.
+* The thumb's diameter is derived from the track height and its inset, not independently configurable.
+
+The state transitions follow this pattern:
+
+```text
+false → true → false
+```
+
+## Theme values
+
+The switch uses values from `theme.components.switch` for:
+
+* The track's fixed width and height (the switch does not auto-size or accept size override props)
+* Corner radius and border thickness of the track
+* The transparency applied to both track and thumb while `disabled`
+* The tween duration used to animate the thumb position and track colors
+* The off-state track background color, background transparency, and border color
+* Optional per-intent color overrides for the on-state track/border colors, layered on top of `theme.colors.intents`
+* The thumb's inset from the track edge (which also determines its diameter), corner radius, background color, background transparency, border color, border thickness, and box shadow
+
+These values can be changed by providing a custom Clean UI theme.

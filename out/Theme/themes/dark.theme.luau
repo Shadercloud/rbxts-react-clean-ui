@@ -251,6 +251,30 @@ local DarkTheme = createTheme({
 				xl = 8,
 			},
 		},
+		switch = {
+			width = 40,
+			height = 22,
+			cornerRadius = "100%",
+			borderThickness = 1,
+			disabledTransparency = 0.5,
+			animation = {
+				duration = 0.15,
+			},
+			track = {
+				backgroundColor = Color3.fromHex("#2A303B"),
+				backgroundTransparency = 0,
+				borderColor = Color3.fromHex("#3A4352"),
+			},
+			thumb = {
+				inset = 2,
+				cornerRadius = "100%",
+				backgroundColor = Color3.fromHex("#E8EDF8"),
+				backgroundTransparency = 0,
+				borderColor = Color3.fromHex("#4B74C7"),
+				borderThickness = 1,
+				boxShadow = "0px 0px 2px 1px",
+			},
+		},
 		tabs = {
 			borderColor = Color3.fromHex("#343B49"),
 			backgroundColor = Color3.fromHex("#1B1F27"),

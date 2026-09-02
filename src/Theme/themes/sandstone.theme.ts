@@ -266,6 +266,31 @@ export const SandstoneTheme = createTheme({
             },
         },
 
+        switch: {
+            width: 40,
+            height: 22,
+            cornerRadius: 4,
+            borderThickness: 1,
+            disabledTransparency: 0.5,
+            animation: {
+                duration: 0.15,
+            },
+            track: {
+                backgroundColor: Color3.fromHex("#EFE5D3"),
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#CDBFA8"),
+            },
+            thumb: {
+                inset: 2,
+                cornerRadius: 4,
+                backgroundColor: Color3.fromHex("#FFF9ED"),
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#CDBFA8"),
+                borderThickness: 1,
+                boxShadow: "0px 0px 2px 1px",
+            },
+        },
+
         tabs: {
             borderColor: Color3.fromHex("#D8CDBA"),
             backgroundColor: Color3.fromHex("#FFF9ED"),
