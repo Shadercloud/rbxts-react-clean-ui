@@ -65,7 +65,7 @@ local function Checkbox(props)
 		_condition_2 = theme.components.button.backgroundTransparency
 	end
 	_attributes.BackgroundTransparency = _condition_2
-	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.button.intents).backgroundColor
+	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.checkbox.intents).backgroundColor
 	_attributes.AutoButtonColor = false
 	_attributes.Image = backgroundImage.Image
 	_attributes.ImageColor3 = backgroundImage.ImageColor3

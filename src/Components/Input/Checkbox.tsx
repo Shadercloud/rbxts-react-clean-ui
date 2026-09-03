@@ -60,7 +60,7 @@ export function Checkbox(props: CheckboxProps) {
             theme,
             props.intent,
             "default",
-            theme.components.button.intents,
+            theme.components.checkbox.intents,
         ).backgroundColor}
         AutoButtonColor={false}
 

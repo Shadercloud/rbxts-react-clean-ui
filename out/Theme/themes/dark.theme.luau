@@ -292,6 +292,13 @@ local DarkTheme = createTheme({
 			borderColor = Color3.fromHex("#3A4352"),
 			borderThickness = 1,
 			cornerRadius = 8,
+			intents = {
+				primary = {
+					default = {
+						backgroundColor = Color3.fromHex("#2A303B"),
+					},
+				},
+			},
 			spacing = {
 				xs = 1,
 				sm = 2,
