@@ -1,0 +1,157 @@
+---
+title: Pagination
+description: Navigate between pages with an automatic window or a custom compound layout.
+icon: ListOrdered
+---
+
+`Pagination` provides a smart default for common page navigation and compound subcomponents for custom layouts. It always keeps page state controlled through `page` and `onPageChange`.
+
+## Simple
+
+Omit `children` to render the standard previous button, calculated page window, and next button. The window always includes the first and last pages, includes up to `siblingCount` pages on either side of the current page, and collapses remaining gaps into ellipses. Once `totalPages` exceeds what fits on screen, the window keeps a constant total item count at every page — pages near the start or end extend their run of numbers (instead of shrinking the window) so the rendered bar never changes width as the user navigates.
+
+<Demo preview="Scenes/Layout/Pagination.loom.tsx" previewHeight={180} screenshot="/images/screenshots/Layout/Pagination.png">
+```tsx
+import React from "@rbxts/react";
+import { Pagination } from "@rbxts/react-clean-ui";
+
+export function SimplePagination() {
+    const [page, setPage] = React.useState(5);
+
+    return (
+        <Pagination
+            page={page}
+            totalPages={10}
+            siblingCount={1}
+            onPageChange={setPage}
+        />
+    );
+}
+```
+</Demo>
+
+## Customized
+
+Pass `children` to replace the default composition. When `children` are supplied, `Pagination` renders them directly with no layout imposed on them — unlike the default composition, which arranges its controls in an internal `HStack`. This means you provide your own layout container (an `HStack`, a `VStack`, or anything else) to control not just which controls appear, but how they're arranged, spaced, and aligned. Each compound subcomponent reads the root pagination state independently, so controls can be reordered, omitted, laid out vertically, or combined with other content.
+
+```tsx
+import React from "@rbxts/react";
+import { HStack, Pagination, Text } from "@rbxts/react-clean-ui";
+
+export function CustomizedPagination() {
+    const totalPages = 12;
+    const [page, setPage] = React.useState(6);
+
+    return (
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage}>
+            <HStack valign="Center" spacing="sm">
+                <Pagination.Next />
+                <Text text={`Page ${page} of ${totalPages}`} />
+                <Pagination.Prev />
+            </HStack>
+        </Pagination>
+    );
+}
+```
+
+This example deliberately reverses the navigation buttons, replaces the numbered list with a status label, and wraps the result in an `HStack` to control spacing and alignment. `Pagination.Prev`, `Pagination.Next`, and `Pagination.Item` still use the root's current page and `onPageChange` callback.
+
+Because no layout is imposed automatically, the same subcomponents can be arranged vertically by swapping in a `VStack` instead:
+
+```tsx
+import React from "@rbxts/react";
+import { Pagination, VStack } from "@rbxts/react-clean-ui";
+
+export function VerticalPagination() {
+    const totalPages = 8;
+    const [page, setPage] = React.useState(1);
+
+    return (
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage}>
+            <VStack HorizontalAlignment={Enum.HorizontalAlignment.Center} spacing="sm">
+                <Pagination.Prev />
+                <Pagination.List />
+                <Pagination.Next />
+            </VStack>
+        </Pagination>
+    );
+}
+```
+
+To customize the surrounding controls while retaining the calculated page window, include `Pagination.List` without children:
+
+```tsx
+<Pagination page={page} totalPages={20} siblingCount={2} onPageChange={setPage}>
+    <HStack valign="Center">
+        <Pagination.Next />
+        <Pagination.List />
+        <Pagination.Prev />
+    </HStack>
+</Pagination>
+```
+
+To control the items inside the list as well, pass explicit children to `Pagination.List`:
+
+```tsx
+<Pagination page={page} totalPages={20} onPageChange={setPage}>
+    <HStack valign="Center">
+        <Pagination.Prev />
+        <Pagination.List>
+            <Pagination.Item value={1} />
+            <Pagination.Ellipsis />
+            <Pagination.Item value={10} />
+            <Pagination.Ellipsis />
+            <Pagination.Item value={20} />
+        </Pagination.List>
+        <Pagination.Next />
+    </HStack>
+</Pagination>
+```
+
+Explicit list children are rendered exactly as supplied; they do not alter when `page` changes. Use an empty `Pagination.List` when the built-in windowing behavior is preferred.
+
+## Pagination
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `page` | `number` | — | Current controlled page. Values are floored and clamped to the available range. |
+| `totalPages` | `number` | — | Total number of pages. Values are floored and cannot be lower than zero. |
+| `siblingCount` | `number` | `1` | Number of pages shown on each side of the current page in the calculated window. Values are floored and cannot be lower than zero. |
+| `onPageChange` | `(page: number) => void` | — | Called with the next clamped page when an enabled item or navigation button is activated. |
+| `children` | `React.ReactNode` | Standard layout | Replaces the standard previous/list/next composition with custom content, rendered directly with no layout container applied. |
+
+When `totalPages` is zero, the calculated list is empty, both navigation buttons are disabled, and page-change callbacks are not issued.
+
+## Compound components
+
+### Pagination.List
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `React.ReactNode` | Calculated page window | Custom list contents. Omit this prop to render the root's calculated items and ellipses. |
+
+### Pagination.Item
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `number` | Page selected when the item is activated. The item uses the selected visual state when it matches the current page. |
+
+`Pagination.Item` also accepts the shared `PaddingProps` values for overriding its item padding.
+
+### Pagination.Prev and Pagination.Next
+
+These components accept no props. They move one page backward or forward and become disabled at the corresponding boundary.
+
+### Pagination.Ellipsis
+
+This component accepts no props and renders a static ellipsis. It does not change pages when activated.
+
+All compound subcomponents must be rendered inside `Pagination`.
+
+## Behavior
+
+- `Pagination` is controlled: activating a control calls `onPageChange`, while the selected page changes only when the supplied `page` changes.
+- Page values, totals, and sibling counts are normalized to whole numbers. Requested pages are clamped between `1` and `totalPages`.
+- The automatic list shows every page when the total fits within the visible window (`siblingCount * 2 + 5` items). Otherwise it preserves the first page, last page, current-page siblings, and ellipses for gaps, while extending the leading or trailing run of numbers near the start or end of the range so the total item count stays exactly `siblingCount * 2 + 5` at every page — the bar's width never changes as the current page changes.
+- Providing root `children` disables the default composition, including its internal `HStack`; the supplied children are rendered directly, so provide your own layout container (`HStack`, `VStack`, or otherwise) to arrange them. A child `Pagination.List` can still consume the calculated window.
+- Item backgrounds, borders, spacing, typography, and default, hover, selected, and disabled colors come from the active theme.

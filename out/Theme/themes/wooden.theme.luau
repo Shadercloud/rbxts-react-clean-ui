@@ -594,6 +594,51 @@ local WoodenTheme = createTheme({
 				cornerRadius = "100%",
 			},
 		},
+		pagination = {
+			backgroundColor = Color3.fromHex("#5C3A18"),
+			backgroundTransparency = 1,
+			borderColor = Color3.fromHex("#331D07"),
+			borderThickness = 1,
+			cornerRadius = 0,
+			item = {
+				borderThickness = 0,
+				cornerRadius = 0,
+				intents = {
+					primary = {
+						default = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								image = 92016395170536,
+								slice = "10 5 240 40",
+								tintColor = Color3.fromHex("#A16B30"),
+							},
+						},
+						hover = {
+							textColor = Color3.fromHex("#D3CBA3"),
+							backgroundImage = {
+								tintColor = Color3.fromHex("#BA854A"),
+							},
+						},
+						focus = {
+							textColor = Color3.fromHex("#FFF7CF"),
+							backgroundTransparency = 1,
+							boxShadow = 0,
+							backgroundImage = {
+								tintColor = Color3.fromHex("#7A4A20"),
+							},
+						},
+						disabled = {
+							textColor = Color3.fromHex("#a4a29f"),
+							backgroundTransparency = 1,
+							backgroundImage = {
+								transparency = 0.3,
+							},
+						},
+					},
+				},
+			},
+		},
 		toast = {
 			intents = {
 				primary = {

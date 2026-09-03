@@ -7,6 +7,7 @@ export * from './Fieldset';
 export * from './FlexItem';
 export * from './Group';
 export * from './HStack';
+export * from './Pagination';
 export * from './Row';
 export * from './Scroller';
 export * from './Tabs';

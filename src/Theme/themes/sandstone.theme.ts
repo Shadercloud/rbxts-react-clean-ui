@@ -363,6 +363,21 @@ export const SandstoneTheme = createTheme({
                 },
             },
         },
+        pagination: {
+            backgroundColor: Color3.fromHex("#EFE5D3"), backgroundTransparency: 0,
+            borderColor: Color3.fromHex("#D8CDBA"), borderThickness: 1, cornerRadius: 2,
+            spacing: { xs: 2, sm: 4, md: 6, lg: 8, xl: 12 },
+            item: {
+                borderThickness: 0, cornerRadius: 2,
+                spacing: { xs: 1, sm: 2, md: 4, lg: 6, xl: 8 },
+                intents: { primary: {
+                    default: { backgroundTransparency: 1, textColor: Color3.fromHex("#746754") },
+                    hover: { backgroundTransparency: 1, textColor: Color3.fromHex("#244F4A") },
+                    focus: { textColor: Color3.fromHex("#244F4A"), backgroundColor: Color3.fromHex("#FFF9ED"), backgroundTransparency: 0, boxShadow: "0px 2px 5px 0px", typography: { weight: Enum.FontWeight.SemiBold } },
+                    disabled: { backgroundTransparency: 1, borderColor: Color3.fromHex("#D8CDBA"), textColor: Color3.fromHex("#9B8B73") },
+                } },
+            },
+        },
         accordion: {
             borderColor: Color3.fromHex("#B9A98F"),
             header: {

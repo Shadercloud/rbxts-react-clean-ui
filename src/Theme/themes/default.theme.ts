@@ -340,6 +340,21 @@ export const DefaultTheme: ThemeTemplate = {
                 }
             },
         },
+        pagination: {
+            backgroundColor: Color3.fromHex("#F5F5F5"), backgroundTransparency: 0,
+            borderColor: Color3.fromHex("#D9DEE8"), borderThickness: 1, cornerRadius: 8,
+            spacing: { xs: 2, sm: 4, md: 6, lg: 8, xl: 12 },
+            item: {
+                borderThickness: 0, cornerRadius: 4,
+                spacing: { xs: 1, sm: 2, md: 4, lg: 6, xl: 8 },
+                intents: { primary: {
+                    default: { backgroundTransparency: 1, textColor: Color3.fromHex("#4F4F4F") },
+                    hover: { backgroundTransparency: 1, textColor: Color3.fromHex("#000000") },
+                    focus: { textColor: Color3.fromHex("#000000"), backgroundColor: Color3.fromHex("#FFFFFF"), backgroundTransparency: 0, boxShadow: "2px 2px 2px 2px", typography: { weight: Enum.FontWeight.Bold } },
+                    disabled: { backgroundTransparency: 1, borderColor: Color3.fromHex("#D9DEE8"), textColor: Color3.fromHex("#8A8A8A") },
+                } },
+            },
+        },
         accordion: {
             borderColor: Color3.fromHex("#D9DEE8"),
             borderThickness: 1,

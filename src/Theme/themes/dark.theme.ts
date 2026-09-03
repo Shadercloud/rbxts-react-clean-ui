@@ -367,6 +367,21 @@ export const DarkTheme = createTheme({
             },
 
         },
+        pagination: {
+            backgroundColor: Color3.fromHex("#14181F"), backgroundTransparency: 0,
+            borderColor: Color3.fromHex("#343B49"), borderThickness: 1, cornerRadius: 8,
+            spacing: { xs: 2, sm: 4, md: 6, lg: 8, xl: 12 },
+            item: {
+                borderThickness: 0, cornerRadius: 4,
+                spacing: { xs: 1, sm: 2, md: 4, lg: 6, xl: 8 },
+                intents: { primary: {
+                    default: { backgroundTransparency: 1, textColor: Color3.fromHex("#AAB3C2") },
+                    hover: { backgroundTransparency: 1, textColor: Color3.fromHex("#FFFFFF") },
+                    focus: { textColor: Color3.fromHex("#FFFFFF"), backgroundColor: Color3.fromHex("#2A303B"), backgroundTransparency: 0, boxShadow: "2px 2px 6px 0px", typography: { weight: Enum.FontWeight.Bold } },
+                    disabled: { backgroundTransparency: 1, borderColor: Color3.fromHex("#343B49"), textColor: Color3.fromHex("#697386") },
+                } },
+            },
+        },
         accordion: {
             borderColor: Color3.fromHex("#4B5568"),
             header: {

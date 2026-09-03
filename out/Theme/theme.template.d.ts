@@ -159,6 +159,24 @@ export interface ThemeTemplate {
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
             };
         };
+        pagination: {
+            backgroundColor: Color3;
+            backgroundTransparency: number;
+            borderColor: Color3;
+            borderThickness: number;
+            cornerRadius: CssSize;
+            spacing?: ScaleSizeValue<number>;
+            padding?: ScaledCssPadding;
+            item: {
+                borderThickness: number;
+                cornerRadius: CssSize;
+                spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
+                boxShadow?: CssShadow;
+                typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+            };
+        };
         accordion: {
             borderColor: Color3;
             borderThickness: number;
