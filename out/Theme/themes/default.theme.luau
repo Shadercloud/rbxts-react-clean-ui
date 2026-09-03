@@ -381,6 +381,31 @@ local DefaultTheme = {
 				duration = 0.2,
 			},
 		},
+		table = {
+			backgroundColor = Color3.fromHex("#FFFFFF"),
+			backgroundTransparency = 0,
+			borderColor = Color3.fromHex("#D9DEE8"),
+			borderThickness = 1,
+			cornerRadius = 8,
+			rowDividerColor = Color3.fromHex("#D9DEE8"),
+			rowDividerThickness = 1,
+			header = {
+				backgroundColor = Color3.fromHex("#F2F4F8"),
+				backgroundTransparency = 0,
+				typography = {
+					weight = Enum.FontWeight.Bold,
+				},
+			},
+			cell = {
+				spacing = {
+					xs = 4,
+					sm = 8,
+					md = 12,
+					lg = 16,
+					xl = 24,
+				},
+			},
+		},
 		draggable = {
 			placeholder = {
 				backgroundColor = Color3.fromHex("#D9DEE8"),

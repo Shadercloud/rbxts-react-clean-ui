@@ -1,0 +1,169 @@
+---
+title: Table
+description: Present structured data in aligned rows and columns.
+icon: Table
+---
+
+`Table` displays related values in a row-and-column layout. Its compound components distinguish column headings from the table body, while every section shares the same measured column widths so cell boundaries and content stay aligned.
+
+## Import
+
+```tsx
+import { Table } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Layout/Table.loom.tsx" previewHeight={340} screenshot="/images/screenshots/Layout/Table.png">
+```tsx
+import React from "@rbxts/react";
+import { Container, Table } from "@rbxts/react-clean-ui";
+
+export function InvoiceTable() {
+    return (
+        <Container width="90%" height="240" center>
+            <Table>
+                <Table.Header>
+                    <Table.Row>
+                        <Table.Head>Invoice</Table.Head>
+                        <Table.Head>Status</Table.Head>
+                        <Table.Head>Method</Table.Head>
+                        <Table.Head>Amount</Table.Head>
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                    <Table.Row>
+                        <Table.Cell>INV001</Table.Cell>
+                        <Table.Cell>Paid</Table.Cell>
+                        <Table.Cell>Credit Card</Table.Cell>
+                        <Table.Cell>$250.00</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                        <Table.Cell>INV002</Table.Cell>
+                        <Table.Cell>Pending</Table.Cell>
+                        <Table.Cell>PayPal</Table.Cell>
+                        <Table.Cell>$150.00</Table.Cell>
+                    </Table.Row>
+                </Table.Body>
+            </Table>
+        </Container>
+    );
+}
+```
+</Demo>
+
+The example does not assign a width to `Table`. In this mode, the table sizes itself horizontally to the intrinsic width of its columns and vertically to its rows, similar to an HTML table. The surrounding `Container` only provides space for the preview.
+
+## Structure
+
+Build a table from the components exposed on `Table`:
+
+- `Table.Header` contains the heading row or rows.
+- `Table.Body` contains the data rows.
+- `Table.Row` groups the cells that belong on one horizontal row.
+- `Table.Head` creates a heading cell.
+- `Table.Cell` creates a body cell.
+
+Keep the cells in the same order in every row. A table is easiest to scan when each body row has one `Table.Cell` for every `Table.Head` in the header.
+
+Each column takes the widest intrinsic measurement reported by the heading or body cell at that position. That maximum is used for the matching column in every header and body row, so shorter cells do not create different boundaries from the cells above or below them. Cell padding is included in the measurement.
+
+## Sizing
+
+Leave both `width` and `Size` unset to make the table hug its column content horizontally. Its height also grows to fit its rows by default.
+
+Set `width` or `Size` when the table should occupy an explicit horizontal space. The columns retain the proportions of their intrinsic widths within that space, so columns with wider content receive more room while all rows remain aligned. `height` and `AutomaticSize` follow the shared `SizeElementProps` behavior inherited from `Container`.
+
+## Custom cell content
+
+Heading and body cells accept React children, so a cell can contain another clean-ui component when plain text is not enough.
+
+```tsx
+import { Table, Text } from "@rbxts/react-clean-ui";
+
+<Table.Row>
+    <Table.Cell>
+        <Text text="INV003" weight="bold" />
+    </Table.Cell>
+    <Table.Cell>
+        <Text text="Paid" />
+    </Table.Cell>
+</Table.Row>
+```
+
+String children are rendered as themed table text automatically.
+
+## Props
+
+### Table
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `React.ReactNode` | The table header and body. |
+| `name` | `string` | Name assigned to the table's root `ImageLabel`. |
+
+#### Shared props
+
+| Interface | Purpose |
+| --- | --- |
+| `ScalableElementProps` | Supplies `scale` (`"xs" \| "sm" \| "md" \| "lg" \| "xl"`) for cell spacing and typography. |
+| `SizeElementProps` | Configures `width`, `height`, native `Size`, and `AutomaticSize`. Omitting both `width` and `Size` enables intrinsic horizontal sizing. |
+
+### Table.Header
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `React.ReactNode` | One or more heading rows. |
+
+### Table.Body
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `React.ReactNode` | The table's data rows. |
+
+### Table.Row
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `React.ReactNode` | Heading or body cells in column order. |
+
+### Table.Head
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `React.ReactNode \| string` | The heading content for one column. Used when `text` is omitted. |
+| `text` | `string` | Text rendered with the table header typography. Takes precedence over `children`. |
+| `align` | `Enum.HorizontalAlignment \| "Left" \| "Center" \| "Right"` | Horizontal alignment of the cell content. Defaults to `"Left"`. |
+
+#### Shared props
+
+| Interface | Purpose |
+| --- | --- |
+| `PaddingProps` | Configures `spacing`, side-specific padding (`top`, `bottom`, `left`, and `right`), or a CSS-style `padding` value. |
+
+### Table.Cell
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `React.ReactNode \| string` | The content at one row and column intersection. Used when `text` is omitted. |
+| `text` | `string` | Text rendered with the table cell typography. Takes precedence over `children`. |
+| `align` | `Enum.HorizontalAlignment \| "Left" \| "Center" \| "Right"` | Horizontal alignment of the cell content. Defaults to `"Left"`. |
+
+#### Shared props
+
+| Interface | Purpose |
+| --- | --- |
+| `PaddingProps` | Configures `spacing`, side-specific padding (`top`, `bottom`, `left`, and `right`), or a CSS-style `padding` value. |
+
+## Behavior
+
+- The header and body are visual sections of the same table. Every column uses the maximum intrinsic width of the cells at that position across both sections, keeping cell bounds and content aligned between rows.
+- With no `width` or `Size`, the table hugs its measured columns horizontally. With either prop supplied, those intrinsic widths become proportional shares of the explicit table width.
+- Intrinsic measurements include resolved cell padding and update when mounted cell content, typography, scale, padding, or composition changes.
+- Sections and rows are displayed in child order.
+- Cell strings use the active table typography and colors; custom React children render in the same cell bounds.
+- Table styling, including backgrounds, borders, spacing, and typography, comes from the active theme.
+
+## Theme values
+
+The table uses `theme.components.table` for its background, border, corner radius, body-row dividers, cell spacing and padding, and header and cell typography. Setting `scale` on `Table` overrides the scale used to resolve its cell spacing and typography.

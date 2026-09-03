@@ -182,6 +182,25 @@ export interface ThemeTemplate {
                 duration: number;
             };
         };
+        table: {
+            backgroundColor: Color3;
+            backgroundTransparency: number;
+            borderColor: Color3;
+            borderThickness: number;
+            cornerRadius: CssSize;
+            rowDividerColor: Color3;
+            rowDividerThickness: number;
+            header: {
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+            };
+            cell: {
+                spacing?: ScaleSizeValue<number>;
+                padding?: ScaledCssPadding;
+                typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+            };
+        };
         card: {
             borderThickness: number;
             cornerRadius: CssSize;

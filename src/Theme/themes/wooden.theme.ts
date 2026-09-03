@@ -163,6 +163,19 @@ export const WoodenTheme = createTheme({
                 backgroundTransparency: 0,
             },
         },
+        table: {
+            backgroundColor: Color3.fromHex("#5C3A18"),
+            backgroundTransparency: 0,
+            borderColor: Color3.fromHex("#3D2712"),
+            borderThickness: 2,
+            cornerRadius: 0,
+            rowDividerColor: Color3.fromHex("#3D2712"),
+            rowDividerThickness: 2,
+            header: {
+                backgroundColor: Color3.fromHex("#7A4A20"),
+                backgroundTransparency: 0,
+            },
+        },
         tabs: {
             backgroundImage: {
                 image: 137043424796720,

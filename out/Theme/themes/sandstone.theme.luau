@@ -371,6 +371,14 @@ local SandstoneTheme = createTheme({
 				backgroundColor = Color3.fromHex("#FFF9ED"),
 			},
 		},
+		table = {
+			backgroundColor = Color3.fromHex("#FFF9ED"),
+			borderColor = Color3.fromHex("#B9A98F"),
+			rowDividerColor = Color3.fromHex("#D8CBB5"),
+			header = {
+				backgroundColor = Color3.fromHex("#EFE5D3"),
+			},
+		},
 		draggable = {
 			placeholder = {
 				backgroundColor = Color3.fromHex("#EFE5D3"),

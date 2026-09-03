@@ -396,6 +396,14 @@ export const DarkTheme = createTheme({
                 backgroundColor: Color3.fromHex("#171B22"),
             },
         },
+        table: {
+            backgroundColor: Color3.fromHex("#171B22"),
+            borderColor: Color3.fromHex("#4B5568"),
+            rowDividerColor: Color3.fromHex("#343C4A"),
+            header: {
+                backgroundColor: Color3.fromHex("#252B36"),
+            },
+        },
         draggable: {
             placeholder: {
                 backgroundColor: Color3.fromHex("#2A303B"),
