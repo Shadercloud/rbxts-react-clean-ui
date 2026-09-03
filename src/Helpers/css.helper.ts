@@ -1,4 +1,4 @@
-import { CssBoxShadow, CssShadow, CssSize, CssCalcSize, CssQuad, CssDual, CssSliceInset } from "../Interfaces/css.types";
+import { CssBoxShadow, CssShadow, CssSize, CssCalcSize, CssQuad, CssDual, CssSliceInset, CssBackgroundGradient } from "../Interfaces/css.types";
 import { CssBackgroundImage } from "../Theme";
 
 interface ParsedShadow {
@@ -219,5 +219,54 @@ export class CssHelper {
             SliceScale: value.sliceScale,
             TileSize: value.tileSize !== undefined ? this.parseCssDual(value.tileSize) : undefined,
         };
+    }
+
+    public static resolveBackgroundGradient(value: CssBackgroundGradient | undefined): React.InstanceProps<UIGradient> | undefined {
+        if (value === undefined) {
+            return undefined;
+        }
+
+        const color = typeIs(value.colors, "ColorSequence")
+            ? value.colors
+            : this.buildColorSequence(value.colors, value.stops);
+
+        return {
+            Color: color,
+            Transparency: this.buildTransparencySequence(value.transparency),
+            Rotation: value.rotation,
+            Offset: value.offset,
+        };
+    }
+
+    private static buildColorSequence(colors: Color3[], stops?: number[]): ColorSequence {
+        if (colors.size() === 1) {
+            return new ColorSequence(colors[0]);
+        }
+
+        const keypoints = colors.map((color, index) => {
+            const time = stops?.[index] !== undefined
+                ? math.clamp(stops[index], 0, 1)
+                : index / (colors.size() - 1);
+
+            return new ColorSequenceKeypoint(time, color);
+        });
+
+        // Roblox requires the first keypoint's Time to be exactly 0 and the last exactly 1
+        keypoints[0] = new ColorSequenceKeypoint(0, keypoints[0].Value);
+        keypoints[keypoints.size() - 1] = new ColorSequenceKeypoint(1, keypoints[keypoints.size() - 1].Value);
+
+        return new ColorSequence(keypoints);
+    }
+
+    private static buildTransparencySequence(value: number | NumberSequence | undefined): NumberSequence | undefined {
+        if (value === undefined) {
+            return undefined;
+        }
+
+        if (typeIs(value, "NumberSequence")) {
+            return value;
+        }
+
+        return new NumberSequence(math.clamp(value, 0, 1));
     }
 }

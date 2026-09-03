@@ -400,6 +400,27 @@ The `backgroundImage` prop accepts a `CssBackgroundImage` object. Its fields mat
 
 When `backgroundImage` is not provided, the select uses `theme.components.select.backgroundImage` if the active theme defines one. A directly supplied prop overrides the theme value for that select instance.
 
+## Background Gradient
+
+Use `backgroundGradient` to apply a `UIGradient` to the closed select control. The gradient is layered over the select's background colour, while its border and corner styling continue to come from the active theme.
+
+```tsx
+<Select
+    backgroundGradient={{
+        colors: [Color3.fromHex("#4F46E5"), Color3.fromHex("#EC4899")],
+        rotation: 45,
+    }}
+>
+    <Select.Option text="Oak" />
+    <Select.Option text="Walnut" />
+    <Select.Option text="Maple" />
+</Select>
+```
+
+The `backgroundGradient` prop accepts a `CssBackgroundGradient` object. Its fields match the background-gradient styling supported by [`Box`](/components/surface/box), including `colors`, `stops`, `rotation`, `offset`, and `transparency`.
+
+When `backgroundGradient` is not provided, the select uses `theme.components.select.backgroundGradient` if the active theme defines one. A directly supplied prop overrides the theme value for that select instance.
+
 ## Native ImageLabel Properties
 
 `Select` renders its root as a [`Container`](/components/layout/container), so it extends `React.InstanceProps<ImageLabel>` and accepts native Roblox `ImageLabel` properties directly, rather than the `TextBox` properties its underlying control might suggest.
@@ -430,6 +451,7 @@ See the `Container` documentation for the full set of native `ImageLabel` proper
 | `spacing`    | `SpaceSize`                 | Theme default | Controls the internal padding of the select.                          |
 | `max-height` | `CssSize`                   | Theme default | Sets the maximum height of the dropdown before it becomes scrollable. |
 | `backgroundImage` | `CssBackgroundImage`       | Theme default | Sets the image layered over the closed select control's background.   |
+| `backgroundGradient` | `CssBackgroundGradient` | Theme default | Sets the gradient layered over the closed select control's background. |
 | `searchable` | `boolean`                   | `false`       | Renders a filter textbox above the option list when the dropdown is open. |
 | `searchPlaceholder` | `string`              | `"Search"`    | Placeholder text for the search textbox. Only used when `searchable` is `true`. |
 | `children`   | `React.ReactNode`           | —             | The `Select.Option` and `Select.OptGroup` components displayed in the dropdown. |
@@ -536,7 +558,7 @@ export function SettingsForm() {
 
 ## Theme Values
 
-The select's appearance is controlled by `theme.components.select`. Its `backgroundImage` value supplies the closed control's background image when the `backgroundImage` prop is omitted. Existing select theme values continue to control typography, borders, corner radius, dropdown height, dropdown colour, and option intent colours. Internal padding (the `spacing` prop) is resolved from the global `theme.spacing` scale rather than a select-specific value.
+The select's appearance is controlled by `theme.components.select`. Its `backgroundImage` value supplies the closed control's background image when the `backgroundImage` prop is omitted, and its `backgroundGradient` value likewise supplies the background gradient when the `backgroundGradient` prop is omitted. Existing select theme values continue to control typography, borders, corner radius, dropdown height, dropdown colour, and option intent colours. Internal padding (the `spacing` prop) is resolved from the global `theme.spacing` scale rather than a select-specific value.
 
 `theme.components.select.optGroup` controls the appearance of `Select.OptGroup` headers:
 

@@ -2,7 +2,7 @@ import React from "@rbxts/react";
 import { Icon } from "../Surface";
 import { CleanThemeContext } from "../../Contexts";
 import { FieldsetContext } from "../Layout";
-import { Corners, Padding } from "../Decorator";
+import { Corners, Gradient, Padding } from "../Decorator";
 import { ColorHelper, CssHelper, SpacingHelper } from "../../Helpers";
 import { BackgroundElementProps, IconName, Intent, IntentElementProps, PaddingProps, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 
@@ -73,6 +73,7 @@ export function Checkbox(props: CheckboxProps) {
         TileSize={backgroundImage.TileSize}
     >
         <Corners radius={theme.components.checkbox.cornerRadius} />
+        <Gradient value={theme.components.checkbox.backgroundGradient} />
         <uistroke
             key="Stroke"
             Thickness={theme.components.checkbox.borderThickness}

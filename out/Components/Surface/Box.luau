@@ -6,6 +6,7 @@ local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Padding = _Decorator.Padding
 local Corners = _Decorator.Corners
 local BoxShadow = _Decorator.BoxShadow
+local Gradient = _Decorator.Gradient
 local Container = TS.import(script, script.Parent.Parent, "Layout").Container
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local SizeHelper = _Helpers.SizeHelper
@@ -54,6 +55,8 @@ local Box = React.forwardRef(function(props, ref)
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.box.spacing, theme.components.box.padding),
 	}), React.createElement(Corners, {
 		radius = theme.components.box.cornerRadius,
+	}), React.createElement(Gradient, {
+		value = props["background-gradient"] or theme.components.box.backgroundGradient,
 	}), props.children)
 end)
 return {

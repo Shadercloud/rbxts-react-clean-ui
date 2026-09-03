@@ -6,13 +6,14 @@ import {
 } from "../../Contexts";
 import { ColorHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import {
+    CssBackgroundGradient,
     CssSize,
     ScalableElementProps,
     ScaleSize,
     SpacedElementProps,
 } from "../../Interfaces";
 import { CssBackgroundImage } from "../../Theme";
-import { Corners, Padding } from "../Decorator";
+import { Corners, Gradient, Padding } from "../Decorator";
 import { Container, FieldsetContext, FlexItem, HStack, Scroller, VStack } from "../Layout";
 import { Text } from "../Typography";
 import { Icon } from "../Surface";
@@ -25,6 +26,7 @@ export interface SelectProps
     selected?: number;
     'max-height'?: CssSize;
     backgroundImage?: CssBackgroundImage;
+    backgroundGradient?: CssBackgroundGradient;
     onChange?: (selected: number, value?: string) => void;
     name?: string;
     searchable?: boolean;
@@ -447,6 +449,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
             AutomaticSize={Enum.AutomaticSize.Y}
             backgroundImage={props.backgroundImage ?? theme.components.select.backgroundImage}
         >
+            <Gradient value={props.backgroundGradient ?? theme.components.select.backgroundGradient} />
             <SelectContext.Provider value={context}>
                 <imagebutton
                     key="SelectButton"

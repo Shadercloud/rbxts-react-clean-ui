@@ -1,4 +1,4 @@
-import { CssBoxShadow, CssShadow, CssCalcSize, CssQuad, CssDual, CssSliceInset } from "../Interfaces/css.types";
+import { CssBoxShadow, CssShadow, CssCalcSize, CssQuad, CssDual, CssSliceInset, CssBackgroundGradient } from "../Interfaces/css.types";
 import { CssBackgroundImage } from "../Theme";
 interface ParsedShadow {
     offset: UDim2;
@@ -35,5 +35,8 @@ export declare class CssHelper {
         SliceScale?: number;
         TileSize?: UDim2;
     };
+    static resolveBackgroundGradient(value: CssBackgroundGradient | undefined): React.InstanceProps<UIGradient> | undefined;
+    private static buildColorSequence;
+    private static buildTransparencySequence;
 }
 export {};

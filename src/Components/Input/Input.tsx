@@ -3,7 +3,7 @@ import { CleanThemeContext } from "../../Contexts";
 import { CssHelper, TypographyHelper } from "../../Helpers";
 import { IconName, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 import { TypographyStyle } from "../../Theme";
-import { Corners, Padding } from "../Decorator";
+import { Corners, Gradient, Padding } from "../Decorator";
 import { FieldsetContext, FlexItem, HStack } from "../Layout";
 import { Icon } from "../Surface";
 import { resolveClampedText, resolveValidatedText } from "./Input.validation";
@@ -91,6 +91,7 @@ export function Input(props: InputProps) {
             />
 
             <Corners radius={theme.components.input.cornerRadius} />
+            <Gradient value={theme.components.input.backgroundGradient} />
             <Padding {...props} />
             <HStack valign="Center" Wraps={false}>
                 {props.icon !== undefined && (

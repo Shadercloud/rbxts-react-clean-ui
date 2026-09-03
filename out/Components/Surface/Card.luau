@@ -180,6 +180,7 @@ local CardHeader = React.forwardRef(function(props, ref)
 	_attributes.BackgroundColor3 = intent.backgroundColor
 	_attributes.BorderSizePixel = 0
 	_attributes.backgroundImage = intent.backgroundImage
+	_attributes.backgroundGradient = intent.backgroundGradient
 	_attributes.Change = if overlay and card.reportOverlayHeaderRect ~= nil then {
 		AbsolutePosition = function(instance)
 			return card.reportOverlayHeaderRect(instance.AbsolutePosition, instance.AbsoluteSize)
@@ -266,6 +267,7 @@ local CardFooter = React.forwardRef(function(props, ref)
 	_attributes.BackgroundColor3 = intent.backgroundColor
 	_attributes.BorderSizePixel = 0
 	_attributes.backgroundImage = intent.backgroundImage
+	_attributes.backgroundGradient = intent.backgroundGradient
 	_attributes.Change = if overlay and card.reportOverlayFooterRect ~= nil then {
 		AbsolutePosition = function(instance)
 			return card.reportOverlayFooterRect(instance.AbsolutePosition, instance.AbsoluteSize)

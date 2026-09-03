@@ -5,6 +5,7 @@ local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contex
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local BoxShadow = _Decorator.BoxShadow
 local Corners = _Decorator.Corners
+local Gradient = _Decorator.Gradient
 local Padding = _Decorator.Padding
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
@@ -224,9 +225,12 @@ local Button = React.forwardRef(function(props, ref)
 	end
 	_attributes_3.value = _condition_4
 	local _exp_4 = React.createElement(BoxShadow, _attributes_3)
+	local _exp_5 = React.createElement(Gradient, {
+		value = intentColors.backgroundGradient,
+	})
 	local _attributes_4 = table.clone(props)
 	setmetatable(_attributes_4, nil)
-	return React.createElement("imagebutton", _attributes, _exp_2, _exp_3, _exp_4, React.createElement(Padding, _attributes_4), React.createElement(Group.Element, {
+	return React.createElement("imagebutton", _attributes, _exp_2, _exp_3, _exp_4, _exp_5, React.createElement(Padding, _attributes_4), React.createElement(Group.Element, {
 		enabled = props.group,
 		padding = padding,
 	}, (props.icon ~= nil or props.text ~= nil) and React.createElement(HStack, {

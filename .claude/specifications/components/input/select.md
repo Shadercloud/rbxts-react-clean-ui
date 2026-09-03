@@ -4,7 +4,7 @@
 
 ## Public API
 
-- `SelectProps` composes `ScalableElementProps`, `SpacedElementProps`, and `React.InstanceProps<ImageLabel>` (it renders through `Container`, so it accepts native `ImageLabel` properties, not `TextBox` properties), plus `selected?: number`, `'max-height'?: CssSize`, `backgroundImage?: CssBackgroundImage`, `onChange?: (selected: number, value?: string) => void`, `searchable?: boolean`, and `searchPlaceholder?: string` (defaults to `"Search"`).
+- `SelectProps` composes `ScalableElementProps`, `SpacedElementProps`, and `React.InstanceProps<ImageLabel>` (it renders through `Container`, so it accepts native `ImageLabel` properties, not `TextBox` properties), plus `selected?: number`, `'max-height'?: CssSize`, `backgroundImage?: CssBackgroundImage`, `backgroundGradient?: CssBackgroundGradient`, `onChange?: (selected: number, value?: string) => void`, `searchable?: boolean`, and `searchPlaceholder?: string` (defaults to `"Search"`).
 - `Select.Option` accepts `text?: string`, `children?: React.ReactNode`, `Event?: React.InstanceEvent<ImageButton>`, and `BackgroundColor3?: Color3`. `index` and `value` are assigned/consumed internally; `index` must not be set by a consumer (`Select` assigns it based on child position).
 - `Select.OptGroup` accepts `label: string` and `children?: React.ReactNode` (expected to be `Select.Option` elements). It renders nothing itself — like `Accordion.Item`/`Header`/`Content`, it's a structural marker that `Select` walks to build its own render tree — and only groups one level deep: a `Select.OptGroup` nested inside another `Select.OptGroup` is ignored, along with any non-`Select.Option` children of a group.
 - `Select.Option` is recognized both as a direct child of `Select` and as a child of a `Select.OptGroup` that is itself a direct child of `Select`; an option nested any deeper (or inside any other element) does not receive a valid `index` and its `Select.Option` internals will assert (`"Select.Option must be a direct child of Select or Select.OptGroup"`). Index assignment is a single sequential counter across the whole `children` tree (ungrouped options and every group's options interleave in document order), so index order matches the order options are declared regardless of grouping.
@@ -37,6 +37,7 @@
 - `dropDownBackgroundColor`.
 - `typography`, resolved via `TypographyHelper.getTypography`.
 - Optional `backgroundImage`, overridden per instance by the matching `SelectProps.backgroundImage`, renders directly on the root `Container` using the shared `CssBackgroundImage` shape and resolution behavior.
+- Optional `backgroundGradient`, overridden per instance by the matching `SelectProps.backgroundGradient`, renders on the root `Container` using the shared `CssBackgroundGradient` shape and resolution behavior (see [Box](../surface/box.md#backgroundgradient)).
 - `intents` for the `default`/`hover`/`focus` (selected) option colors.
 - `maxDropDownHeight`, the fallback for `'max-height'`.
 - `optGroup.textColor` (required) plus optional `typography`, `backgroundColor`, `backgroundTransparency` (defaults to `1`, i.e. invisible, when unset), `spacing`, and `padding` (the latter two resolved via `SpacingHelper.GetResolvedPadding`) for a `Select.OptGroup` header row.

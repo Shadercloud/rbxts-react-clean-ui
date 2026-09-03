@@ -126,6 +126,60 @@ To tile an image instead of stretching it, pair `size: Enum.ScaleType.Tile` with
 </Box>
 ```
 
+## Background gradient
+
+Theme authors can set `theme.components.box.backgroundGradient` to layer a `UIGradient` on top of every `Box`'s background colour. Like `backgroundImage`, this is purely additive — `backgroundColor`, `border-color`, corner radius, and `box-shadow` all keep working unchanged, and the gradient renders underneath the border stroke and inside the clipped corner radius.
+
+`Box` also accepts a `background-gradient` prop directly, which overrides the themed `backgroundGradient` for that single instance — the same pattern used by `background-image`.
+
+```tsx
+<Box
+    spacing="md"
+    background-gradient={{
+        colors: [Color3.fromHex("#4F46E5"), Color3.fromHex("#EC4899")],
+        rotation: 45,
+    }}
+>
+    <Text text="Gradient Box" variant="heading" />
+</Box>
+```
+
+Use `createTheme` (or `extendTheme`) to set `components.box.backgroundGradient` theme-wide instead, then apply it to a subtree with `ThemeProvider`:
+
+```tsx
+import { Box, createTheme, ThemeProvider, VStack, Text } from "@rbxts/react-clean-ui";
+
+const themeWithBackgroundGradient = createTheme({
+    components: {
+        box: {
+            backgroundGradient: {
+                colors: [Color3.fromHex("#4F46E5"), Color3.fromHex("#EC4899")],
+                rotation: 45,
+            },
+        },
+    },
+});
+
+<ThemeProvider theme={themeWithBackgroundGradient}>
+    <Box spacing="md">
+        <VStack>
+            <Text text="Gradient Box" variant="heading" />
+            <Text text="The border, corner radius, and shadow still render on top of the gradient." />
+        </VStack>
+    </Box>
+</ThemeProvider>
+```
+
+`backgroundGradient` accepts a `CssBackgroundGradient` object:
+
+| Field          | Type                       | Default | Description                                                                                                                                                              |
+| -------------- | --------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `colors`       | `Color3[] \| ColorSequence` | -       | A plain `Color3[]` is spaced evenly across 0–1 (first colour at 0, last at 1). Pass a raw `ColorSequence` instead for full manual control over keypoint positions.          |
+| `stops`        | `number[]`                  | -       | Optional 0–1 positions, index-matched to `colors`. Only used when `colors` is a plain array — ignored when `colors` is already a `ColorSequence`, since that already carries its own keypoint positions. Values are clamped to the `0`-`1` range. |
+| `rotation`     | `number`                    | `0`     | Degrees, maps directly to `UIGradient.Rotation` (`0` = left→right, clockwise).                                                                                              |
+| `offset`       | `Vector2`                   | -       | Maps directly to `UIGradient.Offset`.                                                                                                                                        |
+| `transparency` | `number \| NumberSequence`  | -       | A single `number` applies uniform transparency; pass a raw `NumberSequence` for full control.                                                                               |
+
 ## Props
 
 | Prop                     | Type                     | Description                                                  |
@@ -140,6 +194,7 @@ To tile an image instead of stretching it, pair `size: Enum.ScaleType.Tile` with
 | `border-thickness`       | `number`                 | Overrides the themed border thickness.                       |
 | `border-color`           | `Color3`                 | Overrides the themed border colour.                          |
 | `background-image`       | `CssBackgroundImage`     | Overrides the themed background image for this instance.     |
+| `background-gradient`    | `CssBackgroundGradient`  | Overrides the themed background gradient for this instance.  |
 | `ZIndex`                 | `number`                 | Sets the rendering order.                                    |
 
 ## Notes

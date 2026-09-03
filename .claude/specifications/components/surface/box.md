@@ -4,7 +4,7 @@
 
 ## Public API
 
-- `BoxProps` composes `SpacedElementProps`, `ShadowElementProps`, `BackgroundElementProps`, `ZIndexElementProps`, `SizeElementProps`, `PositionElementProps`, and `React.InstanceProps<ImageLabel>`, plus three Box-specific fields: `'border-thickness'?: number`, `'border-color'?: Color3`, and `'background-image'?: CssBackgroundImage`.
+- `BoxProps` composes `SpacedElementProps`, `ShadowElementProps`, `BackgroundElementProps`, `ZIndexElementProps`, `SizeElementProps`, `PositionElementProps`, and `React.InstanceProps<ImageLabel>`, plus four Box-specific fields: `'border-thickness'?: number`, `'border-color'?: Color3`, `'background-image'?: CssBackgroundImage`, and `'background-gradient'?: CssBackgroundGradient`.
 - `Box` forwards a ref to the underlying `ImageLabel` — `Box` is a thin wrapper around [`Container`](../layout/container.md), which always renders an `ImageLabel` as its root instance (rather than conditionally choosing between `Frame`/`ImageLabel`), so every ref that terminates at `Box`'s own instance is typed `ImageLabel`, not `Frame`. This is a breaking type change for any existing `React.useRef<Frame>()`/`InstanceProps<Frame>` typed against a `Box` ref.
 
 ## Behavior
@@ -16,10 +16,11 @@
 - A `Padding` decorator applies any of the standard padding props.
 - A `Corners` decorator applies `theme.components.box.cornerRadius`.
 - `props['background-image']`, falling back to `theme.components.box.backgroundImage`, is passed straight through as `Container`'s own `backgroundImage` prop, so `Container` (an `ImageLabel`) renders it directly as its own `Image`/`ImageColor3`/`ImageTransparency`/`ScaleType`/`SliceCenter`, composited underneath `BackgroundColor3` in the same way a plain background color renders — there is no separate image layer/child instance for it (unlike `BoxShadow`/`Corners`/`Padding`, which remain ordinary decorator children). It still visually composites with the solid `BackgroundColor3` fill, border stroke, corner radius, and shadow rather than replacing any of them, and sits below `children` in draw order.
+- `props['background-gradient']`, falling back to `theme.components.box.backgroundGradient`, is passed straight through as `Container`'s own `backgroundGradient` prop. Unlike `backgroundImage`, `Container` renders this via the `Gradient` decorator (a `<uigradient>` child instance, same "return nothing when empty" pattern as `BoxShadow`/`Corners`), which composites on top of `BackgroundColor3` following ordinary Roblox `UIGradient` layering.
 
 ## Theme
 
-Box defaults live under `theme.components.box`: `backgroundColor`, `backgroundTransparency`, `borderColor`, `borderThickness`, `cornerRadius`, optional `spacing`, optional `padding`, optional `boxShadow`, and optional `backgroundImage`. The theme shape also declares an `intents` field (per-intent color schemes), but `Box` itself never reads it — no intent resolution happens inside `Box`; components built on top of `Box` (e.g. `Card`, `Toast`) apply their own intent colors as explicit `BackgroundColor3`/`border-color` overrides instead. Treat `theme.components.box.intents` as currently unused by `Box`.
+Box defaults live under `theme.components.box`: `backgroundColor`, `backgroundTransparency`, `borderColor`, `borderThickness`, `cornerRadius`, optional `spacing`, optional `padding`, optional `boxShadow`, optional `backgroundImage`, and optional `backgroundGradient`. The theme shape also declares an `intents` field (per-intent color schemes), but `Box` itself never reads it — no intent resolution happens inside `Box`; components built on top of `Box` (e.g. `Card`, `Toast`) apply their own intent colors as explicit `BackgroundColor3`/`border-color` overrides instead. Treat `theme.components.box.intents` as currently unused by `Box`.
 
 ### `padding` / `spacing`
 
@@ -38,3 +39,15 @@ Box defaults live under `theme.components.box`: `backgroundColor`, `backgroundTr
 - `sliceScale` (optional, `number`, default `1`): maps directly to `ImageLabel.SliceScale`. Only takes effect when `slice` is set. `slice`'s coordinates are always in the source image's own pixel space, so a source image with a naturally large border region (e.g. a few hundred px) would otherwise always render that same large thickness regardless of how small the destination `Box` actually is; `sliceScale` decouples "which region of the source image is the border" (`slice`) from "how thick that border renders on screen", letting the rendered border be scaled down/up independent of the slice region's literal pixel size.
 
 `CssHelper.resolveBackgroundImage(value: CssBackgroundImage | undefined)` is the shared pure function that turns a `CssBackgroundImage` into the resolved `Image`/`ImageColor3`/`ImageTransparency`/`ScaleType`/`SliceCenter`/`SliceScale`/`TileSize` prop values; it lives in `src/Helpers/css.helper.ts` alongside `parseCssSliceInset`/`parseCssDual`/`parseCssShadow`/`parseCssSize`, and is shared by any component that renders a `CssBackgroundImage` (currently just [`Container`](../layout/container.md), which `Box` composes).
+
+### `backgroundGradient`
+
+`theme.components.box.backgroundGradient` (type `CssBackgroundGradient`, declared in `src/Interfaces/css.types.ts`) lets a theme author layer a `UIGradient` onto every `Box` in that theme, on top of the plain background/border/corner/shadow styling. The `'background-gradient'` prop on `BoxProps` overrides this theme value per-instance when supplied, the same `??` prop-overrides-theme pattern `'background-image'` uses. It is optional; when unset, no gradient renders.
+
+- `colors` (`Color3[] | ColorSequence`, required): a plain array is auto-spaced evenly across `0`–`1` (first color at `0`, last at `1`); a raw `ColorSequence` is used as-is for full manual keypoint control.
+- `stops` (optional, `number[]`): index-matched `0`–`1` positions for each entry in a plain `colors` array, clamped to `0`–`1`. Ignored when `colors` is already a `ColorSequence`, since that already carries its own keypoint positions.
+- `rotation` (optional, `number`): degrees, maps directly to `UIGradient.Rotation`.
+- `offset` (optional, `Vector2`): maps directly to `UIGradient.Offset`.
+- `transparency` (optional, `number | NumberSequence`): a single number for uniform transparency, or a raw `NumberSequence` for full control.
+
+`CssHelper.resolveBackgroundGradient(value: CssBackgroundGradient | undefined)` turns a `CssBackgroundGradient` into resolved `UIGradient` props (`Color`/`Transparency`/`Rotation`/`Offset`), returning `undefined` when `value` is `undefined`. Unlike `backgroundImage`, which resolves onto `Container`'s own `ImageLabel` properties, `backgroundGradient` is rendered by the `Gradient` decorator component (`src/Components/Decorator/Gradient.tsx`), which renders a `<uigradient>` child instance (or nothing, when there's no gradient set) — the same pattern as the `BoxShadow`/`Corners` decorators in that same folder.

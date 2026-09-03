@@ -4,9 +4,9 @@ import { VStack } from "./VStack";
 import { Text } from "../Typography";
 import { Container } from "./Container";
 import { CleanThemeContext } from "../../Contexts";
-import { BoxShadow, Corners, Padding } from "../Decorator";
+import { BoxShadow, Corners, Gradient, Padding } from "../Decorator";
 import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
-import { PaddingProps, ScalableElementProps } from "../../Interfaces";
+import { CssBackgroundGradient, PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
 import { CssBackgroundImage } from "../../Theme";
 
@@ -180,6 +180,7 @@ const TabsList = React.forwardRef<ImageLabel, TabsListProps>(
                 BackgroundTransparency={theme.components.tabs.list.backgroundTransparency ?? 0}
                 backgroundImage={theme.components.tabs.list.backgroundImage}>
                 <Corners radius={theme.components.tabs.list.cornerRadius} />
+                <Gradient value={theme.components.tabs.list.backgroundGradient} />
                 <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing, theme.components.tabs.list.padding)} />
                 <HStack>
                     {props.children}
@@ -190,6 +191,7 @@ const TabsList = React.forwardRef<ImageLabel, TabsListProps>(
 
 interface TabsBodyProps extends ScalableElementProps {
     backgroundImage?: CssBackgroundImage;
+    backgroundGradient?: CssBackgroundGradient;
     children?: React.ReactNode;
 }
 
@@ -211,6 +213,7 @@ const TabsBody = React.forwardRef<ImageLabel, TabsBodyProps>(
                 />
                 <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding)} />
                 <Corners radius={theme.components.tabs.cornerRadius} />
+                <Gradient value={props.backgroundGradient ?? theme.components.tabs.backgroundGradient} />
 
                 {props.children}
             </Container>

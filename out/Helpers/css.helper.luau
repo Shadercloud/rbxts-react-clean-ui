@@ -341,6 +341,53 @@ do
 		_object.TileSize = if value.tileSize ~= nil then self:parseCssDual(value.tileSize) else nil
 		return _object
 	end
+	function CssHelper:resolveBackgroundGradient(value)
+		if value == nil then
+			return nil
+		end
+		local _colors = value.colors
+		local color = if typeof(_colors) == "ColorSequence" then value.colors else self:buildColorSequence(value.colors, value.stops)
+		return {
+			Color = color,
+			Transparency = self:buildTransparencySequence(value.transparency),
+			Rotation = value.rotation,
+			Offset = value.offset,
+		}
+	end
+	function CssHelper:buildColorSequence(colors, stops)
+		if #colors == 1 then
+			return ColorSequence.new(colors[1])
+		end
+		-- ▼ ReadonlyArray.map ▼
+		local _newValue = table.create(#colors)
+		local _callback = function(color, index)
+			local _result = stops
+			if _result ~= nil then
+				_result = _result[index + 1]
+			end
+			local time = if _result ~= nil then math.clamp(stops[index + 1], 0, 1) else index / (#colors - 1)
+			return ColorSequenceKeypoint.new(time, color)
+		end
+		for _k, _v in colors do
+			_newValue[_k] = _callback(_v, _k - 1, colors)
+		end
+		-- ▲ ReadonlyArray.map ▲
+		local keypoints = _newValue
+		-- Roblox requires the first keypoint's Time to be exactly 0 and the last exactly 1
+		keypoints[1] = ColorSequenceKeypoint.new(0, keypoints[1].Value)
+		keypoints[#keypoints] = ColorSequenceKeypoint.new(1, keypoints[#keypoints].Value)
+		return ColorSequence.new(keypoints)
+	end
+	function CssHelper:buildTransparencySequence(value)
+		if value == nil then
+			return nil
+		end
+		local _value = value
+		if typeof(_value) == "NumberSequence" then
+			return value
+		end
+		return NumberSequence.new(math.clamp(value, 0, 1))
+	end
 end
 return {
 	CssHelper = CssHelper,

@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { BackgroundElementProps, PaddingProps, PositionElementProps, ShadowElementProps, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
+import { BackgroundElementProps, CssBackgroundGradient, PaddingProps, PositionElementProps, ShadowElementProps, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
-import { Padding, Corners, BoxShadow } from "../Decorator";
+import { Padding, Corners, BoxShadow, Gradient } from "../Decorator";
 import { Container } from "../Layout";
 import { SizeHelper, SpacingHelper } from "../../Helpers";
 import { CssBackgroundImage } from "../../Theme";
@@ -16,6 +16,7 @@ export interface BoxProps extends SpacedElementProps,
     'border-thickness'?: number;
     'border-color'?: Color3;
     'background-image'?: CssBackgroundImage;
+    'background-gradient'?: CssBackgroundGradient;
     name?: string;
 }
 
@@ -61,6 +62,8 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
                 <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.box.spacing, theme.components.box.padding)} />
 
                 <Corners radius={theme.components.box.cornerRadius} />
+
+                <Gradient value={props['background-gradient'] ?? theme.components.box.backgroundGradient} />
 
                 {props.children}
             </Container>

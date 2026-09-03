@@ -9,7 +9,7 @@ import {
     ZIndexElementProps,
 } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
-import { BoxShadow, Corners, Padding } from "../Decorator";
+import { BoxShadow, Corners, Gradient, Padding } from "../Decorator";
 import { Text } from "../Typography";
 import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { Icon, IconProps } from "../Surface";
@@ -192,6 +192,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 />
 
                 <BoxShadow {...props} value={props.styleOverride?.boxShadow ?? theme.components.button.boxShadow} />
+                <Gradient value={intentColors.backgroundGradient} />
                 <Padding {...props} />
                 <Group.Element enabled={props.group} padding={padding}>
 

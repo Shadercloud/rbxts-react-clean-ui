@@ -4,6 +4,7 @@ local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local _ = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local SizeHelper = _.SizeHelper
 local CssHelper = _.CssHelper
+local Gradient = TS.import(script, script.Parent.Parent, "Decorator").Gradient
 local _Group = TS.import(script, script.Parent, "Group")
 local Group = _Group.Group
 local GroupContext = _Group.GroupContext
@@ -80,7 +81,9 @@ local Container = React.forwardRef(function(props, ref)
 	_attributes.TileSize = backgroundImage.TileSize
 	_attributes.Change = props.Change
 	_attributes.Event = props.Event
-	local content = (React.createElement("imagelabel", _attributes, React.createElement(Group.Element, {
+	local content = (React.createElement("imagelabel", _attributes, React.createElement(Gradient, {
+		value = props.backgroundGradient,
+	}), React.createElement(Group.Element, {
 		enabled = props.group,
 	}, props.children)))
 	if not centerViaLayout then

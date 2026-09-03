@@ -6,6 +6,8 @@ import {
 } from "../../Interfaces/";
 import { SizeHelper, CssHelper } from "../../Helpers/";
 import { CssBackgroundImage } from "../../Theme";
+import { CssBackgroundGradient } from "../../Interfaces/";
+import { Gradient } from "../Decorator";
 import { Group, GroupContext } from "./Group";
 
 export interface ContainerProps
@@ -15,6 +17,7 @@ export interface ContainerProps
     React.InstanceProps<ImageLabel> {
     group?: boolean;
     backgroundImage?: Partial<CssBackgroundImage>;
+    backgroundGradient?: Partial<CssBackgroundGradient>;
     name?: string;
 }
 
@@ -87,6 +90,7 @@ export const Container = React.forwardRef<ImageLabel, ContainerProps>(
                 Change={props.Change}
                 Event={props.Event}
             >
+                <Gradient value={props.backgroundGradient} />
 
                 <Group.Element enabled={props.group}>
                     {props.children}

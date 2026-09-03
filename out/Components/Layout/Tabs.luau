@@ -9,6 +9,7 @@ local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contex
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local BoxShadow = _Decorator.BoxShadow
 local Corners = _Decorator.Corners
+local Gradient = _Decorator.Gradient
 local Padding = _Decorator.Padding
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
@@ -163,6 +164,8 @@ local TabsList = React.forwardRef(function(props, ref)
 	_attributes.backgroundImage = theme.components.tabs.list.backgroundImage
 	return React.createElement(Container, _attributes, React.createElement(Corners, {
 		radius = theme.components.tabs.list.cornerRadius,
+	}), React.createElement(Gradient, {
+		value = theme.components.tabs.list.backgroundGradient,
 	}), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing, theme.components.tabs.list.padding),
 	}), React.createElement(HStack, nil, props.children))
@@ -183,6 +186,8 @@ local TabsBody = React.forwardRef(function(props, ref)
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding),
 	}), React.createElement(Corners, {
 		radius = theme.components.tabs.cornerRadius,
+	}), React.createElement(Gradient, {
+		value = props.backgroundGradient or theme.components.tabs.backgroundGradient,
 	}), props.children)
 end)
 -- Root doesn't render a real Roblox Instance of its own (just a Context

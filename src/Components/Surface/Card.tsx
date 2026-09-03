@@ -180,6 +180,7 @@ export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
             BackgroundColor3={intent.backgroundColor}
             BorderSizePixel={0}
             backgroundImage={intent.backgroundImage}
+            backgroundGradient={intent.backgroundGradient}
             Change={overlay && card.reportOverlayHeaderRect !== undefined ? {
                 AbsolutePosition: (instance) => card.reportOverlayHeaderRect!(instance.AbsolutePosition, instance.AbsoluteSize),
                 AbsoluteSize: (instance) => card.reportOverlayHeaderRect!(instance.AbsolutePosition, instance.AbsoluteSize),
@@ -247,6 +248,7 @@ export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
             BackgroundColor3={intent.backgroundColor}
             BorderSizePixel={0}
             backgroundImage={intent.backgroundImage}
+            backgroundGradient={intent.backgroundGradient}
             Change={overlay && card.reportOverlayFooterRect !== undefined ? {
                 AbsolutePosition: (instance) => card.reportOverlayFooterRect!(instance.AbsolutePosition, instance.AbsoluteSize),
                 AbsoluteSize: (instance) => card.reportOverlayFooterRect!(instance.AbsolutePosition, instance.AbsoluteSize),

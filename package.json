@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/react-clean-ui",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A clean UI library for Roblox TypeScript projects",
   "main": "out/init.lua",
   "scripts": {

@@ -75,3 +75,11 @@ export type CssPadding = CssQuad;
 export type ScaledCssPadding = CssPadding | ScaleSizeValue<CssPadding>;
 
 export type ResponsiveCssSize = CssSize | CssBreakpointSize;
+
+export type CssBackgroundGradient = {
+    colors: Color3[] | ColorSequence;
+    stops?: number[]; // Stops are ignored when colors is a ColorSequence, since ColorSequence already has its own stop positions
+    rotation?: number;
+    offset?: Vector2;
+    transparency?: number | NumberSequence;
+}

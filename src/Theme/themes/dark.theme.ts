@@ -172,16 +172,30 @@ export const DarkTheme = createTheme({
                 primary: {
                     default: {
                         textColor: Color3.fromHex("#FFFFFF"),
+                        backgroundColor: Color3.fromHex("#FFFFFF"),
+                        borderColor: Color3.fromHex("#6B96F0"),
+                        backgroundGradient: {
+                            colors: [Color3.fromHex("#365FAF"), Color3.fromHex("#4775CC")],
+                            rotation: 90,
+                        },
                     },
                     disabled: {
                         backgroundColor: Color3.fromHex("#1D222B"),
                         borderColor: Color3.fromHex("#343B49"),
                         textColor: Color3.fromHex("#697386"),
                     },
+                    hover: {
+                        backgroundColor: Color3.fromHex("#b8b8b8"),
+                    }
                 },
                 success: {
                     default: {
                         textColor: Color3.fromHex("#FFFFFF"),
+                        borderColor: Color3.fromHex("#42C982"),
+                        backgroundGradient: {
+                            colors: [Color3.fromHex("#237A4D"), Color3.fromHex("#2D965F")],
+                            rotation: 90,
+                        },
                     },
                     disabled: {
                         backgroundColor: Color3.fromHex("#1D222B"),
@@ -192,6 +206,11 @@ export const DarkTheme = createTheme({
                 info: {
                     default: {
                         textColor: Color3.fromHex("#FFFFFF"),
+                        borderColor: Color3.fromHex("#3ED6E8"),
+                        backgroundGradient: {
+                            colors: [Color3.fromHex("#0E7C8C"), Color3.fromHex("#20B4C4")],
+                            rotation: 90,
+                        },
                     },
                     disabled: {
                         backgroundColor: Color3.fromHex("#1D222B"),
@@ -202,6 +221,11 @@ export const DarkTheme = createTheme({
                 warning: {
                     default: {
                         textColor: Color3.fromHex("#FFFFFF"),
+                        borderColor: Color3.fromHex("#E0AD3E"),
+                        backgroundGradient: {
+                            colors: [Color3.fromHex("#916B1D"), Color3.fromHex("#AF8427")],
+                            rotation: 90,
+                        },
                     },
                     disabled: {
                         backgroundColor: Color3.fromHex("#1D222B"),
@@ -212,6 +236,11 @@ export const DarkTheme = createTheme({
                 danger: {
                     default: {
                         textColor: Color3.fromHex("#FFFFFF"),
+                        borderColor: Color3.fromHex("#EB6262"),
+                        backgroundGradient: {
+                            colors: [Color3.fromHex("#A63737"), Color3.fromHex("#C64646")],
+                            rotation: 90,
+                        },
                     },
                     disabled: {
                         backgroundColor: Color3.fromHex("#1D222B"),
@@ -374,12 +403,14 @@ export const DarkTheme = createTheme({
             item: {
                 borderThickness: 0, cornerRadius: 4,
                 spacing: { xs: 1, sm: 2, md: 4, lg: 6, xl: 8 },
-                intents: { primary: {
-                    default: { backgroundTransparency: 1, textColor: Color3.fromHex("#AAB3C2") },
-                    hover: { backgroundTransparency: 1, textColor: Color3.fromHex("#FFFFFF") },
-                    focus: { textColor: Color3.fromHex("#FFFFFF"), backgroundColor: Color3.fromHex("#2A303B"), backgroundTransparency: 0, boxShadow: "2px 2px 6px 0px", typography: { weight: Enum.FontWeight.Bold } },
-                    disabled: { backgroundTransparency: 1, borderColor: Color3.fromHex("#343B49"), textColor: Color3.fromHex("#697386") },
-                } },
+                intents: {
+                    primary: {
+                        default: { backgroundTransparency: 1, textColor: Color3.fromHex("#AAB3C2") },
+                        hover: { backgroundTransparency: 1, textColor: Color3.fromHex("#FFFFFF") },
+                        focus: { textColor: Color3.fromHex("#FFFFFF"), backgroundColor: Color3.fromHex("#2A303B"), backgroundTransparency: 0, boxShadow: "2px 2px 6px 0px", typography: { weight: Enum.FontWeight.Bold } },
+                        disabled: { backgroundTransparency: 1, borderColor: Color3.fromHex("#343B49"), textColor: Color3.fromHex("#697386") },
+                    }
+                },
             },
         },
         accordion: {

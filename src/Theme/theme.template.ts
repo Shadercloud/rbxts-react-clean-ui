@@ -1,4 +1,4 @@
-import { CssShadow, CssSize, ScaledCssPadding, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow } from "../Interfaces/";
+import { CssShadow, CssSize, ScaledCssPadding, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow, CssBackgroundGradient } from "../Interfaces/";
 import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors, CssBackgroundImage, CssPosition } from "./theme.style";
 
 export interface ThemeTemplate {
@@ -60,6 +60,7 @@ export interface ThemeTemplate {
             padding?: ScaledCssPadding;
             boxShadow?: CssShadow;
             backgroundImage?: CssBackgroundImage;
+            backgroundGradient?: CssBackgroundGradient;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
 
@@ -82,6 +83,7 @@ export interface ThemeTemplate {
             cornerRadius: CssSize;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             backgroundImage?: CssBackgroundImage;
+            backgroundGradient?: CssBackgroundGradient;
             placeholder?: Partial<TypographyStyle> | ScaledTypographyStyle;
             iconColor?: Color3;
         };
@@ -90,6 +92,7 @@ export interface ThemeTemplate {
             borderThickness: number;
             cornerRadius: CssSize;
             backgroundImage?: CssBackgroundImage;
+            backgroundGradient?: CssBackgroundGradient;
             dropDownBackgroundColor: Color3;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
@@ -116,6 +119,7 @@ export interface ThemeTemplate {
             spacing?: ScaleSizeValue<number>;
             padding?: ScaledCssPadding;
             backgroundImage?: CssBackgroundImage;
+            backgroundGradient?: CssBackgroundGradient;
         };
         switch: {
             width: CssSize;
@@ -146,6 +150,7 @@ export interface ThemeTemplate {
             borderColor: Color3;
             backgroundColor: Color3;
             backgroundImage?: CssBackgroundImage;
+            backgroundGradient?: CssBackgroundGradient;
             borderThickness: number;
             cornerRadius: CssSize;
             spacing?: ScaleSizeValue<number>;
@@ -159,6 +164,7 @@ export interface ThemeTemplate {
                 spacing?: ScaleSizeValue<number>;
                 padding?: ScaledCssPadding;
                 backgroundImage?: CssBackgroundImage;
+                backgroundGradient?: CssBackgroundGradient;
             },
             button: {
                 borderThickness: number;

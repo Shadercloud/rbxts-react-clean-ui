@@ -12,6 +12,7 @@ local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
+local Gradient = _Decorator.Gradient
 local Padding = _Decorator.Padding
 local _Layout = TS.import(script, script.Parent.Parent, "Layout")
 local Container = _Layout.Container
@@ -437,18 +438,21 @@ local Select = React.forwardRef(function(props, ref)
 	_attributes.Size = UDim2.fromScale(1, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes.backgroundImage = props.backgroundImage or theme.components.select.backgroundImage
-	local _exp_1 = React.createElement("uistroke", {
+	local _exp_1 = React.createElement(Gradient, {
+		value = props.backgroundGradient or theme.components.select.backgroundGradient,
+	})
+	local _exp_2 = React.createElement("uistroke", {
 		key = "Stroke",
 		Thickness = theme.components.select.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.select.borderColor,
 	})
-	local _exp_2 = React.createElement(Corners, {
+	local _exp_3 = React.createElement(Corners, {
 		radius = theme.components.select.cornerRadius,
 	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
-	local _exp_3 = React.createElement(Padding, _attributes_1)
+	local _exp_4 = React.createElement(Padding, _attributes_1)
 	local _attributes_2 = {
 		name = "SelectedText",
 	}
@@ -462,7 +466,7 @@ local Select = React.forwardRef(function(props, ref)
 	end
 	_attributes_2.text = _condition_4
 	_attributes_2.typography = typography
-	local _exp_4 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_2)), React.createElement(Icon, {
+	local _exp_5 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_2)), React.createElement(Icon, {
 		name = "SelectCaret",
 		icon = "caret-down",
 		color = theme.colors.intents.primary.default.textColor,
@@ -510,7 +514,7 @@ local Select = React.forwardRef(function(props, ref)
 			typography = typography,
 		}))))), overlay.overlay)
 	end
-	return React.createElement(Container, _attributes, React.createElement(SelectContext.Provider, {
+	return React.createElement(Container, _attributes, _exp_1, React.createElement(SelectContext.Provider, {
 		value = context,
 	}, React.createElement("imagebutton", {
 		key = "SelectButton",
@@ -521,7 +525,7 @@ local Select = React.forwardRef(function(props, ref)
 		Event = {
 			Activated = activateSelect,
 		},
-	}, _exp_1, _exp_2, _exp_3, _exp_4, _condition_5)))
+	}, _exp_2, _exp_3, _exp_4, _exp_5, _condition_5)))
 end)
 Select.Option = SelectOption
 Select.OptGroup = SelectOptGroup

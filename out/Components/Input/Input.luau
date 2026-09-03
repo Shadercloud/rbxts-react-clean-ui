@@ -10,6 +10,7 @@ local CssHelper = _Helpers.CssHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
+local Gradient = _Decorator.Gradient
 local Padding = _Decorator.Padding
 local _Layout = TS.import(script, script.Parent.Parent, "Layout")
 local FieldsetContext = _Layout.FieldsetContext
@@ -79,10 +80,13 @@ local function Input(props)
 	local _exp_1 = React.createElement(Corners, {
 		radius = theme.components.input.cornerRadius,
 	})
+	local _exp_2 = React.createElement(Gradient, {
+		value = theme.components.input.backgroundGradient,
+	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
-	local _exp_2 = React.createElement(Padding, _attributes_1)
-	local _exp_3 = props.icon ~= nil and (React.createElement(Icon, {
+	local _exp_3 = React.createElement(Padding, _attributes_1)
+	local _exp_4 = props.icon ~= nil and (React.createElement(Icon, {
 		name = "InputIcon",
 		icon = props.icon,
 		color = theme.components.input.iconColor,
@@ -198,10 +202,10 @@ local function Input(props)
 		end
 	end
 	_attributes_2.Change = _object_1
-	return React.createElement("imagelabel", _attributes, _exp, _exp_1, _exp_2, React.createElement(HStack, {
+	return React.createElement("imagelabel", _attributes, _exp, _exp_1, _exp_2, _exp_3, React.createElement(HStack, {
 		valign = "Center",
 		Wraps = false,
-	}, _exp_3, React.createElement(FlexItem, nil, React.createElement("textbox", _attributes_2))))
+	}, _exp_4, React.createElement(FlexItem, nil, React.createElement("textbox", _attributes_2))))
 end
 return {
 	Input = Input,

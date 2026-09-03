@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { PaddingProps, ScalableElementProps } from "../../Interfaces";
+import { CssBackgroundGradient, PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { CssBackgroundImage } from "../../Theme";
 interface TabTitleProps extends PaddingProps {
     value: string;
@@ -17,6 +17,7 @@ interface TabsListProps extends ScalableElementProps {
 declare const TabsList: React.ForwardRefExoticComponent<TabsListProps & React.RefAttributes<ImageLabel>>;
 interface TabsBodyProps extends ScalableElementProps {
     backgroundImage?: CssBackgroundImage;
+    backgroundGradient?: CssBackgroundGradient;
     children?: React.ReactNode;
 }
 declare const TabsBody: React.ForwardRefExoticComponent<TabsBodyProps & React.RefAttributes<ImageLabel>>;

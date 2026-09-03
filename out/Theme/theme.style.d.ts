@@ -1,5 +1,5 @@
 import { Binding } from "@rbxts/react";
-import { ScaleSize, CssShadow, ButtonFlag, CssDual, CssSliceInset, CssSize, CssCalcSize } from "../Interfaces/";
+import { ScaleSize, CssShadow, ButtonFlag, CssDual, CssSliceInset, CssSize, CssCalcSize, CssBackgroundGradient } from "../Interfaces/";
 export interface TypographyStyle {
     font: Enum.Font;
     size: Enum.FontSize;
@@ -18,6 +18,7 @@ export interface IntentScheme {
     boxShadow?: CssShadow;
     typography?: Partial<TypographyStyle>;
     backgroundImage?: Partial<CssBackgroundImage>;
+    backgroundGradient?: Partial<CssBackgroundGradient>;
 }
 export interface IntentColors extends Partial<Record<ButtonFlag, IntentScheme>> {
     default: IntentScheme;
