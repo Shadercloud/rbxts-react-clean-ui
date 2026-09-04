@@ -526,6 +526,92 @@ local DarkTheme = createTheme({
 				cornerRadius = "100%",
 			},
 		},
+		progressBar = {
+			animation = {
+				duration = 0.2,
+			},
+			header = {
+				spacing = {
+					xs = 2,
+					sm = 4,
+					md = 6,
+					lg = 8,
+					xl = 10,
+				},
+				label = {
+					typography = {
+						size = Enum.FontSize.Size18,
+						color = Color3.fromHex("#E8EDF8"),
+					},
+				},
+				value = {
+					typography = {
+						size = Enum.FontSize.Size18,
+						color = Color3.fromHex("#697386"),
+					},
+				},
+			},
+			track = {
+				backgroundColor = Color3.fromHex("#2A303B"),
+				backgroundTransparency = 0,
+				borderColor = Color3.fromHex("#3A4352"),
+				borderThickness = 1,
+				cornerRadius = "100%",
+			},
+			fill = {
+				cornerRadius = "100%",
+				intents = {
+					primary = {
+						default = {
+							backgroundColor = Color3.fromHex("#FFFFFF"),
+							backgroundGradient = {
+								colors = { Color3.fromHex("#5A87DE"), Color3.fromHex("#345FAF") },
+								rotation = 90,
+							},
+						},
+					},
+					success = {
+						default = {
+							backgroundColor = Color3.fromHex("#FFFFFF"),
+							backgroundGradient = {
+								colors = { Color3.fromHex("#40A871"), Color3.fromHex("#237A4D") },
+								rotation = 90,
+							},
+						},
+					},
+					info = {
+						default = {
+							backgroundColor = Color3.fromHex("#FFFFFF"),
+							backgroundGradient = {
+								colors = { Color3.fromHex("#4799D0"), Color3.fromHex("#286D9F") },
+								rotation = 90,
+							},
+						},
+					},
+					warning = {
+						default = {
+							backgroundColor = Color3.fromHex("#FFFFFF"),
+							backgroundGradient = {
+								colors = { Color3.fromHex("#C29639"), Color3.fromHex("#916B1D") },
+								rotation = 90,
+							},
+						},
+					},
+					danger = {
+						default = {
+							backgroundColor = Color3.fromHex("#FFFFFF"),
+							backgroundGradient = {
+								colors = { Color3.fromHex("#D95858"), Color3.fromHex("#A63737") },
+								rotation = 90,
+							},
+						},
+					},
+				},
+				stripe = {
+					enabled = false,
+				},
+			},
+		},
 		toast = {
 			width = 300,
 			fadeDuration = 0.5,

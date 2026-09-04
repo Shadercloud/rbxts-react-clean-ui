@@ -347,12 +347,14 @@ export const DefaultTheme: ThemeTemplate = {
             item: {
                 borderThickness: 0, cornerRadius: 4,
                 spacing: { xs: 1, sm: 2, md: 4, lg: 6, xl: 8 },
-                intents: { primary: {
-                    default: { backgroundTransparency: 1, textColor: Color3.fromHex("#4F4F4F") },
-                    hover: { backgroundTransparency: 1, textColor: Color3.fromHex("#000000") },
-                    focus: { textColor: Color3.fromHex("#000000"), backgroundColor: Color3.fromHex("#FFFFFF"), backgroundTransparency: 0, boxShadow: "2px 2px 2px 2px", typography: { weight: Enum.FontWeight.Bold } },
-                    disabled: { backgroundTransparency: 1, borderColor: Color3.fromHex("#D9DEE8"), textColor: Color3.fromHex("#8A8A8A") },
-                } },
+                intents: {
+                    primary: {
+                        default: { backgroundTransparency: 1, textColor: Color3.fromHex("#4F4F4F") },
+                        hover: { backgroundTransparency: 1, textColor: Color3.fromHex("#000000") },
+                        focus: { textColor: Color3.fromHex("#000000"), backgroundColor: Color3.fromHex("#FFFFFF"), backgroundTransparency: 0, boxShadow: "2px 2px 2px 2px", typography: { weight: Enum.FontWeight.Bold } },
+                        disabled: { backgroundTransparency: 1, borderColor: Color3.fromHex("#D9DEE8"), textColor: Color3.fromHex("#8A8A8A") },
+                    }
+                },
             },
         },
         accordion: {
@@ -556,6 +558,86 @@ export const DefaultTheme: ThemeTemplate = {
                 cornerRadius: 8,
                 aspectRatio: 1
             }
+        },
+        progressBar: {
+            height: {
+                xs: 8,
+                sm: 12,
+                md: 16,
+                lg: 20,
+                xl: 30,
+            },
+            animation: {
+                duration: 0.2,
+            },
+            header: {
+                spacing: {
+                    xs: 2,
+                    sm: 4,
+                    md: 6,
+                    lg: 8,
+                    xl: 10,
+                },
+                label: {
+                    typography: {
+                        size: Enum.FontSize.Size18,
+                        color: Color3.fromHex("#1D2433"),
+                    },
+                },
+                value: {
+                    typography: {
+                        size: Enum.FontSize.Size18,
+                        color: Color3.fromHex("#5C6577"),
+                    },
+                },
+            },
+            track: {
+                backgroundColor: Color3.fromHex("#F5F5F5"),
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#D9DEE8"),
+                borderThickness: 1,
+                cornerRadius: 4,
+            },
+            fill: {
+                cornerRadius: 4,
+                intents: {
+                    primary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#477FE8"),
+                        },
+                    },
+                    success: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#2E9D63"),
+                        },
+                    },
+                    info: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#3187C8"),
+                        },
+                    },
+                    warning: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#E7A92F"),
+                        },
+                    },
+                    danger: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#D64545"),
+                        },
+                    },
+                },
+                stripe: {
+                    enabled: true,
+                    image: {
+                        image: 86644568183933,
+                        tileSize: "16px",
+                        transparency: 0.9,
+                    },
+                    duration: 0.75,
+                    direction: 1,
+                },
+            },
         },
         toast: {
             fadeDuration: 0.5,

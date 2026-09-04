@@ -574,6 +574,86 @@ local DefaultTheme = {
 				aspectRatio = 1,
 			},
 		},
+		progressBar = {
+			height = {
+				xs = 8,
+				sm = 12,
+				md = 16,
+				lg = 20,
+				xl = 30,
+			},
+			animation = {
+				duration = 0.2,
+			},
+			header = {
+				spacing = {
+					xs = 2,
+					sm = 4,
+					md = 6,
+					lg = 8,
+					xl = 10,
+				},
+				label = {
+					typography = {
+						size = Enum.FontSize.Size18,
+						color = Color3.fromHex("#1D2433"),
+					},
+				},
+				value = {
+					typography = {
+						size = Enum.FontSize.Size18,
+						color = Color3.fromHex("#5C6577"),
+					},
+				},
+			},
+			track = {
+				backgroundColor = Color3.fromHex("#F5F5F5"),
+				backgroundTransparency = 0,
+				borderColor = Color3.fromHex("#D9DEE8"),
+				borderThickness = 1,
+				cornerRadius = 4,
+			},
+			fill = {
+				cornerRadius = 4,
+				intents = {
+					primary = {
+						default = {
+							backgroundColor = Color3.fromHex("#477FE8"),
+						},
+					},
+					success = {
+						default = {
+							backgroundColor = Color3.fromHex("#2E9D63"),
+						},
+					},
+					info = {
+						default = {
+							backgroundColor = Color3.fromHex("#3187C8"),
+						},
+					},
+					warning = {
+						default = {
+							backgroundColor = Color3.fromHex("#E7A92F"),
+						},
+					},
+					danger = {
+						default = {
+							backgroundColor = Color3.fromHex("#D64545"),
+						},
+					},
+				},
+				stripe = {
+					enabled = true,
+					image = {
+						image = 86644568183933,
+						tileSize = "16px",
+						transparency = 0.9,
+					},
+					duration = 0.75,
+					direction = 1,
+				},
+			},
+		},
 		toast = {
 			fadeDuration = 0.5,
 			width = 300,

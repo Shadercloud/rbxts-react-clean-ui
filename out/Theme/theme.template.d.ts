@@ -273,6 +273,40 @@ export interface ThemeTemplate {
                 aspectRatio?: number;
             };
         };
+        progressBar: {
+            height: ScaleSizeValue<CssSize>;
+            animation: {
+                duration: number;
+            };
+            header: {
+                spacing?: ScaleSizeValue<number>;
+                label: {
+                    typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                };
+                value: {
+                    typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                };
+            };
+            track: {
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                borderColor: Color3;
+                borderThickness: number;
+                cornerRadius: CssSize;
+                backgroundImage?: CssBackgroundImage;
+                backgroundGradient?: CssBackgroundGradient;
+            };
+            fill: {
+                cornerRadius: CssSize;
+                intents?: Partial<Record<Intent, InlineIntentColors>>;
+                stripe?: {
+                    enabled: boolean;
+                    image?: Omit<Partial<CssBackgroundImage>, "size">;
+                    duration?: number;
+                    direction?: number;
+                };
+            };
+        };
         toast: {
             width: CssSize;
             fadeDuration: number;

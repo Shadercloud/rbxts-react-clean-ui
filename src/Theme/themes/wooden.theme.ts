@@ -569,6 +569,79 @@ export const WoodenTheme = createTheme({
                 borderColor: Color3.fromHex("#3D2712"),
             },
         },
+        progressBar: {
+            animation: {
+                duration: 0.2,
+            },
+            header: {
+                spacing: {
+                    xs: 2,
+                    sm: 4,
+                    md: 6,
+                    lg: 8,
+                    xl: 10,
+                },
+                label: {
+                    typography: {
+                        size: Enum.FontSize.Size18,
+                        color: Color3.fromHex("#FFF7CF"),
+                    },
+                },
+                value: {
+                    typography: {
+                        size: Enum.FontSize.Size18,
+                        color: Color3.fromHex("#D3CBA3"),
+                    },
+                },
+            },
+            track: {
+                backgroundColor: Color3.fromHex("#5C3A18"),
+                backgroundTransparency: 0,
+                borderColor: Color3.fromHex("#3D2712"),
+                borderThickness: 2,
+                cornerRadius: 0,
+            },
+            fill: {
+                cornerRadius: 0,
+                intents: {
+                    primary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#A16B30"),
+                        },
+                    },
+                    success: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#4E6A24"),
+                        },
+                    },
+                    info: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#2C5270"),
+                        },
+                    },
+                    warning: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#A67A20"),
+                        },
+                    },
+                    danger: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#7A3220"),
+                        },
+                    },
+                },
+                stripe: {
+                    enabled: false,
+                    image: {
+                        image: 86644568183933,
+                        tileSize: "16px",
+                        transparency: 0.65,
+                    },
+                    duration: 0.85,
+                    direction: 1,
+                },
+            },
+        },
         slider: {
             height: 20,
             bar: {

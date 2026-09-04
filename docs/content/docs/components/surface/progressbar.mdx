@@ -1,0 +1,269 @@
+---
+title: ProgressBar
+description: A themed track and fill for showing determinate progress.
+icon: Gauge
+---
+
+`ProgressBar` is a themed progress indicator built on Roblox's native [`ImageLabel`](https://create.roblox.com/docs/reference/engine/classes/ImageLabel), via [`Container`](/components/layout/container). It renders a track with a colored fill whose width reflects a numeric `value`/`max` pair.
+
+## Import
+
+```tsx
+import { ProgressBar } from "@rbxts/react-clean-ui";
+```
+
+## Example
+
+<Demo preview="Scenes/Surface/ProgressBar.loom.tsx" previewHeight={660} screenshot="/images/screenshots/Surface/ProgressBar.png">
+```tsx
+import React from "@rbxts/react";
+import { Box, Container, ProgressBar, VStack } from "@rbxts/react-clean-ui";
+
+export function ProgressBarExample() {
+    return (
+        <Container width="80%" height="560" center>
+            <Box>
+                <VStack>
+                    <ProgressBar value={25} />
+                    <ProgressBar value={60} intent="success" />
+                    <ProgressBar value={90} intent="danger" scale="lg" />
+                    <ProgressBar value={40} intent="warning" />
+                    <ProgressBar value={50} scale="sm" intent="info" />
+                    <ProgressBar value={70} label="Uploading" showValue intent="success" />
+                    <ProgressBar
+                        value={3}
+                        max={5}
+                        label="Storage used"
+                        showValue
+                        valueFormatter={(value, max) => `${value} of ${max} GB`}
+                    />
+                    <ProgressBar value={65} striped label="Processing" showValue intent="info" />
+                    <ProgressBar
+                        value={45}
+                        striped
+                        stripeDirection={-1}
+                        intent="warning"
+                    />
+                    <ProgressBar value={80} striped stripeDuration={2} intent="success" />
+                </VStack>
+            </Box>
+        </Container>
+    );
+}
+```
+</Demo>
+
+## Basic usage
+
+```tsx
+import React from "@rbxts/react";
+import { Container, ProgressBar } from "@rbxts/react-clean-ui";
+
+export function ProgressBarExample() {
+    return (
+        <Container width="300px">
+            <ProgressBar value={60} />
+        </Container>
+    );
+}
+```
+
+## Value and max
+
+`value` is required and is clamped between `0` and `max`. `max` defaults to `100` and is itself clamped to a minimum of `0`.
+
+```tsx
+<ProgressBar value={7} max={10} />
+```
+
+Changing `value` animates the fill's width using a tween, governed by `theme.components.progressBar.animation.duration`. Setting that duration to `0` snaps the fill to its new width instantly instead of animating.
+
+```tsx
+const [value, setValue] = React.useState(0);
+
+<ProgressBar value={value} max={100} />
+```
+
+## Intents
+
+Set `intent` to control the fill's color.
+
+```tsx
+<ProgressBar value={40} intent="primary" />
+<ProgressBar value={40} intent="success" />
+<ProgressBar value={40} intent="info" />
+<ProgressBar value={40} intent="warning" />
+<ProgressBar value={40} intent="danger" />
+```
+
+Fill colors are resolved per-intent from `theme.components.progressBar.fill.intents`, falling back to `theme.colors.intents` for any intent the component theme doesn't explicitly override. The bundled default, dark, sandstone, and wooden themes each define all five intents explicitly, so every intent renders with its own distinct color and gradient.
+
+## Scale
+
+Use the `scale` prop to select the track's height from `theme.components.progressBar.height`.
+
+```tsx
+<VStack spacing="md">
+    <ProgressBar value={40} scale="xs" />
+    <ProgressBar value={40} scale="sm" />
+    <ProgressBar value={40} scale="md" />
+    <ProgressBar value={40} scale="lg" />
+    <ProgressBar value={40} scale="xl" />
+</VStack>
+```
+
+When `scale` is not provided, the component uses `theme.default.scale`.
+
+## Label and value
+
+Set `label` to render a header row above the track with a text label flush to the left. Set `showValue` to render a formatted value flush to the right of the same row. Neither prop is required for the other — a bar can show just a label, just a value, or both. If neither is set, no header row renders at all, matching the component's previous behavior exactly.
+
+```tsx
+<VStack spacing="md">
+    <ProgressBar value={30} label="Uploading..." />
+    <ProgressBar value={65} showValue />
+    <ProgressBar value={80} label="Storage used" showValue intent="warning" />
+</VStack>
+```
+
+By default, the value is formatted as a rounded percentage of `value` against `max` (for example `"30%"`). Pass `valueFormatter` to render something else, such as a raw fraction:
+
+```tsx
+<ProgressBar
+    value={7}
+    max={10}
+    label="Quests completed"
+    showValue
+    valueFormatter={(value, max) => `${value}/${max}`}
+/>
+```
+
+## Stripe animation
+
+Set `striped` to overlay an animated diagonal-looking stripe pattern on the fill — useful for signaling that progress is actively in motion (uploads, processing, indeterminate-feeling waits) rather than a static value.
+
+```tsx
+<ProgressBar value={65} striped intent="info" />
+```
+
+`stripeDuration` controls how many seconds one tile-width animation loop takes; lower values sweep faster.
+
+```tsx
+<ProgressBar value={80} striped stripeDuration={2} intent="success" />
+```
+
+`stripeDirection` controls which way the pattern appears to travel. It's a number: `1` sweeps left-to-right (the default), `-1` sweeps right-to-left. Any other value (including `undefined`) resolves to `1`.
+
+```tsx
+<ProgressBar value={45} striped stripeDirection={-1} intent="warning" />
+```
+
+All three props override `theme.components.progressBar.fill.stripe`'s `enabled`, `duration`, and `direction` respectively. Within the theme's `fill.stripe` object, only `enabled` is required — a theme author can write `stripe: { enabled: false }` alone, without also supplying `image`, `duration`, or `direction`. Every shipped theme (default, dark, sandstone, wooden) ships `enabled: false` so stripes are opt-in, but each also defines real `image`/`duration`/`direction` values, so setting `striped` alone looks good immediately without any theming.
+
+<Callout type="info">
+The stripe sweeps by animating the tiled image's `Position` rather than scrolling its UV rect (`ImageRectOffset`), because `ImageRectOffset` doesn't work correctly under `ScaleType.Tile` — a Roblox engine limitation, not a bug in this component.
+</Callout>
+
+## Theming
+
+Use `createTheme` (or `extendTheme`) to customize the track, fill, header, and animation timings theme-wide, then apply it to a subtree with `ThemeProvider`.
+
+```tsx
+import { Container, createTheme, ProgressBar, ThemeProvider } from "@rbxts/react-clean-ui";
+
+const themeWithCustomProgressBar = createTheme({
+    components: {
+        progressBar: {
+            track: {
+                backgroundColor: Color3.fromHex("#1F2937"),
+                borderColor: Color3.fromHex("#374151"),
+            },
+            fill: {
+                intents: {
+                    primary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#22D3EE"),
+                        },
+                    },
+                },
+            },
+            header: {
+                label: {
+                    typography: {
+                        color: Color3.fromHex("#E5E7EB"),
+                    },
+                },
+                value: {
+                    typography: {
+                        color: Color3.fromHex("#9CA3AF"),
+                    },
+                },
+            },
+        },
+    },
+});
+
+<ThemeProvider theme={themeWithCustomProgressBar}>
+    <Container width="300px">
+        <ProgressBar value={75} label="Storage used" showValue />
+    </Container>
+</ThemeProvider>
+```
+
+## Props
+
+### ProgressBar-specific props
+
+| Prop            | Type      | Default        | Description                                                                          |
+| ---------------- | --------- | -------------- | ------------------------------------------------------------------------------------- |
+| `value`          | `number`  | Required        | Current progress amount, clamped between `0` and `max`.                              |
+| `max`            | `number`  | `100`           | Maximum progress value. Clamped to a minimum of `0`.                                  |
+| `label`          | `string`  | `undefined`     | Text shown at the start of a header row above the track. If set (with or without `showValue`), a header row renders. |
+| `showValue`      | `boolean` | `undefined`     | Renders a formatted value at the end of the header row, opposite the label. Works even without `label`, right-aligning the value on its own. |
+| `valueFormatter` | `(value: number, max: number) => string` | Rounded percentage, e.g. `"30%"` | Formats the text shown when `showValue` is set. Receives the clamped value and resolved max. |
+| `striped`        | `boolean` | `false`         | Enables the animated diagonal-stripe overlay on the fill. Overrides `theme.components.progressBar.fill.stripe.enabled`. |
+| `stripeDuration` | `number`  | `0.75`          | Seconds for one tile-width stripe animation loop; lower is faster. Overrides `theme.components.progressBar.fill.stripe.duration`. |
+| `stripeDirection` | `number` | `1` | Direction the stripe pattern appears to travel. `1` sweeps left-to-right, `-1` sweeps right-to-left; any other value (including `undefined`) resolves to `1`. Overrides `theme.components.progressBar.fill.stripe.direction`. |
+| `name`           | `string`  | `"ProgressBar"` | Name assigned to the underlying `ImageLabel`.                                         |
+
+### Shared props
+
+The progress bar also supports props inherited from the following interfaces.
+
+| Interface              | Purpose                                                                 |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `IntentElementProps`   | Configures the fill's color scheme.                                     |
+| `ScalableElementProps` | Configures the track height read from `theme.components.progressBar.height`. |
+| `SizeElementProps`     | Configures `width`, `height`, and native `Size`. The track's height still defaults to the theme scale unless overridden. |
+| `PositionElementProps` | Configures `Position`, `AnchorPoint`, `center`, and edge offsets.        |
+| `ZIndexElementProps`   | Configures the progress bar's `ZIndex`.                                 |
+| `React.InstanceProps<ImageLabel>` | Accepts native `ImageLabel` properties, including `Change` and `Event`. `BackgroundColor3` and `BackgroundTransparency` are always overridden by the theme's track values. |
+
+## Behaviour
+
+* `value` is clamped to the `[0, max]` range using `math.clamp`; non-integer values are accepted as-is. Progress is always derived from `clampedValue / maxValue`.
+* `max` is clamped to a minimum of `0` using `math.max`; negative `max` values are treated as `0`.
+* If `max` resolves to `0`, progress is forced to `0` rather than dividing by zero.
+* Progress changes animate the fill's width via a tween; a `theme.components.progressBar.animation.duration` of `0` applies the new width instantly.
+* The track clips its contents (`ClipsDescendants` defaults to `true`), so the fill never visually overflows the track's rounded corners.
+* A header row only renders when `label` is set or `showValue` is `true`. Without either, the component renders exactly the same `Container`/`ImageLabel` tree as before these props existed — no wrapper frame, no visual or behavioral change for existing usage.
+* When a header renders, the label and value are laid out with `SpaceBetween` alignment, so the label stays flush to the left and the value stays flush to the right, even when only one of them is present.
+* The ref still forwards to the track `ImageLabel` specifically, not to the wrapping frame that appears when a header is rendered.
+* `valueFormatter`, when provided, is only invoked when `showValue` is `true`.
+* The stripe overlay only renders when the resolved `striped` value is `true` — no extra `ImageLabel` is created, and no animation runs, when it's `false` (the theme default), so a plain bar has zero overhead from this feature.
+* The stripe overlay is one tile wider than the fill and its position loops from `0` to `1` on a linear, infinitely-repeating tween that restarts from the beginning whenever `striped` becomes `true` or `stripeDuration` changes, so the seam between loops is never visible.
+* The stripe's tile width comes from the resolved theme image's `TileSize.X.Offset`, falling back to `16` pixels if the theme doesn't set one.
+* The stripe's `ScaleType` is always `Enum.ScaleType.Tile` — this is fixed in code, not themeable (the theme's `fill.stripe.image` type omits `size` entirely), because the sweep animates `Position` rather than `ImageRectOffset` (see the note above).
+
+## Theme values
+
+The progress bar uses values from `theme.components.progressBar` for:
+
+* The track's height per `scale` (`xs`–`xl`)
+* The track's background color, background transparency, border color, border thickness, corner radius, and optional background image/gradient
+* The fill's corner radius and optional per-intent color/gradient overrides (layered on top of `theme.colors.intents`)
+* The fill's tween duration when `value` changes
+* `fill.stripe` (optional) — the animated stripe overlay's defaults. Only `enabled` (theme default for `striped`) is required if a `stripe` object is set at all; `image`, `duration`, and `direction` are each optional. `image` is an `Omit<Partial<CssBackgroundImage>, "size">` for the stripe's asset id, tile size, and transparency/tint (the same shape `track.backgroundImage` uses, minus `size` — the component always forces `ScaleType.Tile`, so tiling isn't themeable), `duration` is the sweep's one-tile-width loop duration in seconds, and `direction` is a number (`1` for left-to-right, `-1` for right-to-left). Every shipped theme ships `enabled: false` but also defines real `image`/`duration`/`direction` values, so `striped` looks good immediately without any theming.
+* `header.spacing` — the gap between the header row and the track, and between the label and value within the header row, read per `scale`
+* `header.label.typography` — the label's typography style, including its `color`
+* `header.value.typography` — the value's typography style, including its `color`, falling back to `header.label.typography` when not set

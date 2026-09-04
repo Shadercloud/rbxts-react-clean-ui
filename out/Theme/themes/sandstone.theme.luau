@@ -487,6 +487,76 @@ local SandstoneTheme = createTheme({
 				cornerRadius = 4,
 			},
 		},
+		progressBar = {
+			header = {
+				spacing = {
+					xs = 2,
+					sm = 4,
+					md = 6,
+					lg = 8,
+					xl = 10,
+				},
+				label = {
+					typography = {
+						size = Enum.FontSize.Size18,
+						color = Color3.fromHex("#244F4A"),
+					},
+				},
+				value = {
+					typography = {
+						size = Enum.FontSize.Size18,
+						color = Color3.fromHex("#9B8B73"),
+					},
+				},
+			},
+			track = {
+				backgroundColor = Color3.fromHex("#EFE5D3"),
+				backgroundTransparency = 0,
+				borderColor = Color3.fromHex("#CDBFA8"),
+				borderThickness = 1,
+				cornerRadius = 4,
+			},
+			fill = {
+				cornerRadius = 4,
+				intents = {
+					primary = {
+						default = {
+							backgroundColor = Color3.fromHex("#4E8179"),
+						},
+					},
+					success = {
+						default = {
+							backgroundColor = Color3.fromHex("#5B8A6A"),
+						},
+					},
+					info = {
+						default = {
+							backgroundColor = Color3.fromHex("#6F98AE"),
+						},
+					},
+					warning = {
+						default = {
+							backgroundColor = Color3.fromHex("#C3994C"),
+						},
+					},
+					danger = {
+						default = {
+							backgroundColor = Color3.fromHex("#B46861"),
+						},
+					},
+				},
+				stripe = {
+					enabled = false,
+					image = {
+						image = 86644568183933,
+						tileSize = "16px",
+						transparency = 0.85,
+					},
+					duration = 0.75,
+					direction = 1,
+				},
+			},
+		},
 		toast = {
 			width = 300,
 			fadeDuration = 0.5,
