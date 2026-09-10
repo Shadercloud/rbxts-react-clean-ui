@@ -5,6 +5,7 @@ export * from './Draggable';
 export * from './Droppable';
 export * from './Fieldset';
 export * from './FlexItem';
+export * from './Grid';
 export * from './Group';
 export * from './HStack';
 export * from './Pagination';

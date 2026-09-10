@@ -22,6 +22,9 @@ end
 for _k, _v in TS.import(script, script, "FlexItem") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "Grid") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "Group") or {} do
 	exports[_k] = _v
 end

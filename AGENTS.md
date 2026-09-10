@@ -229,3 +229,19 @@ roblox-ts's module resolution. Ask the user to run the tests from VS Code's
 Test Explorer (or the "Lunit: Run All Tests" command), and read the results
 there or in the "Lunit" output channel.
 <!-- END lunit-test-explorer:agent-instructions -->
+
+## Test layout and naming (project conventions)
+
+* `src/Tests/` mirrors `src/`: a test for `src/<path>/<Module>.ts(x)` lives at
+  `src/Tests/<path>/<Module>.test.ts(x)` (e.g.
+  `src/Tests/Components/Input/Increment.test.tsx`,
+  `src/Tests/Components/Input/Increment.step.test.ts`,
+  `src/Tests/Providers/modal.provider.test.tsx`). There are no `Lune/` or
+  `Studio/` folders -- the runtime split is expressed only with `@Tag("Lune")`
+  (pure logic) or `@Tag("Studio")` (mounts React / creates Instances) on the
+  class.
+* Test method names are short, punchy camelCase titles of a few words
+  (`defaultStep`, `clampsToMax`, `noDecimalDrift`). Every `@Test` method also
+  carries a `@DisplayName("...")` with a short sentence-case description of
+  the scenario and expected outcome that adds detail rather than restating the
+  method name.

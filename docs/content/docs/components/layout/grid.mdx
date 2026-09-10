@@ -1,0 +1,182 @@
+---
+title: Grid
+description: Arrange children into a responsive grid of equal-width, uniform-height cells.
+icon: LayoutGrid
+---
+
+`Grid` is a layout primitive built on a native Roblox [`UIGridLayout`](https://create.roblox.com/docs/reference/engine/classes/UIGridLayout). It arranges its `children` — any mix of `@rbxts/react-clean-ui` components and native Roblox instances — into a fixed number of equal-width columns, with every cell sized to the same, content-driven row height. No wrapper or cell component is required around each child.
+
+## Import
+
+```tsx
+import { Grid } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Layout/Grid.loom.tsx" previewHeight={360}>
+```tsx
+import React from "@rbxts/react";
+import { Box, Container, Grid, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function GridExample() {
+    return (
+        <Container width="90%" height="260" center>
+            <Grid cols={{ xs: 1, sm: 2, md: 3 }} gap="md">
+                <Box name="TallCell">
+                    <VStack spacing="sm">
+                        <Text text="Tall cell" />
+                        <Text text="This cell has extra lines of content," />
+                        <Text text="which stretches every other cell to match" />
+                        <Text text="its measured height." />
+                    </VStack>
+                </Box>
+                <Box name="ShortCellOne">
+                    <Text text="Short cell" />
+                </Box>
+                <Box name="ShortCellTwo">
+                    <Text text="Short cell" />
+                </Box>
+            </Grid>
+        </Container>
+    );
+}
+```
+</Demo>
+
+## Sizing
+
+By default, `Grid` fills its parent's width (`UDim2.fromScale(1, 1)`). Previously, the only way to control `Grid`'s own width was to wrap it in an outer `Container`:
+
+```tsx
+<Container width={650}>
+    <Grid cols={{ xs: 1, sm: 2, md: 3 }} gap="md">
+        ...
+    </Grid>
+</Container>
+```
+
+`Grid` now accepts its own `width` prop, so wrapping it is no longer necessary — this is the more idiomatic way to size a `Grid` going forward:
+
+```tsx
+<Grid width={650} cols={{ xs: 1, sm: 2, md: 3 }} gap="md">
+    ...
+</Grid>
+```
+
+`width` accepts the same CSS-style values as every other component in this package — a number or numeric string is pixels, or use a percentage:
+
+```tsx
+<Grid width="50%" cols={{ xs: 1, sm: 2, md: 3 }} gap="md">
+    ...
+</Grid>
+```
+
+Height is never user-settable — it's always driven by `Grid`'s own measure/lock cycle (see [Uniform cell height](#uniform-cell-height) below).
+
+## Uniform cell height
+
+Every cell in a `Grid` is sized to the height of its tallest child. Internally, `Grid` measures each child's natural height first, then locks every cell to the tallest value it found. This means a single tall child in the grid makes every other cell in that grid the same height — there's no way to opt a single cell out of the shared row height.
+
+```tsx
+<Grid cols={2} gap="sm">
+    <Box>
+        <Text text="Short" />
+    </Box>
+    <Box>
+        <Text text="This card has a lot more text in it, so it wraps onto several lines and ends up much taller than its neighbor." />
+    </Box>
+</Grid>
+```
+
+Both cells above render at the height of the taller, wrapped card.
+
+## Responsive columns
+
+Rather than a single column count, `cols` can be an object keyed by breakpoint (`xs`/`sm`/`md`/`lg`/`xl`) giving the column count at that breakpoint and up. This resolves mobile-first — a breakpoint with no value defined falls back to the next smaller breakpoint that has one — against the `Grid`'s own measured width, not the viewport.
+
+```tsx
+<Grid
+    cols={{
+        xs: 1,
+        sm: 2,
+        md: 3,
+        lg: 4,
+    }}
+    gap="md"
+>
+    <Box name="cell-1">
+        <Text text="A" />
+    </Box>
+    <Box name="cell-2">
+        <Text text="B" />
+    </Box>
+    <Box name="cell-3">
+        <Text text="C" />
+    </Box>
+    <Box name="cell-4">
+        <Text text="D" />
+    </Box>
+</Grid>
+```
+
+If `cols` is omitted, `Grid` defaults to a single column.
+
+## Setting breakpoints
+
+By default, breakpoint widths come from the active theme's `theme.breakpoints`, the same setting `Row` uses (see [Row / Column](/components/layout/row) for the default values). Pass `breakpoints` to override them for a single `Grid`:
+
+```tsx
+<Grid
+    cols={{ xs: 2, lg: 4 }}
+    breakpoints={{
+        xs: 200,
+        sm: 300,
+        md: 450,
+        lg: 700,
+        xl: 900,
+    }}
+>
+    ...
+</Grid>
+```
+
+## Spacing
+
+`gap` sets the spacing between cells, both horizontally and vertically. It accepts a theme spacing scale key (`"xs"`, `"sm"`, `"md"`, `"lg"`, `"xl"`) or `"None"`.
+
+```tsx
+<Grid cols={4} gap="lg">
+    ...
+</Grid>
+```
+
+## Props
+
+### Grid-specific props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `cols` | `number \| Partial<Record<"xs" \| "sm" \| "md" \| "lg" \| "xl", number>>` | `1` | Column count, either fixed or resolved per breakpoint against the `Grid`'s measured width. |
+| `gap` | `ScaleSize \| "None"` | Theme default | Spacing between cells, applied both horizontally and vertically. |
+| `width` | `ResponsiveCssSize` | Fills parent (`Scale(1, 1)`) | `Grid`'s own outer width — a number (pixels), a percentage string, `"Auto"`, or a per-breakpoint object, the same CSS-style width every other component accepts. Height is never user-settable. |
+| `children` | `React.ReactNode` | `undefined` | Arbitrary nodes placed into cells in order, one child per cell. |
+| `name` | `string` | `"Grid"` | Sets the underlying frame's `Name`. |
+
+### Shared props
+
+| Interface | Purpose |
+| --- | --- |
+| `BreakPointElementProps` | Configures the `breakpoints` prop used to resolve responsive `cols` values. |
+
+## Behaviour
+
+* `Grid` renders a frame sized `UDim2.fromScale(1, 1)` in width by default — or whatever `width` resolves to, via the same `SizeHelper` every CSS-style `width` prop in this package uses — and `AutomaticSize.Y` in height, and measures its own `AbsoluteSize.X` to resolve the active breakpoint — the same approach `Row` uses.
+* Column width is deterministic from `cols` and `gap`, so `cols` cells plus `cols - 1` gaps exactly fill one row.
+* Row height locks to the tallest child's natural height using a two-pass measure-then-lock cycle. This cycle re-runs (briefly re-measuring before locking again) whenever the Grid's width, the resolved `cols`, `gap`, or the number of children changes. Width is included on purpose: cells are Scale-based, so resizing the container within a single breakpoint still re-wraps text taller or shorter, and the row height follows it in both directions rather than sticking at the tallest height ever measured. It does not re-run when a child's own content changes without changing the child count or the Grid's width.
+* Each cell keeps its source order via an explicit `LayoutOrder` matching its index among `children`.
+* Any `children` — custom `@rbxts/react-clean-ui` components or native Roblox instances — are placed directly into cells; unlike `Row`/`Column`, no dedicated cell component is needed.
+
+## Theme values
+
+`Grid` is a layout-only primitive, like `Row`, `Column`, `HStack`, and `VStack`. It has no dedicated `theme.components.grid` entry — its only themed value is the spacing scale used to resolve `gap`.
