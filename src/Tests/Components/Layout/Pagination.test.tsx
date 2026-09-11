@@ -67,8 +67,6 @@ class PaginationMountValidation {
 	public startWindow() {
 		const { host, root } = renderPagination(<Pagination page={1} totalPages={10} onPageChange={() => {}} />);
 
-		// Near the start, the leading run of numbers extends (1..5) to keep the
-		// total item count constant with the middle/end windows.
 		for (const page of [1, 2, 3, 4, 5, 10]) Assert.notUndefined(host.FindFirstChild(`PaginationItem-${page}`, true));
 		Assert.undefined(host.FindFirstChild("PaginationItem-6", true));
 		Assert.equal(getNamedDescendants(host, "PaginationEllipsis").size(), 1);
@@ -82,8 +80,6 @@ class PaginationMountValidation {
 	public endWindow() {
 		const { host, root } = renderPagination(<Pagination page={10} totalPages={10} onPageChange={() => {}} />);
 
-		// Near the end, the trailing run of numbers extends (6..10) to keep the
-		// total item count constant with the middle/start windows.
 		for (const page of [1, 6, 7, 8, 9, 10]) Assert.notUndefined(host.FindFirstChild(`PaginationItem-${page}`, true));
 		Assert.undefined(host.FindFirstChild("PaginationItem-5", true));
 		Assert.equal(getNamedDescendants(host, "PaginationEllipsis").size(), 1);
@@ -141,10 +137,6 @@ class PaginationMountValidation {
 		Assert.false(previous.Selectable);
 		Assert.true(nextButton.Active);
 		Assert.true(nextButton.Selectable);
-		// The selected item uses the focus intent. Every bundled theme distinguishes it
-		// from the default state by making the background opaque (transparency 0 vs 1),
-		// not by colour: the default state inherits the base primary background
-		// (#FFFFFF in the default theme), which is identical to the focus colour.
 		Assert.true(selected.BackgroundTransparency < unselected.BackgroundTransparency);
 
 		unmount(root, host);

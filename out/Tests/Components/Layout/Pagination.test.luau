@@ -108,8 +108,6 @@ do
 		}))
 		local host = _binding_1.host
 		local root = _binding_1.root
-		-- Near the start, the leading run of numbers extends (1..5) to keep the
-		-- total item count constant with the middle/end windows.
 		for _, page in { 1, 2, 3, 4, 5, 10 } do
 			Assert:notUndefined(host:FindFirstChild(`PaginationItem-{page}`, true))
 		end
@@ -125,8 +123,6 @@ do
 		}))
 		local host = _binding_1.host
 		local root = _binding_1.root
-		-- Near the end, the trailing run of numbers extends (6..10) to keep the
-		-- total item count constant with the middle/start windows.
 		for _, page in { 1, 6, 7, 8, 9, 10 } do
 			Assert:notUndefined(host:FindFirstChild(`PaginationItem-{page}`, true))
 		end
@@ -184,10 +180,6 @@ do
 		Assert["false"](Assert, previous.Selectable)
 		Assert["true"](Assert, nextButton.Active)
 		Assert["true"](Assert, nextButton.Selectable)
-		-- The selected item uses the focus intent. Every bundled theme distinguishes it
-		-- from the default state by making the background opaque (transparency 0 vs 1),
-		-- not by colour: the default state inherits the base primary background
-		-- (#FFFFFF in the default theme), which is identical to the focus colour.
 		Assert["true"](Assert, selected.BackgroundTransparency < unselected.BackgroundTransparency)
 		unmount(root, host)
 	end

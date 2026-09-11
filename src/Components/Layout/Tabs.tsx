@@ -10,13 +10,9 @@ import { CssBackgroundGradient, PaddingProps, ScalableElementProps } from "../..
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
 import { CssBackgroundImage } from "../../Theme";
 
-// Selection only — Tabs.List/Tabs.Body/Tabs.Title/Tabs.Content each render
-// themselves for real (see Card.tsx's CardHeader/CardFooter for the same
-// "Root provides Context, subparts consume it independently" pattern), so
-// there's nothing here to scan or harvest from children.
 interface TabsContextValue {
     selected: string | undefined;
-    setSelected: (value: string) => void;
+    setSelected: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const TabsContext = React.createContext<TabsContextValue>({
@@ -46,22 +42,13 @@ function TabButtonContent(props: TabTitleProps) {
         /></>
 }
 
-// The real per-tab button — derives its own default/hover/focus color scheme
-// from the theme (same per-instance derivation Card.Header/Card.Footer use,
-// not hoisted to Root) and drives selection itself via TabsContext.
 function TabTitle(props: TabTitleProps) {
     const theme = React.useContext(CleanThemeContext);
     const { selected, setSelected } = React.useContext(TabsContext);
     const isSelected = selected === props.value;
 
-    // The first-mounted Tabs.Title claims the selection if none is set yet,
-    // preserving "first tab selected by default" now that nothing scans the
-    // tab list up front. Known limitation: if the currently-selected tab's
-    // Tabs.Title unmounts, selection isn't automatically reassigned.
     React.useEffect(() => {
-        if (selected === undefined) {
-            setSelected(props.value);
-        }
+        setSelected((current) => current ?? props.value);
     }, []);
 
     const buttonDefault = ColorHelper.getIntentColors(
@@ -142,14 +129,6 @@ interface TabContentProps {
     children?: React.ReactNode;
 }
 
-// Always mounted — visibility is toggled rather than the panel being
-// unmounted/remounted, so per-tab local state (e.g. a Scroller's scroll
-// position) survives switching tabs. Roblox excludes a GuiObject with
-// Visible=false from its ancestors' AutomaticSize/UIListLayout
-// content-size calculations, so the hidden panels don't inflate Tabs.Body's
-// own AutomaticSize; since only one panel is ever visible at a time, the
-// default (unset) Position/AnchorPoint every panel shares never causes a
-// visible overlap either.
 function TabContent(props: TabContentProps) {
     const { selected } = React.useContext(TabsContext);
 
@@ -225,17 +204,6 @@ export interface TabsProps {
     defaultValue?: string;
 }
 
-// Root doesn't render a real Roblox Instance of its own (just a Context
-// Provider around a VStack, itself just a Fragment) — see Group.tsx for the
-// same shape. It's still wrapped in React.forwardRef, not a plain function,
-// because roblox-ts compiles a bare arrow function to an actual Lua
-// `function` value, and Lua functions can't have table-style properties
-// (Tabs.List = ...) assigned onto them — forwardRef's return value compiles
-// to a table instead. The ref itself is genuinely unused: there's no
-// sensible Instance for it to point at, so RefAttributes<Frame> below is a
-// type-level placeholder to keep this consistent with every other compound
-// component's shape, not a real forwarded ref — Tabs does not support a
-// `ref` prop in practice.
 type TabsComponent = React.ForwardRefExoticComponent<
     TabsProps & React.RefAttributes<Frame>
 > & {

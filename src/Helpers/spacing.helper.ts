@@ -4,9 +4,6 @@ import { CssHelper } from "./css.helper";
 
 
 export class SpacingHelper {
-    // Tiers 1+2 collapsed to one pixel value for one scale key: the
-    // component map overrides the global map per-key, falling back to the
-    // global map for any key it doesn't define.
     public static GetPadding(theme: ThemeTemplate, spacing?: ScaleSize | "None", component?: ScaleSizeValue<number>): number {
         if (spacing === "None") return 0;
 
@@ -14,9 +11,6 @@ export class SpacingHelper {
         return component?.[key] ?? theme.spacing[key] ?? 0;
     }
 
-    // Full 4-tier resolution, merged per side. `defaultSpacing` lets a
-    // caller (Card.Header/Footer) pin the active scale key instead of
-    // following theme.default.spacing, preserving an existing default.
     public static GetResolvedPadding(
         theme: ThemeTemplate,
         props: PaddingProps,
@@ -29,9 +23,6 @@ export class SpacingHelper {
         const isNone = props.spacing === "None";
         const key: ScaleSize = props.spacing !== undefined && props.spacing !== "None" ? props.spacing : (defaultSpacing ?? theme.default.spacing);
 
-        // tier 3: a scale-indexed map picks the quad for the active key
-        // (falling through to tiers 1/2 if that key isn't defined in the
-        // map); a plain quad applies regardless of key.
         const quadForKey = isNone || componentPadding === undefined
             ? undefined
             : typeIs(componentPadding, "table")
@@ -52,14 +43,6 @@ export class SpacingHelper {
         };
     }
 
-    // Tier-3-only: the theme's explicit component-level padding, with no
-    // fallback to the global spacing scale (unlike GetResolvedPadding, which
-    // always produces a value). Returns undefined when the theme doesn't set
-    // an explicit padding for this component at all — for a caller that
-    // wants an opt-in floor value that must stay a no-op for every theme
-    // that doesn't specifically configure it (e.g. Card's wood-frame-clearance
-    // floor, which should only ever engage for a theme like wooden that
-    // gives Box a real padding for its decorative background image).
     public static GetExplicitPadding(componentPadding: ScaledCssPadding | undefined, key: ScaleSize): ResolvedPadding | undefined {
         if (componentPadding === undefined) return undefined;
 

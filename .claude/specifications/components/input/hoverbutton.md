@@ -15,3 +15,7 @@
 - Hover state (`hovering`) is local `React.useState`, toggled by the underlying `ImageButton`'s `MouseEnter`/`MouseLeave`.
 - `isSelected` takes precedence over hover: while `isSelected` is `true`, the component always reports/renders the `focus` state regardless of pointer position.
 - There is no `disabled` state — a consumer wanting a disabled visual must fold that into its own `default`/`hover`/`focus` prop sets.
+
+## Implementation notes
+
+- The rendered props are built by spreading `default` and the active state's prop set into a new object. Don't switch to object rest destructuring (`const { isSelected, ...rest } = props`): object spread is fine in roblox-ts, but rest destructuring is not supported.

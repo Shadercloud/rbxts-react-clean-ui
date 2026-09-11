@@ -66,3 +66,8 @@ Card defaults live under `theme.components.card`:
 ## Story
 
 A story should demonstrate a card with header, body, and footer using the card-level `intent`, plus a header (or footer) whose own `intent` overrides the card-level one, and (given the `wooden` theme exists in this package's theme switcher) a story/demo that cycles themes should show the header's overlay "mounted plaque" look when `wooden` is selected — and, now that `wooden` also overlays the footer, should show the footer's narrower, centered, bottom-flush plaque at the same time (both use the same underlying overlay mechanism, so one story exercising both is sufficient — no need for a separate footer-only story).
+
+## Implementation notes
+
+- `resolveCssPositionOffset` is a Card-local resolver on purpose: `SizeHelper.GetPosition`/`GetAnchor` apply `center` to both axes at once, and other components rely on that, so don't widen them to support `CssPosition`'s axis-aware `center: "x" | "y"`.
+- Parse the theme `position.width` with `CssHelper.parseCssSize`, not `SizeHelper.toUDim` (which `top`/`left`/`right`/`bottom` use). Only `parseCssSize` understands the `"<percent>% - <px>px"` `CssCalcSize` shape.

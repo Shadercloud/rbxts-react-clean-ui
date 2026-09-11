@@ -75,3 +75,8 @@ Two stories cover `Tabs`, mirroring the two-file (`<Component>.tsx` fixture + `<
 ## Loom
 
 - A fixed-width `Container` showing `Tabs` (with a `Tabs.List` and `Tabs.Body`, two or three tabs) and the first tab initially selected, matching the documented basic-usage example.
+
+## Implementation notes
+
+- `Tabs.Title`'s mount-time claim must use a functional updater (`setSelected((current) => current ?? props.value)`). Every title mounts in the same commit with `selected` still `undefined`, so a plain `setSelected(props.value)` would let each one claim, and the last-declared title would win.
+- The `Tabs` root renders no Instance of its own, but it's still wrapped in `React.forwardRef` so roblox-ts compiles it to a table that can hold `Tabs.List`/`Body`/`Title`/`Content`. The `ref` is unused. `RefAttributes<Frame>` is only a type-level placeholder, and `Tabs` doesn't support `ref` in practice.

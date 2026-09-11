@@ -31,8 +31,6 @@ function computePaginationItems(page: number, totalPages: number, siblingCount: 
     const showRightEllipsis = rightSiblingIndex < pageCount - 1;
 
     if (!showLeftEllipsis && showRightEllipsis) {
-        // Near the start: no left ellipsis needed, so extend the leading run of
-        // numbers to keep the total item count constant.
         const leftItemCount = siblings * 2 + 3;
         const items: PaginationItemValue[] = [];
         for (let value = 1; value <= leftItemCount; value++) items.push(value);
@@ -42,15 +40,12 @@ function computePaginationItems(page: number, totalPages: number, siblingCount: 
     }
 
     if (showLeftEllipsis && !showRightEllipsis) {
-        // Near the end: no right ellipsis needed, so extend the trailing run of
-        // numbers to keep the total item count constant.
         const rightItemCount = siblings * 2 + 3;
         const items: PaginationItemValue[] = [1, "ellipsis"];
         for (let value = pageCount - rightItemCount + 1; value <= pageCount; value++) items.push(value);
         return items;
     }
 
-    // Both ellipses shown (the normal middle case) — unchanged from before.
     const items: PaginationItemValue[] = [1, "ellipsis"];
     for (let value = leftSiblingIndex; value <= rightSiblingIndex; value++) items.push(value);
     items.push("ellipsis");

@@ -148,7 +148,6 @@ type ParsedSection =
 
 interface ParsedSelectChildren {
     sections: ParsedSection[];
-    // flatOptions[i].index === i always, gap-free
     flatOptions: ParsedOption[];
 }
 
@@ -160,9 +159,6 @@ function parseSelectChildren(children: React.ReactNode): ParsedSelectChildren {
     let nodeCount = 0;
     let groupCount = 0;
 
-    // Fragment-wrapped children (`<>...</>`) are unwrapped/recursed into so
-    // consumers can conditionally compose Option/OptGroup lists (a common
-    // React pattern) without breaking option indexing.
     const collectGroupOptions = (node: React.ReactNode, options: ParsedOption[]) => {
         React.Children.forEach(node, (groupChild) => {
             if (React.isValidElement(groupChild) && groupChild.type === React.Fragment) {
@@ -214,8 +210,6 @@ function optionMatchesQuery(option: ParsedOption, normalizedQuery: string): bool
     if (normalizedQuery === "") return true;
     if (option.text === undefined) return true;
 
-    // Plain-text/literal find (the trailing `true`) avoids treating Lua
-    // pattern characters in the query (e.g. `%`, `-`) as patterns.
     return option.text.lower().find(normalizedQuery, 1, true)[0] !== undefined;
 }
 

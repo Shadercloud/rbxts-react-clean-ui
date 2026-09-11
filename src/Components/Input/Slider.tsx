@@ -95,9 +95,6 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
             setValue(nextValue);
         }, []);
 
-        /**
-         * Converts an input position into a single slider value.
-         */
         const getNumberFromInput = React.useCallback(
             (input: InputObject): number | undefined => {
                 const container = containerRef.current;
@@ -130,15 +127,10 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                 const step = currentProps.step;
 
                 if (step !== undefined && step > 0) {
-                    /*
-                     * Offset snapping from minValue so ranges such as
-                     * min=5, step=2 produce 5, 7, 9, etc.
-                     */
                     nextValue =
                         minValue +
                         math.round((nextValue - minValue) / step) * step;
 
-                    // Remove floating-point artifacts.
                     const parts = tostring(step).split(".");
 
                     const decimals = parts.size() > 1 ? parts[1].size() : 0;
@@ -153,10 +145,6 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
             [],
         );
 
-        /**
-         * Converts a single input value into either a number or Vector2,
-         * depending on whether range mode is enabled.
-         */
         const getValueFromInput = React.useCallback(
             (input: InputObject): SliderValue | undefined => {
                 const inputValue = getNumberFromInput(input);
@@ -255,10 +243,6 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                         if (!isDraggingRef.current)
                             return;
 
-                        /*
-                         * Stop processing movement immediately, before
-                         * React gets around to updating the state.
-                         */
                         isDraggingRef.current = false;
 
                         const nextValue = getValueFromInput(input);

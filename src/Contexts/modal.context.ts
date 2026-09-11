@@ -24,9 +24,6 @@ export function useModalStack(): ModalStackContextValue {
     return context;
 }
 
-// Per-instance, provided by each <Modal> around its own children so a
-// header close button or footer button can close the nearest modal
-// without the consumer threading their own handler down manually.
 export const ModalCloseContext = React.createContext<(() => void) | undefined>(
     undefined,
 );

@@ -32,8 +32,6 @@ local function Input(props)
 	local value, setValue = useState(props.value)
 	local lastValidText = useRef(props.value)
 	local typography = TypographyHelper:getTypography(theme, props.scale, theme.components.input.typography)
-	-- Roblox's TextBox has no PlaceholderTransparency and shares font/size/weight/lineHeight
-	-- between Text and PlaceholderText, so only `.color` from this resolution is actually used below.
 	local placeholderTypography = TypographyHelper:getTypography(theme, props.scale, theme.components.input.placeholder)
 	local backgroundImage = CssHelper:resolveBackgroundImage(theme.components.input.backgroundImage)
 	React.useEffect(function()

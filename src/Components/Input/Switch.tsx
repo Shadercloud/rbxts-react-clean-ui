@@ -13,8 +13,6 @@ export interface SwitchProps extends IntentElementProps, BackgroundElementProps,
     name?: string;
 }
 
-// Linearly interpolates between two UDim values by treating Scale and Offset
-// as independent components, since UDim itself has no Lerp method.
 function lerpUDim(from: UDim, to: UDim, alpha: number): UDim {
     return new UDim(
         from.Scale + (to.Scale - from.Scale) * alpha,

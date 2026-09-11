@@ -212,7 +212,6 @@ local function Tooltip(props)
 			return nil
 		end
 		task.delay(fadeDuration, function()
-			-- Do not remove it if the tooltip was shown again.
 			if hideRequest.current == request then
 				setTarget(nil)
 			end

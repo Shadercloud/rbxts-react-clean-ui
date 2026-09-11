@@ -19,10 +19,6 @@ local TypographyHelper = _Helpers.TypographyHelper
 local _HoverButton = TS.import(script, script.Parent.Parent, "Input", "HoverButton")
 local HoverButton = _HoverButton.HoverButton
 local HoverButtonContext = _HoverButton.HoverButtonContext
--- Selection only — Tabs.List/Tabs.Body/Tabs.Title/Tabs.Content each render
--- themselves for real (see Card.tsx's CardHeader/CardFooter for the same
--- "Root provides Context, subparts consume it independently" pattern), so
--- there's nothing here to scan or harvest from children.
 local TabsContext = React.createContext({
 	selected = nil,
 	setSelected = function() end,
@@ -58,23 +54,20 @@ local function TabButtonContent(props)
 		typography = TypographyHelper:getTypography(theme, nil, intent.typography),
 	}))
 end
--- The real per-tab button — derives its own default/hover/focus color scheme
--- from the theme (same per-instance derivation Card.Header/Card.Footer use,
--- not hoisted to Root) and drives selection itself via TabsContext.
 local function TabTitle(props)
 	local theme = React.useContext(CleanThemeContext)
 	local _binding = React.useContext(TabsContext)
 	local selected = _binding.selected
 	local setSelected = _binding.setSelected
 	local isSelected = selected == props.value
-	-- The first-mounted Tabs.Title claims the selection if none is set yet,
-	-- preserving "first tab selected by default" now that nothing scans the
-	-- tab list up front. Known limitation: if the currently-selected tab's
-	-- Tabs.Title unmounts, selection isn't automatically reassigned.
 	React.useEffect(function()
-		if selected == nil then
-			setSelected(props.value)
-		end
+		setSelected(function(current)
+			local _condition = current
+			if _condition == nil then
+				_condition = props.value
+			end
+			return _condition
+		end)
 	end, {})
 	local buttonDefault = ColorHelper:getIntentColors(theme, "primary", "default", theme.components.tabs.button.intents)
 	local buttonHover = ColorHelper:getIntentColors(theme, "primary", "hover", theme.components.tabs.button.intents)
@@ -131,14 +124,6 @@ local function TabTitle(props)
 		},
 	}, React.createElement(TabButtonContent, _attributes))
 end
--- Always mounted — visibility is toggled rather than the panel being
--- unmounted/remounted, so per-tab local state (e.g. a Scroller's scroll
--- position) survives switching tabs. Roblox excludes a GuiObject with
--- Visible=false from its ancestors' AutomaticSize/UIListLayout
--- content-size calculations, so the hidden panels don't inflate Tabs.Body's
--- own AutomaticSize; since only one panel is ever visible at a time, the
--- default (unset) Position/AnchorPoint every panel shares never causes a
--- visible overlap either.
 local function TabContent(props)
 	local _binding = React.useContext(TabsContext)
 	local selected = _binding.selected
@@ -190,17 +175,6 @@ local TabsBody = React.forwardRef(function(props, ref)
 		value = props.backgroundGradient or theme.components.tabs.backgroundGradient,
 	}), props.children)
 end)
--- Root doesn't render a real Roblox Instance of its own (just a Context
--- Provider around a VStack, itself just a Fragment) — see Group.tsx for the
--- same shape. It's still wrapped in React.forwardRef, not a plain function,
--- because roblox-ts compiles a bare arrow function to an actual Lua
--- `function` value, and Lua functions can't have table-style properties
--- (Tabs.List = ...) assigned onto them — forwardRef's return value compiles
--- to a table instead. The ref itself is genuinely unused: there's no
--- sensible Instance for it to point at, so RefAttributes<Frame> below is a
--- type-level placeholder to keep this consistent with every other compound
--- component's shape, not a real forwarded ref — Tabs does not support a
--- `ref` prop in practice.
 local Tabs = React.forwardRef(function(props, _ref)
 	local selected, setSelected = React.useState(props.defaultValue)
 	local contextValue = React.useMemo(function()

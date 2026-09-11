@@ -51,8 +51,6 @@ local function computePaginationItems(page, totalPages, siblingCount)
 	local showLeftEllipsis = leftSiblingIndex > 2
 	local showRightEllipsis = rightSiblingIndex < pageCount - 1
 	if not showLeftEllipsis and showRightEllipsis then
-		-- Near the start: no left ellipsis needed, so extend the leading run of
-		-- numbers to keep the total item count constant.
 		local leftItemCount = siblings * 2 + 3
 		local items = {}
 		do
@@ -76,8 +74,6 @@ local function computePaginationItems(page, totalPages, siblingCount)
 		return items
 	end
 	if showLeftEllipsis and not showRightEllipsis then
-		-- Near the end: no right ellipsis needed, so extend the trailing run of
-		-- numbers to keep the total item count constant.
 		local rightItemCount = siblings * 2 + 3
 		local items = { 1, "ellipsis" }
 		do
@@ -98,7 +94,6 @@ local function computePaginationItems(page, totalPages, siblingCount)
 		end
 		return items
 	end
-	-- Both ellipses shown (the normal middle case) — unchanged from before.
 	local items = { 1, "ellipsis" }
 	do
 		local value = leftSiblingIndex

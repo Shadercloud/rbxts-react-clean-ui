@@ -12,12 +12,6 @@ local Text = React.forwardRef(function(props, ref)
 		_condition = style.letterSpacing
 	end
 	local letterSpacing = _condition
-	-- Roblox text instances have no native letter-spacing property, so a nonzero
-	-- value is faked by splitting the text into one TextLabel per character laid
-	-- out in a UIListLayout row with the spacing as its Padding. This only makes
-	-- sense for short, single-line, plain text: RichText is forced off per-character
-	-- (markup tags can't survive being split apart), and wrapping/truncation are
-	-- moot since each character label auto-sizes to itself and never overflows.
 	if letterSpacing ~= nil and letterSpacing ~= 0 and props.text ~= "" then
 		local characters = {}
 		for index = 0, #props.text - 1 do

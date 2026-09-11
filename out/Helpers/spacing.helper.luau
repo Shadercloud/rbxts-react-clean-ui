@@ -39,9 +39,6 @@ do
 		end
 		local isNone = props.spacing == "None"
 		local key = if props.spacing ~= nil and props.spacing ~= "None" then props.spacing else (defaultSpacing or theme.default.spacing)
-		-- tier 3: a scale-indexed map picks the quad for the active key
-		-- (falling through to tiers 1/2 if that key isn't defined in the
-		-- map); a plain quad applies regardless of key.
 		local _result
 		if isNone or componentPadding == nil then
 			_result = nil

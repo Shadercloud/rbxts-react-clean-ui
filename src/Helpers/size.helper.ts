@@ -84,8 +84,6 @@ export class SizeHelper {
         if (props.AutomaticSize !== undefined)
             return props.AutomaticSize
 
-        // "Auto" behaves like an unset dimension for the purposes of deciding
-        // which axes get AutomaticSize, but still forces that axis to 0 in GetSize.
         const width = props.width === "Auto" ? undefined : props.width;
         const height = props.height === "Auto" ? undefined : props.height;
 

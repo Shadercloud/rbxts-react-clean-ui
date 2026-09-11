@@ -54,7 +54,7 @@ function TooltipPopup(props: TooltipPopup) {
     const pointerSize = props.placement === "Center" ? 0 : theme.components.tooltip.pointerSize;
 
     let anchor = Vector2.zero;
-    let position = props.target.position.sub(props.overlay.AbsolutePosition); // Top Left Corner
+    let position = props.target.position.sub(props.overlay.AbsolutePosition);
     let pointerRotation = 45;
     let pointerAnchor = new Vector2(0.5, 1);
     let pointerPosition = new UDim2(0.5, 0, 1, 0);
@@ -213,7 +213,6 @@ export function Tooltip(props: TooltipProps) {
         }
 
         task.delay(fadeDuration, () => {
-            // Do not remove it if the tooltip was shown again.
             if (hideRequest.current === request) {
                 setTarget(undefined);
             }

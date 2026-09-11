@@ -46,3 +46,7 @@
 ## Story
 
 Worth demonstrating: default (uncontrolled) selection, a controlled selection that reads back through `onChange`, options with custom `children` in addition to `text`, enough options to trigger the scrollable/max-height dropdown behavior, `searchable` filtering, and `Select.OptGroup` sectioning (including a mix of grouped and ungrouped options, and searching within groups). Requires wrapping the story in an `OverlayProvider` for the dropdown to render.
+
+## Implementation notes
+
+- `parseSelectChildren` keeps `flatOptions` gap-free, so `flatOptions[i].index === i` always holds. The closed control finds the selected option by position (`flatOptions[selected]`), so any change to how indices are assigned must keep that invariant.

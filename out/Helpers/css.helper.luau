@@ -86,12 +86,6 @@ do
 		if type(_value) == "number" then
 			return UDim.new(0, value)
 		end
-		-- The one CSS calc() shape supported: "<percent>% - <px>px" /
-		-- "<percent>% + <px>px" (e.g. "100% - 50px") maps directly onto
-		-- UDim(scale, offset) — split on the literal " - "/" + " separator
-		-- and parse each term with this same function. Anything without
-		-- either separator falls through to the single-token parsing below,
-		-- unchanged.
 		local minusParts = string.split(value, " - ")
 		if #minusParts == 2 then
 			local scale = self:parseCssSize(minusParts[1]).Scale
@@ -342,11 +336,18 @@ do
 		return _object
 	end
 	function CssHelper:resolveBackgroundGradient(value)
-		if value == nil then
+		local _colors = value
+		if _colors ~= nil then
+			_colors = _colors.colors
+		end
+		local colors = _colors
+		if value == nil or colors == nil then
 			return nil
 		end
-		local _colors = value.colors
-		local color = if typeof(_colors) == "ColorSequence" then value.colors else self:buildColorSequence(value.colors, value.stops)
+		if not (typeof(colors) == "ColorSequence") and #colors == 0 then
+			return nil
+		end
+		local color = if typeof(colors) == "ColorSequence" then colors else self:buildColorSequence(colors, value.stops)
 		return {
 			Color = color,
 			Transparency = self:buildTransparencySequence(value.transparency),
@@ -358,6 +359,7 @@ do
 		if #colors == 1 then
 			return ColorSequence.new(colors[1])
 		end
+		local lastIndex = #colors - 1
 		-- ▼ ReadonlyArray.map ▼
 		local _newValue = table.create(#colors)
 		local _callback = function(color, index)
@@ -365,18 +367,39 @@ do
 			if _result ~= nil then
 				_result = _result[index + 1]
 			end
-			local time = if _result ~= nil then math.clamp(stops[index + 1], 0, 1) else index / (#colors - 1)
-			return ColorSequenceKeypoint.new(time, color)
+			local time = if _result ~= nil then math.clamp(stops[index + 1], 0, 1) else index / lastIndex
+			if index == 0 then
+				time = 0
+			elseif index == lastIndex then
+				time = 1
+			end
+			return {
+				time = time,
+				color = color,
+				index = index,
+			}
 		end
 		for _k, _v in colors do
 			_newValue[_k] = _callback(_v, _k - 1, colors)
 		end
 		-- ▲ ReadonlyArray.map ▲
-		local keypoints = _newValue
-		-- Roblox requires the first keypoint's Time to be exactly 0 and the last exactly 1
-		keypoints[1] = ColorSequenceKeypoint.new(0, keypoints[1].Value)
-		keypoints[#keypoints] = ColorSequenceKeypoint.new(1, keypoints[#keypoints].Value)
-		return ColorSequence.new(keypoints)
+		local entries = _newValue
+		table.sort(entries, function(a, b)
+			if a.time ~= b.time then
+				return a.time < b.time
+			end
+			return a.index < b.index
+		end)
+		-- ▼ ReadonlyArray.map ▼
+		local _newValue_1 = table.create(#entries)
+		local _callback_1 = function(entry)
+			return ColorSequenceKeypoint.new(entry.time, entry.color)
+		end
+		for _k, _v in entries do
+			_newValue_1[_k] = _callback_1(_v, _k - 1, entries)
+		end
+		-- ▲ ReadonlyArray.map ▲
+		return ColorSequence.new(_newValue_1)
 	end
 	function CssHelper:buildTransparencySequence(value)
 		if value == nil then

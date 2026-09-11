@@ -26,11 +26,8 @@ export interface ProgressBarProps extends
     showValue?: boolean;
     valueFormatter?: (value: number, max: number) => string;
     name?: string;
-    /** Overrides `theme.components.progressBar.fill.stripe.enabled`. */
     striped?: boolean;
-    /** Overrides `theme.components.progressBar.fill.stripe.duration`. */
     stripeDuration?: number;
-    /** Overrides `theme.components.progressBar.fill.stripe.direction`. `1` sweeps left-to-right, `-1` sweeps right-to-left; any other value is treated as `1`. */
     stripeDirection?: number;
 }
 
@@ -158,7 +155,7 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
                             Size={new UDim2(1, stripeTileWidth, 1, 0)}
                             Position={stripePosition}
                             Image={resolvedStripeImage.Image ?? `rbxassetid://86644568183933`}
-                            ScaleType={Enum.ScaleType.Tile /* always tiled, regardless of theme.components.progressBar.fill.stripe.image */}
+                            ScaleType={Enum.ScaleType.Tile}
                             TileSize={stripeTileSize}
                         />
                     )}

@@ -90,9 +90,6 @@ local function parseSelectChildren(children)
 	local index = 0
 	local nodeCount = 0
 	local groupCount = 0
-	-- Fragment-wrapped children (`<>...</>`) are unwrapped/recursed into so
-	-- consumers can conditionally compose Option/OptGroup lists (a common
-	-- React pattern) without breaking option indexing.
 	local collectGroupOptions
 	collectGroupOptions = function(node, options)
 		React.Children.forEach(node, function(groupChild)
@@ -179,8 +176,6 @@ local function optionMatchesQuery(option, normalizedQuery)
 	if option.text == nil then
 		return true
 	end
-	-- Plain-text/literal find (the trailing `true`) avoids treating Lua
-	-- pattern characters in the query (e.g. `%`, `-`) as patterns.
 	local _exp = string.lower(option.text)
 	local _normalizedQuery = normalizedQuery
 	return (string.find(_exp, _normalizedQuery, 1, true)) ~= nil

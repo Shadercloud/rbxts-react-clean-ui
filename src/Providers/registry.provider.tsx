@@ -2,9 +2,6 @@ import React from "@rbxts/react";
 import { DraggableContextValue } from "../Contexts";
 import { HttpService } from "@rbxts/services";
 
-// This registry is used to keep a global map of GuiObjects => React components
-// For example Droppable zones use this to register themselves
-
 export interface RegistryKey<T extends defined> {
     readonly name: string;
 }

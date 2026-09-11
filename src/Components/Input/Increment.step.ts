@@ -1,4 +1,4 @@
-const ROUNDING_PRECISION = 1e9; // 9 decimal places
+const ROUNDING_PRECISION = 1e9;
 
 function roundToPrecision(value: number): number {
     return value >= 0

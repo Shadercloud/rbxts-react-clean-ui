@@ -84,7 +84,6 @@ do
 						rootIndex = index,
 					}
 					table.insert(surfaces, _arg0)
-					-- Don't recurse into another render surface.
 					continue
 				end
 				visit(child)
@@ -117,11 +116,9 @@ do
 			if a.object.ZIndex ~= b.object.ZIndex then
 				return a.object.ZIndex < b.object.ZIndex
 			end
-			-- Preserve sibling order.
 			return a.siblingIndex < b.siblingIndex
 		end)
 		for _, child in children do
-			-- Parent renders before its children.
 			local _result = result
 			local _object = child.object
 			table.insert(_result, _object)

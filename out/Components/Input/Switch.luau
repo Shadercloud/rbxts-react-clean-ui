@@ -10,8 +10,6 @@ local BoxShadow = _Decorator.BoxShadow
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local SizeHelper = _Helpers.SizeHelper
--- Linearly interpolates between two UDim values by treating Scale and Offset
--- as independent components, since UDim itself has no Lerp method.
 local function lerpUDim(from, to, alpha)
 	return UDim.new(from.Scale + (to.Scale - from.Scale) * alpha, from.Offset + (to.Offset - from.Offset) * alpha)
 end

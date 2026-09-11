@@ -68,11 +68,6 @@ local Slider = React.forwardRef(function(props, ref)
 		end
 		setValue(nextValue)
 	end, {})
-	--[[
-		*
-		         * Converts an input position into a single slider value.
-		         
-	]]
 	local getNumberFromInput = React.useCallback(function(input)
 		local container = containerRef.current
 		if not container then
@@ -95,14 +90,7 @@ local Slider = React.forwardRef(function(props, ref)
 		local nextValue = minValue + percentage * (maxValue - minValue)
 		local step = currentProps.step
 		if step ~= nil and step > 0 then
-			--[[
-				
-				                     * Offset snapping from minValue so ranges such as
-				                     * min=5, step=2 produce 5, 7, 9, etc.
-				                     
-			]]
 			nextValue = minValue + math.round((nextValue - minValue) / step) * step
-			-- Remove floating-point artifacts.
 			local parts = string.split(tostring(step), ".")
 			local decimals = if #parts > 1 then #parts[2] else 0
 			local scale = 10 ^ decimals
@@ -110,12 +98,6 @@ local Slider = React.forwardRef(function(props, ref)
 		end
 		return math.clamp(nextValue, minValue, maxValue)
 	end, {})
-	--[[
-		*
-		         * Converts a single input value into either a number or Vector2,
-		         * depending on whether range mode is enabled.
-		         
-	]]
 	local getValueFromInput = React.useCallback(function(input)
 		local inputValue = getNumberFromInput(input)
 		if inputValue == nil then
@@ -186,12 +168,6 @@ local Slider = React.forwardRef(function(props, ref)
 			if not isDraggingRef.current then
 				return nil
 			end
-			--[[
-				
-				                         * Stop processing movement immediately, before
-				                         * React gets around to updating the state.
-				                         
-			]]
 			isDraggingRef.current = false
 			local nextValue = getValueFromInput(input)
 			activeHandleRef.current = nil

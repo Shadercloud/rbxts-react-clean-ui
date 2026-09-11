@@ -93,7 +93,6 @@ function getCirclePosition(normalized: number, radius: number = 0.3): UDim2 {
     const centerX = 0.5;
     const centerY = 0.5;
 
-    // Convert 0 → 1 into radians (0 → 2π)
     const angle = normalized * math.pi * 2 + math.pi;
 
     const x = centerX + math.cos(angle) * radius;
@@ -291,7 +290,7 @@ export function Pie(props: PieProps) {
                             return;
                         }
 
-                        let angle = math.atan2(dy, dx); // -π → π
+                        let angle = math.atan2(dy, dx);
 
                         if (angle < 0) {
                             angle += math.pi * 2;

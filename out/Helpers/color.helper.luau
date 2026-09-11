@@ -46,6 +46,7 @@ do
 	function ColorHelper:mergeLayers(layers)
 		local merged = {}
 		local backgroundImage
+		local backgroundGradient
 		local typography
 		for _, layer in layers do
 			if layer == nil then
@@ -69,6 +70,32 @@ do
 				end
 				backgroundImage = _object_1
 			end
+			if layer.backgroundGradient ~= nil then
+				local _result
+				if layer.backgroundGradient.colors ~= nil then
+					local _object_1 = {}
+					if backgroundGradient then
+						for _k, _v in backgroundGradient do
+							_object_1[_k] = _v
+						end
+					end
+					_object_1.stops = nil
+					_result = _object_1
+				else
+					_result = backgroundGradient
+				end
+				local inheritedGradient = _result
+				local _object_1 = {}
+				if inheritedGradient then
+					for _k, _v in inheritedGradient do
+						_object_1[_k] = _v
+					end
+				end
+				for _k, _v in layer.backgroundGradient do
+					_object_1[_k] = _v
+				end
+				backgroundGradient = _object_1
+			end
 			if layer.typography ~= nil then
 				local _object_1 = {}
 				if typography then
@@ -83,6 +110,7 @@ do
 			end
 		end
 		merged.backgroundImage = backgroundImage
+		merged.backgroundGradient = backgroundGradient
 		merged.typography = typography
 		return merged
 	end

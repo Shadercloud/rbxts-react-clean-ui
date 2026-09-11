@@ -35,7 +35,7 @@ export declare class CssHelper {
         SliceScale?: number;
         TileSize?: UDim2;
     };
-    static resolveBackgroundGradient(value: CssBackgroundGradient | undefined): React.InstanceProps<UIGradient> | undefined;
+    static resolveBackgroundGradient(value: Partial<CssBackgroundGradient> | undefined): React.InstanceProps<UIGradient> | undefined;
     private static buildColorSequence;
     private static buildTransparencySequence;
 }

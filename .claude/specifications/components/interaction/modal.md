@@ -58,3 +58,8 @@ Modal defaults live under `theme.components.modal`:
 ## Story
 
 A story should demonstrate: a basic modal with `Card.Header`/`Card.Body`/`Card.Footer` content, two modals opened at once to show stacking/z-order, and a controlled modal driven by external state.
+
+## Implementation notes
+
+- `GuiService.SelectedObject` throws when the target isn't under a `PlayerGui` (for example in a ui-labs Studio preview). Focus is optional polish, so `trySetSelectedObject` wraps the assignment in `pcall` and ignores failures.
+- The stack-registration effect depends only on `shouldRender`. It reads `closeOnEscape` and `requestClose` through refs that are updated on every render, so adding them to the dependencies would re-register the modal whenever they change. Re-registering appends it to the end of the stack, moving it to the top z-order and making it the Escape target.

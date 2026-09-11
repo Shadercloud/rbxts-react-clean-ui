@@ -38,8 +38,6 @@ export function Input(props: InputProps) {
         theme.components.input.typography
     )
 
-    // Roblox's TextBox has no PlaceholderTransparency and shares font/size/weight/lineHeight
-    // between Text and PlaceholderText, so only `.color` from this resolution is actually used below.
     const placeholderTypography: TypographyStyle = TypographyHelper.getTypography(
         theme,
         props.scale,

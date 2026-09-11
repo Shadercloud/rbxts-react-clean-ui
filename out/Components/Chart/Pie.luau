@@ -60,7 +60,6 @@ local function getCirclePosition(normalized, radius)
 	end
 	local centerX = 0.5
 	local centerY = 0.5
-	-- Convert 0 → 1 into radians (0 → 2π)
 	local angle = normalized * math.pi * 2 + math.pi
 	local x = centerX + math.cos(angle) * radius
 	local y = centerY + math.sin(angle) * radius

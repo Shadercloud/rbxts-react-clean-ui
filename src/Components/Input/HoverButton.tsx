@@ -34,8 +34,6 @@ export function HoverButton(propSet: HoverButtonProps) {
     const stateProps = propSet[state];
 
 
-    // Object spreading into a new object is supported.
-    // It is object rest destructuring that roblox-ts does not support.
     const props: ImageButtonProps = {
         ...propSet.default,
         ...stateProps,

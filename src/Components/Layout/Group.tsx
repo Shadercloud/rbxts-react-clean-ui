@@ -1,6 +1,5 @@
 import React from "@rbxts/react";
 import { ResolvedPadding } from "../../Interfaces";
-// import { HttpService } from "@rbxts/services";
 import { RegistryContext } from "../../Providers";
 
 interface GroupContextValue {
@@ -21,10 +20,20 @@ interface GroupElementProps {
     name?: string;
 }
 
+let nextFallbackElementId = 0;
+
 function GroupElement(props: GroupElementProps) {
     const registry = React.useContext(RegistryContext);
     const context = React.useContext(GroupContext);
-    const id = React.useRef(registry?.GetNextId() ?? "").current;
+    const idRef = React.useRef<string>();
+
+    if (idRef.current === undefined) {
+        nextFallbackElementId += 1;
+        idRef.current =
+            registry?.GetNextId() ?? `group-element-${nextFallbackElementId}`;
+    }
+
+    const id = idRef.current;
 
     const enabled = props.enabled === true && context !== undefined;
 

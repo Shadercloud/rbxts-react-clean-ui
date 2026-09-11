@@ -63,8 +63,6 @@ do
 		if props.AutomaticSize ~= nil then
 			return props.AutomaticSize
 		end
-		-- "Auto" behaves like an unset dimension for the purposes of deciding
-		-- which axes get AutomaticSize, but still forces that axis to 0 in GetSize.
 		local width = if props.width == "Auto" then nil else props.width
 		local height = if props.height == "Auto" then nil else props.height
 		local _condition = props.Size ~= nil

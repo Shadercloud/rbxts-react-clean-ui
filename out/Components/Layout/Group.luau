@@ -1,27 +1,32 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
--- import { HttpService } from "@rbxts/services";
 local RegistryContext = TS.import(script, script.Parent.Parent.Parent, "Providers").RegistryContext
 local GroupContext = React.createContext(nil)
+local nextFallbackElementId = 0
 local function GroupElement(props)
 	local registry = React.useContext(RegistryContext)
 	local context = React.useContext(GroupContext)
-	local _result = registry
-	if _result ~= nil then
-		_result = _result.GetNextId()
+	local idRef = React.useRef()
+	if idRef.current == nil then
+		nextFallbackElementId += 1
+		local _result = registry
+		if _result ~= nil then
+			_result = _result.GetNextId()
+		end
+		local _condition = _result
+		if _condition == nil then
+			_condition = `group-element-{nextFallbackElementId}`
+		end
+		idRef.current = _condition
 	end
-	local _condition = _result
-	if _condition == nil then
-		_condition = ""
-	end
-	local id = React.useRef(_condition).current
+	local id = idRef.current
 	local enabled = props.enabled == true and context ~= nil
 	local _exp = function()
 		if not enabled then
-			local _result_1 = context
-			if _result_1 ~= nil then
-				_result_1.removeElement(id)
+			local _result = context
+			if _result ~= nil then
+				_result.removeElement(id)
 			end
 			return nil
 		end
@@ -29,54 +34,54 @@ local function GroupElement(props)
 			context.removeElement(id)
 		end
 	end
-	local _result_1 = context
-	if _result_1 ~= nil then
-		_result_1 = _result_1.removeElement
+	local _result = context
+	if _result ~= nil then
+		_result = _result.removeElement
 	end
-	React.useEffect(_exp, { enabled, _result_1 })
+	React.useEffect(_exp, { enabled, _result })
 	if not enabled then
 		return props.children
 	end
+	local _result_1 = props.padding
+	if _result_1 ~= nil then
+		_result_1 = _result_1.left
+	end
+	local _condition = _result_1
+	if _condition == nil then
+		_condition = 0
+	end
 	local _result_2 = props.padding
 	if _result_2 ~= nil then
-		_result_2 = _result_2.left
+		_result_2 = _result_2.right
 	end
 	local _condition_1 = _result_2
 	if _condition_1 == nil then
 		_condition_1 = 0
 	end
+	local horizontalPadding = _condition + _condition_1
 	local _result_3 = props.padding
 	if _result_3 ~= nil then
-		_result_3 = _result_3.right
+		_result_3 = _result_3.top
 	end
 	local _condition_2 = _result_3
 	if _condition_2 == nil then
 		_condition_2 = 0
 	end
-	local horizontalPadding = _condition_1 + _condition_2
 	local _result_4 = props.padding
 	if _result_4 ~= nil then
-		_result_4 = _result_4.top
+		_result_4 = _result_4.bottom
 	end
 	local _condition_3 = _result_4
 	if _condition_3 == nil then
 		_condition_3 = 0
 	end
-	local _result_5 = props.padding
-	if _result_5 ~= nil then
-		_result_5 = _result_5.bottom
-	end
-	local _condition_4 = _result_5
-	if _condition_4 == nil then
-		_condition_4 = 0
-	end
-	local verticalPadding = _condition_3 + _condition_4
+	local verticalPadding = _condition_2 + _condition_3
 	local _attributes = {}
-	local _condition_5 = props.name
-	if _condition_5 == nil then
-		_condition_5 = "GroupElement"
+	local _condition_4 = props.name
+	if _condition_4 == nil then
+		_condition_4 = "GroupElement"
 	end
-	_attributes.key = _condition_5
+	_attributes.key = _condition_4
 	_attributes.BackgroundTransparency = 1
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	_attributes.Change = {

@@ -64,7 +64,6 @@ export function Scroller(props: ScrollerProps) {
             VerticalScrollBarInset={Enum.ScrollBarInset.ScrollBar}
             AutomaticCanvasSize={Enum.AutomaticSize.Y}
         >
-            { /* Need this for the automaticSize of the parent to work (weird Roblox thing) */}
             {props.AutomaticSizeParent && <uilistlayout
                 key="AutomaticSizeLayout"
                 FillDirection={Enum.FillDirection.Horizontal}

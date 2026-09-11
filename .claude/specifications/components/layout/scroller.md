@@ -4,13 +4,13 @@
 
 ## Public API
 
-- Composes `SizeElementProps`, `PositionElementProps`, and `SpacedElementProps` (`spacing`), plus `children`.
+- Composes `SizeElementProps`, `PositionElementProps`, and `SpacedElementProps` (`spacing`), plus `children` and `AutomaticSizeParent?: boolean` (see below).
 - Defaults to filling its parent (`UDim2.fromScale(1, 1)`) and `AutomaticSize.None` when no `Size`/`width`/`height`/`AutomaticSize` is given — unlike `Container`, it does not hug content by default.
 
 ## Layout and scrolling
 
 - Scrolls vertically only (`ScrollingDirection.Y`); the canvas height is automatic (`AutomaticCanvasSize.Y`) while `CanvasSize` itself is declared as `UDim2.fromScale(1, 0)`.
-- `children` render inside an inner transparent frame (`AutomaticSize.Y`) nested in the scrolling frame; a `UIListLayout` is also placed directly on the scrolling frame itself, which the source notes is required for the parent's automatic-size measurement to work correctly.
+- `children` render inside an inner transparent frame (`AutomaticSize.Y`) nested in the scrolling frame. When `AutomaticSizeParent` is `true`, a horizontal `UIListLayout` is also placed directly on the scrolling frame itself; without it, an automatically sized parent does not measure the `Scroller` correctly (a Roblox layout quirk).
 - The inner content frame's width is `100%` minus the scrollbar thickness (`12px`) and the current `spacing` value, but only while content is actually overflowing (tracked via `AbsoluteCanvasSize`/`AbsoluteWindowSize` comparison); when content fits without scrolling, the content frame uses the full available width instead.
 - `spacing` only controls the extra width reserved next to the scrollbar when it's visible — `Scroller` does not add its own inter-child spacing; nest a [`VStack`](./vstack.md)/[`HStack`](./hstack.md) inside for that.
 

@@ -26,8 +26,9 @@ Rules for delegation:
 2. Review similar existing implementations to understand established patterns.
 3. Check for applicable specifications:
 
-   * Architecture specifications: `/.claude/architecture/*.md`
-   * Feature specifications: `/.claude/specifications/*.md`
+   * Architecture specifications: `/.claude/architecture/*.md` (including `shared-modules.md`, the implementation notes for `src/Helpers`, `src/Interfaces`, `src/Contexts` and `src/Providers`)
+   * Feature specifications: `/.claude/specifications/*.md` (including `testing.md` for `src/Tests`)
+   * Component specs and their **Implementation notes**: `/.claude/specifications/components/<category>/<component>.md`. `src/` has no comments, so these notes are the only record of why non-obvious code is the way it is.
 4. When a feature specification is located in a directory containing an `index.md`, read that file as additional context.
 5. Identify existing helpers, components, types, and abstractions that can be reused.
 
@@ -43,7 +44,14 @@ Do not begin implementation until you understand the existing behaviour and conv
 * Do not reformat, rename, or refactor unrelated code.
 * Avoid introducing new dependencies unless explicitly required.
 * Preserve public APIs and existing behaviour unless explicitly asked to change them.
-* Do not add comments unless they provide necessary context and are consistent with the surrounding file.
+* **No comments in `src/`** (components, helpers, interfaces, contexts, providers, theme, and tests alike): no `//` lines, no trailing comments, no `/* */` or JSDoc blocks. If you delete code, delete its comment too, and remove any comment you find while editing a file. Rationale, pitfalls, rejected approaches and "why is this here" knowledge go in the matching `.claude/` file instead:
+  * a component → the **Implementation notes** section of its spec at `.claude/specifications/components/<category>/<component>.md`
+  * helpers, interfaces, contexts, providers → `.claude/architecture/shared-modules.md`
+  * tests and test helpers → `.claude/specifications/testing.md`
+
+  Write each note so a reader can find what it refers to without line numbers: name the symbol, prop or file. Read the relevant notes before changing that code.
+
+  **The one exception:** the trailing colour-name comments on palette entries in `src/Theme/themes/*.theme.ts` (e.g. `Color3.fromHex("#2E9D63"), // Green`) stay. Keep them, and add one for any palette colour you add or change.
 * Do not introduce speculative abstractions for potential future requirements.
 * Prefer consistency with the codebase over generic best practices when the two differ.
 
@@ -219,16 +227,80 @@ class MountsAComponent {
 export = MountsAComponent;
 ```
 
-### Verifying your work
+### Verifying your work: run the tests from the terminal
 
-Don't compile and invoke Lunit's runner yourself from a terminal -- the
-working test runner is regenerated fresh by this extension into VS Code's
-own extension storage (outside the project) before every run, and
-hand-invoking Lunit's own bundled scripts directly is known not to work with
-roblox-ts's module resolution. Ask the user to run the tests from VS Code's
-Test Explorer (or the "Lunit: Run All Tests" command), and read the results
-there or in the "Lunit" output channel.
+Don't compile and invoke Lunit's runner yourself -- the working test runner
+is regenerated fresh by the extension before every run, and hand-invoking
+Lunit's own bundled scripts directly is known not to work with roblox-ts's
+module resolution. Instead, run the extension's own command-line entry point,
+which executes the tests through the exact same code path as clicking "Run in
+Roblox Studio" / "Run with Lune" in the Test Explorer and prints the same
+per-test results (the run also shows up in the user's Testing view):
+
+```sh
+node "C:\Users\david\AppData\Roaming\Code\User\globalStorage\shadercloud.vscode-lunit-companion\lunit-cli.js" --studio
+```
+
+- `--studio` (default) runs in Roblox Studio; `--lune` runs headlessly with
+  Lune (Lune can't run `@Tag("Studio")` tests, so prefer `--studio` to
+  verify everything at once).
+- Add one or more filters to run a subset, e.g. `... --studio MyFeature`
+  or `... --studio src/foo.test.ts` -- case-insensitive substrings matched
+  against each test's file path, class name, method name and display name.
+- Add `--json` for a machine-readable summary on stdout (`tests[]` with
+  `status`, `message`, `file`, `className`, `methodName`; `counts`).
+- Exit code 0 means every test passed (or was skipped); 1 means at least one
+  failed or errored (each is listed with its failure message); 2 means the run
+  couldn't be performed at all -- read the printed reason, fix it if it's about
+  your code, otherwise report it to the user.
+- Studio runs can take a while (up to a few minutes if a new Studio process
+  has to be launched); wait for the command to finish rather than assuming
+  it hung. Use `--help` for every option.
 <!-- END lunit-test-explorer:agent-instructions -->
+
+## Running the tests in this repo (read before running)
+
+The generated section above is generic; this package has a nested layout that
+changes the exact invocation. Copy this rather than working it out:
+
+```sh
+# 1. Compile THIS package (the CLI's own compile step only builds the
+#    dev-packages root, so skipping this runs stale Luau in Studio).
+cd /c/Users/david/Documents/ROBLOX/dev-packages/Packages/rbxts-react-clean-ui && npx rbxtsc
+
+# 2. Run from the dev-packages root -- that's the Rojo project synced into Studio.
+cd /c/Users/david/Documents/ROBLOX/dev-packages && \
+  node "$APPDATA/Code/User/globalStorage/shadercloud.vscode-lunit-companion/lunit-cli.js" \
+  --studio --workspace "$(pwd -W)" [filter ...]
+```
+
+* Always use the `globalStorage/.../lunit-cli.js` launcher above. It is
+  rewritten on every extension activation to point at the installed version;
+  hard-coded `~/.vscode/extensions/shadercloud.vscode-lunit-companion-<ver>/out/cli.js`
+  paths break whenever the extension updates.
+* Scope runs with a filter (`Grid`, `Increment`, `Components/Layout`) while
+  iterating; run unfiltered `--studio` before reporting done.
+* `--lune` runs only `@Tag("Lune")`/untagged classes and finishes in seconds.
+  It prints `failed to load test module ... module not found: .../@rbxts/react`
+  warnings for every Studio-tagged file -- those are expected, not failures.
+  Trust the final `[lunit] N tests via Lune: X passed, Y failed.` line and the
+  exit code.
+* Studio runs need `rojo serve` actively syncing into the open Studio. If
+  previously-passing tests suddenly all fail, or results don't reflect your
+  edit, suspect the sync first. Studio also keeps required modules cached for
+  the session: after editing a component (not just a test), ask the user to
+  restart Studio / re-sync before trusting the result.
+* Studio mount tests that read layout must mount through
+  `mountInScreenGui`/`withMounted` in `src/Tests/Helpers/layout.ts` (a
+  `ScreenGui` in `CoreGui`) -- a detached Frame is never laid out, so
+  `AbsoluteSize` and text bounds stay 0 or stale. `withMounted` always
+  unmounts and destroys the host; with `mountInScreenGui`, call `unmount()`
+  yourself. The same file has the `waitFor*`/`assert*` layout helpers.
+* If a Studio test fails, confirm the behaviour is actually wrong (e.g. visible
+  in the component's story) before changing `src/Components/**` -- don't bend
+  a component to satisfy a test.
+* Other fast checks: `npm run typecheck`, `npm run lint`, `npm run build`
+  (all run from this package's folder).
 
 ## Test layout and naming (project conventions)
 

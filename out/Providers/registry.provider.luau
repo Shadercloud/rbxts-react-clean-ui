@@ -2,8 +2,6 @@
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local HttpService = TS.import(script, TS.getModule(script, "@rbxts", "services")).HttpService
--- This registry is used to keep a global map of GuiObjects => React components
--- For example Droppable zones use this to register themselves
 local DroppableRegistryKey = {
 	name = "Droppable",
 }

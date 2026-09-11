@@ -116,7 +116,6 @@ export class GuiHelper {
                         rootIndex: index,
                     });
 
-                    // Don't recurse into another render surface.
                     continue;
                 }
 
@@ -161,12 +160,10 @@ export class GuiHelper {
                 return a.object.ZIndex < b.object.ZIndex;
             }
 
-            // Preserve sibling order.
             return a.siblingIndex < b.siblingIndex;
         });
 
         for (const child of children) {
-            // Parent renders before its children.
             result.push(child.object);
             this.appendGuiObjects(child.object, result);
         }

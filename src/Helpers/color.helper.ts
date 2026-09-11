@@ -5,7 +5,7 @@ import {
     CssBackgroundImage,
     TypographyStyle,
 } from "../Theme";
-import { ButtonFlag, Intent } from "../Interfaces";
+import { ButtonFlag, CssBackgroundGradient, Intent } from "../Interfaces";
 
 type ComponentIntentColors =
     | Partial<Record<Intent, InlineIntentColors>>
@@ -17,11 +17,6 @@ export class ColorHelper {
         intent: Intent | undefined,
         state: ButtonFlag = "default",
         componentColors?: ComponentIntentColors,
-        // Highest-precedence tier, layered on top of `componentColors` (which
-        // itself layers on top of the theme-global tier) rather than replacing
-        // it. Used for per-instance style overrides (e.g. Button's
-        // `styleOverride.intents`) so a partial override doesn't wipe out the
-        // base component theme's fields it didn't set.
         overrideColors?: ComponentIntentColors,
     ): IntentScheme {
         const selectedIntent = intent ?? "primary";
@@ -36,27 +31,21 @@ export class ColorHelper {
         const overrideMatching = overrideColors?.[selectedIntent];
 
         const layers: (Partial<IntentScheme> | undefined)[] = [
-            // Theme tier, `default` sub-layers (primary before matching)
             defaultPrimary.default,
             defaultMatching.default,
 
-            // Theme tier, requested-state sub-layers (primary before matching)
             defaultPrimary[state],
             defaultMatching[state],
 
-            // Component tier, `default` sub-layers (primary before matching)
             this.resolveComponentDefaultLayer(componentPrimary),
             this.resolveComponentDefaultLayer(componentMatching),
 
-            // Component tier, requested-state sub-layers (primary before matching)
             this.resolveComponentStateLayer(componentPrimary, state),
             this.resolveComponentStateLayer(componentMatching, state),
 
-            // Override tier, `default` sub-layers (primary before matching)
             this.resolveComponentDefaultLayer(overridePrimary),
             this.resolveComponentDefaultLayer(overrideMatching),
 
-            // Override tier, requested-state sub-layers (primary before matching)
             this.resolveComponentStateLayer(overridePrimary, state),
             this.resolveComponentStateLayer(overrideMatching, state),
         ];
@@ -64,14 +53,10 @@ export class ColorHelper {
         return this.mergeLayers(layers);
     }
 
-    // Combines an ordered list of cascade layers (earliest = lowest precedence)
-    // into a single IntentScheme. Most fields are last-wins/shallow-replace, but
-    // `backgroundImage` and `typography` are nested objects where a later layer
-    // should only override the fields it actually sets, inheriting the rest from
-    // earlier layers instead of wiping the whole object out.
     private static mergeLayers(layers: (Partial<IntentScheme> | undefined)[]): IntentScheme {
         let merged: Partial<IntentScheme> = {};
         let backgroundImage: Partial<CssBackgroundImage> | undefined;
+        let backgroundGradient: Partial<CssBackgroundGradient> | undefined;
         let typography: Partial<TypographyStyle> | undefined;
 
         for (const layer of layers) {
@@ -85,20 +70,26 @@ export class ColorHelper {
                 backgroundImage = { ...backgroundImage, ...layer.backgroundImage };
             }
 
+            if (layer.backgroundGradient !== undefined) {
+                const inheritedGradient =
+                    layer.backgroundGradient.colors !== undefined
+                        ? { ...backgroundGradient, stops: undefined }
+                        : backgroundGradient;
+                backgroundGradient = { ...inheritedGradient, ...layer.backgroundGradient };
+            }
+
             if (layer.typography !== undefined) {
                 typography = { ...typography, ...layer.typography };
             }
         }
 
         merged.backgroundImage = backgroundImage;
+        merged.backgroundGradient = backgroundGradient;
         merged.typography = typography;
 
         return merged as IntentScheme;
     }
 
-    // Extracts a component-theme intent entry's `default` sub-layer.
-    // A direct Partial<IntentScheme> (no state variants) is always
-    // applied here, since the requested state is ignored for it.
     private static resolveComponentDefaultLayer(
         colors: InlineIntentColors | Partial<IntentScheme> | undefined,
     ): Partial<IntentScheme> | undefined {
@@ -113,9 +104,6 @@ export class ColorHelper {
         return colors;
     }
 
-    // Extracts a component-theme intent entry's requested-state sub-layer.
-    // A direct Partial<IntentScheme> has no state variants, so it never
-    // contributes a state layer (it's already applied by the default layer).
     private static resolveComponentStateLayer(
         colors: InlineIntentColors | Partial<IntentScheme> | undefined,
         state: ButtonFlag,

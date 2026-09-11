@@ -37,7 +37,6 @@ export class TypographyHelper {
     ): Partial<TypographyStyle> | undefined {
         const scaleIndex = ScaleSizes.indexOf(scale);
 
-        // Prefer the exact scale, then progressively smaller scales.
         for (let index = scaleIndex; index >= 0; index--) {
             const value = typography[ScaleSizes[index]];
 
@@ -46,7 +45,6 @@ export class TypographyHelper {
             }
         }
 
-        // If no smaller scale exists, use the nearest larger scale.
         for (let index = scaleIndex + 1; index < ScaleSizes.size(); index++) {
             const value = typography[ScaleSizes[index]];
 

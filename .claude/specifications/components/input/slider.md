@@ -42,3 +42,7 @@
 ## Story
 
 Worth demonstrating: a single-value slider with `onDragged`/`onChanged` wired to visible state, a `step` example, a `range` slider with `highlight="middle"`, and the three `highlight` options on non-range sliders.
+
+## Implementation notes
+
+- On drag end, `isDraggingRef` is cleared synchronously before `setDragging(false)`, so `InputChanged` events that arrive before React re-renders stop moving the handle straight away. Gate movement on the ref, not on the `dragging` state.

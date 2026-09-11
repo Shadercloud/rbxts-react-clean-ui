@@ -268,3 +268,141 @@ Install the UI Labs plugin:
 https://ui-labs.luau.page/docs/installation
 
 Once installed, open **Plugins → UI Labs**. You should see the React Clean UI component stories, allowing you to preview components while you develop.
+
+## Testing
+
+React Clean UI is tested with [`@rbxts/lunit`](https://www.npmjs.com/package/@rbxts/lunit), a class and decorator based test framework.
+
+### Test layout
+
+Test files match `**/*.{test,spec}.{ts,tsx}` and live under `src/Tests/`, which mirrors the layout of `src/`:
+
+| Source file | Test file |
+| --- | --- |
+| `src/Components/Input/Increment.tsx` | `src/Tests/Components/Input/Increment.test.tsx` |
+| `src/Components/Input/Increment.step.ts` | `src/Tests/Components/Input/Increment.step.test.ts` |
+| `src/Providers/modal.provider.tsx` | `src/Tests/Providers/modal.provider.test.tsx` |
+
+The suite currently covers these areas:
+
+- **Chart** — `BarChart`, `Pie`
+- **Decorator** — `BoxShadow`, `Corners`, `Gradient`, `Padding`
+- **Input** — `Button`, `Checkbox`, `HoverButton`, `Increment` (plus its step logic), `Input` (plus its validation logic), `Select`, `Slider`, `Switch`
+- **Interaction** — `Modal`, `Toast`, `Tooltip`
+- **Layout** — `Accordion`, `Column`, `Container`, `Draggable`, `Droppable`, `Fieldset`, `FlexItem`, `Grid`, `Group`, `HStack`, `Pagination`, `Row`, `Scroller`, `Table`, `Tabs`, `VStack`
+- **Navigation** — `Menu`
+- **Surface** — `Box`, `Card`, `Icon`, `ProgressBar`
+- **Typography** — `Text`
+- **Providers** — `modal.provider`
+
+The compiled `out/Tests/**` output is excluded from the published package (`"!out/Tests/**"` in the `files` field of `package.json`).
+
+### Writing a test
+
+- Each file contains **one test class**, exported with `export = ClassName` (not a named export).
+- Each `@Test` method has a short camelCase name and a `@DisplayName("...")` sentence describing the behaviour it checks.
+- Tests are split by **tag**, not by folder:
+    - `@Tag("Lune")` for pure logic that runs headlessly.
+    - `@Tag("Studio")` for anything that mounts React or creates Instances.
+
+```ts
+import { Test, Assert, Tag, DisplayName } from "@rbxts/lunit";
+import { resolveSteppedValue } from "../../../Components/Input/Increment.step";
+
+@Tag("Lune")
+class IncrementStepValidation {
+    @DisplayName("A step that would overshoot max is clamped to max")
+    @Test
+    public clampsToMax() {
+        Assert.equal(resolveSteppedValue(8, "increment", 5, 0, 10), 10);
+    }
+}
+
+export = IncrementStepValidation;
+```
+
+<Callout type="warn">
+    Studio mount tests must parent their host `Frame` under a `ScreenGui`. Roblox never lays out a detached `Frame`, so `AbsoluteSize` and text bounds stay at `0`. The test must also unmount the React root and `Destroy()` the host when it finishes.
+</Callout>
+
+#### Layout helpers
+
+Rather than building a `ScreenGui` host by hand, Studio mount tests use the shared helpers in `src/Tests/Helpers/layout.ts`:
+
+- `mountInScreenGui(width, height, element)` mounts `element` under a `ScreenGui` in `CoreGui`, wrapped in a `ThemeProvider` using `DefaultTheme`.
+- `withMounted(width, height, element, fn)` mounts the element, runs `fn` against it, and always unmounts afterwards, even when an assertion fails.
+- `waitForLayout`, `waitForGuiObject` and `waitForDescendant` poll until the engine has laid out the instance you're checking.
+- `assert*` layout assertions check real on-screen rects: `assertContained`, `assertAllDescendantsContained`, `assertNoSiblingOverlap`, `assertTextFits`, `assertCenteredIn`, `assertSizeApprox`, `assertStackedVertically` / `assertStackedHorizontally`, and others.
+
+Studio tests also skip themselves outside Roblox with `@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)`:
+
+```tsx
+import React from "@rbxts/react";
+import { Test, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
+import { Box } from "../../../Components/Surface/Box";
+import { STUDIO_SKIP_MESSAGE, assertCenteredIn, waitForGuiObject, withMounted } from "../../Helpers/layout";
+
+const { Skip } = Decorators;
+
+@Tag("Studio")
+class BoxMountValidation {
+    @Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+    @DisplayName("center={true} with a fixed width and height places the Box in the middle of the host")
+    @Test
+    public centeredInHost() {
+        withMounted(400, 300, <Box center={true} width={200} height={100} />, (mounted) => {
+            const box = waitForGuiObject<ImageLabel>(mounted.host, "Box");
+
+            assertCenteredIn(box, mounted.host, "both", 1, "centered box");
+        });
+    }
+}
+
+export = BoxMountValidation;
+```
+
+### Running tests
+
+Running the suite requires the **Lunit Test Companion** VS Code extension (publisher `ShaderCloud`). Once it's installed, you can run tests from VS Code's **Test Explorer** with the **Run with Lune** or **Run in Roblox Studio** profile, or with the **Lunit: Run All Tests** command.
+
+Before a Studio run:
+
+- Compile React Clean UI with `npx rbxtsc` (or `npm run build` / `npm run watch`, as in Terminal 1 above) inside `Packages/rbxts-react-clean-ui`. The runner's own compile step only builds the `dev-packages` root, so skipping this step runs stale code.
+- Make sure `rojo serve` is running and syncing into Studio.
+- Studio caches required modules for the session. After you edit a component, restart Studio (or re-sync) before you trust a result.
+
+### Running from the terminal
+
+For terminal or CI-style runs, use the extension's CLI. It runs the same code path as the Test Explorer. The extension writes a version-stable launcher to VS Code's global storage, so use that path instead of a versioned extension path.
+
+Run this from the `dev-packages` root (the Rojo project that syncs into Studio), using Git Bash:
+
+```bash
+cd C:\Users\username\Documents\dev-packages
+node "$APPDATA/Code/User/globalStorage/shadercloud.vscode-lunit-companion/lunit-cli.js" --studio --workspace "$(pwd -W)" [filter ...]
+```
+
+| Option | Description |
+| --- | --- |
+| `--studio` | Run in Roblox Studio (default). |
+| `--lune` | Run headlessly with Lune. Studio-tagged files log `module not found: @rbxts/react` load warnings under Lune. These are expected and harmless. |
+| `[filter ...]` | Case-insensitive substrings matched against the file path, class, method, or display name, e.g. `Grid` or `Increment`. |
+| `--json` | Print a machine-readable summary. |
+| `--help` | List every option. |
+
+| Exit code | Meaning |
+| --- | --- |
+| `0` | All tests passed or were skipped. |
+| `1` | One or more tests failed. |
+| `2` | The tests couldn't be run. |
+| `130` | The run was cancelled. |
+
+### Other checks
+
+Run these from `Packages/rbxts-react-clean-ui` alongside the test suite:
+
+```bash
+npm run typecheck
+npm run lint
+npm run format:check
+```

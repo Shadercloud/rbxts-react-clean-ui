@@ -67,21 +67,11 @@ export class CssHelper {
         return value.Scale === 0 && value.Offset === 0;
     }
 
-    // Accepts CssCalcSize (a CssSize plus the one supported calc() shape)
-    // rather than plain CssSize so a caller like CssPosition.width can pass
-    // a calc() term through — every existing CssSize-typed caller still
-    // type-checks unchanged, since CssSize is a subset of CssCalcSize.
     public static parseCssSize(value: CssCalcSize): UDim {
         if (typeIs(value, "number")) {
             return new UDim(0, value);
         }
 
-        // The one CSS calc() shape supported: "<percent>% - <px>px" /
-        // "<percent>% + <px>px" (e.g. "100% - 50px") maps directly onto
-        // UDim(scale, offset) — split on the literal " - "/" + " separator
-        // and parse each term with this same function. Anything without
-        // either separator falls through to the single-token parsing below,
-        // unchanged.
         const minusParts = value.split(" - ");
         if (minusParts.size() === 2) {
             const scale = this.parseCssSize(minusParts[0] as CssCalcSize).Scale;
@@ -109,7 +99,6 @@ export class CssHelper {
         return new UDim(0, tonumber(value) ?? 0);
     }
 
-    // CSS quad shorthand ("top right bottom left"), e.g. border-image-slice
     public static parseCssQuad(value: CssQuad): ParsedQuad {
         if (typeIs(value, "number")) {
             const size = this.parseCssSize(value).Offset;
@@ -128,9 +117,6 @@ export class CssHelper {
         return { top, right, bottom, left };
     }
 
-    // strips a trailing "%"/"px" unit suffix (if present) and returns the remaining numeric
-    // portion as a raw pixel count — unlike parseCssSize, no Scale/Offset UDim is produced,
-    // since SliceCenter's Rect needs plain numbers regardless of what unit (if any) was written
     private static toRawPixels(value: CssSize): number {
         if (typeIs(value, "number")) {
             return value;
@@ -147,10 +133,6 @@ export class CssHelper {
         return tonumber(value) ?? 0;
     }
 
-    // Roblox SliceCenter absolute pixel corner shorthand — "A B" (symmetric square
-    // corners: Rect(A, A, B, B)) or "A B C D" (Rect(A, B, C, D) directly, i.e.
-    // Rect.new(minX, minY, maxX, maxY)) — see CssSliceInset for why this can't be an
-    // edge-inset shorthand the way parseCssQuad is for padding/shadow/tileSize
     public static parseCssSliceInset(value: CssSliceInset): ParsedSliceInset {
         const parts = value
             .split(" ")
@@ -165,7 +147,6 @@ export class CssHelper {
         return { x1: pixels[0], y1: pixels[1], x2: pixels[2], y2: pixels[3] };
     }
 
-    // CSS 1-or-2-value shorthand ("x" or "x y"), e.g. background-size / tile-size
     public static parseCssDual(value: CssDual): UDim2 {
         if (typeIs(value, "number")) {
             const size = this.parseCssSize(value);
@@ -221,14 +202,20 @@ export class CssHelper {
         };
     }
 
-    public static resolveBackgroundGradient(value: CssBackgroundGradient | undefined): React.InstanceProps<UIGradient> | undefined {
-        if (value === undefined) {
+    public static resolveBackgroundGradient(value: Partial<CssBackgroundGradient> | undefined): React.InstanceProps<UIGradient> | undefined {
+        const colors = value?.colors;
+
+        if (value === undefined || colors === undefined) {
             return undefined;
         }
 
-        const color = typeIs(value.colors, "ColorSequence")
-            ? value.colors
-            : this.buildColorSequence(value.colors, value.stops);
+        if (!typeIs(colors, "ColorSequence") && colors.size() === 0) {
+            return undefined;
+        }
+
+        const color = typeIs(colors, "ColorSequence")
+            ? colors
+            : this.buildColorSequence(colors, value.stops);
 
         return {
             Color: color,
@@ -243,19 +230,31 @@ export class CssHelper {
             return new ColorSequence(colors[0]);
         }
 
-        const keypoints = colors.map((color, index) => {
-            const time = stops?.[index] !== undefined
-                ? math.clamp(stops[index], 0, 1)
-                : index / (colors.size() - 1);
+        const lastIndex = colors.size() - 1;
 
-            return new ColorSequenceKeypoint(time, color);
+        const entries = colors.map((color, index) => {
+            let time = stops?.[index] !== undefined
+                ? math.clamp(stops[index], 0, 1)
+                : index / lastIndex;
+
+            if (index === 0) {
+                time = 0;
+            } else if (index === lastIndex) {
+                time = 1;
+            }
+
+            return { time, color, index };
         });
 
-        // Roblox requires the first keypoint's Time to be exactly 0 and the last exactly 1
-        keypoints[0] = new ColorSequenceKeypoint(0, keypoints[0].Value);
-        keypoints[keypoints.size() - 1] = new ColorSequenceKeypoint(1, keypoints[keypoints.size() - 1].Value);
+        entries.sort((a, b) => {
+            if (a.time !== b.time) {
+                return a.time < b.time;
+            }
 
-        return new ColorSequence(keypoints);
+            return a.index < b.index;
+        });
+
+        return new ColorSequence(entries.map((entry) => new ColorSequenceKeypoint(entry.time, entry.color)));
     }
 
     private static buildTransparencySequence(value: number | NumberSequence | undefined): NumberSequence | undefined {

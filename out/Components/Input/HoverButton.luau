@@ -6,8 +6,6 @@ local function HoverButton(propSet)
 	local hovering, setHovering = React.useState(false)
 	local state = if propSet.isSelected then "focus" elseif hovering then "hover" else "default"
 	local stateProps = propSet[state]
-	-- Object spreading into a new object is supported.
-	-- It is object rest destructuring that roblox-ts does not support.
 	local _object = table.clone(propSet.default)
 	setmetatable(_object, nil)
 	if stateProps then

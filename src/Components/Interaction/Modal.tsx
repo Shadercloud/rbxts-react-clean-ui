@@ -27,10 +27,6 @@ function generateModalId() {
     return `modal-${nextModalId}`;
 }
 
-// GuiService.SelectedObject can only be set to a descendant of a PlayerGui —
-// it throws otherwise (e.g. a ui-labs Studio plugin preview, or any other
-// non-PlayerGui host). Focus is a non-essential enhancement, so failures here
-// are swallowed rather than crashing the whole render.
 function trySetSelectedObject(target: GuiObject | undefined) {
     pcall(() => {
         GuiService.SelectedObject = target;
@@ -126,9 +122,6 @@ export function Modal(props: ModalProps) {
         });
     }, [fadeDuration]);
 
-    // Public open state vs. animated-unmount state: closing must finish its
-    // fade before the portal actually disappears, so `shouldRender` lags
-    // `open` on the way down (see beginExit above).
     React.useEffect(() => {
         if (open) {
             const fadeThread = fadeThreadRef.current;
@@ -164,11 +157,6 @@ export function Modal(props: ModalProps) {
         };
     }, []);
 
-    // Registers with the shared modal stack only while actually visible
-    // (including through the closing fade), so escape only ever targets the
-    // topmost visible modal. closeOnEscape/requestClose are read through
-    // refs kept current every render (see above) so this effect only needs
-    // to run when shouldRender flips.
     React.useEffect(() => {
         if (!shouldRender) {
             return;
@@ -185,8 +173,6 @@ export function Modal(props: ModalProps) {
         };
     }, [shouldRender]);
 
-    // Scoped per-instance so nested modals restore focus to whatever was
-    // selected right before THEY opened, not a single shared value.
     React.useEffect(() => {
         if (!shouldRender) {
             return;

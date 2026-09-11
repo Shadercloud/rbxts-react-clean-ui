@@ -37,7 +37,6 @@ do
 	function TypographyHelper:getClosestTypography(typography, scale)
 		local _scale = scale
 		local scaleIndex = (table.find(ScaleSizes, _scale) or 0) - 1
-		-- Prefer the exact scale, then progressively smaller scales.
 		do
 			local index = scaleIndex
 			local _shouldIncrement = false
@@ -56,7 +55,6 @@ do
 				end
 			end
 		end
-		-- If no smaller scale exists, use the nearest larger scale.
 		do
 			local index = scaleIndex + 1
 			local _shouldIncrement = false
