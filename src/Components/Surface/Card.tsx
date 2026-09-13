@@ -127,6 +127,12 @@ export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
         const intent = ColorHelper.getIntentColors(theme, props.intent ?? card.intent ?? "primary", "default", theme.components.card.header.intents);
         const padding = SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.card.header.spacing, theme.components.card.header.padding, "md");
         const corners = CssHelper.parseCssSize(theme.components.card.cornerRadius);
+        const headerCorners = theme.components.card.header.cornerRadius;
+        const noCorner = new UDim(0, 0);
+        const topLeftRadius = headerCorners?.topLeft !== undefined ? CssHelper.parseCssSize(headerCorners.topLeft) : corners;
+        const topRightRadius = headerCorners?.topRight !== undefined ? CssHelper.parseCssSize(headerCorners.topRight) : corners;
+        const bottomLeftRadius = headerCorners?.bottomLeft !== undefined ? CssHelper.parseCssSize(headerCorners.bottomLeft) : noCorner;
+        const bottomRightRadius = headerCorners?.bottomRight !== undefined ? CssHelper.parseCssSize(headerCorners.bottomRight) : noCorner;
         const { overlay, positionProps } = resolveOverlayPosition(props, theme.components.card.header.position);
         return <Container
             name="CardHeader"
@@ -147,7 +153,7 @@ export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
         >
             <Padding resolvedPadding={padding} />
             <uistroke key="Stroke" Thickness={theme.components.card.header.borderThickness ?? theme.components.card.borderThickness} Color={intent.borderColor} BorderStrokePosition={Enum.BorderStrokePosition.Inner} />
-            <uicorner key="Corners" TopLeftRadius={corners} TopRightRadius={corners} BottomLeftRadius={new UDim(0, 0)} BottomRightRadius={new UDim(0, 0)} />
+            <uicorner key="Corners" TopLeftRadius={topLeftRadius} TopRightRadius={topRightRadius} BottomLeftRadius={bottomLeftRadius} BottomRightRadius={bottomRightRadius} />
             {props.children}
         </Container>
     });
@@ -187,6 +193,12 @@ export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
         const intent = ColorHelper.getIntentColors(theme, props.intent ?? card.intent ?? "primary", "default", theme.components.card.footer.intents);
         const padding = SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.card.footer.spacing, theme.components.card.footer.padding, "md");
         const corners = CssHelper.parseCssSize(theme.components.card.cornerRadius);
+        const footerCorners = theme.components.card.footer.cornerRadius;
+        const noCorner = new UDim(0, 0);
+        const topLeftRadius = footerCorners?.topLeft !== undefined ? CssHelper.parseCssSize(footerCorners.topLeft) : noCorner;
+        const topRightRadius = footerCorners?.topRight !== undefined ? CssHelper.parseCssSize(footerCorners.topRight) : noCorner;
+        const bottomLeftRadius = footerCorners?.bottomLeft !== undefined ? CssHelper.parseCssSize(footerCorners.bottomLeft) : corners;
+        const bottomRightRadius = footerCorners?.bottomRight !== undefined ? CssHelper.parseCssSize(footerCorners.bottomRight) : corners;
         const { overlay, positionProps } = resolveOverlayPosition(props, theme.components.card.footer.position);
         return <Container
             name="CardFooter"
@@ -207,7 +219,7 @@ export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
         >
             <Padding resolvedPadding={padding} />
             <uistroke key="Stroke" Thickness={theme.components.card.footer.borderThickness ?? theme.components.card.borderThickness} Color={intent.borderColor} BorderStrokePosition={Enum.BorderStrokePosition.Inner} />
-            <uicorner key="Corners" TopLeftRadius={new UDim(0, 0)} TopRightRadius={new UDim(0, 0)} BottomLeftRadius={corners} BottomRightRadius={corners} />
+            <uicorner key="Corners" TopLeftRadius={topLeftRadius} TopRightRadius={topRightRadius} BottomLeftRadius={bottomLeftRadius} BottomRightRadius={bottomRightRadius} />
             {props.children}
         </Container>
     });

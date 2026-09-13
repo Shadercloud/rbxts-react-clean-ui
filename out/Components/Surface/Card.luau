@@ -129,6 +129,28 @@ local CardHeader = React.forwardRef(function(props, ref)
 	local intent = ColorHelper:getIntentColors(theme, props.intent or card.intent or "primary", "default", theme.components.card.header.intents)
 	local padding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.card.header.spacing, theme.components.card.header.padding, "md")
 	local corners = CssHelper:parseCssSize(theme.components.card.cornerRadius)
+	local headerCorners = theme.components.card.header.cornerRadius
+	local noCorner = UDim.new(0, 0)
+	local _result = headerCorners
+	if _result ~= nil then
+		_result = _result.topLeft
+	end
+	local topLeftRadius = if _result ~= nil then CssHelper:parseCssSize(headerCorners.topLeft) else corners
+	local _result_1 = headerCorners
+	if _result_1 ~= nil then
+		_result_1 = _result_1.topRight
+	end
+	local topRightRadius = if _result_1 ~= nil then CssHelper:parseCssSize(headerCorners.topRight) else corners
+	local _result_2 = headerCorners
+	if _result_2 ~= nil then
+		_result_2 = _result_2.bottomLeft
+	end
+	local bottomLeftRadius = if _result_2 ~= nil then CssHelper:parseCssSize(headerCorners.bottomLeft) else noCorner
+	local _result_3 = headerCorners
+	if _result_3 ~= nil then
+		_result_3 = _result_3.bottomRight
+	end
+	local bottomRightRadius = if _result_3 ~= nil then CssHelper:parseCssSize(headerCorners.bottomRight) else noCorner
 	local _binding = resolveOverlayPosition(props, theme.components.card.header.position)
 	local overlay = _binding.overlay
 	local positionProps = _binding.positionProps
@@ -172,10 +194,10 @@ local CardHeader = React.forwardRef(function(props, ref)
 	_attributes_1.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 	return React.createElement(Container, _attributes, _exp, React.createElement("uistroke", _attributes_1), React.createElement("uicorner", {
 		key = "Corners",
-		TopLeftRadius = corners,
-		TopRightRadius = corners,
-		BottomLeftRadius = UDim.new(0, 0),
-		BottomRightRadius = UDim.new(0, 0),
+		TopLeftRadius = topLeftRadius,
+		TopRightRadius = topRightRadius,
+		BottomLeftRadius = bottomLeftRadius,
+		BottomRightRadius = bottomRightRadius,
 	}), props.children)
 end)
 local CardBody = React.forwardRef(function(props, ref)
@@ -208,6 +230,28 @@ local CardFooter = React.forwardRef(function(props, ref)
 	local intent = ColorHelper:getIntentColors(theme, props.intent or card.intent or "primary", "default", theme.components.card.footer.intents)
 	local padding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.card.footer.spacing, theme.components.card.footer.padding, "md")
 	local corners = CssHelper:parseCssSize(theme.components.card.cornerRadius)
+	local footerCorners = theme.components.card.footer.cornerRadius
+	local noCorner = UDim.new(0, 0)
+	local _result = footerCorners
+	if _result ~= nil then
+		_result = _result.topLeft
+	end
+	local topLeftRadius = if _result ~= nil then CssHelper:parseCssSize(footerCorners.topLeft) else noCorner
+	local _result_1 = footerCorners
+	if _result_1 ~= nil then
+		_result_1 = _result_1.topRight
+	end
+	local topRightRadius = if _result_1 ~= nil then CssHelper:parseCssSize(footerCorners.topRight) else noCorner
+	local _result_2 = footerCorners
+	if _result_2 ~= nil then
+		_result_2 = _result_2.bottomLeft
+	end
+	local bottomLeftRadius = if _result_2 ~= nil then CssHelper:parseCssSize(footerCorners.bottomLeft) else corners
+	local _result_3 = footerCorners
+	if _result_3 ~= nil then
+		_result_3 = _result_3.bottomRight
+	end
+	local bottomRightRadius = if _result_3 ~= nil then CssHelper:parseCssSize(footerCorners.bottomRight) else corners
 	local _binding = resolveOverlayPosition(props, theme.components.card.footer.position)
 	local overlay = _binding.overlay
 	local positionProps = _binding.positionProps
@@ -251,10 +295,10 @@ local CardFooter = React.forwardRef(function(props, ref)
 	_attributes_1.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 	return React.createElement(Container, _attributes, _exp, React.createElement("uistroke", _attributes_1), React.createElement("uicorner", {
 		key = "Corners",
-		TopLeftRadius = UDim.new(0, 0),
-		TopRightRadius = UDim.new(0, 0),
-		BottomLeftRadius = corners,
-		BottomRightRadius = corners,
+		TopLeftRadius = topLeftRadius,
+		TopRightRadius = topRightRadius,
+		BottomLeftRadius = bottomLeftRadius,
+		BottomRightRadius = bottomRightRadius,
 	}), props.children)
 end)
 local Card = React.forwardRef(function(props, ref)

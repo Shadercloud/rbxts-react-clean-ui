@@ -47,3 +47,9 @@ export interface CssPosition {
     zIndex?: number;
     width?: CssCalcSize;
 }
+export interface CssCornerRadius {
+    topLeft?: CssSize;
+    topRight?: CssSize;
+    bottomLeft?: CssSize;
+    bottomRight?: CssSize;
+}

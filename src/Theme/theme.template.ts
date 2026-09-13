@@ -1,5 +1,5 @@
 import { CssShadow, CssSize, ScaledCssPadding, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow, CssBackgroundGradient } from "../Interfaces/";
-import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors, CssBackgroundImage, CssPosition } from "./theme.style";
+import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors, CssBackgroundImage, CssPosition, CssCornerRadius } from "./theme.style";
 
 export interface ThemeTemplate {
     colors: {
@@ -242,6 +242,7 @@ export interface ThemeTemplate {
             cornerRadius: CssSize;
             header: {
                 borderThickness?: number;
+                cornerRadius?: CssCornerRadius;
                 spacing?: ScaleSizeValue<number>;
                 padding?: ScaledCssPadding;
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
@@ -249,6 +250,7 @@ export interface ThemeTemplate {
             },
             footer: {
                 borderThickness?: number;
+                cornerRadius?: CssCornerRadius;
                 spacing?: ScaleSizeValue<number>;
                 padding?: ScaledCssPadding;
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
