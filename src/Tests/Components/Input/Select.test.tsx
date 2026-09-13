@@ -5,6 +5,8 @@ const { Skip } = Decorators;
 import { Select } from "../../../Components/Input/Select";
 import { FieldsetContext } from "../../../Components/Layout";
 import { OverlayProvider } from "../../../Providers/overlay.provider";
+import { ThemeProvider } from "../../../Providers/theme.provider";
+import { DefaultTheme, ThemeTemplate, extendTheme } from "../../../Theme";
 import {
 	STUDIO_SKIP_MESSAGE,
 	assertAllDescendantsContained,
@@ -26,6 +28,14 @@ function selectWithOptions(props: { selected?: number } = {}) {
 			))}
 		</Select>
 	);
+}
+
+const FIELD_FILL = Color3.fromRGB(41, 88, 150);
+const FIELD_TEXT = Color3.fromRGB(255, 247, 207);
+const CARET_COLOR = Color3.fromRGB(200, 60, 90);
+
+function themedSelect(theme: ThemeTemplate) {
+	return <ThemeProvider theme={theme}>{selectWithOptions()}</ThemeProvider>;
 }
 
 function waitForSelect(host: Instance): ImageLabel {
@@ -128,6 +138,92 @@ class SelectMountValidation {
 		} finally {
 			labelActivated.Destroy();
 		}
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Without theme background keys the Select root stays transparent and carries no root Corners")
+	@Test
+	public defaultTransparent() {
+		withMounted(400, 200, selectWithOptions(), (mounted) => {
+			const selectRoot = waitForSelect(mounted.host);
+
+			Assert.equal(selectRoot.BackgroundTransparency, 1);
+			Assert.undefined(selectRoot.FindFirstChild("Corners"));
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A themed backgroundColor with backgroundTransparency below 1 fills the root and rounds it with the theme cornerRadius")
+	@Test
+	public themedBackground() {
+		const theme = extendTheme(DefaultTheme, {
+			components: { select: { backgroundColor: FIELD_FILL, backgroundTransparency: 0.5, cornerRadius: 6 } },
+		});
+
+		withMounted(400, 200, themedSelect(theme), (mounted) => {
+			const selectRoot = waitForSelect(mounted.host);
+
+			Assert.equal(selectRoot.BackgroundColor3, FIELD_FILL);
+			Assert.equal(selectRoot.BackgroundTransparency, 0.5);
+
+			const corners = selectRoot.FindFirstChild("Corners") as UICorner | undefined;
+			Assert.notUndefined(corners, "Expected a Corners UICorner directly under the Select root");
+			Assert.equal(corners!.CornerRadius, new UDim(0, 6));
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("An instance BackgroundTransparency beats the theme fill while the root Corners still follows the theme transparency")
+	@Test
+	public instanceTransparencyWins() {
+		const theme = extendTheme(DefaultTheme, {
+			components: { select: { backgroundColor: FIELD_FILL, backgroundTransparency: 0 } },
+		});
+
+		withMounted(
+			400,
+			200,
+			<ThemeProvider theme={theme}>
+				<Select BackgroundTransparency={1}>
+					<Select.Option text="Alpha" />
+				</Select>
+			</ThemeProvider>,
+			(mounted) => {
+				const selectRoot = waitForSelect(mounted.host);
+
+				Assert.equal(selectRoot.BackgroundTransparency, 1);
+				Assert.notUndefined(selectRoot.FindFirstChild("Corners"));
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("select.textColor colours SelectedText and select.iconColor colours the SelectCaret image")
+	@Test
+	public themedTextAndCaret() {
+		const theme = extendTheme(DefaultTheme, {
+			components: { select: { textColor: FIELD_TEXT, iconColor: CARET_COLOR } },
+		});
+
+		withMounted(400, 200, themedSelect(theme), (mounted) => {
+			const selectRoot = waitForSelect(mounted.host);
+
+			Assert.equal(findSelectedText(selectRoot).TextColor3, FIELD_TEXT);
+			Assert.equal(findDescendant<ImageLabel>(selectRoot, "SelectCaret").ImageColor3, CARET_COLOR);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Without select.textColor or iconColor both fall back to the primary intent's default textColor")
+	@Test
+	public defaultTextAndCaret() {
+		withMounted(400, 200, selectWithOptions(), (mounted) => {
+			const selectRoot = waitForSelect(mounted.host);
+			const fallback = DefaultTheme.colors.intents.primary.default.textColor;
+
+			Assert.equal(findSelectedText(selectRoot).TextColor3, fallback);
+			Assert.equal(findDescendant<ImageLabel>(selectRoot, "SelectCaret").ImageColor3, fallback);
+		});
 	}
 }
 

@@ -417,37 +417,51 @@ local Select = React.forwardRef(function(props, ref)
 		_result_1 = _result_1.labelActivated
 	end
 	React.useEffect(_exp, { _result_1, activateSelect })
+	local _condition_3 = theme.components.select.backgroundTransparency
+	if _condition_3 == nil then
+		_condition_3 = 1
+	end
+	local themeBackgroundTransparency = _condition_3
 	if open and overlay.overlay == nil then
 		warn("You have used a Select component without using the Overlay Provider")
 	end
 	local _attributes = {}
-	local _condition_3 = props.name
-	if _condition_3 == nil then
-		_condition_3 = "Select"
+	local _condition_4 = props.name
+	if _condition_4 == nil then
+		_condition_4 = "Select"
 	end
-	_attributes.name = _condition_3
+	_attributes.name = _condition_4
 	_attributes.ref = ref
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
 	_attributes.Size = UDim2.fromScale(1, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes.BackgroundColor3 = props.BackgroundColor3 or theme.components.select.backgroundColor
+	local _condition_5 = props.BackgroundTransparency
+	if _condition_5 == nil then
+		_condition_5 = themeBackgroundTransparency
+	end
+	_attributes.BackgroundTransparency = _condition_5
 	_attributes.backgroundImage = props.backgroundImage or theme.components.select.backgroundImage
-	local _exp_1 = React.createElement(Gradient, {
+	local _exp_1 = themeBackgroundTransparency < 1 and React.createElement(Corners, {
+		radius = theme.components.select.cornerRadius,
+	})
+	local _exp_2 = React.createElement(Gradient, {
 		value = props.backgroundGradient or theme.components.select.backgroundGradient,
 	})
-	local _exp_2 = React.createElement("uistroke", {
+	local _exp_3 = React.createElement("uistroke", {
 		key = "Stroke",
 		Thickness = theme.components.select.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.select.borderColor,
 	})
-	local _exp_3 = React.createElement(Corners, {
+	local _exp_4 = React.createElement(Corners, {
 		radius = theme.components.select.cornerRadius,
 	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
-	local _exp_4 = React.createElement(Padding, _attributes_1)
+	local _exp_5 = React.createElement(Padding, _attributes_1)
 	local _attributes_2 = {
 		name = "SelectedText",
 	}
@@ -455,19 +469,20 @@ local Select = React.forwardRef(function(props, ref)
 	if _result_2 ~= nil then
 		_result_2 = _result_2.props.text
 	end
-	local _condition_4 = _result_2
-	if _condition_4 == nil then
-		_condition_4 = "No Options"
+	local _condition_6 = _result_2
+	if _condition_6 == nil then
+		_condition_6 = "No Options"
 	end
-	_attributes_2.text = _condition_4
+	_attributes_2.text = _condition_6
 	_attributes_2.typography = typography
-	local _exp_5 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_2)), React.createElement(Icon, {
+	_attributes_2.TextColor3 = theme.components.select.textColor
+	local _exp_6 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_2)), React.createElement(Icon, {
 		name = "SelectCaret",
 		icon = "caret-down",
-		color = theme.colors.intents.primary.default.textColor,
+		color = theme.components.select.iconColor or theme.colors.intents.primary.default.textColor,
 	}))
-	local _condition_5 = open and overlay.overlay ~= nil
-	if _condition_5 then
+	local _condition_7 = open and overlay.overlay ~= nil
+	if _condition_7 then
 		local _attributes_3 = {
 			key = "SelectDropdown",
 			BackgroundTransparency = 0,
@@ -479,7 +494,7 @@ local Select = React.forwardRef(function(props, ref)
 		_attributes_3.Size = UDim2.fromOffset(dropdownSize.X.Offset, 0)
 		_attributes_3.AutomaticSize = Enum.AutomaticSize.Y
 		_attributes_3.ClipsDescendants = true
-		_condition_5 = ReactRoblox.createPortal(React.createElement("frame", _attributes_3, React.createElement("uistroke", {
+		_condition_7 = ReactRoblox.createPortal(React.createElement("frame", _attributes_3, React.createElement("uistroke", {
 			key = "Stroke",
 			Thickness = theme.components.select.borderThickness,
 			BorderStrokePosition = Enum.BorderStrokePosition.Outer,
@@ -509,7 +524,7 @@ local Select = React.forwardRef(function(props, ref)
 			typography = typography,
 		}))))), overlay.overlay)
 	end
-	return React.createElement(Container, _attributes, _exp_1, React.createElement(SelectContext.Provider, {
+	return React.createElement(Container, _attributes, _exp_1, _exp_2, React.createElement(SelectContext.Provider, {
 		value = context,
 	}, React.createElement("imagebutton", {
 		key = "SelectButton",
@@ -520,7 +535,7 @@ local Select = React.forwardRef(function(props, ref)
 		Event = {
 			Activated = activateSelect,
 		},
-	}, _exp_2, _exp_3, _exp_4, _exp_5, _condition_5)))
+	}, _exp_3, _exp_4, _exp_5, _exp_6, _condition_7)))
 end)
 Select.Option = SelectOption
 Select.OptGroup = SelectOptGroup

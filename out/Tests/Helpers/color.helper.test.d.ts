@@ -10,5 +10,8 @@ declare class IntentGradientMerge {
     undefinedStopsIgnored(): void;
     overrideRefinesTheme(): void;
     matchingIntentRefines(): void;
+    secondaryFromTheme(): void;
+    secondaryFallsBack(): void;
+    secondaryLayersOverPrimary(): void;
 }
 export = IntentGradientMerge;

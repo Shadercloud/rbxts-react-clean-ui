@@ -35,6 +35,9 @@
 
 - `borderColor`, `borderThickness` (`Inner` stroke on the control, `Outer` stroke on the dropdown), `cornerRadius` for both the control and the dropdown.
 - `dropDownBackgroundColor`.
+- `backgroundColor?: Color3` and `backgroundTransparency?: number` (default `1`, invisible) — a flat fill on the closed field's root `Container` (the `Select` `ImageLabel`). Instance `BackgroundColor3`/`BackgroundTransparency` props still win. When the theme `backgroundTransparency` is below `1`, the root also gets a `uicorner` named `Corners` from `cornerRadius` (none at `0`) so the fill follows the stroke's rounding. The `backgroundImage` sits on the same instance and draws over the fill. Unset in every shipped theme.
+- `textColor?: Color3` — `TextColor3` of the closed field's `SelectedText`. Unset = `Text`'s own default (`theme.colors.intents.primary.default.textColor`).
+- `iconColor?: Color3` — colour of the `SelectCaret` icon. Unset = `theme.colors.intents.primary.default.textColor`, as before.
 - `typography`, resolved via `TypographyHelper.getTypography`.
 - Optional `backgroundImage`, overridden per instance by the matching `SelectProps.backgroundImage`, renders directly on the root `Container` using the shared `CssBackgroundImage` shape and resolution behavior.
 - Optional `backgroundGradient`, overridden per instance by the matching `SelectProps.backgroundGradient`, renders on the root `Container` using the shared `CssBackgroundGradient` shape and resolution behavior (see [Box](../surface/box.md#backgroundgradient)).
@@ -48,5 +51,8 @@
 Worth demonstrating: default (uncontrolled) selection, a controlled selection that reads back through `onChange`, options with custom `children` in addition to `text`, enough options to trigger the scrollable/max-height dropdown behavior, `searchable` filtering, and `Select.OptGroup` sectioning (including a mix of grouped and ungrouped options, and searching within groups). Requires wrapping the story in an `OverlayProvider` for the dropdown to render.
 
 ## Implementation notes
+
+- The root `Corners` is gated on the *theme* `backgroundTransparency` only, not the instance prop. Adding a `uicorner` whenever a caller passes `BackgroundTransparency` would round callers' existing square fills, and adding it unconditionally would round a theme's `backgroundImage` that is square today.
+- `textColor` is a dedicated key rather than `typography.color`, because `Text` ignores `typography.color`, and wiring it through would recolour Select for any theme whose base `typography.body.color` is set.
 
 - `parseSelectChildren` keeps `flatOptions` gap-free, so `flatOptions[i].index === i` always holds. The closed control finds the selected option by position (`flatOptions[selected]`), so any change to how indices are assigned must keep that invariant.

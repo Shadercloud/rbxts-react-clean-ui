@@ -3,5 +3,10 @@ declare class SelectMountValidation {
     seedsFromSelected(): void;
     noOptionsFallback(): void;
     labelTogglesDropdown(): void;
+    defaultTransparent(): void;
+    themedBackground(): void;
+    instanceTransparencyWins(): void;
+    themedTextAndCaret(): void;
+    defaultTextAndCaret(): void;
 }
 export = SelectMountValidation;

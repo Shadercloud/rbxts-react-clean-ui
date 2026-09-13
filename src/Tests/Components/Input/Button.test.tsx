@@ -4,6 +4,8 @@ import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/luni
 const { Skip } = Decorators;
 import { Button } from "../../../Components/Input/Button";
 import { Group, HStack } from "../../../Components/Layout";
+import { ThemeProvider } from "../../../Providers/theme.provider";
+import { WoodenTheme } from "../../../Theme";
 import {
 	STUDIO_SKIP_MESSAGE,
 	assertAllDescendantsContained,
@@ -16,6 +18,11 @@ import {
 	waitForLayout,
 	withMounted,
 } from "../../Helpers/layout";
+
+const WOODEN_SECONDARY_TEXT = Color3.fromHex("#D3CBA3");
+const WOODEN_SECONDARY_BORDER = Color3.fromHex("#3D2712");
+const WOODEN_SECONDARY_TOP = Color3.fromHex("#7A4A20");
+const WOODEN_SECONDARY_BOTTOM = Color3.fromHex("#5C3A18");
 
 function waitForButton(host: Instance, name = "Button"): ImageButton {
 	return waitForGuiObject<ImageButton>(host, name);
@@ -93,6 +100,57 @@ class ButtonMountValidation {
 
 				assertAllDescendantsContained(short, "grouped short button");
 				assertAllDescendantsContained(long, "grouped long button");
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Under WoodenTheme a secondary Button renders an opaque gradient fill, a 3px border stroke and #D3CBA3 text")
+	@Test
+	public woodenSecondary() {
+		withMounted(
+			400,
+			200,
+			<ThemeProvider theme={WoodenTheme}>
+				<Button text="Cancel" intent="secondary" />
+			</ThemeProvider>,
+			(mounted) => {
+				const button = waitForButton(mounted.host);
+
+				Assert.equal(button.BackgroundTransparency, 0);
+
+				const gradient = button.FindFirstChild("Gradient") as UIGradient | undefined;
+				Assert.notUndefined(gradient, "Expected the secondary Button to carry a Gradient UIGradient");
+				const keypoints = gradient!.Color.Keypoints;
+				Assert.equal(keypoints[0].Value, WOODEN_SECONDARY_TOP);
+				Assert.equal(keypoints[keypoints.size() - 1].Value, WOODEN_SECONDARY_BOTTOM);
+				Assert.equal(gradient!.Rotation, 90);
+
+				const stroke = findDescendant<UIStroke>(button, "Stroke");
+				Assert.equal(stroke.Thickness, 3);
+				Assert.equal(stroke.Color, WOODEN_SECONDARY_BORDER);
+
+				Assert.equal(findDescendant<TextLabel>(button, "ButtonText").TextColor3, WOODEN_SECONDARY_TEXT);
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Under WoodenTheme a primary Button keeps its transparent image look with a zero-thickness stroke and no gradient")
+	@Test
+	public woodenPrimaryUnchanged() {
+		withMounted(
+			400,
+			200,
+			<ThemeProvider theme={WoodenTheme}>
+				<Button text="Confirm" />
+			</ThemeProvider>,
+			(mounted) => {
+				const button = waitForButton(mounted.host);
+
+				Assert.equal(button.BackgroundTransparency, 1);
+				Assert.equal(findDescendant<UIStroke>(button, "Stroke").Thickness, 0);
+				Assert.undefined(button.FindFirstChild("Gradient"));
 			},
 		);
 	}

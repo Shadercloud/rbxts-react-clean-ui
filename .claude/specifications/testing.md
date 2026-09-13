@@ -33,6 +33,7 @@ Implementation notes for src/Tests — test files carry no comments, so non-obvi
   - Tooltip: `HoverTarget` calls `MouseEnter`/`MouseLeave`.
   - Draggable: the handle calls `InputBegan` with a plain-table `InputObject` stand-in, the same approach as `Modal.test.tsx`.
   - Droppable: the test calls `registration.drop` directly, as `Draggable.findDroppable` does.
+  - Tabs: `TabButton-<value>` is an `imagebutton` rendered inside `HoverButton`, so there is no child to inject through. `activateButton` in `Tabs.test.tsx` walks the root's fiber tree (`root._internalRoot.current`, via `child`/`sibling`) to the host fiber whose `stateNode` is the button and calls `memoizedProps[React.Event.Activated]`. `@rbxts/react`'s `createElement` rewrites `Event={{ Activated }}` into that `React.Event.Activated` key, and the key object is cached per event name, so it is the same handler the engine would call. `VirtualInputManager.SendMouseButtonEvent` is not an option: the test runner lacks the `RobloxScript` capability and the call throws.
 - **Driving providers from outside the tree.** A small harness component stores the provider's value in a module-level variable: `ToastHarness`/`useToast`, `latestRegistry` in Draggable/Droppable, and `RegistryHarness` in `Modal.test.tsx`.
 - **Group needs a `RegistryProvider`.** `Group.Element` takes its id from `RegistryContext.GetNextId`. Without a `RegistryProvider`, every element shares the id `""`, the reported widths collide, and the Group never propagates the widest width. Wrap Group/`group` fixtures in `RegistryProvider`, as `CleanUiProvider` does (Group, Menu).
 - **Group width propagation is asynchronous** (a `Change:AbsoluteSize` handler followed by a Group state update). Poll until members agree before measuring (Button `groupAlignsWidths`, Menu `waitForGroupSettled`).
@@ -50,6 +51,8 @@ Implementation notes for src/Tests — test files carry no comments, so non-obvi
 - **Bounding text.** The `Text` component is always an `AutomaticSize.XY` TextLabel with a `(0,0)` Size, so on its own it grows to one line and never wraps.
   - To bound it, use a `UISizeConstraint` child (`Text.test.tsx` `narrowText`).
   - For text whose height must follow its container's width, use a native `textlabel` (Grid `relockOnWidthChange`).
+- **Float properties are stored as 32-bit floats.** `BackgroundTransparency = 0.4` reads back as `0.4000000059604645` and fails `Assert.equal`. Themed-value tests use binary-exact fractions (`0.25`, `0.5`).
+- **Theme-driven tests nest a `ThemeProvider`.** `withMounted` always wraps in `DefaultTheme`; an inner `ThemeProvider` with `extendTheme(DefaultTheme, {...})` overrides it for the subtree (Tabs theming, Input/Select background, Button under `WoodenTheme`).
 - **Values coupled to `DefaultTheme`** (`src/Theme/themes/default.theme.ts`). If a default-theme edit breaks these tests, update the constants rather than suspecting the component:
   - Breakpoints: `xs 100 / sm 200 / md 300 / lg 400 / xl 500`, used by Grid, Row and Fieldset.
   - Spacing: `md = 12`, which is Row's `DEFAULT_GAP`, and `xl = 24`. HStack/VStack gaps are half the resolved spacing (`math.ceil(GetPadding / 2)`), giving 6 and 12.
@@ -106,6 +109,16 @@ Implementation notes for src/Tests — test files carry no comments, so non-obvi
 
 - `storyFixture` mirrors `Stories/Navigation/Menu.tsx` (an auto-width Box that fills the host's height) inside a `RegistryProvider`, the way `createStory`/`CleanUiProvider` renders it.
 - `MenuHeader` and every `MenuItem` belong to the same Group, and the Menu hugs the header. The Menu only reaches its final width once the Group has propagated the widest item's width, so `waitForGroupSettled` waits for that before measuring. It polls by hand so that a timeout message reports the widths at timeout, not at frame 0.
+
+## `Tabs.test.tsx`
+
+- `controlledClickOnlyReports` waits a few frames after the click before asserting the panel is unchanged, so a stray uncontrolled state update would have time to commit and fail the test.
+- The root `VStack` layout of `Tabs` is found directly under the host (`tabsGap`) because `Tabs`, `ThemeProvider` and `VStack` render no instance of their own.
+- `listFillShares` compares title widths rather than exact pixels: with `HorizontalFlex = Fill` and `AutomaticSize.Y` the titles split the list's inner width, which depends on the list padding tokens.
+
+## `color.helper.test.ts` secondary intent
+
+- `secondaryFallsBack` uses the `themeWith` stub, which has no `secondary` entry in `colors.intents`, so the fallback is proven against a theme lacking it. The shipped themes all define `secondary` now, so they can't show the fallback.
 
 ## `Toast.test.tsx`
 

@@ -64,6 +64,7 @@ Set `intent` to control the button's background, border, and text/icon colors.
 
 ```tsx
 <Button text="Primary" intent="primary" />
+<Button text="Secondary" intent="secondary" />
 <Button text="Success" intent="success" />
 <Button text="Info" intent="info" />
 <Button text="Warning" intent="warning" />
@@ -71,6 +72,8 @@ Set `intent` to control the button's background, border, and text/icon colors.
 ```
 
 Hovering a button switches its colors to the intent's `hover` state.
+
+`secondary` is a lower-emphasis alternative to `primary`, such as a neutral grey button in the default theme. Every shipped theme styles it. A custom theme that doesn't define `secondary` still works: the button falls back to the `primary` colors.
 
 ## Custom content
 
@@ -167,6 +170,8 @@ The button also supports props inherited from the following interfaces.
 * Setting `disabled` sets `Active={false}`, ignores hover and `Activated` events, and switches colours to the intent's `disabled` state (when defined in the theme).
 * When `group` is set and a `Group` ancestor is present, the button's width is fixed to the widest button reporting into that `Group`; its height still grows automatically.
 * Without `text`, `icon`, or `children`, the button renders with no content.
+* Background transparency resolves as `BackgroundTransparency` prop, then `styleOverride.backgroundTransparency`, then the current intent's own `backgroundTransparency` (non-`primary` intents only), then `theme.components.button.backgroundTransparency`.
+* Border thickness resolves as the intent state's `borderThickness`, then `styleOverride.borderThickness`, then `theme.components.button.borderThickness`.
 
 ## Theme values
 
@@ -177,6 +182,11 @@ The button uses values from `theme.components.button` for:
 * Background transparency
 * Typography
 * Box shadow
-* Per-intent background, border, and text/icon colours for the `default`, `hover`, and `disabled` states
+* Per-intent background, border, and text/icon colours for the `default`, `hover`, and `disabled` states, plus optional `backgroundImage` and `backgroundGradient`
+
+Each intent state in `theme.components.button.intents` can also set:
+
+* `borderThickness` — overrides the button's border thickness for that intent and state.
+* `backgroundTransparency` — for any intent other than `primary`, overrides `theme.components.button.backgroundTransparency`. It is read from that intent's current state, then that intent's `default` entry, and is never inherited from `primary`. For `primary`, the component-level `backgroundTransparency` always applies.
 
 These values can be changed by providing a custom Clean UI theme.

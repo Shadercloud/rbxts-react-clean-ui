@@ -10,6 +10,7 @@ export type TextVariant =
 
 export type Intent =
     | "primary"
+    | "secondary"
     | "success"
     | "warning"
     | "danger"

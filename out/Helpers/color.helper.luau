@@ -40,7 +40,17 @@ do
 			_overrideMatching = _overrideMatching[selectedIntent]
 		end
 		local overrideMatching = _overrideMatching
-		local layers = { defaultPrimary.default, defaultMatching.default, defaultPrimary[state], defaultMatching[state], self:resolveComponentDefaultLayer(componentPrimary), self:resolveComponentDefaultLayer(componentMatching), self:resolveComponentStateLayer(componentPrimary, state), self:resolveComponentStateLayer(componentMatching, state), self:resolveComponentDefaultLayer(overridePrimary), self:resolveComponentDefaultLayer(overrideMatching), self:resolveComponentStateLayer(overridePrimary, state), self:resolveComponentStateLayer(overrideMatching, state) }
+		local _exp = defaultPrimary.default
+		local _result = defaultMatching
+		if _result ~= nil then
+			_result = _result.default
+		end
+		local _exp_1 = defaultPrimary[state]
+		local _result_1 = defaultMatching
+		if _result_1 ~= nil then
+			_result_1 = _result_1[state]
+		end
+		local layers = { _exp, _result, _exp_1, _result_1, self:resolveComponentDefaultLayer(componentPrimary), self:resolveComponentDefaultLayer(componentMatching), self:resolveComponentStateLayer(componentPrimary, state), self:resolveComponentStateLayer(componentMatching, state), self:resolveComponentDefaultLayer(overridePrimary), self:resolveComponentDefaultLayer(overrideMatching), self:resolveComponentStateLayer(overridePrimary, state), self:resolveComponentStateLayer(overrideMatching, state) }
 		return self:mergeLayers(layers)
 	end
 	function ColorHelper:mergeLayers(layers)

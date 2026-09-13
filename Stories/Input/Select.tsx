@@ -14,6 +14,30 @@ const themeWithBackgroundImage = createTheme({
     },
 });
 
+const flatFieldTheme = createTheme({
+    components: {
+        select: {
+            backgroundColor: Color3.fromHex("#295896"),
+            backgroundTransparency: 0,
+            borderColor: Color3.fromHex("#3D2712"),
+            borderThickness: 3,
+            cornerRadius: 0,
+            textColor: Color3.fromHex("#FFF7CF"),
+            iconColor: Color3.fromHex("#FFF7CF"),
+        },
+        input: {
+            backgroundColor: Color3.fromHex("#295896"),
+            backgroundTransparency: 0,
+            borderColor: Color3.fromHex("#3D2712"),
+            borderThickness: 3,
+            cornerRadius: 0,
+            typography: { color: Color3.fromHex("#FFF7CF") },
+            placeholder: { color: Color3.fromHex("#8FA6C4") },
+            iconColor: Color3.fromHex("#FFF7CF"),
+        },
+    },
+});
+
 function CountrySelect(props: { searchable?: boolean; grouped?: boolean }) {
     return (
         <SelectComponent max-height="200px" searchable={props.searchable}>
@@ -63,6 +87,10 @@ function Select(props: { screenshot?: boolean; searchable?: boolean; grouped?: b
                 <CountrySelect searchable={searchable} grouped={grouped} />
                 <Text text="Select with theme.components.select.backgroundImage" />
                 <ThemeProvider theme={themeWithBackgroundImage}>
+                    <CountrySelect searchable={searchable} grouped={grouped} />
+                </ThemeProvider>
+                <Text text="Select with a flat themed background" />
+                <ThemeProvider theme={flatFieldTheme}>
                     <CountrySelect searchable={searchable} grouped={grouped} />
                 </ThemeProvider>
             </VStack>

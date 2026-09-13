@@ -71,6 +71,46 @@ const MyTheme = extendTheme(DefaultTheme, {
 });
 ```
 
+## Intents
+
+`theme.colors.intents` defines the colour schemes selected by a component's `intent` prop: `primary`, `secondary`, `success`, `warning`, `danger`, and `info`. Each intent has a `default` scheme and optional state schemes such as `hover`, `focus`, and `disabled`.
+
+A scheme can set:
+
+* `textColor`, `backgroundColor`, and `borderColor`
+* `backgroundTransparency`
+* `borderThickness` — overrides the component's border thickness, for components that read it (such as `Button` and `Tabs` titles)
+* `boxShadow`
+* `typography`
+* `backgroundImage` and `backgroundGradient`
+
+Many components also have their own `intents` map under `theme.components.<name>`, which is layered on top of `theme.colors.intents`. A state scheme only needs the fields it changes; the rest come from the `default` scheme.
+
+### Fallback to `primary`
+
+Every intent starts from the `primary` scheme, so an intent that a theme doesn't define simply looks like `primary`. `secondary` is the only optional intent in `theme.colors.intents`: a custom theme written before `secondary` existed still works, and `intent="secondary"` renders with that theme's `primary` colours until you add it.
+
+```tsx
+const MyTheme = extendTheme(DefaultTheme, {
+    colors: {
+        intents: {
+            secondary: {
+                default: {
+                    textColor: Color3.fromHex("#1D2433"),
+                    backgroundColor: Color3.fromHex("#E4E7EC"),
+                    borderColor: Color3.fromHex("#C5CAD3"),
+                },
+                hover: {
+                    backgroundColor: Color3.fromHex("#D5D9E0"),
+                },
+            },
+        },
+    },
+});
+```
+
+All built-in themes define `secondary`.
+
 ## Using Your Theme
 
 Once you've created your theme, pass it to the `ThemeProvider`.

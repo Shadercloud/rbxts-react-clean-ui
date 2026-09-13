@@ -18,6 +18,19 @@ export const DarkTheme = createTheme({
                 },
             },
 
+            secondary: {
+                default: {
+                    textColor: Color3.fromHex("#D5DAE3"),
+                    borderColor: Color3.fromHex("#4A5263"),
+                    backgroundColor: Color3.fromHex("#3A414E"),
+                },
+                hover: {
+                    textColor: Color3.fromHex("#FFFFFF"),
+                    borderColor: Color3.fromHex("#5E687B"),
+                    backgroundColor: Color3.fromHex("#474F5E"),
+                },
+            },
+
             success: {
                 default: {
                     textColor: Color3.fromHex("#75E0A7"),
@@ -176,6 +189,13 @@ export const DarkTheme = createTheme({
                         backgroundTransparency: 0,
                     },
                 },
+                secondary: {
+                    default: {
+                        textColor: Color3.fromHex("#D5DAE3"),
+                        backgroundColor: Color3.fromHex("#2A303B"),
+                        borderColor: Color3.fromHex("#4A5263"),
+                    },
+                },
                 success: {
                     default: {
                         textColor: Color3.fromHex("#75E0A7"),
@@ -230,6 +250,21 @@ export const DarkTheme = createTheme({
                     hover: {
                         backgroundColor: Color3.fromHex("#b8b8b8"),
                     }
+                },
+                secondary: {
+                    default: {
+                        textColor: Color3.fromHex("#FFFFFF"),
+                        borderColor: Color3.fromHex("#5E687B"),
+                        backgroundGradient: {
+                            colors: [Color3.fromHex("#3A414E"), Color3.fromHex("#474F5E")],
+                            rotation: 90,
+                        },
+                    },
+                    disabled: {
+                        backgroundColor: Color3.fromHex("#1D222B"),
+                        borderColor: Color3.fromHex("#343B49"),
+                        textColor: Color3.fromHex("#697386"),
+                    },
                 },
                 success: {
                     default: {
@@ -519,6 +554,13 @@ export const DarkTheme = createTheme({
                             backgroundColor: Color3.fromHex("#20252E"),
                             backgroundTransparency: 0,
                         }
+                    },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#3A414E"),
+                            backgroundTransparency: 0,
+                            borderColor: Color3.fromHex("#4A5263"),
+                        }
                     }
                 }
             },
@@ -528,6 +570,13 @@ export const DarkTheme = createTheme({
                         default: {
                             backgroundColor: Color3.fromHex("#20252E"),
                             backgroundTransparency: 0,
+                        }
+                    },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#3A414E"),
+                            backgroundTransparency: 0,
+                            borderColor: Color3.fromHex("#4A5263"),
                         }
                     }
                 }
@@ -597,6 +646,15 @@ export const DarkTheme = createTheme({
                             backgroundColor: Color3.fromHex("#FFFFFF"),
                             backgroundGradient: {
                                 colors: [Color3.fromHex("#5A87DE"), Color3.fromHex("#345FAF")],
+                                rotation: 90,
+                            },
+                        },
+                    },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#FFFFFF"),
+                            backgroundGradient: {
+                                colors: [Color3.fromHex("#6B7486"), Color3.fromHex("#474F5E")],
                                 rotation: 90,
                             },
                         },

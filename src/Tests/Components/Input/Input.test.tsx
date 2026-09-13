@@ -4,6 +4,11 @@ import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/luni
 
 const { Skip } = Decorators;
 import { Input } from "../../../Components/Input/Input";
+import { ThemeProvider } from "../../../Providers/theme.provider";
+import { DefaultTheme, extendTheme } from "../../../Theme";
+import { STUDIO_SKIP_MESSAGE, waitForGuiObject, withMounted } from "../../Helpers/layout";
+
+const FIELD_FILL = Color3.fromRGB(41, 88, 150);
 
 @Tag("Studio")
 class InputMountValidation {
@@ -46,6 +51,40 @@ class InputMountValidation {
 
 		root.unmount();
 		host.Destroy();
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Without theme background keys the root Input ImageLabel stays fully transparent")
+	@Test
+	public defaultTransparent() {
+		withMounted(400, 200, <Input value="" />, (mounted) => {
+			const root = waitForGuiObject<ImageLabel>(mounted.host, "Input");
+
+			Assert.equal(root.BackgroundTransparency, 1);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("theme.components.input backgroundColor and backgroundTransparency fill the root Input ImageLabel")
+	@Test
+	public themedBackground() {
+		const theme = extendTheme(DefaultTheme, {
+			components: { input: { backgroundColor: FIELD_FILL, backgroundTransparency: 0.25 } },
+		});
+
+		withMounted(
+			400,
+			200,
+			<ThemeProvider theme={theme}>
+				<Input value="" />
+			</ThemeProvider>,
+			(mounted) => {
+				const root = waitForGuiObject<ImageLabel>(mounted.host, "Input");
+
+				Assert.equal(root.BackgroundColor3, FIELD_FILL);
+				Assert.equal(root.BackgroundTransparency, 0.25);
+			},
+		);
 	}
 }
 

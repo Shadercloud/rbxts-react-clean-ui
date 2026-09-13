@@ -13,6 +13,10 @@ local Skip = _binding.Skip
 local Select = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Input", "Select").Select
 local FieldsetContext = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout").FieldsetContext
 local OverlayProvider = TS.import(script, script.Parent.Parent.Parent.Parent, "Providers", "overlay.provider").OverlayProvider
+local ThemeProvider = TS.import(script, script.Parent.Parent.Parent.Parent, "Providers", "theme.provider").ThemeProvider
+local _Theme = TS.import(script, script.Parent.Parent.Parent.Parent, "Theme")
+local DefaultTheme = _Theme.DefaultTheme
+local extendTheme = _Theme.extendTheme
 local _layout = TS.import(script, script.Parent.Parent.Parent, "Helpers", "layout")
 local STUDIO_SKIP_MESSAGE = _layout.STUDIO_SKIP_MESSAGE
 local assertAllDescendantsContained = _layout.assertAllDescendantsContained
@@ -42,6 +46,14 @@ local function selectWithOptions(props)
 	return React.createElement(Select, {
 		selected = props.selected,
 	}, _newValue)
+end
+local FIELD_FILL = Color3.fromRGB(41, 88, 150)
+local FIELD_TEXT = Color3.fromRGB(255, 247, 207)
+local CARET_COLOR = Color3.fromRGB(200, 60, 90)
+local function themedSelect(theme)
+	return React.createElement(ThemeProvider, {
+		theme = theme,
+	}, selectWithOptions())
 end
 local function waitForSelect(host)
 	return waitForGuiObject(host, "Select")
@@ -149,6 +161,76 @@ do
 			labelActivated:Destroy()
 		end)
 	end
+	function SelectMountValidation:defaultTransparent()
+		withMounted(400, 200, selectWithOptions(), function(mounted)
+			local selectRoot = waitForSelect(mounted.host)
+			Assert:equal(selectRoot.BackgroundTransparency, 1)
+			Assert:undefined(selectRoot:FindFirstChild("Corners"))
+		end)
+	end
+	function SelectMountValidation:themedBackground()
+		local theme = extendTheme(DefaultTheme, {
+			components = {
+				select = {
+					backgroundColor = FIELD_FILL,
+					backgroundTransparency = 0.5,
+					cornerRadius = 6,
+				},
+			},
+		})
+		withMounted(400, 200, themedSelect(theme), function(mounted)
+			local selectRoot = waitForSelect(mounted.host)
+			Assert:equal(selectRoot.BackgroundColor3, FIELD_FILL)
+			Assert:equal(selectRoot.BackgroundTransparency, 0.5)
+			local corners = selectRoot:FindFirstChild("Corners")
+			Assert:notUndefined(corners, "Expected a Corners UICorner directly under the Select root")
+			Assert:equal(corners.CornerRadius, UDim.new(0, 6))
+		end)
+	end
+	function SelectMountValidation:instanceTransparencyWins()
+		local theme = extendTheme(DefaultTheme, {
+			components = {
+				select = {
+					backgroundColor = FIELD_FILL,
+					backgroundTransparency = 0,
+				},
+			},
+		})
+		withMounted(400, 200, React.createElement(ThemeProvider, {
+			theme = theme,
+		}, React.createElement(Select, {
+			BackgroundTransparency = 1,
+		}, React.createElement(Select.Option, {
+			text = "Alpha",
+		}))), function(mounted)
+			local selectRoot = waitForSelect(mounted.host)
+			Assert:equal(selectRoot.BackgroundTransparency, 1)
+			Assert:notUndefined(selectRoot:FindFirstChild("Corners"))
+		end)
+	end
+	function SelectMountValidation:themedTextAndCaret()
+		local theme = extendTheme(DefaultTheme, {
+			components = {
+				select = {
+					textColor = FIELD_TEXT,
+					iconColor = CARET_COLOR,
+				},
+			},
+		})
+		withMounted(400, 200, themedSelect(theme), function(mounted)
+			local selectRoot = waitForSelect(mounted.host)
+			Assert:equal(findSelectedText(selectRoot).TextColor3, FIELD_TEXT)
+			Assert:equal(findDescendant(selectRoot, "SelectCaret").ImageColor3, CARET_COLOR)
+		end)
+	end
+	function SelectMountValidation:defaultTextAndCaret()
+		withMounted(400, 200, selectWithOptions(), function(mounted)
+			local selectRoot = waitForSelect(mounted.host)
+			local fallback = DefaultTheme.colors.intents.primary.default.textColor
+			Assert:equal(findSelectedText(selectRoot).TextColor3, fallback)
+			Assert:equal(findDescendant(selectRoot, "SelectCaret").ImageColor3, fallback)
+		end)
+	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	local _decorator_1 = DisplayName("With three options and no selected prop, the closed control shows the first option and stays self-contained")
 	local _descriptor = Test(SelectMountValidation, "mountsContained", {
@@ -228,6 +310,106 @@ do
 	})
 	if _descriptor_11 then
 		SelectMountValidation.labelTogglesDropdown = _descriptor_11.value
+	end
+	local _decorator_8 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_9 = DisplayName("Without theme background keys the Select root stays transparent and carries no root Corners")
+	local _descriptor_12 = Test(SelectMountValidation, "defaultTransparent", {
+		value = SelectMountValidation.defaultTransparent,
+	})
+	if _descriptor_12 then
+		SelectMountValidation.defaultTransparent = _descriptor_12.value
+	end
+	local _descriptor_13 = _decorator_9(SelectMountValidation, "defaultTransparent", {
+		value = SelectMountValidation.defaultTransparent,
+	})
+	if _descriptor_13 then
+		SelectMountValidation.defaultTransparent = _descriptor_13.value
+	end
+	local _descriptor_14 = _decorator_8(SelectMountValidation, "defaultTransparent", {
+		value = SelectMountValidation.defaultTransparent,
+	})
+	if _descriptor_14 then
+		SelectMountValidation.defaultTransparent = _descriptor_14.value
+	end
+	local _decorator_10 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_11 = DisplayName("A themed backgroundColor with backgroundTransparency below 1 fills the root and rounds it with the theme cornerRadius")
+	local _descriptor_15 = Test(SelectMountValidation, "themedBackground", {
+		value = SelectMountValidation.themedBackground,
+	})
+	if _descriptor_15 then
+		SelectMountValidation.themedBackground = _descriptor_15.value
+	end
+	local _descriptor_16 = _decorator_11(SelectMountValidation, "themedBackground", {
+		value = SelectMountValidation.themedBackground,
+	})
+	if _descriptor_16 then
+		SelectMountValidation.themedBackground = _descriptor_16.value
+	end
+	local _descriptor_17 = _decorator_10(SelectMountValidation, "themedBackground", {
+		value = SelectMountValidation.themedBackground,
+	})
+	if _descriptor_17 then
+		SelectMountValidation.themedBackground = _descriptor_17.value
+	end
+	local _decorator_12 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_13 = DisplayName("An instance BackgroundTransparency beats the theme fill while the root Corners still follows the theme transparency")
+	local _descriptor_18 = Test(SelectMountValidation, "instanceTransparencyWins", {
+		value = SelectMountValidation.instanceTransparencyWins,
+	})
+	if _descriptor_18 then
+		SelectMountValidation.instanceTransparencyWins = _descriptor_18.value
+	end
+	local _descriptor_19 = _decorator_13(SelectMountValidation, "instanceTransparencyWins", {
+		value = SelectMountValidation.instanceTransparencyWins,
+	})
+	if _descriptor_19 then
+		SelectMountValidation.instanceTransparencyWins = _descriptor_19.value
+	end
+	local _descriptor_20 = _decorator_12(SelectMountValidation, "instanceTransparencyWins", {
+		value = SelectMountValidation.instanceTransparencyWins,
+	})
+	if _descriptor_20 then
+		SelectMountValidation.instanceTransparencyWins = _descriptor_20.value
+	end
+	local _decorator_14 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_15 = DisplayName("select.textColor colours SelectedText and select.iconColor colours the SelectCaret image")
+	local _descriptor_21 = Test(SelectMountValidation, "themedTextAndCaret", {
+		value = SelectMountValidation.themedTextAndCaret,
+	})
+	if _descriptor_21 then
+		SelectMountValidation.themedTextAndCaret = _descriptor_21.value
+	end
+	local _descriptor_22 = _decorator_15(SelectMountValidation, "themedTextAndCaret", {
+		value = SelectMountValidation.themedTextAndCaret,
+	})
+	if _descriptor_22 then
+		SelectMountValidation.themedTextAndCaret = _descriptor_22.value
+	end
+	local _descriptor_23 = _decorator_14(SelectMountValidation, "themedTextAndCaret", {
+		value = SelectMountValidation.themedTextAndCaret,
+	})
+	if _descriptor_23 then
+		SelectMountValidation.themedTextAndCaret = _descriptor_23.value
+	end
+	local _decorator_16 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_17 = DisplayName("Without select.textColor or iconColor both fall back to the primary intent's default textColor")
+	local _descriptor_24 = Test(SelectMountValidation, "defaultTextAndCaret", {
+		value = SelectMountValidation.defaultTextAndCaret,
+	})
+	if _descriptor_24 then
+		SelectMountValidation.defaultTextAndCaret = _descriptor_24.value
+	end
+	local _descriptor_25 = _decorator_17(SelectMountValidation, "defaultTextAndCaret", {
+		value = SelectMountValidation.defaultTextAndCaret,
+	})
+	if _descriptor_25 then
+		SelectMountValidation.defaultTextAndCaret = _descriptor_25.value
+	end
+	local _descriptor_26 = _decorator_16(SelectMountValidation, "defaultTextAndCaret", {
+		value = SelectMountValidation.defaultTextAndCaret,
+	})
+	if _descriptor_26 then
+		SelectMountValidation.defaultTextAndCaret = _descriptor_26.value
 	end
 	SelectMountValidation = Tag("Studio")(SelectMountValidation) or SelectMountValidation
 end

@@ -43,7 +43,16 @@ Button defaults live under `theme.components.button`:
 - Each intent/state entry may also define `backgroundImage` (see [Components](../index.md) for how it merges across the intent/state cascade). When present, it renders on the root `imagebutton` alongside `BackgroundColor3`, resolved through the same `default`/`hover`/`disabled` state as the background color — there is no separate prop to override it, matching how `BackgroundColor3` itself is theme/intent-driven only.
 - Each intent/state entry may likewise define `backgroundGradient` (merged across the intent/state cascade the same way — see [Components](../index.md)). When present, it renders alongside `backgroundImage`/`BackgroundColor3` on the root `imagebutton` via the `Gradient` decorator (see [Box](../surface/box.md#backgroundgradient)), resolved through the same `default`/`hover`/`disabled` state cascade. There is no separate prop to override it either.
 - `props.BackgroundTransparency` overrides the theme's `backgroundTransparency` when supplied — this still applies even when `disabled`; `props.styleOverride?.backgroundTransparency` sits between the two, applying only when `BackgroundTransparency` is not supplied.
+- Below those two, a **non-primary** intent can set its own surface transparency: the `backgroundTransparency` of that intent's own entry for the current state, falling back to its own `default` entry (checked in `styleOverride.intents` first, then `theme.components.button.intents`), is used before `theme.components.button.backgroundTransparency`. It is read from that intent's entry only, never inherited from `primary`. For `primary` (and an unset `intent`) the component-level `backgroundTransparency` always applies, as before.
+- Stroke `Thickness` resolves as the merged intent/state `borderThickness` (optional `IntentScheme` field) `?? styleOverride.borderThickness ?? theme.components.button.borderThickness`. No shipped theme sets the intent field on `primary`, so thicknesses are unchanged.
+- `intent="secondary"`: see [Components](../index.md) for the fallback to `primary`. Defaults: Default theme = neutral grey (`#E4E7EC` fill, `#C5CAD3` border, `#1D2433` text; hover `#D5D9E0`/`#B8BEC9`). `WoodenTheme` = vertical gradient `#7A4A20` → `#5C3A18` (hover `#8A5A28` → `#6B4520`) on a white, opaque background, image cleared (`image: ""`), text `#D3CBA3`, 3px `#3D2712` stroke. Dark and Sandstone have their own muted secondary entries.
 
 ## Story
 
+Also show `intent="secondary"` next to `primary`.
+
 Worth demonstrating: each `intent`, icon-only vs. text-only vs. both, custom `children` composed from `Button.Icon`/`Button.Text`, a `disabled` example per intent showing the muted color state and inert click, a `Group` of buttons with `group` set on each to show width alignment across differing label lengths, and a `styleOverride` example (e.g. borderless/flat) to contrast against the default themed appearance.
+
+## Implementation notes
+
+- The per-intent transparency skips `primary` on purpose. `DefaultTheme`'s `button.intents.primary.disabled.backgroundTransparency: 0.35` has never been applied, and honouring it would change the default disabled look. It is read from the intent's own entry rather than the merged scheme for the same reason: merging would pull that `primary` value into every other intent.

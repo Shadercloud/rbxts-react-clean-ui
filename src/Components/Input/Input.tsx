@@ -66,7 +66,8 @@ export function Input(props: InputProps) {
             key={props.name ?? "Input"}
             Size={props.Size ?? UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
-            BackgroundTransparency={1}
+            BackgroundColor3={theme.components.input.backgroundColor}
+            BackgroundTransparency={theme.components.input.backgroundTransparency ?? 1}
             AnchorPoint={props.AnchorPoint}
             Position={props.Position}
             LayoutOrder={props.LayoutOrder}

@@ -1,7 +1,7 @@
 import { Test, Assert, Tag, DisplayName } from "@rbxts/lunit";
 import { ColorHelper } from "../../Helpers/color.helper";
 import { CssBackgroundGradient } from "../../Interfaces/css.types";
-import { IntentScheme, ThemeTemplate } from "../../Theme";
+import { DefaultTheme, IntentScheme, ThemeTemplate } from "../../Theme";
 
 const RED = Color3.fromRGB(255, 0, 0);
 const GREEN = Color3.fromRGB(0, 255, 0);
@@ -20,6 +20,16 @@ function themeWith(primaryDefault: Partial<IntentScheme> = {}): ThemeTemplate {
 			},
 		},
 	} as unknown as ThemeTemplate;
+}
+
+function assertSameScheme(actual: IntentScheme, expected: IntentScheme, label: string) {
+	Assert.equal(actual.textColor, expected.textColor, `${label}: textColor`);
+	Assert.equal(actual.backgroundColor, expected.backgroundColor, `${label}: backgroundColor`);
+	Assert.equal(actual.borderColor, expected.borderColor, `${label}: borderColor`);
+	Assert.equal(actual.backgroundTransparency, expected.backgroundTransparency, `${label}: backgroundTransparency`);
+	Assert.equal(actual.borderThickness, expected.borderThickness, `${label}: borderThickness`);
+	Assert.equal(actual.backgroundGradient === undefined, expected.backgroundGradient === undefined, `${label}: gradient presence`);
+	Assert.equal(actual.backgroundGradient?.rotation, expected.backgroundGradient?.rotation, `${label}: gradient rotation`);
 }
 
 function gradientOf(scheme: IntentScheme): Partial<CssBackgroundGradient> {
@@ -197,6 +207,54 @@ class IntentGradientMerge {
 		assertColors(gradient.colors, [RED, BLUE], "primary colours");
 		Assert.equal(gradient.offset, new Vector2(0.5, 0));
 		Assert.equal(gradient.rotation, 180);
+	}
+
+	@DisplayName("The secondary intent resolves DefaultTheme's own button secondary scheme, per state, instead of the primary one")
+	@Test
+	public secondaryFromTheme() {
+		const intents = DefaultTheme.components.button.intents;
+		const scheme = ColorHelper.getIntentColors(DefaultTheme, "secondary", "default", intents);
+		const hover = ColorHelper.getIntentColors(DefaultTheme, "secondary", "hover", intents);
+		const primary = ColorHelper.getIntentColors(DefaultTheme, "primary", "default", intents);
+
+		Assert.equal(scheme.backgroundColor, Color3.fromHex("#E4E7EC"));
+		Assert.equal(scheme.textColor, Color3.fromHex("#1D2433"));
+		Assert.equal(scheme.borderColor, Color3.fromHex("#C5CAD3"));
+		Assert.equal(hover.backgroundColor, Color3.fromHex("#D5D9E0"));
+		Assert.equal(hover.borderColor, Color3.fromHex("#B8BEC9"));
+		Assert.notEqual(scheme.backgroundColor, primary.backgroundColor);
+	}
+
+	@DisplayName("With no secondary entry in the theme or component colours, secondary resolves exactly like primary in every state")
+	@Test
+	public secondaryFallsBack() {
+		const componentColors = {
+			primary: {
+				default: { textColor: RED, backgroundColor: GREEN, backgroundTransparency: 0.2, borderThickness: 2 },
+				hover: { backgroundColor: BLUE, backgroundGradient: { colors: [RED, BLUE], rotation: 30 } },
+			},
+		};
+
+		for (const state of ["default", "hover", "focus", "disabled"] as const) {
+			assertSameScheme(
+				ColorHelper.getIntentColors(themeWith(), "secondary", state, componentColors),
+				ColorHelper.getIntentColors(themeWith(), "primary", state, componentColors),
+				`secondary vs primary (${state})`,
+			);
+		}
+	}
+
+	@DisplayName("A secondary component entry layers over the primary one, so keys it leaves unset still come from primary")
+	@Test
+	public secondaryLayersOverPrimary() {
+		const scheme = ColorHelper.getIntentColors(themeWith(), "secondary", "default", {
+			primary: { default: { textColor: RED, backgroundColor: GREEN, borderThickness: 2 } },
+			secondary: { default: { backgroundColor: BLUE, borderThickness: 3 } },
+		});
+
+		Assert.equal(scheme.textColor, RED);
+		Assert.equal(scheme.backgroundColor, BLUE);
+		Assert.equal(scheme.borderThickness, 3);
 	}
 }
 

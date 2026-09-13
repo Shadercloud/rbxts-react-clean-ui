@@ -90,13 +90,14 @@ Set `intent` to control the fill's color.
 
 ```tsx
 <ProgressBar value={40} intent="primary" />
+<ProgressBar value={40} intent="secondary" />
 <ProgressBar value={40} intent="success" />
 <ProgressBar value={40} intent="info" />
 <ProgressBar value={40} intent="warning" />
 <ProgressBar value={40} intent="danger" />
 ```
 
-Fill colors are resolved per-intent from `theme.components.progressBar.fill.intents`, falling back to `theme.colors.intents` for any intent the component theme doesn't explicitly override. The bundled default, dark, sandstone, and wooden themes each define all five intents explicitly, so every intent renders with its own distinct color and gradient.
+Fill colors are resolved per-intent from `theme.components.progressBar.fill.intents`, falling back to `theme.colors.intents` for any intent the component theme doesn't explicitly override. The bundled default, dark, sandstone, and wooden themes each define all six intents explicitly, so every intent renders with its own distinct color. An intent that a custom theme doesn't define at all falls back to `primary`.
 
 ## Scale
 

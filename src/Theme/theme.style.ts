@@ -17,6 +17,7 @@ export interface IntentScheme {
     textColor: Color3;
     backgroundColor: Color3;
     borderColor: Color3;
+    borderThickness?: number;
     backgroundTransparency?: number;
     boxShadow?: CssShadow;
     typography?: Partial<TypographyStyle>;

@@ -38,6 +38,13 @@ export const WoodenTheme = createTheme({
                 default: {
                     textColor: Color3.fromHex("#FFF7CF"),
                 }
+            },
+            secondary: {
+                default: {
+                    textColor: Color3.fromHex("#D3CBA3"),
+                    borderColor: Color3.fromHex("#3D2712"),
+                    backgroundColor: Color3.fromHex("#5C3A18"),
+                }
             }
         }
     },
@@ -60,6 +67,13 @@ export const WoodenTheme = createTheme({
                         borderColor: Color3.fromHex("#3D2712"),
                         backgroundColor: Color3.fromHex("#7A4A20"),
                         backgroundTransparency: 0,
+                    },
+                },
+                secondary: {
+                    default: {
+                        textColor: Color3.fromHex("#D3CBA3"),
+                        borderColor: Color3.fromHex("#3D2712"),
+                        backgroundColor: Color3.fromHex("#5C3A18"),
                     },
                 },
                 success: {
@@ -117,6 +131,27 @@ export const WoodenTheme = createTheme({
                             transparency: 0.3,
                         }
                     }
+                },
+                secondary: {
+                    default: {
+                        textColor: Color3.fromHex("#D3CBA3"),
+                        borderColor: Color3.fromHex("#3D2712"),
+                        borderThickness: 3,
+                        backgroundColor: Color3.fromHex("#FFFFFF"),
+                        backgroundTransparency: 0,
+                        backgroundImage: {
+                            image: "",
+                        },
+                        backgroundGradient: {
+                            colors: [Color3.fromHex("#7A4A20"), Color3.fromHex("#5C3A18")],
+                            rotation: 90,
+                        },
+                    },
+                    hover: {
+                        backgroundGradient: {
+                            colors: [Color3.fromHex("#8A5A28"), Color3.fromHex("#6B4520")],
+                        },
+                    },
                 },
                 success: {
                     default: {
@@ -377,6 +412,15 @@ export const WoodenTheme = createTheme({
                             },
                         },
                     },
+                    secondary: {
+                        default: {
+                            textColor: Color3.fromHex("#D3CBA3"),
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#5C3A18"),
+                            },
+                        },
+                    },
                     success: {
                         default: {
                             backgroundTransparency: 1,
@@ -435,6 +479,15 @@ export const WoodenTheme = createTheme({
                                 image: 92016395170536,
                                 slice: "10 5 240 40",
                                 tintColor: Color3.fromHex("#7A4A20"),
+                            },
+                        },
+                    },
+                    secondary: {
+                        default: {
+                            textColor: Color3.fromHex("#D3CBA3"),
+                            backgroundTransparency: 1,
+                            backgroundImage: {
+                                tintColor: Color3.fromHex("#5C3A18"),
                             },
                         },
                     },
@@ -659,6 +712,11 @@ export const WoodenTheme = createTheme({
                             backgroundColor: Color3.fromHex("#A16B30"),
                         },
                     },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#8C7B62"),
+                        },
+                    },
                     success: {
                         default: {
                             backgroundColor: Color3.fromHex("#4E6A24"),
@@ -745,6 +803,10 @@ export const WoodenTheme = createTheme({
                     backgroundColor: Color3.fromHex("#7A4A20"),
                     borderColor: Color3.fromHex("#3D2712"),
                     backgroundTransparency: 0,
+                },
+                secondary: {
+                    textColor: Color3.fromHex("#D3CBA3"),
+                    backgroundColor: Color3.fromHex("#5C3A18"),
                 },
                 success: {
                     backgroundColor: Color3.fromHex("#4E6A24"),

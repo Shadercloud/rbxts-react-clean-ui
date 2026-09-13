@@ -1,7 +1,9 @@
 import React from "@rbxts/react";
 import {
     BackgroundElementProps,
+    ButtonFlag,
     IconElementProps,
+    Intent,
     IntentElementProps,
     ScalableElementProps,
     ShadowElementProps,
@@ -18,6 +20,20 @@ import { Group, GroupContext } from "../Layout/";
 import { ThemeTemplate } from "../../Theme/theme.template";
 
 export type ButtonStyleOverride = Partial<ThemeTemplate["components"]["button"]>;
+
+function resolveOwnIntentTransparency(
+    intent: Intent | undefined,
+    state: ButtonFlag,
+    intents: ButtonStyleOverride["intents"],
+): number | undefined {
+    if (intent === undefined || intent === "primary") {
+        return undefined;
+    }
+
+    const entry = intents?.[intent];
+
+    return entry?.[state]?.backgroundTransparency ?? entry?.default?.backgroundTransparency;
+}
 
 export interface ButtonProps extends
     SpacedElementProps,
@@ -129,6 +145,16 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
 
         const backgroundImage = CssHelper.resolveBackgroundImage(intentColors.backgroundImage);
 
+        const intentBackgroundTransparency = resolveOwnIntentTransparency(
+            props.intent,
+            state,
+            props.styleOverride?.intents,
+        ) ?? resolveOwnIntentTransparency(
+            props.intent,
+            state,
+            theme.components.button.intents,
+        );
+
         return (
             <imagebutton
                 key={props.name ?? "Button"}
@@ -167,6 +193,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 BackgroundTransparency={
                     props.BackgroundTransparency ??
                     props.styleOverride?.backgroundTransparency ??
+                    intentBackgroundTransparency ??
                     theme.components.button.backgroundTransparency
                 }
                 BackgroundColor3={intentColors.backgroundColor}
@@ -186,7 +213,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
 
                 <uistroke
                     key="Stroke"
-                    Thickness={props.styleOverride?.borderThickness ?? theme.components.button.borderThickness}
+                    Thickness={intentColors.borderThickness ?? props.styleOverride?.borderThickness ?? theme.components.button.borderThickness}
                     BorderStrokePosition={Enum.BorderStrokePosition.Inner}
                     Color={intentColors.borderColor}
                 />

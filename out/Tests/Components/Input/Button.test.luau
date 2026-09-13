@@ -14,6 +14,8 @@ local Button = TS.import(script, script.Parent.Parent.Parent.Parent, "Components
 local _Layout = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout")
 local Group = _Layout.Group
 local HStack = _Layout.HStack
+local ThemeProvider = TS.import(script, script.Parent.Parent.Parent.Parent, "Providers", "theme.provider").ThemeProvider
+local WoodenTheme = TS.import(script, script.Parent.Parent.Parent.Parent, "Theme").WoodenTheme
 local _layout = TS.import(script, script.Parent.Parent.Parent, "Helpers", "layout")
 local STUDIO_SKIP_MESSAGE = _layout.STUDIO_SKIP_MESSAGE
 local assertAllDescendantsContained = _layout.assertAllDescendantsContained
@@ -25,6 +27,10 @@ local rect = _layout.rect
 local waitForGuiObject = _layout.waitForGuiObject
 local waitForLayout = _layout.waitForLayout
 local withMounted = _layout.withMounted
+local WOODEN_SECONDARY_TEXT = Color3.fromHex("#D3CBA3")
+local WOODEN_SECONDARY_BORDER = Color3.fromHex("#3D2712")
+local WOODEN_SECONDARY_TOP = Color3.fromHex("#7A4A20")
+local WOODEN_SECONDARY_BOTTOM = Color3.fromHex("#5C3A18")
 local function waitForButton(host, name)
 	if name == nil then
 		name = "Button"
@@ -101,6 +107,39 @@ do
 			end, `Timed out waiting for grouped buttons to share a width (short={rect(short).width}, long={rect(long).width})`)
 			assertAllDescendantsContained(short, "grouped short button")
 			assertAllDescendantsContained(long, "grouped long button")
+		end)
+	end
+	function ButtonMountValidation:woodenSecondary()
+		withMounted(400, 200, React.createElement(ThemeProvider, {
+			theme = WoodenTheme,
+		}, React.createElement(Button, {
+			text = "Cancel",
+			intent = "secondary",
+		})), function(mounted)
+			local button = waitForButton(mounted.host)
+			Assert:equal(button.BackgroundTransparency, 0)
+			local gradient = button:FindFirstChild("Gradient")
+			Assert:notUndefined(gradient, "Expected the secondary Button to carry a Gradient UIGradient")
+			local keypoints = gradient.Color.Keypoints
+			Assert:equal(keypoints[1].Value, WOODEN_SECONDARY_TOP)
+			Assert:equal(keypoints[#keypoints].Value, WOODEN_SECONDARY_BOTTOM)
+			Assert:equal(gradient.Rotation, 90)
+			local stroke = findDescendant(button, "Stroke")
+			Assert:equal(stroke.Thickness, 3)
+			Assert:equal(stroke.Color, WOODEN_SECONDARY_BORDER)
+			Assert:equal(findDescendant(button, "ButtonText").TextColor3, WOODEN_SECONDARY_TEXT)
+		end)
+	end
+	function ButtonMountValidation:woodenPrimaryUnchanged()
+		withMounted(400, 200, React.createElement(ThemeProvider, {
+			theme = WoodenTheme,
+		}, React.createElement(Button, {
+			text = "Confirm",
+		})), function(mounted)
+			local button = waitForButton(mounted.host)
+			Assert:equal(button.BackgroundTransparency, 1)
+			Assert:equal(findDescendant(button, "Stroke").Thickness, 0)
+			Assert:undefined(button:FindFirstChild("Gradient"))
 		end)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
@@ -182,6 +221,46 @@ do
 	})
 	if _descriptor_11 then
 		ButtonMountValidation.groupAlignsWidths = _descriptor_11.value
+	end
+	local _decorator_8 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_9 = DisplayName("Under WoodenTheme a secondary Button renders an opaque gradient fill, a 3px border stroke and #D3CBA3 text")
+	local _descriptor_12 = Test(ButtonMountValidation, "woodenSecondary", {
+		value = ButtonMountValidation.woodenSecondary,
+	})
+	if _descriptor_12 then
+		ButtonMountValidation.woodenSecondary = _descriptor_12.value
+	end
+	local _descriptor_13 = _decorator_9(ButtonMountValidation, "woodenSecondary", {
+		value = ButtonMountValidation.woodenSecondary,
+	})
+	if _descriptor_13 then
+		ButtonMountValidation.woodenSecondary = _descriptor_13.value
+	end
+	local _descriptor_14 = _decorator_8(ButtonMountValidation, "woodenSecondary", {
+		value = ButtonMountValidation.woodenSecondary,
+	})
+	if _descriptor_14 then
+		ButtonMountValidation.woodenSecondary = _descriptor_14.value
+	end
+	local _decorator_10 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_11 = DisplayName("Under WoodenTheme a primary Button keeps its transparent image look with a zero-thickness stroke and no gradient")
+	local _descriptor_15 = Test(ButtonMountValidation, "woodenPrimaryUnchanged", {
+		value = ButtonMountValidation.woodenPrimaryUnchanged,
+	})
+	if _descriptor_15 then
+		ButtonMountValidation.woodenPrimaryUnchanged = _descriptor_15.value
+	end
+	local _descriptor_16 = _decorator_11(ButtonMountValidation, "woodenPrimaryUnchanged", {
+		value = ButtonMountValidation.woodenPrimaryUnchanged,
+	})
+	if _descriptor_16 then
+		ButtonMountValidation.woodenPrimaryUnchanged = _descriptor_16.value
+	end
+	local _descriptor_17 = _decorator_10(ButtonMountValidation, "woodenPrimaryUnchanged", {
+		value = ButtonMountValidation.woodenPrimaryUnchanged,
+	})
+	if _descriptor_17 then
+		ButtonMountValidation.woodenPrimaryUnchanged = _descriptor_17.value
 	end
 	ButtonMountValidation = Tag("Studio")(ButtonMountValidation) or ButtonMountValidation
 end

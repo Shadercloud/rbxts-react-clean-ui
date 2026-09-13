@@ -310,7 +310,7 @@ Some properties are managed internally by the component, including:
 * `FontFace`
 * `FontSize`
 * `LineHeight`
-* `BackgroundTransparency`
+* `BackgroundTransparency` (set from the theme, see [Theme Styling](#theme-styling))
 * `ClearTextOnFocus`
 * `AutomaticSize`
 
@@ -363,11 +363,37 @@ theme.components.input.typography
 theme.components.input.borderThickness
 theme.components.input.borderColor
 theme.components.input.cornerRadius
+theme.components.input.backgroundColor
+theme.components.input.backgroundTransparency
 theme.components.input.backgroundImage
 theme.components.input.backgroundGradient
 theme.components.input.placeholder
 theme.components.input.iconColor
 ```
+
+`backgroundColor` and `backgroundTransparency` are optional and give the input a flat fill. `backgroundTransparency` defaults to `1`, so the fill is invisible unless a theme sets it lower. No shipped theme sets either value. A `backgroundImage` draws on top of the fill, so a theme extending one that has a background image (such as `WoodenTheme`) can clear it with `backgroundImage: { image: "" }` to show only the flat colour.
+
+A `cornerRadius` of `0` gives square corners.
+
+```ts
+const MyTheme = extendTheme(WoodenTheme, {
+    components: {
+        input: {
+            backgroundColor: Color3.fromHex("#295896"),
+            backgroundTransparency: 0,
+            backgroundImage: { image: "" },
+            borderColor: Color3.fromHex("#3D2712"),
+            borderThickness: 3,
+            cornerRadius: 0,
+            typography: { color: Color3.fromHex("#FFF7CF") },
+            placeholder: { color: Color3.fromHex("#8FA6C4") },
+            iconColor: Color3.fromHex("#FFF7CF"),
+        },
+    },
+});
+```
+
+Because a searchable [`Select`](/components/form/select) renders an `Input` for its search row, it picks up the same styling.
 
 `iconColor` is optional and only affects the leading icon rendered when the `icon` prop is set. If the theme doesn't define it, the icon falls back to the same default text color as the input.
 

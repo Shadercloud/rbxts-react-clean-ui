@@ -56,7 +56,12 @@ local function Input(props)
 	_attributes.key = _condition
 	_attributes.Size = props.Size or UDim2.fromScale(1, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
-	_attributes.BackgroundTransparency = 1
+	_attributes.BackgroundColor3 = theme.components.input.backgroundColor
+	local _condition_1 = theme.components.input.backgroundTransparency
+	if _condition_1 == nil then
+		_condition_1 = 1
+	end
+	_attributes.BackgroundTransparency = _condition_1
 	_attributes.AnchorPoint = props.AnchorPoint
 	_attributes.Position = props.Position
 	_attributes.LayoutOrder = props.LayoutOrder
@@ -99,21 +104,21 @@ local function Input(props)
 		FontFace = Font.fromName(typography.font.Name, typography.weight or Enum.FontWeight.Regular),
 		FontSize = typography.size,
 	}
-	local _condition_1 = props.PlaceholderText
-	if _condition_1 == nil then
-		_condition_1 = props.placeholder
+	local _condition_2 = props.PlaceholderText
+	if _condition_2 == nil then
+		_condition_2 = props.placeholder
 	end
-	_attributes_2.PlaceholderText = _condition_1
+	_attributes_2.PlaceholderText = _condition_2
 	_attributes_2.PlaceholderColor3 = props.PlaceholderColor3 or placeholderTypography.color
 	_attributes_2.TextScaled = props.TextScaled
 	_attributes_2.LineHeight = typography.lineHeight
 	_attributes_2.Text = if props.controlled then props.value else value
 	_attributes_2.TextColor3 = props.TextColor3 or typography.color or theme.colors.intents.primary.default.textColor
-	local _condition_2 = props.TextTransparency
-	if _condition_2 == nil then
-		_condition_2 = typography.transparency
+	local _condition_3 = props.TextTransparency
+	if _condition_3 == nil then
+		_condition_3 = typography.transparency
 	end
-	_attributes_2.TextTransparency = _condition_2
+	_attributes_2.TextTransparency = _condition_3
 	_attributes_2.Active = props.Active
 	_attributes_2.Archivable = props.Archivable
 	_attributes_2.BorderColor3 = props.BorderColor3
@@ -133,11 +138,11 @@ local function Input(props)
 	_attributes_2.NextSelectionUp = props.NextSelectionUp
 	_attributes_2.SelectionGroup = props.SelectionGroup
 	_attributes_2.SelectionOrder = props.SelectionOrder
-	local _condition_3 = props.ClearTextOnFocus
-	if _condition_3 == nil then
-		_condition_3 = false
+	local _condition_4 = props.ClearTextOnFocus
+	if _condition_4 == nil then
+		_condition_4 = false
 	end
-	_attributes_2.ClearTextOnFocus = _condition_3
+	_attributes_2.ClearTextOnFocus = _condition_4
 	_attributes_2.CursorPosition = props.CursorPosition
 	_attributes_2.MultiLine = props.MultiLine
 	_attributes_2.SelectionStart = props.SelectionStart

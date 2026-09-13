@@ -62,6 +62,60 @@ export function ScrollableTabsExample() {
 
 Because a `Tabs.Content` panel stays mounted while hidden rather than unmounting, a `Scroller`'s scroll position is preserved when switching away from its tab and back.
 
+## Controlled selection
+
+By default `Tabs` manages its own selection. Pass `value` to control it from outside: the selected tab is then always `value`, and clicking a title only calls `onValueChange` with that title's `value`. Feed the new value back to actually switch tabs.
+
+```tsx
+import React from "@rbxts/react";
+import { Button, Tabs, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function ControlledTabsExample() {
+    const [tab, setTab] = React.useState("first");
+
+    return (
+        <VStack>
+            <Button text="Go to second tab" Event={{ Activated: () => setTab("second") }} />
+            <Tabs value={tab} onValueChange={setTab}>
+                <Tabs.List>
+                    <Tabs.Title value="first" text="First Tab" />
+                    <Tabs.Title value="second" text="Second Tab" />
+                </Tabs.List>
+                <Tabs.Body>
+                    <Tabs.Content value="first">
+                        <Text text="Content for the first tab." />
+                    </Tabs.Content>
+                    <Tabs.Content value="second">
+                        <Text text="Content for the second tab." />
+                    </Tabs.Content>
+                </Tabs.Body>
+            </Tabs>
+        </VStack>
+    );
+}
+```
+
+`onValueChange` can also be used without `value`, to observe clicks while `Tabs` stays uncontrolled.
+
+## Equal-width titles
+
+Set `fill` on `Tabs.List` to make every title share the list's width equally, regardless of text length. Each title's text is centred within its share.
+
+```tsx
+<Tabs>
+    <Tabs.List fill>
+        <Tabs.Title value="stats" text="Stats" />
+        <Tabs.Title value="inventory" text="Inventory" />
+        <Tabs.Title value="achievements" text="Achievements" />
+    </Tabs.List>
+    <Tabs.Body>
+        {/* ... */}
+    </Tabs.Body>
+</Tabs>
+```
+
+Without `fill`, each title is sized to fit its text.
+
 ## Placing tabs in a card header
 
 `Tabs.List` and `Tabs.Body` don't need to be siblings — each reads the current selection from `Tabs` via context wherever it's mounted, so the button bar and the content panel can live in entirely different parts of the layout. This makes it possible to put the buttons in a `Card.Header` while the panel content lives in the `Card.Body`:
@@ -113,13 +167,16 @@ The only rule is that a `Tabs.Title` and the `Tabs.Content` it should reveal sha
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `defaultValue` | `string` | First mounted tab | Sets which tab's `value` starts selected. |
+| `defaultValue` | `string` | First mounted tab | Sets which tab's `value` starts selected. Only used when `value` is omitted. |
+| `value` | `string` | `undefined` | Makes `Tabs` controlled: the selected tab is always this value. |
+| `onValueChange` | `(value: string) => void` | `undefined` | Called with a title's `value` whenever that title is clicked, in both controlled and uncontrolled mode. |
 
 ## Tabs.List
 
-| Prop | Type | Description |
-| --- | --- | --- |
-| `children` | `React.ReactNode` | `Tabs.Title` elements rendered as the button bar. |
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fill` | `boolean` | `false` | Makes the titles share the list's width equally instead of sizing to their text. |
+| `children` | `React.ReactNode` | — | `Tabs.Title` elements rendered as the button bar. |
 
 ### Shared props
 
@@ -164,5 +221,88 @@ The only rule is that a `Tabs.Title` and the `Tabs.Content` it should reveal sha
 ## Behaviour
 
 - The first `Tabs.Title` to mount is selected by default. Set `defaultValue` on `Tabs` to choose a different initial tab.
+- When `value` is set, clicking a title does not change the selection by itself; only a new `value` does. A `value` that matches no title shows no panel, and titles never claim the selection on mount.
+- `onValueChange` fires on every title click, including clicks on the already-selected title. It never fires for the initial selection or for `defaultValue`.
+- If the selected `Tabs.Title` unmounts, the selection is not moved to another tab.
 - Every `Tabs.Content` stays mounted at all times — switching tabs toggles visibility rather than mounting and unmounting, so a panel's local state (such as a `Scroller`'s scroll position) is preserved when switching away and back.
-- Hovering or selecting a `Tabs.Title` switches its background, border, and text colors to the theme's `hover`/`focus` intent states.
+- Hovering or selecting a `Tabs.Title` switches its background, border, gradient, and text colors to the theme's `hover`/`focus` intent states.
+- `fill` only affects titles rendered inside that `Tabs.List`.
+
+## Theme values
+
+`Tabs` reads its appearance from `theme.components.tabs`:
+
+- `gap` — pixel gap between the direct children of `Tabs` (normally `Tabs.List` and `Tabs.Body`). Unset uses the default `VStack` gap. Negative values make them overlap. Has no effect when `Tabs.List`/`Tabs.Body` are placed elsewhere, such as in a `Card`.
+- `borderColor`, `borderThickness`, `cornerRadius`, `spacing`, `padding`, `backgroundImage`, and `backgroundGradient` — style `Tabs.Body`. A `borderThickness` of `0` renders no border.
+- `list.backgroundColor`, `list.backgroundTransparency`, `list.backgroundImage`, `list.backgroundGradient`, `list.cornerRadius`, `list.spacing`, and `list.padding` — style the `Tabs.List` bar.
+- `list.gap` — pixel gap between titles. Unset uses the default `HStack` gap. This is separate from `list.spacing`, which only controls the bar's padding.
+- `button.spacing`, `button.padding`, `button.boxShadow`, and `button.typography` — style each title button.
+- `button.cornerRadius` — either a single size or a per-corner object `{ topLeft?, topRight?, bottomLeft?, bottomRight? }`. With the per-corner object, any corner you leave out uses `list.cornerRadius`. A single size is ignored, and every corner uses `list.cornerRadius`. When every corner resolves to `0`, no `UICorner` is added.
+- `button.borderThickness` — thickness of the title button's inner border. `0` (the value in every shipped theme) renders no border.
+- `button.intents.primary.default`, `.hover`, and `.focus` — the unselected, hovered, and selected title states. Each state can set `textColor`, `backgroundColor`, `backgroundTransparency`, `borderColor`, `borderThickness` (overrides `button.borderThickness`), `backgroundImage`, `backgroundGradient`, and `boxShadow`. Titles always use the `primary` intent.
+
+A `UIGradient` multiplies the background colour, so a state that sets `backgroundGradient` should also set `backgroundColor` to white and `backgroundTransparency` to `0`.
+
+## Tabs sitting on the panel
+
+A common look puts the titles directly on top of the panel: an outline around both, rounded top corners on the titles, and a gradient on the selected title only. You can get close to this with theme values alone.
+
+A `UIStroke` can't leave out one side, and there's no per-side border. So the recipe overlaps the title row onto the body by exactly the border thickness (`gap: -3` with a 3px border). The bottom of each title's border then sits on the top of the body's border, and the two draw as one 3px line.
+
+The limitation: that shared line also runs under the selected title, so the selected tab doesn't open into the panel.
+
+This example extends `WoodenTheme`:
+
+```ts
+import { WoodenTheme, extendTheme } from "@rbxts/react-clean-ui";
+
+const TabsOnPanelTheme = extendTheme(WoodenTheme, {
+    components: {
+        tabs: {
+            gap: -3,
+            borderColor: Color3.fromHex("#331D07"),
+            borderThickness: 3,
+            cornerRadius: 0,
+            list: {
+                backgroundTransparency: 1,
+                backgroundImage: { image: "" },
+                padding: "0px",
+                cornerRadius: 0,
+            },
+            button: {
+                borderThickness: 3,
+                cornerRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
+                intents: {
+                    primary: {
+                        default: {
+                            textColor: Color3.fromHex("#D3CBA3"),
+                            borderColor: Color3.fromHex("#331D07"),
+                            backgroundColor: Color3.fromHex("#5C3A18"),
+                            backgroundTransparency: 0,
+                            backgroundImage: { image: "" },
+                        },
+                        hover: {
+                            textColor: Color3.fromHex("#D3CBA3"),
+                            backgroundTransparency: 0,
+                        },
+                        focus: {
+                            textColor: Color3.fromHex("#FFF7CF"),
+                            backgroundColor: Color3.fromHex("#FFFFFF"),
+                            backgroundTransparency: 0,
+                            backgroundGradient: {
+                                colors: [Color3.fromHex("#BA854A"), Color3.fromHex("#A16B30"), Color3.fromHex("#7A4A20")],
+                                stops: [0, 0.48, 1],
+                                rotation: 90,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+});
+```
+
+- `gap` only overlaps the two when `Tabs.List` and `Tabs.Body` are direct children of `Tabs`.
+- `list.padding` must be `0` at the bottom. Otherwise the padding pushes the titles away from the body and the borders no longer line up.
+- `WoodenTheme` puts images on the list and the buttons. A theme merge can't remove a key, so set `image: ""` to clear them.

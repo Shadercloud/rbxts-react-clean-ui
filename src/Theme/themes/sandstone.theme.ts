@@ -18,6 +18,19 @@ export const SandstoneTheme = createTheme({
                 },
             },
 
+            secondary: {
+                default: {
+                    textColor: Color3.fromHex("#5E5446"),
+                    borderColor: Color3.fromHex("#A89A84"),
+                    backgroundColor: Color3.fromHex("#EAE2D4"),
+                },
+                hover: {
+                    textColor: Color3.fromHex("#4A4034"),
+                    borderColor: Color3.fromHex("#928470"),
+                    backgroundColor: Color3.fromHex("#DFD5C3"),
+                },
+            },
+
             success: {
                 default: {
                     textColor: Color3.fromHex("#2E6245"),
@@ -176,6 +189,13 @@ export const SandstoneTheme = createTheme({
                         backgroundTransparency: 0,
                     },
                 },
+                secondary: {
+                    default: {
+                        textColor: Color3.fromHex("#5E5446"),
+                        backgroundColor: Color3.fromHex("#EAE2D4"),
+                        borderColor: Color3.fromHex("#A89A84"),
+                    },
+                },
                 success: {
                     default: {
                         textColor: Color3.fromHex("#2E6245"),
@@ -215,6 +235,16 @@ export const SandstoneTheme = createTheme({
                 primary: {
                     default: {
                         textColor: Color3.fromHex("#244F4A"),
+                    },
+                    disabled: {
+                        backgroundColor: Color3.fromHex("#E8DFCF"),
+                        borderColor: Color3.fromHex("#D8CDBA"),
+                        textColor: Color3.fromHex("#9B8B73"),
+                    },
+                },
+                secondary: {
+                    default: {
+                        textColor: Color3.fromHex("#5E5446"),
                     },
                     disabled: {
                         backgroundColor: Color3.fromHex("#E8DFCF"),
@@ -479,6 +509,13 @@ export const SandstoneTheme = createTheme({
                             backgroundTransparency: 0,
                         },
                     },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#E3D9C6"),
+                            backgroundTransparency: 0,
+                            borderColor: Color3.fromHex("#A89A84"),
+                        },
+                    },
                 },
             },
             footer: {
@@ -487,6 +524,13 @@ export const SandstoneTheme = createTheme({
                         default: {
                             backgroundColor: Color3.fromHex("#EFE5D3"),
                             backgroundTransparency: 0,
+                        },
+                    },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#E3D9C6"),
+                            backgroundTransparency: 0,
+                            borderColor: Color3.fromHex("#A89A84"),
                         },
                     },
                 },
@@ -553,6 +597,11 @@ export const SandstoneTheme = createTheme({
                         default: {
                             backgroundColor: Color3.fromHex("#4E8179"),
 
+                        },
+                    },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#A89A84"),
                         },
                     },
                     success: {

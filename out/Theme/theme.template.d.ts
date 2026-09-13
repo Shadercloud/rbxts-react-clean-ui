@@ -2,7 +2,7 @@ import { CssShadow, CssSize, ScaledCssPadding, Breakpoint, BreakpointValue, Scal
 import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors, CssBackgroundImage, CssPosition, CssCornerRadius } from "./theme.style";
 export interface ThemeTemplate {
     colors: {
-        intents: Record<Intent, IntentColors>;
+        intents: Record<Exclude<Intent, "secondary">, IntentColors> & Partial<Record<"secondary", IntentColors>>;
     };
     breakpoints: BreakpointValue<number>;
     default: {
@@ -78,6 +78,8 @@ export interface ThemeTemplate {
             borderColor: Color3;
             borderThickness: number;
             cornerRadius: CssSize;
+            backgroundColor?: Color3;
+            backgroundTransparency?: number;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             backgroundImage?: CssBackgroundImage;
             backgroundGradient?: CssBackgroundGradient;
@@ -88,6 +90,10 @@ export interface ThemeTemplate {
             borderColor: Color3;
             borderThickness: number;
             cornerRadius: CssSize;
+            backgroundColor?: Color3;
+            backgroundTransparency?: number;
+            textColor?: Color3;
+            iconColor?: Color3;
             backgroundImage?: CssBackgroundImage;
             backgroundGradient?: CssBackgroundGradient;
             dropDownBackgroundColor: Color3;
@@ -152,7 +158,9 @@ export interface ThemeTemplate {
             cornerRadius: CssSize;
             spacing?: ScaleSizeValue<number>;
             padding?: ScaledCssPadding;
+            gap?: number;
             list: {
+                gap?: number;
                 borderColor?: Color3;
                 backgroundColor?: Color3;
                 backgroundTransparency?: number;
@@ -165,7 +173,7 @@ export interface ThemeTemplate {
             };
             button: {
                 borderThickness: number;
-                cornerRadius: CssSize;
+                cornerRadius: CssSize | CssCornerRadius;
                 spacing?: ScaleSizeValue<number>;
                 padding?: ScaledCssPadding;
                 boxShadow?: CssShadow;

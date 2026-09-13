@@ -14,6 +14,7 @@ local Padding = _Decorator.Padding
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
+local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local _HoverButton = TS.import(script, script.Parent.Parent, "Input", "HoverButton")
@@ -21,11 +22,44 @@ local HoverButton = _HoverButton.HoverButton
 local HoverButtonContext = _HoverButton.HoverButtonContext
 local TabsContext = React.createContext({
 	selected = nil,
-	setSelected = function() end,
+	claimTab = function() end,
+	selectTab = function() end,
 })
+local TabsListContext = React.createContext({
+	fill = false,
+})
+local function TabButtonCorners()
+	local theme = React.useContext(CleanThemeContext)
+	local cornerRadius = theme.components.tabs.button.cornerRadius
+	if not (type(cornerRadius) == "table") then
+		return React.createElement(Corners, {
+			radius = theme.components.tabs.list.cornerRadius,
+		})
+	end
+	local fallback = SizeHelper:toUDim(theme.components.tabs.list.cornerRadius)
+	local topLeftRadius = if cornerRadius.topLeft ~= nil then CssHelper:parseCssSize(cornerRadius.topLeft) else fallback
+	local topRightRadius = if cornerRadius.topRight ~= nil then CssHelper:parseCssSize(cornerRadius.topRight) else fallback
+	local bottomLeftRadius = if cornerRadius.bottomLeft ~= nil then CssHelper:parseCssSize(cornerRadius.bottomLeft) else fallback
+	local bottomRightRadius = if cornerRadius.bottomRight ~= nil then CssHelper:parseCssSize(cornerRadius.bottomRight) else fallback
+	local isZero = function(radius)
+		return radius.Scale == 0 and radius.Offset == 0
+	end
+	if isZero(topLeftRadius) and isZero(topRightRadius) and isZero(bottomLeftRadius) and isZero(bottomRightRadius) then
+		return nil
+	end
+	return React.createElement("uicorner", {
+		key = "Corners",
+		TopLeftRadius = topLeftRadius,
+		TopRightRadius = topRightRadius,
+		BottomLeftRadius = bottomLeftRadius,
+		BottomRightRadius = bottomRightRadius,
+	})
+end
 local function TabButtonContent(props)
 	local theme = React.useContext(CleanThemeContext)
 	local hover = React.useContext(HoverButtonContext)
+	local _binding = React.useContext(TabsListContext)
+	local fill = _binding.fill
 	local _result = hover
 	if _result ~= nil then
 		_result = _result.isSelected
@@ -41,13 +75,29 @@ local function TabButtonContent(props)
 		_result_1 = if _result_2 then "hover" else "default"
 	end
 	local intent = ColorHelper:getIntentColors(theme, "primary", _result_1, theme.components.tabs.button.intents)
-	return React.createElement(React.Fragment, nil, React.createElement(Corners, {
-		radius = theme.components.tabs.list.cornerRadius,
+	local _condition = intent.borderThickness
+	if _condition == nil then
+		_condition = theme.components.tabs.button.borderThickness
+	end
+	local borderThickness = _condition
+	return React.createElement(React.Fragment, nil, React.createElement(TabButtonCorners), borderThickness > 0 and (React.createElement("uistroke", {
+		key = "Stroke",
+		Thickness = borderThickness,
+		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
+		Color = intent.borderColor,
+	})), React.createElement(Gradient, {
+		value = intent.backgroundGradient,
 	}), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding),
 	}), React.createElement(BoxShadow, {
 		value = intent.boxShadow,
-	}), React.createElement(Text, {
+	}), fill and (React.createElement("uilistlayout", {
+		key = "TitleLayout",
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	})), React.createElement(Text, {
 		name = "TabTitleText",
 		TextColor3 = intent.textColor,
 		text = props.text,
@@ -58,16 +108,13 @@ local function TabTitle(props)
 	local theme = React.useContext(CleanThemeContext)
 	local _binding = React.useContext(TabsContext)
 	local selected = _binding.selected
-	local setSelected = _binding.setSelected
+	local claimTab = _binding.claimTab
+	local selectTab = _binding.selectTab
+	local _binding_1 = React.useContext(TabsListContext)
+	local fill = _binding_1.fill
 	local isSelected = selected == props.value
 	React.useEffect(function()
-		setSelected(function(current)
-			local _condition = current
-			if _condition == nil then
-				_condition = props.value
-			end
-			return _condition
-		end)
+		claimTab(props.value)
 	end, {})
 	local buttonDefault = ColorHelper:getIntentColors(theme, "primary", "default", theme.components.tabs.button.intents)
 	local buttonHover = ColorHelper:getIntentColors(theme, "primary", "hover", theme.components.tabs.button.intents)
@@ -82,7 +129,7 @@ local function TabTitle(props)
 		name = `TabButton-{props.value}`,
 		default = {
 			Size = UDim2.fromScale(0, 0),
-			AutomaticSize = Enum.AutomaticSize.XY,
+			AutomaticSize = if fill then Enum.AutomaticSize.Y else Enum.AutomaticSize.XY,
 			BackgroundColor3 = buttonDefault.backgroundColor,
 			BackgroundTransparency = buttonDefault.backgroundTransparency,
 			BorderSizePixel = 0,
@@ -96,7 +143,7 @@ local function TabTitle(props)
 			TileSize = buttonDefaultBackgroundImage.TileSize,
 			Event = {
 				Activated = function()
-					setSelected(props.value)
+					selectTab(props.value)
 				end,
 			},
 		},
@@ -153,7 +200,15 @@ local TabsList = React.forwardRef(function(props, ref)
 		value = theme.components.tabs.list.backgroundGradient,
 	}), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing, theme.components.tabs.list.padding),
-	}), React.createElement(HStack, nil, props.children))
+	}), React.createElement(TabsListContext.Provider, {
+		value = {
+			fill = props.fill == true,
+		},
+	}, React.createElement(HStack, {
+		HorizontalFlex = if props.fill then Enum.UIFlexAlignment.Fill else nil,
+		Wraps = if props.fill then false else nil,
+		Padding = if theme.components.tabs.list.gap ~= nil then UDim.new(0, theme.components.tabs.list.gap) else nil,
+	}, props.children)))
 end)
 local TabsBody = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
@@ -162,12 +217,12 @@ local TabsBody = React.forwardRef(function(props, ref)
 		ref = ref,
 		width = "100%",
 		backgroundImage = props.backgroundImage or theme.components.tabs.backgroundImage,
-	}, React.createElement("uistroke", {
+	}, theme.components.tabs.borderThickness > 0 and (React.createElement("uistroke", {
 		key = "Stroke",
 		Thickness = theme.components.tabs.borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = theme.components.tabs.borderColor,
-	}), React.createElement(Padding, {
+	})), React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding),
 	}), React.createElement(Corners, {
 		radius = theme.components.tabs.cornerRadius,
@@ -176,16 +231,41 @@ local TabsBody = React.forwardRef(function(props, ref)
 	}), props.children)
 end)
 local Tabs = React.forwardRef(function(props, _ref)
-	local selected, setSelected = React.useState(props.defaultValue)
+	local theme = React.useContext(CleanThemeContext)
+	local uncontrolledSelected, setUncontrolledSelected = React.useState(props.defaultValue)
+	local controlled = props.value ~= nil
+	local selected = if controlled then props.value else uncontrolledSelected
+	local onValueChange = props.onValueChange
 	local contextValue = React.useMemo(function()
 		return {
 			selected = selected,
-			setSelected = setSelected,
+			claimTab = function(value)
+				if not controlled then
+					setUncontrolledSelected(function(current)
+						local _condition = current
+						if _condition == nil then
+							_condition = value
+						end
+						return _condition
+					end)
+				end
+			end,
+			selectTab = function(value)
+				if not controlled then
+					setUncontrolledSelected(value)
+				end
+				local _result = onValueChange
+				if _result ~= nil then
+					_result(value)
+				end
+			end,
 		}
-	end, { selected })
+	end, { selected, controlled, onValueChange })
 	return React.createElement(TabsContext.Provider, {
 		value = contextValue,
-	}, React.createElement(VStack, nil, props.children))
+	}, React.createElement(VStack, {
+		Padding = if theme.components.tabs.gap ~= nil then UDim.new(0, theme.components.tabs.gap) else nil,
+	}, props.children))
 end)
 Tabs.List = TabsList
 Tabs.Body = TabsBody

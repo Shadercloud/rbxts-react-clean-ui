@@ -560,6 +560,29 @@ export function SettingsForm() {
 
 The select's appearance is controlled by `theme.components.select`. Its `backgroundImage` value supplies the closed control's background image when the `backgroundImage` prop is omitted, and its `backgroundGradient` value likewise supplies the background gradient when the `backgroundGradient` prop is omitted. Existing select theme values continue to control typography, borders, corner radius, dropdown height, dropdown colour, and option intent colours. Internal padding (the `spacing` prop) is resolved from the global `theme.spacing` scale rather than a select-specific value.
 
+The closed control also reads these optional values:
+
+* `backgroundColor` and `backgroundTransparency` — a flat fill behind the closed control. `backgroundTransparency` defaults to `1` (invisible). The `BackgroundColor3` and `BackgroundTransparency` props override them for a single select. When the theme's `backgroundTransparency` is below `1`, the control's corners are rounded with `cornerRadius` so the fill matches the border. A `backgroundImage` draws on top of the fill.
+* `textColor` — colour of the selected option's text in the closed control. Unset uses `theme.colors.intents.primary.default.textColor`.
+* `iconColor` — colour of the dropdown caret icon. Unset uses `theme.colors.intents.primary.default.textColor`.
+
+No shipped theme sets these values, so the closed control looks the same as before unless your theme sets them.
+
+```ts
+const MyTheme = extendTheme(DefaultTheme, {
+    components: {
+        select: {
+            backgroundColor: Color3.fromHex("#295896"),
+            backgroundTransparency: 0,
+            textColor: Color3.fromHex("#FFF7CF"),
+            iconColor: Color3.fromHex("#FFF7CF"),
+        },
+    },
+});
+```
+
+`textColor` is a separate key: the selected text doesn't use `typography.color`.
+
 `theme.components.select.optGroup` controls the appearance of `Select.OptGroup` headers:
 
 * `textColor` (required) — colour of the group's label text

@@ -18,6 +18,35 @@ local HStack = TS.import(script, script.Parent.Parent, "Layout").HStack
 local _ = TS.import(script, script.Parent.Parent, "Layout")
 local Group = _.Group
 local GroupContext = _.GroupContext
+local function resolveOwnIntentTransparency(intent, state, intents)
+	if intent == nil or intent == "primary" then
+		return nil
+	end
+	local _entry = intents
+	if _entry ~= nil then
+		_entry = _entry[intent]
+	end
+	local entry = _entry
+	local _result = entry
+	if _result ~= nil then
+		_result = _result[state]
+		if _result ~= nil then
+			_result = _result.backgroundTransparency
+		end
+	end
+	local _condition = _result
+	if _condition == nil then
+		local _result_1 = entry
+		if _result_1 ~= nil then
+			_result_1 = _result_1.default
+			if _result_1 ~= nil then
+				_result_1 = _result_1.backgroundTransparency
+			end
+		end
+		_condition = _result_1
+	end
+	return _condition
+end
 local function ButtonText(props)
 	local theme = React.useContext(CleanThemeContext)
 	local _attributes = {
@@ -93,12 +122,22 @@ local Button = React.forwardRef(function(props, ref)
 	end
 	local intentColors = ColorHelper:getIntentColors(theme, _exp, state, _exp_1, _result)
 	local backgroundImage = CssHelper:resolveBackgroundImage(intentColors.backgroundImage)
-	local _attributes = {}
-	local _condition = props.name
-	if _condition == nil then
-		_condition = "Button"
+	local _exp_2 = props.intent
+	local _result_1 = props.styleOverride
+	if _result_1 ~= nil then
+		_result_1 = _result_1.intents
 	end
-	_attributes.key = _condition
+	local _condition = resolveOwnIntentTransparency(_exp_2, state, _result_1)
+	if _condition == nil then
+		_condition = resolveOwnIntentTransparency(props.intent, state, theme.components.button.intents)
+	end
+	local intentBackgroundTransparency = _condition
+	local _attributes = {}
+	local _condition_1 = props.name
+	if _condition_1 == nil then
+		_condition_1 = "Button"
+	end
+	_attributes.key = _condition_1
 	_attributes.ref = ref
 	_attributes.Active = not props.disabled
 	local _object = {}
@@ -112,11 +151,11 @@ local Button = React.forwardRef(function(props, ref)
 		if not props.disabled then
 			setHover(true)
 		end
-		local _result_1 = props.Event
-		if _result_1 ~= nil then
-			_result_1 = _result_1.MouseEnter
-			if _result_1 ~= nil then
-				_result_1(button, x, y)
+		local _result_2 = props.Event
+		if _result_2 ~= nil then
+			_result_2 = _result_2.MouseEnter
+			if _result_2 ~= nil then
+				_result_2(button, x, y)
 			end
 		end
 	end
@@ -124,11 +163,11 @@ local Button = React.forwardRef(function(props, ref)
 		if not props.disabled then
 			setHover(false)
 		end
-		local _result_1 = props.Event
-		if _result_1 ~= nil then
-			_result_1 = _result_1.MouseLeave
-			if _result_1 ~= nil then
-				_result_1(button, x, y)
+		local _result_2 = props.Event
+		if _result_2 ~= nil then
+			_result_2 = _result_2.MouseLeave
+			if _result_2 ~= nil then
+				_result_2(button, x, y)
 			end
 		end
 	end
@@ -136,46 +175,49 @@ local Button = React.forwardRef(function(props, ref)
 		if props.disabled then
 			return nil
 		end
-		local _result_1 = props.Event
-		if _result_1 ~= nil then
-			_result_1 = _result_1.Activated
-			if _result_1 ~= nil then
-				_result_1(button, inputObject, clickCount)
+		local _result_2 = props.Event
+		if _result_2 ~= nil then
+			_result_2 = _result_2.Activated
+			if _result_2 ~= nil then
+				_result_2(button, inputObject, clickCount)
 			end
 		end
 	end
 	_attributes.Event = _object
-	local _result_1
+	local _result_2
 	if props.group then
-		local _result_2 = group
-		if _result_2 ~= nil then
-			_result_2 = _result_2.size
-			if _result_2 ~= nil then
-				_result_2 = _result_2.X
+		local _result_3 = group
+		if _result_3 ~= nil then
+			_result_3 = _result_3.size
+			if _result_3 ~= nil then
+				_result_3 = _result_3.X
 			end
 		end
-		local _condition_1 = _result_2
-		if _condition_1 == nil then
-			_condition_1 = 0
+		local _condition_2 = _result_3
+		if _condition_2 == nil then
+			_condition_2 = 0
 		end
-		_result_1 = _condition_1
+		_result_2 = _condition_2
 	else
-		_result_1 = 0
+		_result_2 = 0
 	end
-	_attributes.Size = UDim2.fromOffset(_result_1, 0)
+	_attributes.Size = UDim2.fromOffset(_result_2, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
-	local _condition_1 = props.BackgroundTransparency
-	if _condition_1 == nil then
-		local _result_2 = props.styleOverride
-		if _result_2 ~= nil then
-			_result_2 = _result_2.backgroundTransparency
+	local _condition_2 = props.BackgroundTransparency
+	if _condition_2 == nil then
+		local _result_3 = props.styleOverride
+		if _result_3 ~= nil then
+			_result_3 = _result_3.backgroundTransparency
 		end
-		_condition_1 = _result_2
-		if _condition_1 == nil then
-			_condition_1 = theme.components.button.backgroundTransparency
+		_condition_2 = _result_3
+		if _condition_2 == nil then
+			_condition_2 = intentBackgroundTransparency
+			if _condition_2 == nil then
+				_condition_2 = theme.components.button.backgroundTransparency
+			end
 		end
 	end
-	_attributes.BackgroundTransparency = _condition_1
+	_attributes.BackgroundTransparency = _condition_2
 	_attributes.BackgroundColor3 = intentColors.backgroundColor
 	_attributes.AutoButtonColor = false
 	_attributes.LayoutOrder = props.LayoutOrder
@@ -188,49 +230,52 @@ local Button = React.forwardRef(function(props, ref)
 	_attributes.SliceScale = backgroundImage.SliceScale
 	_attributes.TileSize = backgroundImage.TileSize
 	local _attributes_1 = {}
-	local _result_2 = props.styleOverride
-	if _result_2 ~= nil then
-		_result_2 = _result_2.cornerRadius
-	end
-	local _condition_2 = _result_2
-	if _condition_2 == nil then
-		_condition_2 = theme.components.button.cornerRadius
-	end
-	_attributes_1.radius = _condition_2
-	local _exp_2 = React.createElement(Corners, _attributes_1)
-	local _attributes_2 = {
-		key = "Stroke",
-	}
 	local _result_3 = props.styleOverride
 	if _result_3 ~= nil then
-		_result_3 = _result_3.borderThickness
+		_result_3 = _result_3.cornerRadius
 	end
 	local _condition_3 = _result_3
 	if _condition_3 == nil then
-		_condition_3 = theme.components.button.borderThickness
+		_condition_3 = theme.components.button.cornerRadius
 	end
-	_attributes_2.Thickness = _condition_3
+	_attributes_1.radius = _condition_3
+	local _exp_3 = React.createElement(Corners, _attributes_1)
+	local _attributes_2 = {
+		key = "Stroke",
+	}
+	local _condition_4 = intentColors.borderThickness
+	if _condition_4 == nil then
+		local _result_4 = props.styleOverride
+		if _result_4 ~= nil then
+			_result_4 = _result_4.borderThickness
+		end
+		_condition_4 = _result_4
+		if _condition_4 == nil then
+			_condition_4 = theme.components.button.borderThickness
+		end
+	end
+	_attributes_2.Thickness = _condition_4
 	_attributes_2.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 	_attributes_2.Color = intentColors.borderColor
-	local _exp_3 = React.createElement("uistroke", _attributes_2)
+	local _exp_4 = React.createElement("uistroke", _attributes_2)
 	local _attributes_3 = table.clone(props)
 	setmetatable(_attributes_3, nil)
 	local _result_4 = props.styleOverride
 	if _result_4 ~= nil then
 		_result_4 = _result_4.boxShadow
 	end
-	local _condition_4 = _result_4
-	if _condition_4 == nil then
-		_condition_4 = theme.components.button.boxShadow
+	local _condition_5 = _result_4
+	if _condition_5 == nil then
+		_condition_5 = theme.components.button.boxShadow
 	end
-	_attributes_3.value = _condition_4
-	local _exp_4 = React.createElement(BoxShadow, _attributes_3)
-	local _exp_5 = React.createElement(Gradient, {
+	_attributes_3.value = _condition_5
+	local _exp_5 = React.createElement(BoxShadow, _attributes_3)
+	local _exp_6 = React.createElement(Gradient, {
 		value = intentColors.backgroundGradient,
 	})
 	local _attributes_4 = table.clone(props)
 	setmetatable(_attributes_4, nil)
-	return React.createElement("imagebutton", _attributes, _exp_2, _exp_3, _exp_4, _exp_5, React.createElement(Padding, _attributes_4), React.createElement(Group.Element, {
+	return React.createElement("imagebutton", _attributes, _exp_3, _exp_4, _exp_5, _exp_6, React.createElement(Padding, _attributes_4), React.createElement(Group.Element, {
 		enabled = props.group,
 		padding = padding,
 	}, (props.icon ~= nil or props.text ~= nil) and React.createElement(HStack, {

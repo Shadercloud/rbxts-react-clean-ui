@@ -6,6 +6,7 @@ local Assert = _lunit.Assert
 local Tag = _lunit.Tag
 local DisplayName = _lunit.DisplayName
 local ColorHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers", "color.helper").ColorHelper
+local DefaultTheme = TS.import(script, script.Parent.Parent.Parent, "Theme").DefaultTheme
 local RED = Color3.fromRGB(255, 0, 0)
 local GREEN = Color3.fromRGB(0, 255, 0)
 local BLUE = Color3.fromRGB(0, 0, 255)
@@ -41,6 +42,23 @@ local function themeWith(primaryDefault)
 	_object_1[_left_1] = _object_2
 	_object[_left] = _object_1
 	return _object
+end
+local function assertSameScheme(actual, expected, label)
+	Assert:equal(actual.textColor, expected.textColor, `{label}: textColor`)
+	Assert:equal(actual.backgroundColor, expected.backgroundColor, `{label}: backgroundColor`)
+	Assert:equal(actual.borderColor, expected.borderColor, `{label}: borderColor`)
+	Assert:equal(actual.backgroundTransparency, expected.backgroundTransparency, `{label}: backgroundTransparency`)
+	Assert:equal(actual.borderThickness, expected.borderThickness, `{label}: borderThickness`)
+	Assert:equal(actual.backgroundGradient == nil, expected.backgroundGradient == nil, `{label}: gradient presence`)
+	local _result = actual.backgroundGradient
+	if _result ~= nil then
+		_result = _result.rotation
+	end
+	local _result_1 = expected.backgroundGradient
+	if _result_1 ~= nil then
+		_result_1 = _result_1.rotation
+	end
+	Assert:equal(_result, _result_1, `{label}: gradient rotation`)
 end
 local function gradientOf(scheme)
 	Assert:notUndefined(scheme.backgroundGradient, "Expected the merged scheme to carry a backgroundGradient")
@@ -282,6 +300,60 @@ do
 		Assert:equal(gradient.offset, Vector2.new(0.5, 0))
 		Assert:equal(gradient.rotation, 180)
 	end
+	function IntentGradientMerge:secondaryFromTheme()
+		local intents = DefaultTheme.components.button.intents
+		local scheme = ColorHelper:getIntentColors(DefaultTheme, "secondary", "default", intents)
+		local hover = ColorHelper:getIntentColors(DefaultTheme, "secondary", "hover", intents)
+		local primary = ColorHelper:getIntentColors(DefaultTheme, "primary", "default", intents)
+		Assert:equal(scheme.backgroundColor, Color3.fromHex("#E4E7EC"))
+		Assert:equal(scheme.textColor, Color3.fromHex("#1D2433"))
+		Assert:equal(scheme.borderColor, Color3.fromHex("#C5CAD3"))
+		Assert:equal(hover.backgroundColor, Color3.fromHex("#D5D9E0"))
+		Assert:equal(hover.borderColor, Color3.fromHex("#B8BEC9"))
+		Assert:notEqual(scheme.backgroundColor, primary.backgroundColor)
+	end
+	function IntentGradientMerge:secondaryFallsBack()
+		local componentColors = {
+			primary = {
+				default = {
+					textColor = RED,
+					backgroundColor = GREEN,
+					backgroundTransparency = 0.2,
+					borderThickness = 2,
+				},
+				hover = {
+					backgroundColor = BLUE,
+					backgroundGradient = {
+						colors = { RED, BLUE },
+						rotation = 30,
+					},
+				},
+			},
+		}
+		for _, state in { "default", "hover", "focus", "disabled" } do
+			assertSameScheme(ColorHelper:getIntentColors(themeWith(), "secondary", state, componentColors), ColorHelper:getIntentColors(themeWith(), "primary", state, componentColors), `secondary vs primary ({state})`)
+		end
+	end
+	function IntentGradientMerge:secondaryLayersOverPrimary()
+		local scheme = ColorHelper:getIntentColors(themeWith(), "secondary", "default", {
+			primary = {
+				default = {
+					textColor = RED,
+					backgroundColor = GREEN,
+					borderThickness = 2,
+				},
+			},
+			secondary = {
+				default = {
+					backgroundColor = BLUE,
+					borderThickness = 3,
+				},
+			},
+		})
+		Assert:equal(scheme.textColor, RED)
+		Assert:equal(scheme.backgroundColor, BLUE)
+		Assert:equal(scheme.borderThickness, 3)
+	end
 	local _decorator = DisplayName("A hover layer that sets only rotation keeps the default layer's colours and overrides its rotation")
 	local _descriptor = Test(IntentGradientMerge, "hoverKeepsColors", {
 		value = IntentGradientMerge.hoverKeepsColors,
@@ -424,6 +496,45 @@ do
 	})
 	if _descriptor_21 then
 		IntentGradientMerge.matchingIntentRefines = _descriptor_21.value
+	end
+	local _decorator_11 = DisplayName("The secondary intent resolves DefaultTheme's own button secondary scheme, per state, instead of the primary one")
+	local _descriptor_22 = Test(IntentGradientMerge, "secondaryFromTheme", {
+		value = IntentGradientMerge.secondaryFromTheme,
+	})
+	if _descriptor_22 then
+		IntentGradientMerge.secondaryFromTheme = _descriptor_22.value
+	end
+	local _descriptor_23 = _decorator_11(IntentGradientMerge, "secondaryFromTheme", {
+		value = IntentGradientMerge.secondaryFromTheme,
+	})
+	if _descriptor_23 then
+		IntentGradientMerge.secondaryFromTheme = _descriptor_23.value
+	end
+	local _decorator_12 = DisplayName("With no secondary entry in the theme or component colours, secondary resolves exactly like primary in every state")
+	local _descriptor_24 = Test(IntentGradientMerge, "secondaryFallsBack", {
+		value = IntentGradientMerge.secondaryFallsBack,
+	})
+	if _descriptor_24 then
+		IntentGradientMerge.secondaryFallsBack = _descriptor_24.value
+	end
+	local _descriptor_25 = _decorator_12(IntentGradientMerge, "secondaryFallsBack", {
+		value = IntentGradientMerge.secondaryFallsBack,
+	})
+	if _descriptor_25 then
+		IntentGradientMerge.secondaryFallsBack = _descriptor_25.value
+	end
+	local _decorator_13 = DisplayName("A secondary component entry layers over the primary one, so keys it leaves unset still come from primary")
+	local _descriptor_26 = Test(IntentGradientMerge, "secondaryLayersOverPrimary", {
+		value = IntentGradientMerge.secondaryLayersOverPrimary,
+	})
+	if _descriptor_26 then
+		IntentGradientMerge.secondaryLayersOverPrimary = _descriptor_26.value
+	end
+	local _descriptor_27 = _decorator_13(IntentGradientMerge, "secondaryLayersOverPrimary", {
+		value = IntentGradientMerge.secondaryLayersOverPrimary,
+	})
+	if _descriptor_27 then
+		IntentGradientMerge.secondaryLayersOverPrimary = _descriptor_27.value
 	end
 	IntentGradientMerge = Tag("Studio")(IntentGradientMerge) or IntentGradientMerge
 end

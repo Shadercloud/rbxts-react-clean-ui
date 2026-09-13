@@ -3,5 +3,7 @@ declare class ButtonMountValidation {
     iconLeadsText(): void;
     disabledInert(): void;
     groupAlignsWidths(): void;
+    woodenSecondary(): void;
+    woodenPrimaryUnchanged(): void;
 }
 export = ButtonMountValidation;

@@ -1,6 +1,7 @@
 import {
     ThemeTemplate,
     InlineIntentColors,
+    IntentColors,
     IntentScheme,
     CssBackgroundImage,
     TypographyStyle,
@@ -22,7 +23,7 @@ export class ColorHelper {
         const selectedIntent = intent ?? "primary";
 
         const defaultPrimary = theme.colors.intents.primary;
-        const defaultMatching = theme.colors.intents[selectedIntent];
+        const defaultMatching: IntentColors | undefined = theme.colors.intents[selectedIntent];
 
         const componentPrimary = componentColors?.primary;
         const componentMatching = componentColors?.[selectedIntent];
@@ -32,10 +33,10 @@ export class ColorHelper {
 
         const layers: (Partial<IntentScheme> | undefined)[] = [
             defaultPrimary.default,
-            defaultMatching.default,
+            defaultMatching?.default,
 
             defaultPrimary[state],
-            defaultMatching[state],
+            defaultMatching?.[state],
 
             this.resolveComponentDefaultLayer(componentPrimary),
             this.resolveComponentDefaultLayer(componentMatching),

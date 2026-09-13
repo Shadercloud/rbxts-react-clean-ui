@@ -12,6 +12,7 @@ interface TabContentProps {
 }
 declare function TabContent(props: TabContentProps): React.JSX.Element;
 interface TabsListProps extends ScalableElementProps {
+    fill?: boolean;
     children?: React.ReactNode;
 }
 declare const TabsList: React.ForwardRefExoticComponent<TabsListProps & React.RefAttributes<ImageLabel>>;
@@ -24,6 +25,8 @@ declare const TabsBody: React.ForwardRefExoticComponent<TabsBodyProps & React.Re
 export interface TabsProps {
     children?: React.ReactNode;
     defaultValue?: string;
+    value?: string;
+    onValueChange?: (value: string) => void;
 }
 type TabsComponent = React.ForwardRefExoticComponent<TabsProps & React.RefAttributes<Frame>> & {
     List: typeof TabsList;

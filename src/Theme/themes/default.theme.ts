@@ -17,6 +17,19 @@ export const DefaultTheme: ThemeTemplate = {
                 },
             },
 
+            secondary: {
+                default: {
+                    textColor: Color3.fromHex("#1D2433"),
+                    borderColor: Color3.fromHex("#C5CAD3"),
+                    backgroundColor: Color3.fromHex("#E4E7EC"),
+                },
+                hover: {
+                    textColor: Color3.fromHex("#1D2433"),
+                    borderColor: Color3.fromHex("#B8BEC9"),
+                    backgroundColor: Color3.fromHex("#D5D9E0"),
+                },
+            },
+
             success: {
                 default: {
                     textColor: Color3.fromHex("#2E9D63"),
@@ -189,6 +202,13 @@ export const DefaultTheme: ThemeTemplate = {
                         backgroundTransparency: 0,
                     },
                 },
+                secondary: {
+                    default: {
+                        textColor: Color3.fromHex("#FFFFFF"),
+                        backgroundColor: Color3.fromHex("#6B7C93"),
+                        borderColor: Color3.fromHex("#56657A"),
+                    },
+                },
                 success: {
                     default: {
                         textColor: Color3.fromHex("#FFFFFF"),
@@ -234,6 +254,18 @@ export const DefaultTheme: ThemeTemplate = {
                         backgroundTransparency: 0.35,
                         borderColor: Color3.fromHex("#D9DEE8"),
                         textColor: Color3.fromHex("#8A8A8A"),
+                    },
+                },
+                secondary: {
+                    default: {
+                        textColor: Color3.fromHex("#1D2433"),
+                        backgroundColor: Color3.fromHex("#E4E7EC"),
+                        borderColor: Color3.fromHex("#C5CAD3"),
+                    },
+                    hover: {
+                        textColor: Color3.fromHex("#1D2433"),
+                        backgroundColor: Color3.fromHex("#D5D9E0"),
+                        borderColor: Color3.fromHex("#B8BEC9"),
                     },
                 },
                 success: {
@@ -518,6 +550,13 @@ export const DefaultTheme: ThemeTemplate = {
                             borderColor: Color3.fromHex("#D9DEE8"),
                         }
                     },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#6B7C93"),
+                            backgroundTransparency: 0.7,
+                            borderColor: Color3.fromHex("#56657A"),
+                        }
+                    },
                     success: {
                         default: {
                             backgroundColor: Color3.fromHex("#2E9D63"),
@@ -556,6 +595,13 @@ export const DefaultTheme: ThemeTemplate = {
                             backgroundColor: Color3.fromHex("#F5F5F5"),
                             backgroundTransparency: 0,
                             borderColor: Color3.fromHex("#D9DEE8"),
+                        }
+                    },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#6B7C93"),
+                            backgroundTransparency: 0.7,
+                            borderColor: Color3.fromHex("#56657A"),
                         }
                     },
                     success: {
@@ -663,6 +709,11 @@ export const DefaultTheme: ThemeTemplate = {
                             backgroundColor: Color3.fromHex("#477FE8"),
                         },
                     },
+                    secondary: {
+                        default: {
+                            backgroundColor: Color3.fromHex("#6B7C93"),
+                        },
+                    },
                     success: {
                         default: {
                             backgroundColor: Color3.fromHex("#2E9D63"),
@@ -713,6 +764,9 @@ export const DefaultTheme: ThemeTemplate = {
                 primary: {
                     backgroundTransparency: 0
                 },
+                secondary: {
+                    backgroundColor: Color3.fromHex("#E4E7EC"),
+                },
                 success: {
                     backgroundColor: Color3.fromHex("#dcf5e8"),
                 },
@@ -735,6 +789,9 @@ export const DefaultTheme: ThemeTemplate = {
                     primary: {
                         backgroundColor: Color3.fromHex("#000000"),
                         backgroundTransparency: 0.5
+                    },
+                    secondary: {
+                        backgroundColor: Color3.fromHex("#6B7C93"),
                     },
                     success: {
                         backgroundColor: Color3.fromHex("#237D4D"),
@@ -764,6 +821,9 @@ export const DefaultTheme: ThemeTemplate = {
             cornerRadius: 8,
             boxShadow: "2px 2px 2px 2px",
             intents: {
+                secondary: {
+                    textColor: Color3.fromHex("#1D2433")
+                },
                 success: {
                     textColor: Color3.fromHex("#FFFFFF")
                 },

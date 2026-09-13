@@ -5,19 +5,29 @@ import { Text } from "../Typography";
 import { Container } from "./Container";
 import { CleanThemeContext } from "../../Contexts";
 import { BoxShadow, Corners, Gradient, Padding } from "../Decorator";
-import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { CssBackgroundGradient, PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
 import { CssBackgroundImage } from "../../Theme";
 
 interface TabsContextValue {
     selected: string | undefined;
-    setSelected: React.Dispatch<React.SetStateAction<string | undefined>>;
+    claimTab: (value: string) => void;
+    selectTab: (value: string) => void;
 }
 
 const TabsContext = React.createContext<TabsContextValue>({
     selected: undefined,
-    setSelected: () => { },
+    claimTab: () => { },
+    selectTab: () => { },
+});
+
+interface TabsListContextValue {
+    fill: boolean;
+}
+
+const TabsListContext = React.createContext<TabsListContextValue>({
+    fill: false,
 });
 
 interface TabTitleProps extends PaddingProps {
@@ -25,14 +35,63 @@ interface TabTitleProps extends PaddingProps {
     text: string;
 }
 
+function TabButtonCorners() {
+    const theme = React.useContext(CleanThemeContext);
+    const cornerRadius = theme.components.tabs.button.cornerRadius;
+
+    if (!typeIs(cornerRadius, "table")) {
+        return <Corners radius={theme.components.tabs.list.cornerRadius} />;
+    }
+
+    const fallback = SizeHelper.toUDim(theme.components.tabs.list.cornerRadius);
+    const topLeftRadius = cornerRadius.topLeft !== undefined ? CssHelper.parseCssSize(cornerRadius.topLeft) : fallback;
+    const topRightRadius = cornerRadius.topRight !== undefined ? CssHelper.parseCssSize(cornerRadius.topRight) : fallback;
+    const bottomLeftRadius = cornerRadius.bottomLeft !== undefined ? CssHelper.parseCssSize(cornerRadius.bottomLeft) : fallback;
+    const bottomRightRadius = cornerRadius.bottomRight !== undefined ? CssHelper.parseCssSize(cornerRadius.bottomRight) : fallback;
+
+    const isZero = (radius: UDim) => radius.Scale === 0 && radius.Offset === 0;
+
+    if (isZero(topLeftRadius) && isZero(topRightRadius) && isZero(bottomLeftRadius) && isZero(bottomRightRadius)) {
+        return undefined;
+    }
+
+    return <uicorner
+        key="Corners"
+        TopLeftRadius={topLeftRadius}
+        TopRightRadius={topRightRadius}
+        BottomLeftRadius={bottomLeftRadius}
+        BottomRightRadius={bottomRightRadius}
+    />;
+}
+
 function TabButtonContent(props: TabTitleProps) {
     const theme = React.useContext(CleanThemeContext);
     const hover = React.useContext(HoverButtonContext);
+    const { fill } = React.useContext(TabsListContext);
     const intent = ColorHelper.getIntentColors(theme, "primary", hover?.isSelected ? "focus" : hover?.hover ? "hover" : "default", theme.components.tabs.button.intents);
+    const borderThickness = intent.borderThickness ?? theme.components.tabs.button.borderThickness;
     return <>
-        <Corners radius={theme.components.tabs.list.cornerRadius} />
+        <TabButtonCorners />
+        {borderThickness > 0 && (
+            <uistroke
+                key="Stroke"
+                Thickness={borderThickness}
+                BorderStrokePosition={Enum.BorderStrokePosition.Inner}
+                Color={intent.borderColor}
+            />
+        )}
+        <Gradient value={intent.backgroundGradient} />
         <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding)} />
         <BoxShadow value={intent.boxShadow} />
+        {fill && (
+            <uilistlayout
+                key="TitleLayout"
+                FillDirection={Enum.FillDirection.Horizontal}
+                HorizontalAlignment={Enum.HorizontalAlignment.Center}
+                VerticalAlignment={Enum.VerticalAlignment.Center}
+                SortOrder={Enum.SortOrder.LayoutOrder}
+            />
+        )}
         <Text
             name="TabTitleText"
             TextColor3={intent.textColor}
@@ -44,11 +103,12 @@ function TabButtonContent(props: TabTitleProps) {
 
 function TabTitle(props: TabTitleProps) {
     const theme = React.useContext(CleanThemeContext);
-    const { selected, setSelected } = React.useContext(TabsContext);
+    const { selected, claimTab, selectTab } = React.useContext(TabsContext);
+    const { fill } = React.useContext(TabsListContext);
     const isSelected = selected === props.value;
 
     React.useEffect(() => {
-        setSelected((current) => current ?? props.value);
+        claimTab(props.value);
     }, []);
 
     const buttonDefault = ColorHelper.getIntentColors(
@@ -81,7 +141,7 @@ function TabTitle(props: TabTitleProps) {
             name={`TabButton-${props.value}`}
             default={{
                 Size: UDim2.fromScale(0, 0),
-                AutomaticSize: Enum.AutomaticSize.XY,
+                AutomaticSize: fill ? Enum.AutomaticSize.Y : Enum.AutomaticSize.XY,
                 BackgroundColor3: buttonDefault.backgroundColor,
                 BackgroundTransparency: buttonDefault.backgroundTransparency,
                 BorderSizePixel: 0,
@@ -95,7 +155,7 @@ function TabTitle(props: TabTitleProps) {
                 TileSize: buttonDefaultBackgroundImage.TileSize,
                 Event: {
                     Activated: () => {
-                        setSelected(props.value);
+                        selectTab(props.value);
                     }
                 }
             }} hover={{
@@ -143,6 +203,7 @@ function TabContent(props: TabContentProps) {
 }
 
 interface TabsListProps extends ScalableElementProps {
+    fill?: boolean;
     children?: React.ReactNode;
 }
 
@@ -161,9 +222,15 @@ const TabsList = React.forwardRef<ImageLabel, TabsListProps>(
                 <Corners radius={theme.components.tabs.list.cornerRadius} />
                 <Gradient value={theme.components.tabs.list.backgroundGradient} />
                 <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.list.spacing, theme.components.tabs.list.padding)} />
-                <HStack>
-                    {props.children}
-                </HStack>
+                <TabsListContext.Provider value={{ fill: props.fill === true }}>
+                    <HStack
+                        HorizontalFlex={props.fill ? Enum.UIFlexAlignment.Fill : undefined}
+                        Wraps={props.fill ? false : undefined}
+                        Padding={theme.components.tabs.list.gap !== undefined ? new UDim(0, theme.components.tabs.list.gap) : undefined}
+                    >
+                        {props.children}
+                    </HStack>
+                </TabsListContext.Provider>
             </Container>
         );
     });
@@ -184,12 +251,14 @@ const TabsBody = React.forwardRef<ImageLabel, TabsBodyProps>(
                 ref={ref}
                 width="100%"
                 backgroundImage={props.backgroundImage ?? theme.components.tabs.backgroundImage}>
-                <uistroke
-                    key="Stroke"
-                    Thickness={theme.components.tabs.borderThickness}
-                    BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-                    Color={theme.components.tabs.borderColor}
-                />
+                {theme.components.tabs.borderThickness > 0 && (
+                    <uistroke
+                        key="Stroke"
+                        Thickness={theme.components.tabs.borderThickness}
+                        BorderStrokePosition={Enum.BorderStrokePosition.Inner}
+                        Color={theme.components.tabs.borderColor}
+                    />
+                )}
                 <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.tabs.spacing, theme.components.tabs.padding)} />
                 <Corners radius={theme.components.tabs.cornerRadius} />
                 <Gradient value={props.backgroundGradient ?? theme.components.tabs.backgroundGradient} />
@@ -202,6 +271,8 @@ const TabsBody = React.forwardRef<ImageLabel, TabsBodyProps>(
 export interface TabsProps {
     children?: React.ReactNode;
     defaultValue?: string;
+    value?: string;
+    onValueChange?: (value: string) => void;
 }
 
 type TabsComponent = React.ForwardRefExoticComponent<
@@ -214,16 +285,34 @@ type TabsComponent = React.ForwardRefExoticComponent<
 };
 
 const Tabs = React.forwardRef<Frame, TabsProps>((props, _ref) => {
-    const [selected, setSelected] = React.useState<string | undefined>(props.defaultValue);
+    const theme = React.useContext(CleanThemeContext);
+    const [uncontrolledSelected, setUncontrolledSelected] = React.useState<string | undefined>(props.defaultValue);
+
+    const controlled = props.value !== undefined;
+    const selected = controlled ? props.value : uncontrolledSelected;
+    const onValueChange = props.onValueChange;
 
     const contextValue = React.useMemo<TabsContextValue>(
-        () => ({ selected, setSelected }),
-        [selected],
+        () => ({
+            selected,
+            claimTab: (value) => {
+                if (!controlled) {
+                    setUncontrolledSelected((current) => current ?? value);
+                }
+            },
+            selectTab: (value) => {
+                if (!controlled) {
+                    setUncontrolledSelected(value);
+                }
+                onValueChange?.(value);
+            },
+        }),
+        [selected, controlled, onValueChange],
     );
 
     return (
         <TabsContext.Provider value={contextValue}>
-            <VStack>{props.children}</VStack>
+            <VStack Padding={theme.components.tabs.gap !== undefined ? new UDim(0, theme.components.tabs.gap) : undefined}>{props.children}</VStack>
         </TabsContext.Provider>
     );
 }) as TabsComponent;

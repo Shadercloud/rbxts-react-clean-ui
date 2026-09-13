@@ -428,6 +428,8 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         return () => connection.Disconnect();
     }, [fieldset?.labelActivated, activateSelect]);
 
+    const themeBackgroundTransparency = theme.components.select.backgroundTransparency ?? 1;
+
     if (open && overlay.overlay === undefined) {
         warn(
             "You have used a Select component without using the Overlay Provider",
@@ -441,8 +443,11 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
             {...props}
             Size={UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
+            BackgroundColor3={props.BackgroundColor3 ?? theme.components.select.backgroundColor}
+            BackgroundTransparency={props.BackgroundTransparency ?? themeBackgroundTransparency}
             backgroundImage={props.backgroundImage ?? theme.components.select.backgroundImage}
         >
+            {themeBackgroundTransparency < 1 && <Corners radius={theme.components.select.cornerRadius} />}
             <Gradient value={props.backgroundGradient ?? theme.components.select.backgroundGradient} />
             <SelectContext.Provider value={context}>
                 <imagebutton
@@ -466,9 +471,10 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                                 name="SelectedText"
                                 text={selectedOption?.props.text ?? "No Options"}
                                 typography={typography}
+                                TextColor3={theme.components.select.textColor}
                             />
                         </FlexItem>
-                        <Icon name="SelectCaret" icon="caret-down" color={theme.colors.intents.primary.default.textColor} />
+                        <Icon name="SelectCaret" icon="caret-down" color={theme.components.select.iconColor ?? theme.colors.intents.primary.default.textColor} />
                     </HStack>
 
                     {open &&

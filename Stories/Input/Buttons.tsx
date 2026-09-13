@@ -6,6 +6,7 @@ function Buttons(props: {disabled?: boolean; screenshot?: boolean}) {
     const content = (
         <VStack>
             <Button icon="smile-o" text="Primary" intent="primary" disabled={props.disabled} />
+            <Button icon="circle-o" text="Secondary" intent="secondary" disabled={props.disabled} />
             <Button icon="check" text="Success" intent="success" disabled={props.disabled} />
             <Button icon="info" text="Info" intent="info" disabled={props.disabled} />
             <Button icon="exclamation" text="Warning" intent="warning" disabled={props.disabled} />
