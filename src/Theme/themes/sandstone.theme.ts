@@ -164,6 +164,49 @@ export const SandstoneTheme = createTheme({
             boxShadow: "0px 3px 8px 0px",
         },
 
+        badge: {
+            cornerRadius: 4,
+            borderThickness: 1,
+            intents: {
+                primary: {
+                    default: {
+                        textColor: Color3.fromHex("#244F4A"),
+                        backgroundColor: Color3.fromHex("#D9E9E5"),
+                        borderColor: Color3.fromHex("#4E8179"),
+                        backgroundTransparency: 0,
+                    },
+                },
+                success: {
+                    default: {
+                        textColor: Color3.fromHex("#2E6245"),
+                        backgroundColor: Color3.fromHex("#DDEBDD"),
+                        borderColor: Color3.fromHex("#5B8A6A"),
+                    },
+                },
+                info: {
+                    default: {
+                        textColor: Color3.fromHex("#365F78"),
+                        backgroundColor: Color3.fromHex("#DDEAF0"),
+                        borderColor: Color3.fromHex("#6F98AE"),
+                    },
+                },
+                warning: {
+                    default: {
+                        textColor: Color3.fromHex("#7A5721"),
+                        backgroundColor: Color3.fromHex("#F5E8C8"),
+                        borderColor: Color3.fromHex("#C3994C"),
+                    },
+                },
+                danger: {
+                    default: {
+                        textColor: Color3.fromHex("#8A3D3A"),
+                        backgroundColor: Color3.fromHex("#F2D9D5"),
+                        borderColor: Color3.fromHex("#B46861"),
+                    },
+                },
+            },
+        },
+
         button: {
             backgroundTransparency: 0,
             borderThickness: 1,

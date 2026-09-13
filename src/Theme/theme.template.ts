@@ -64,6 +64,15 @@ export interface ThemeTemplate {
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
 
+        badge: {
+            cornerRadius: CssSize;
+            borderThickness: number;
+            spacing?: ScaleSizeValue<number>;
+            padding?: ScaledCssPadding;
+            typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+            intents?: Partial<Record<Intent, InlineIntentColors>>;
+        };
+
         button: {
             backgroundTransparency: number;
             cornerRadius: CssSize;

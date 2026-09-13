@@ -42,6 +42,56 @@ export const WoodenTheme = createTheme({
         }
     },
     components: {
+        badge: {
+            cornerRadius: "4px",
+            borderThickness: 2,
+            padding: "2px 10px",
+            typography: {
+                xs: { font, size: Enum.FontSize.Size18, weight: Enum.FontWeight.Regular },
+                sm: { font, size: Enum.FontSize.Size18, weight: Enum.FontWeight.Regular },
+                md: { font, size: Enum.FontSize.Size18, weight: Enum.FontWeight.Regular },
+                lg: { font, size: Enum.FontSize.Size18, weight: Enum.FontWeight.Regular },
+                xl: { font, size: Enum.FontSize.Size18, weight: Enum.FontWeight.Regular },
+            },
+            intents: {
+                primary: {
+                    default: {
+                        textColor: Color3.fromHex("#FFF7CF"),
+                        borderColor: Color3.fromHex("#3D2712"),
+                        backgroundColor: Color3.fromHex("#7A4A20"),
+                        backgroundTransparency: 0,
+                    },
+                },
+                success: {
+                    default: {
+                        textColor: Color3.fromHex("#FFF7CF"),
+                        borderColor: Color3.fromHex("#3D2712"),
+                        backgroundColor: Color3.fromHex("#4E6A24"),
+                    },
+                },
+                info: {
+                    default: {
+                        textColor: Color3.fromHex("#FFF7CF"),
+                        borderColor: Color3.fromHex("#3D2712"),
+                        backgroundColor: Color3.fromHex("#2C5270"),
+                    },
+                },
+                warning: {
+                    default: {
+                        textColor: Color3.fromHex("#FFF7CF"),
+                        borderColor: Color3.fromHex("#3D2712"),
+                        backgroundColor: Color3.fromHex("#A67A20"),
+                    },
+                },
+                danger: {
+                    default: {
+                        textColor: Color3.fromHex("#FFF7CF"),
+                        borderColor: Color3.fromHex("#3D2712"),
+                        backgroundColor: Color3.fromHex("#7A3220"),
+                    },
+                },
+            },
+        },
         button: {
             cornerRadius: 0,
             backgroundTransparency: 1,

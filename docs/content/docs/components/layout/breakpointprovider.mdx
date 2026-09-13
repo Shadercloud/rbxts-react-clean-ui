@@ -1,0 +1,282 @@
+---
+title: BreakpointProvider
+description: Measure a region's width and share the active breakpoint with every component inside it.
+icon: MonitorSmartphone
+---
+
+`BreakpointProvider` is a transparent Roblox [`Frame`](https://create.roblox.com/docs/reference/engine/classes/Frame) that measures its own width, resolves the active breakpoint (`xs`, `sm`, `md`, `lg`, or `xl`), and publishes it to its descendants through `BreakpointContext`. The `useBreakpoint` and `useBreakpointValue` hooks read that breakpoint so any component can switch layout, sizes, or content per screen size.
+
+## Import
+
+```tsx
+import { BreakpointProvider, useBreakpoint, useBreakpointValue } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+Wrap a region in `BreakpointProvider`, then call `useBreakpoint` from any component inside it.
+
+```tsx
+import React from "@rbxts/react";
+import { BreakpointProvider, Container, Text, useBreakpoint } from "@rbxts/react-clean-ui";
+
+function CurrentBreakpoint() {
+    const breakpoint = useBreakpoint();
+
+    return <Text text={`Breakpoint: ${breakpoint}`} />;
+}
+
+export function BreakpointExample() {
+    return (
+        <Container width="100%" height="100%">
+            <BreakpointProvider
+                breakpoints={{ xs: 0, sm: 360, md: 600, lg: 900, xl: 1200 }}
+            >
+                <CurrentBreakpoint />
+            </BreakpointProvider>
+        </Container>
+    );
+}
+```
+
+<Callout type="warn">
+The shipped themes' `theme.breakpoints` are very small: `xs: 100`, `sm: 200`, `md: 300`, `lg: 400`, `xl: 500`. They were chosen for measuring small containers such as a `Row` or `Grid`, not whole screens. Measured against a screen, a 390px-wide phone resolves to `md` and almost every other device resolves to `xl`. For screen-level layouts, pass your own `breakpoints` (see [Custom breakpoints](#custom-breakpoints)).
+</Callout>
+
+## Breakpoints
+
+A width resolves to the largest breakpoint whose threshold it has reached. Anything below `sm` is `xs`, whatever the `xs` value is set to.
+
+| Breakpoint | Default threshold | Suggested screen threshold |
+| ---------- | ----------------- | -------------------------- |
+| `xs`       | `100`             | `0`                        |
+| `sm`       | `200`             | `360`                      |
+| `md`       | `300`             | `600`                      |
+| `lg`       | `400`             | `900`                      |
+| `xl`       | `500`             | `1200`                     |
+
+The "suggested" column is only an example; pick thresholds that suit your game's layouts.
+
+## Custom breakpoints
+
+Pass `breakpoints` to override `theme.breakpoints` for a single provider.
+
+```tsx
+const SCREEN_BREAKPOINTS = { xs: 0, sm: 360, md: 600, lg: 900, xl: 1200 };
+
+<BreakpointProvider breakpoints={SCREEN_BREAKPOINTS}>
+    ...
+</BreakpointProvider>
+```
+
+To change them everywhere, including `Row`, `Grid`, and the no-provider fallback of `useBreakpoint`, set `breakpoints` in a custom theme.
+
+```tsx
+import { createTheme, ThemeProvider } from "@rbxts/react-clean-ui";
+
+const theme = createTheme({
+    breakpoints: { xs: 0, sm: 360, md: 600, lg: 900, xl: 1200 },
+});
+
+<ThemeProvider theme={theme}>
+    ...
+</ThemeProvider>
+```
+
+## Measuring its own frame
+
+The provider measures its own frame's width, not the screen. It renders a frame sized `UDim2.fromScale(1, 1)`, so it takes the size of whatever it is placed in. This makes it work inside fixed-size frames, such as a 390x844 phone preview in a UI Labs story, and in panels that only take part of the screen.
+
+```tsx
+<Container width={390} height={844}>
+    <BreakpointProvider breakpoints={SCREEN_BREAKPOINTS}>
+        <VStack spacing="sm" Wraps={false} />
+        ...
+    </BreakpointProvider>
+</Container>
+```
+
+Because the provider renders a real `Frame`, layout objects such as `VStack` and padding placed inside it apply to its children.
+
+## useBreakpoint
+
+`useBreakpoint()` returns the active `Breakpoint` of the nearest `BreakpointProvider` above the component.
+
+```tsx
+function Sidebar() {
+    const breakpoint = useBreakpoint();
+
+    if (breakpoint === "xs" || breakpoint === "sm") {
+        return undefined;
+    }
+
+    return <Box width={240} height="100%">...</Box>;
+}
+```
+
+### Without a provider
+
+When no `BreakpointProvider` is mounted above it, `useBreakpoint` falls back to the width of the camera viewport (`Workspace.CurrentCamera.ViewportSize.X`), resolved against `theme.breakpoints`. It follows `Workspace.CurrentCamera` being replaced, and only re-renders its component when the viewport's breakpoint changes.
+
+If `CurrentCamera` is `nil`, the hook keeps its last breakpoint, or returns `"xs"` if there has never been a camera.
+
+<Callout type="info">
+The fallback always uses `theme.breakpoints`, so with the shipped themes it resolves almost any real screen to `xl`. Either mount a `BreakpointProvider` with custom `breakpoints`, or set `breakpoints` in your theme.
+</Callout>
+
+## useBreakpointValue
+
+`useBreakpointValue(value)` picks a value for the current breakpoint.
+
+* A plain value is returned as-is.
+* An object keyed by breakpoint returns the entry for the current breakpoint. When that entry isn't set, it falls back down the scale (`xl` to `lg` to `md` to `sm` to `xs`) and uses the first one it finds.
+* When nothing is set at or below the current breakpoint, it returns `undefined`. Provide an `xs` entry, or a `??` fallback, when you always need a value.
+
+```tsx
+const columns = useBreakpointValue({ xs: 1, md: 2, xl: 4 });
+// xs, sm -> 1    md, lg -> 2    xl -> 4
+
+const padding = useBreakpointValue({ md: 24 }) ?? 12;
+// xs, sm -> undefined, so 12    md and up -> 24
+
+const title = useBreakpointValue("Worlds");
+// always "Worlds"
+```
+
+## Example: responsive world list
+
+On wide screens each world shows as a table-style row with columns. On phones the same data is stacked into two lines. A `Badge` shows the player count in both layouts.
+
+```tsx
+import React from "@rbxts/react";
+import {
+    Badge,
+    Box,
+    BreakpointProvider,
+    Button,
+    Container,
+    HStack,
+    Text,
+    useBreakpointValue,
+    VStack,
+} from "@rbxts/react-clean-ui";
+
+const SCREEN_BREAKPOINTS = { xs: 0, sm: 360, md: 600, lg: 900, xl: 1200 };
+
+const WORLDS = [
+    { title: "Obby Tower", genre: "Obby", players: "18 / 20" },
+    { title: "Sandbox City", genre: "Sandbox", players: "7 / 30" },
+    { title: "Racing League", genre: "Racing", players: "12 / 12" },
+];
+
+interface WorldRowProps {
+    title: string;
+    genre: string;
+    players: string;
+    LayoutOrder: number;
+}
+
+function WorldRow(props: WorldRowProps) {
+    const layout = useBreakpointValue({ xs: "stacked", md: "table" }) ?? "stacked";
+
+    if (layout === "table") {
+        return (
+            <Box width="100%" AutomaticSize="Y" LayoutOrder={props.LayoutOrder}>
+                <HStack valign="Center" Wraps={false} />
+                <Container name="Title" width={240} AutomaticSize="Y" LayoutOrder={1}>
+                    <Text text={props.title} variant="heading" />
+                </Container>
+                <Container name="Genre" width={140} AutomaticSize="Y" LayoutOrder={2}>
+                    <Text text={props.genre} variant="caption" />
+                </Container>
+                <Container name="Players" width={120} AutomaticSize="Y" LayoutOrder={3}>
+                    <Badge icon="users" text={props.players} intent="info" />
+                </Container>
+                <Button text="Join" intent="primary" LayoutOrder={4} />
+            </Box>
+        );
+    }
+
+    return (
+        <Box width="100%" AutomaticSize="Y" LayoutOrder={props.LayoutOrder}>
+            <VStack spacing="xs" />
+            <Text text={props.title} variant="heading" LayoutOrder={1} />
+            <Container name="SecondLine" AutomaticSize="XY" LayoutOrder={2}>
+                <HStack valign="Center" Wraps={false} />
+                <Badge icon="users" text={props.players} intent="info" scale="sm" LayoutOrder={1} />
+                <Button text="Join" intent="primary" scale="sm" LayoutOrder={2} />
+            </Container>
+        </Box>
+    );
+}
+
+export function WorldList() {
+    return (
+        <Container width="100%" height="100%">
+            <BreakpointProvider breakpoints={SCREEN_BREAKPOINTS}>
+                <VStack spacing="sm" Wraps={false} />
+                {WORLDS.map((world, index) => (
+                    <WorldRow
+                        key={world.title}
+                        title={world.title}
+                        genre={world.genre}
+                        players={world.players}
+                        LayoutOrder={index + 1}
+                    />
+                ))}
+            </BreakpointProvider>
+        </Container>
+    );
+}
+```
+
+## BreakpointContext
+
+`BreakpointContext` is exported for cases where you need more than the breakpoint. Its value is `{ width: number, breakpoint: Breakpoint }`, or `undefined` when no provider is mounted above.
+
+```tsx
+const context = React.useContext(BreakpointContext);
+
+<Text text={`Width at last change: ${context?.width ?? 0}px`} />
+```
+
+`width` is the provider's width **at the moment the breakpoint last changed** (or at its first measurement), not a live width. To react to every pixel of resizing, measure the frame yourself with `Change.AbsoluteSize`.
+
+## Props
+
+### BreakpointProvider-specific props
+
+| Prop          | Type              | Default                | Description                                                   |
+| ------------- | ----------------- | ---------------------- | ------------------------------------------------------------- |
+| `children`    | `React.ReactNode` | `undefined`            | Content that can read the breakpoint.                         |
+| `name`        | `string`          | `"BreakpointProvider"` | Name assigned to the underlying `Frame`.                      |
+| `LayoutOrder` | `number`          | `undefined`            | Native Roblox layout order.                                   |
+
+### Shared props
+
+The provider also supports props inherited from the following interfaces.
+
+| Interface                | Purpose                                                                  |
+| ------------------------ | ------------------------------------------------------------------------ |
+| `BreakPointElementProps` | Configures the `breakpoints` prop, overriding `theme.breakpoints`.       |
+
+### Hooks
+
+| Hook                        | Returns            | Description                                                                                         |
+| --------------------------- | ------------------ | --------------------------------------------------------------------------------------------------- |
+| `useBreakpoint()`           | `Breakpoint`       | The nearest provider's breakpoint, or the camera viewport's breakpoint when there is no provider.   |
+| `useBreakpointValue(value)` | `T \| undefined`   | Resolves a plain value or a per-breakpoint object for the current breakpoint, falling back down the scale. |
+
+## Behaviour
+
+* The provider renders a transparent frame sized `UDim2.fromScale(1, 1)` with no automatic sizing, and measures its own `AbsoluteSize.X`. Inside a parent that sizes to its content, it has nothing to measure; give its parent a size.
+* The context value only changes when the resolved breakpoint changes. Resizing within one breakpoint doesn't re-render the provider or any component reading the breakpoint.
+* Before the first measurement the provider publishes `{ width: 0, breakpoint: "xs" }` (with the shipped breakpoints), then updates once it has measured itself on mount.
+* Changing `breakpoints` re-resolves against the last measured width, and only updates the context if the breakpoint is different.
+* Without a provider, `useBreakpoint` subscribes to the camera's `ViewportSize`, and disconnects on unmount or when a provider appears above it.
+* `Row`, `Grid`, and `Fieldset` measure their own width and don't read `BreakpointContext`, so they aren't affected by a surrounding provider.
+* The ref forwards to the provider's root `Frame`.
+
+## Theme values
+
+`BreakpointProvider` has no `theme.components` entry. It reads `theme.breakpoints` for its thresholds when `breakpoints` isn't passed, and `useBreakpoint` reads `theme.breakpoints` when there's no provider.

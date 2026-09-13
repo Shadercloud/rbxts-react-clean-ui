@@ -33,3 +33,7 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 ## src/Interfaces/css.types.ts
 
 - `CssCalcSize` is kept separate from `CssSize` on purpose. Folding the calc template literals into `CssSize` multiplies through `CssDual`/`CssQuad` and hits TypeScript's "union type that is too complex to represent" error at call sites that spread props with several quad fields (e.g. `<BoxShadow {...props} />` in `Button`). Use `CssCalcSize` only where a calc term is needed (currently `CssPosition.width`).
+
+## src/Contexts/breakpoint.context.ts
+
+- `BreakpointContext`, `useBreakpoint` and `useBreakpointValue` are specified with their provider in [layout/breakpointprovider.md](../specifications/components/layout/breakpointprovider.md), including the implementation notes on hook ordering and the camera/viewport fallback.

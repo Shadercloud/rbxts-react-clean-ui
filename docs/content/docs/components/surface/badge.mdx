@@ -1,0 +1,260 @@
+---
+title: Badge
+description: A small, non-interactive pill for counts, statuses, and short labels.
+icon: Tag
+---
+
+`Badge` is a compact, themed label built on Roblox's native [`ImageLabel`](https://create.roblox.com/docs/reference/engine/classes/ImageLabel). It shows a count, status, or short piece of text, optionally preceded by an icon, and sizes itself to its content.
+
+## Import
+
+```tsx
+import { Badge } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Surface/Badge.loom.tsx" previewHeight={200} screenshot="/images/screenshots/Surface/Badge.png">
+```tsx
+import React from "@rbxts/react";
+import { Badge, Box, Container, HStack } from "@rbxts/react-clean-ui";
+
+export function BadgeExample() {
+    return (
+        <Container width="80%" height="100" center>
+            <Box>
+                <HStack valign="Center" Wraps={false}>
+                    <Badge LayoutOrder={1} text="Primary" intent="primary" />
+                    <Badge LayoutOrder={2} text="Success" intent="success" />
+                    <Badge LayoutOrder={3} text="Info" intent="info" />
+                    <Badge LayoutOrder={4} text="Warning" intent="warning" />
+                    <Badge LayoutOrder={5} text="Danger" intent="danger" />
+                </HStack>
+            </Box>
+        </Container>
+    );
+}
+```
+</Demo>
+
+The `text` prop is required and renders the label.
+
+```tsx
+<Badge text="New" />
+<Badge text="12" intent="danger" />
+```
+
+## Intents
+
+Set `intent` to control the badge's background, border, and text/icon colors. When `intent` is omitted, `primary` is used.
+
+```tsx
+<Badge text="Primary" intent="primary" />
+<Badge text="Success" intent="success" />
+<Badge text="Info" intent="info" />
+<Badge text="Warning" intent="warning" />
+<Badge text="Danger" intent="danger" />
+```
+
+In the default theme, `primary` is a neutral light-grey pill with dark text, while the other intents use solid intent-colored backgrounds with white text.
+
+## Icons
+
+Set `icon` to draw an icon before the text. The icon is tinted with the same color as the text.
+
+<Demo preview="Scenes/Surface/BadgeIcons.loom.tsx" previewHeight={200}>
+```tsx
+import React from "@rbxts/react";
+import { Badge, Box, Container, HStack } from "@rbxts/react-clean-ui";
+
+export function BadgeIconsExample() {
+    return (
+        <Container width="80%" height="100" center>
+            <Box>
+                <HStack valign="Center" Wraps={false}>
+                    <Badge LayoutOrder={1} text="3" icon="smile-o" intent="primary" />
+                    <Badge LayoutOrder={2} text="Online" icon="check" intent="success" />
+                    <Badge LayoutOrder={3} text="New" icon="info" intent="info" />
+                    <Badge LayoutOrder={4} text="12" icon="exclamation" intent="warning" />
+                    <Badge LayoutOrder={5} text="Banned" icon="times" intent="danger" />
+                </HStack>
+            </Box>
+        </Container>
+    );
+}
+```
+</Demo>
+
+The gap between the icon and the text is half of the resolved spacing at the badge's scale, rounded up, the same gap `HStack` uses by default.
+
+## Scaling
+
+`Badge` supports the shared `scale` prop, which moves the text size, icon size, padding, and icon/text gap together.
+
+<Demo preview="Scenes/Surface/BadgeScales.loom.tsx" previewHeight={220}>
+```tsx
+import React from "@rbxts/react";
+import { Badge, Box, Container, HStack } from "@rbxts/react-clean-ui";
+
+export function BadgeScalesExample() {
+    return (
+        <Container width="80%" height="120" center>
+            <Box>
+                <HStack valign="Center" Wraps={false}>
+                    <Badge LayoutOrder={1} text="Extra small" scale="xs" intent="info" />
+                    <Badge LayoutOrder={2} text="Small" scale="sm" intent="info" />
+                    <Badge LayoutOrder={3} text="Medium" scale="md" intent="info" />
+                    <Badge LayoutOrder={4} text="Large" scale="lg" intent="info" />
+                    <Badge LayoutOrder={5} text="Extra large" scale="xl" intent="info" />
+                </HStack>
+            </Box>
+        </Container>
+    );
+}
+```
+</Demo>
+
+Available scales are `xs`, `sm`, `md`, `lg`, and `xl`. When `scale` is not provided, the component uses `theme.default.scale`.
+
+<Callout type="info">
+The Wooden theme uses the same text style (PatrickHand, `Size18`, regular) and the same `"2px 10px"` padding at every scale, so Wooden badges look the same size whatever `scale` you pass. Only the icon size and the icon/text gap still follow `scale`.
+</Callout>
+
+## Placing a badge
+
+`Badge` sizes to its content and never stretches to fill its parent, so it sits naturally next to other content in a stack. Use `LayoutOrder` to order it inside a layout.
+
+<Demo preview="Scenes/Surface/BadgeUsage.loom.tsx" previewHeight={360}>
+```tsx
+import React from "@rbxts/react";
+import { Badge, Box, Button, Container, HStack, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function BadgeUsageExample() {
+    return (
+        <Container width="80%" height="260" center>
+            <Box>
+                <VStack>
+                    <Container name="InboxRow" LayoutOrder={1}>
+                        <HStack valign="Center" Wraps={false}>
+                            <Text LayoutOrder={1} text="Inbox" TextWrap={false} />
+                            <Badge LayoutOrder={2} text="24" intent="danger" />
+                        </HStack>
+                    </Container>
+                    <Container name="FriendsRow" LayoutOrder={2}>
+                        <HStack valign="Center" Wraps={false}>
+                            <Text LayoutOrder={1} text="Friends online" TextWrap={false} />
+                            <Badge LayoutOrder={2} text="5" icon="check" intent="success" />
+                        </HStack>
+                    </Container>
+                    <Container name="QuestsRow" LayoutOrder={3}>
+                        <HStack valign="Center" Wraps={false}>
+                            <Text LayoutOrder={1} text="Daily quests" TextWrap={false} />
+                            <Badge LayoutOrder={2} text="New" intent="info" scale="sm" />
+                        </HStack>
+                    </Container>
+                    <Container name="ButtonRow" LayoutOrder={4}>
+                        <HStack valign="Center" Wraps={false}>
+                            <Button LayoutOrder={1} text="Notifications" />
+                            <Badge LayoutOrder={2} text="99+" intent="warning" />
+                        </HStack>
+                    </Container>
+                </VStack>
+            </Box>
+        </Container>
+    );
+}
+```
+</Demo>
+
+Outside a layout, set `Position` and `AnchorPoint` to place the badge yourself.
+
+```tsx
+<Badge
+    text="Live"
+    intent="danger"
+    scale="xs"
+    Position={new UDim2(1, -4, 0, 4)}
+    AnchorPoint={new Vector2(1, 0)}
+/>
+```
+
+## Theming
+
+`Badge` has no color, padding, or size props of its own; its look comes entirely from `theme.components.badge`. Use `createTheme` (or `extendTheme`) to change it theme-wide, then apply it with `ThemeProvider`.
+
+```tsx
+import { Badge, createTheme, ThemeProvider } from "@rbxts/react-clean-ui";
+
+const themeWithSquareBadges = createTheme({
+    components: {
+        badge: {
+            cornerRadius: "4px",
+            borderThickness: 0,
+            padding: "2px 8px",
+            intents: {
+                danger: {
+                    default: {
+                        textColor: Color3.fromHex("#FFFFFF"),
+                        backgroundColor: Color3.fromHex("#B91C1C"),
+                        borderColor: Color3.fromHex("#B91C1C"),
+                    },
+                },
+            },
+        },
+    },
+});
+
+<ThemeProvider theme={themeWithSquareBadges}>
+    <Badge text="Offline" intent="danger" />
+</ThemeProvider>
+```
+
+<Callout type="warn">
+The default theme's `badge.typography` is keyed by scale (`xs`–`xl`), and themes are deep-merged. If you override it with a plain object such as `{ size: Enum.FontSize.Size14 }`, the scale keys survive the merge and your plain fields are ignored. Override typography per scale key instead, as the Wooden theme does.
+</Callout>
+
+Set `backgroundColor`, `borderColor`, and `textColor` for every intent you customize. The component's `primary` entry is layered over each intent's theme colors, so any field left unset on an intent can inherit `primary`'s neutral pill colors.
+
+## Props
+
+### Badge-specific props
+
+| Prop          | Type       | Default     | Description                                                   |
+| ------------- | ---------- | ----------- | ------------------------------------------------------------- |
+| `text`        | `string`   | Required    | The label shown in the badge. Never wraps.                    |
+| `icon`        | `IconName` | `undefined` | Renders an icon before the text, tinted with the text color.  |
+| `name`        | `string`   | `"Badge"`   | Name assigned to the underlying `ImageLabel`.                 |
+| `LayoutOrder` | `number`   | `undefined` | Native Roblox layout order.                                   |
+| `Position`    | `UDim2`    | `undefined` | Native Roblox position.                                       |
+| `AnchorPoint` | `Vector2`  | `undefined` | Native Roblox anchor point.                                   |
+
+### Shared props
+
+The badge also supports props inherited from the following interfaces.
+
+| Interface              | Purpose                                                                 |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `IntentElementProps`   | Configures the badge's color scheme. Defaults to `primary`.             |
+| `ScalableElementProps` | Configures text size, icon size, padding, and icon/text gap together.   |
+| `IconElementProps`     | Configures the `icon` prop's accepted values.                           |
+
+## Behaviour
+
+* The badge sizes to its content (`AutomaticSize.XY` with a zero base size) and never stretches to its parent's width.
+* The badge never takes input: its `ImageLabel` has `Active` and `Selectable` set to `false`, and no events are wired. There are no hover or disabled states; colors always resolve from the intent's `default` state.
+* Content is laid out left to right and vertically centered, without wrapping: the optional icon first, then the text. Text wrapping is disabled.
+* An inner border stroke only renders when the theme's `borderThickness` is greater than `0`.
+* When the resolved intent has no `backgroundImage`, the image is cleared (`Image=""`), so a flat badge never shows a stale image.
+* The ref forwards to the root `ImageLabel`.
+
+## Theme values
+
+The badge uses values from `theme.components.badge` for:
+
+* `cornerRadius` — the corner radius (`"50%"` for a pill in the default and dark themes, `"4px"` in Sandstone and Wooden)
+* `borderThickness` — the inner border thickness; `0` renders no border
+* `spacing` / `padding` (optional) — internal padding, resolved per badge `scale` (not `theme.default.spacing`). The default theme uses per-scale padding from `"1px 4px"` (`xs`) to `"6px 14px"` (`xl`)
+* `typography` (optional) — a plain partial typography style or a per-scale one, merged over the theme typography for the badge's scale. The default theme uses bold text from `Size10` (`xs`) to `Size24` (`xl`), with no font so each theme keeps its own
+* `intents` (optional) — per-intent `textColor`, `backgroundColor`, `borderColor`, `backgroundTransparency`, `backgroundImage`, and `backgroundGradient`, layered on top of `theme.colors.intents`
+
+These values can be changed by providing a custom Clean UI theme.

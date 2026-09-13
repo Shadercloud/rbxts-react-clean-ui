@@ -78,6 +78,13 @@ Implementation notes for src/Tests — test files carry no comments, so non-obvi
   - `colorsKeepRotation`: the reset only covers `stops`. Earlier `rotation`/`transparency`/`offset` are still inherited.
   - `undefinedStopsIgnored`: an explicit `stops: undefined` counts as unset, because a `nil` field doesn't exist in the Luau table, so the spread never overwrites the inherited `stops`.
 
+## BreakpointProvider (`BreakpointProvider.test.tsx`, `breakpoint.context.test.tsx`)
+
+- Consumers are module-level harnesses (`BreakpointHarness`, `ValueHarness`) that record `useBreakpoint`, `useBreakpointValue` and a render counter, the same pattern as `ToastHarness`.
+- The provider publishes `"xs"` before its first measurement, so the `xs` rows pass even before measuring. They wait for the provider frame to reach the host width and settle a couple of frames first. The other rows are what prove the measurement.
+- `rerendersOnCrossing` counts the harness's renders. The harness is a stable child element of the provider, so it only re-renders when the context value changes. Two resizes inside `sm` must add no renders, and crossing into `md` must add exactly one.
+- The viewport-fallback test can't resize the camera (`ViewportSize` is read-only). It builds a theme whose `md` threshold is exactly the current viewport width, inside a 100px host that would resolve to `sm` against those thresholds. So `"md"` can only come from the viewport, and never from the initial `"xs"` fallback.
+
 ## `BarChart.test.tsx`
 
 - `VALUES = [10, 30, 20]`: `niceStep(30, 5)` is 10, so `chartMax` is exactly 30 and the tallest bar fills the whole `BarsContainer` height.

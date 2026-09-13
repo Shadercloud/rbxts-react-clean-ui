@@ -1,3 +1,4 @@
+export * from './breakpoint.context';
 export * from './draggable.context';
 export * from './droppable.context';
 export * from './modal.context';

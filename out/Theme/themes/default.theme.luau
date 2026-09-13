@@ -148,6 +148,77 @@ local DefaultTheme = {
 			cornerRadius = 8,
 			boxShadow = "2px 2px 2px 2px",
 		},
+		badge = {
+			cornerRadius = "50%",
+			borderThickness = 1,
+			padding = {
+				xs = "1px 4px",
+				sm = "2px 6px",
+				md = "2px 8px",
+				lg = "4px 10px",
+				xl = "6px 14px",
+			},
+			typography = {
+				xs = {
+					weight = Enum.FontWeight.Bold,
+					size = Enum.FontSize.Size10,
+				},
+				sm = {
+					weight = Enum.FontWeight.Bold,
+					size = Enum.FontSize.Size12,
+				},
+				md = {
+					weight = Enum.FontWeight.Bold,
+					size = Enum.FontSize.Size14,
+				},
+				lg = {
+					weight = Enum.FontWeight.Bold,
+					size = Enum.FontSize.Size18,
+				},
+				xl = {
+					weight = Enum.FontWeight.Bold,
+					size = Enum.FontSize.Size24,
+				},
+			},
+			intents = {
+				primary = {
+					default = {
+						textColor = Color3.fromHex("#1D2433"),
+						backgroundColor = Color3.fromHex("#EEF1F6"),
+						borderColor = Color3.fromHex("#D9DEE8"),
+						backgroundTransparency = 0,
+					},
+				},
+				success = {
+					default = {
+						textColor = Color3.fromHex("#FFFFFF"),
+						backgroundColor = Color3.fromHex("#2E9D63"),
+						borderColor = Color3.fromHex("#237D4D"),
+					},
+				},
+				info = {
+					default = {
+						textColor = Color3.fromHex("#FFFFFF"),
+						backgroundColor = Color3.fromHex("#3187C8"),
+						borderColor = Color3.fromHex("#266CA2"),
+					},
+				},
+				warning = {
+					default = {
+						textColor = Color3.fromHex("#FFFFFF"),
+						backgroundColor = Color3.fromHex("#E7A92F"),
+						borderColor = Color3.fromHex("#C58B1D"),
+					},
+				},
+				danger = {
+					default = {
+						textColor = Color3.fromHex("#FFFFFF"),
+						backgroundColor = Color3.fromHex("#D64545"),
+						borderColor = Color3.fromHex("#B53535"),
+					},
+				},
+			},
+		},
 		button = {
 			backgroundTransparency = 0,
 			borderThickness = 1,

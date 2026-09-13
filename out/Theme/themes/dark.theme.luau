@@ -150,6 +150,48 @@ local DarkTheme = createTheme({
 			cornerRadius = 8,
 			boxShadow = "2px 2px 8px 0px",
 		},
+		badge = {
+			cornerRadius = "50%",
+			borderThickness = 1,
+			intents = {
+				primary = {
+					default = {
+						textColor = Color3.fromHex("#E8EDF8"),
+						backgroundColor = Color3.fromHex("#252B36"),
+						borderColor = Color3.fromHex("#343B49"),
+						backgroundTransparency = 0,
+					},
+				},
+				success = {
+					default = {
+						textColor = Color3.fromHex("#75E0A7"),
+						backgroundColor = Color3.fromHex("#1B3A2A"),
+						borderColor = Color3.fromHex("#258A56"),
+					},
+				},
+				info = {
+					default = {
+						textColor = Color3.fromHex("#8DD0FF"),
+						backgroundColor = Color3.fromHex("#1B3345"),
+						borderColor = Color3.fromHex("#2F79B4"),
+					},
+				},
+				warning = {
+					default = {
+						textColor = Color3.fromHex("#FFD978"),
+						backgroundColor = Color3.fromHex("#3A2F17"),
+						borderColor = Color3.fromHex("#B68522"),
+					},
+				},
+				danger = {
+					default = {
+						textColor = Color3.fromHex("#FF8D8D"),
+						backgroundColor = Color3.fromHex("#3F1F1F"),
+						borderColor = Color3.fromHex("#B93A3A"),
+					},
+				},
+			},
+		},
 		button = {
 			backgroundTransparency = 0,
 			borderThickness = 1,

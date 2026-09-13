@@ -1,5 +1,6 @@
 export * from './Column';
 export * from './Accordion';
+export * from './BreakpointProvider';
 export * from './Container';
 export * from './Draggable';
 export * from './Droppable';
