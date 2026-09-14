@@ -49,6 +49,7 @@ export interface ButtonProps extends
     children?: React.ReactNode;
     group?: boolean;
     disabled?: boolean;
+    spinning?: boolean;
     LayoutOrder?: number;
     styleOverride?: ButtonStyleOverride;
     name?: string;
@@ -231,6 +232,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                                     intent={props.intent}
                                     disabled={props.disabled}
                                     icon={props.icon}
+                                    spinning={props.spinning}
                                     styleOverride={props.styleOverride} />
                             }
                             {props.text !== undefined &&

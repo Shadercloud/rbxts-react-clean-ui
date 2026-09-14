@@ -287,6 +287,7 @@ local Button = React.forwardRef(function(props, ref)
 		intent = props.intent,
 		disabled = props.disabled,
 		icon = props.icon,
+		spinning = props.spinning,
 		styleOverride = props.styleOverride,
 	}), props.text ~= nil and React.createElement(ButtonText, {
 		text = props.text,

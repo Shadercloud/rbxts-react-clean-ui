@@ -10,6 +10,7 @@ export interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIn
     children?: React.ReactNode;
     group?: boolean;
     disabled?: boolean;
+    spinning?: boolean;
     LayoutOrder?: number;
     styleOverride?: ButtonStyleOverride;
     name?: string;
