@@ -6,6 +6,8 @@ declare class PaginationMountValidation {
     twoSiblings(): void;
     firstPageState(): void;
     lastPageState(): void;
+    noItemStrokeByDefault(): void;
+    itemStrokeWhenThemed(): void;
     customChildren(): void;
     customList(): void;
     visualOrder(): void;

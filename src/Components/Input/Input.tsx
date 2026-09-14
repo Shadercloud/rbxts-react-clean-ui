@@ -73,7 +73,7 @@ export function Input(props: InputProps) {
             LayoutOrder={props.LayoutOrder}
             Visible={props.Visible}
             ZIndex={props.ZIndex}
-
+            BorderSizePixel={0}
             Image={backgroundImage.Image}
             ImageColor3={backgroundImage.ImageColor3}
             ImageTransparency={backgroundImage.ImageTransparency}
@@ -118,7 +118,7 @@ export function Input(props: InputProps) {
                         Archivable={props.Archivable}
                         BorderColor3={props.BorderColor3}
                         BorderMode={props.BorderMode}
-                        BorderSizePixel={props.BorderSizePixel}
+                        BorderSizePixel={props.BorderSizePixel === undefined ? 0 : props.BorderSizePixel}
                         ClipsDescendants={props.ClipsDescendants}
                         Rotation={props.Rotation}
                         Selectable={props.Selectable}

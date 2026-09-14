@@ -41,6 +41,7 @@ local function GridCell(props)
 		Size = UDim2.new(props.width, UDim.new(0, if props.locked then props.height else 0)),
 		AutomaticSize = if props.locked then Enum.AutomaticSize.None else Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		ClipsDescendants = true,
 		Change = if props.locked then nil else {
 			AbsoluteSize = reportMeasurement,
@@ -131,6 +132,7 @@ local Grid = React.forwardRef(function(props, ref)
 	_attributes.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1))
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	_attributes.Change = {
 		AbsoluteSize = function(instance)
 			local nextWidth = instance.AbsoluteSize.X

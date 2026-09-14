@@ -150,6 +150,7 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
                         <imagelabel
                             key="Stripe"
                             BackgroundTransparency={1}
+                            BorderSizePixel={0}
                             ImageTransparency={resolvedStripeImage.ImageTransparency ?? 0.9}
                             ImageColor3={resolvedStripeImage.ImageColor3}
                             Size={new UDim2(1, stripeTileWidth, 1, 0)}
@@ -171,6 +172,7 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
             <frame
                 key={props.name ?? "ProgressBar"}
                 BackgroundTransparency={1}
+                BorderSizePixel={0}
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 0))}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 Position={SizeHelper.GetPosition(props)}
@@ -181,6 +183,7 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
                     <frame
                         key="ProgressBarHeader"
                         BackgroundTransparency={1}
+                        BorderSizePixel={0}
                         Size={UDim2.fromScale(1, 0)}
                         AutomaticSize={Enum.AutomaticSize.Y}
                     >

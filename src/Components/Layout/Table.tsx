@@ -176,6 +176,7 @@ function TableCellContent(props: TableCellProps & { header: boolean }) {
 				Size={UDim2.fromOffset(0, 0)}
 				AutomaticSize={Enum.AutomaticSize.XY}
 				BackgroundTransparency={1}
+				BorderSizePixel={0}
 				Change={{
 					AbsoluteSize: reportMeasurement,
 				}}

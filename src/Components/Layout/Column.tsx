@@ -52,6 +52,7 @@ export const Column = React.forwardRef<Frame, ColumnProps>(
                 Size={new UDim2(widthScale, widthOffset, 0, 0)}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 BackgroundTransparency={1}
+                BorderSizePixel={0}
             >
                 {props.children}
             </frame >

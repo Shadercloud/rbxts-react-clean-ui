@@ -212,6 +212,7 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                     <frame
                         key="ContentClip"
                         BackgroundTransparency={1}
+                        BorderSizePixel={0}
                         ClipsDescendants
                         Size={height.map((value) => UDim2.fromScale(1, 0).add(UDim2.fromOffset(0, value)))}
                     >
@@ -219,6 +220,7 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                             key="Content"
                             BackgroundColor3={theme.components.accordion.content.backgroundColor}
                             BackgroundTransparency={theme.components.accordion.content.backgroundTransparency}
+                            BorderSizePixel={0}
                             Size={UDim2.fromScale(1, 0)}
                             AutomaticSize={Enum.AutomaticSize.Y}
                             Change={{

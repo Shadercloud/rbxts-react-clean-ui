@@ -54,6 +54,7 @@ local function Scroller(props)
 		Size = UDim2.new(1, if isScrolling then -thickness - spacing else 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 	}, props.children))
 end
 return {

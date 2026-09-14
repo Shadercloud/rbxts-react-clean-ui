@@ -99,6 +99,7 @@ function SelectOption(props: SelectOptionProps) {
             Size={new UDim2(1, 0, 0, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
             BackgroundTransparency={0}
+            BorderSizePixel={0}
             BackgroundColor3={ColorHelper.getIntentColors(
                 theme,
                 "primary",
@@ -224,7 +225,7 @@ function SelectSearchInput(props: SelectSearchInputProps) {
     const theme = React.useContext(CleanThemeContext);
 
     return (
-        <frame key="SearchInput" Size={UDim2.fromScale(1, 0)} AutomaticSize={Enum.AutomaticSize.Y} BackgroundTransparency={1}>
+        <frame key="SearchInput" Size={UDim2.fromScale(1, 0)} AutomaticSize={Enum.AutomaticSize.Y} BackgroundTransparency={1} BorderSizePixel={0}>
             <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, {}, theme.components.select.search.spacing, theme.components.select.search.padding)} />
             <Input
                 icon="search"
@@ -456,6 +457,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                     Size={UDim2.fromScale(1, 0)}
                     AutomaticSize={Enum.AutomaticSize.Y}
                     BackgroundTransparency={1}
+                    BorderSizePixel={0}
                     Event={{
                         Activated: activateSelect,
                     }}
@@ -483,6 +485,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                             <frame
                                 key="SelectDropdown"
                                 BackgroundTransparency={0}
+                                BorderSizePixel={0}
                                 BackgroundColor3={
                                     theme.components.select.dropDownBackgroundColor
                                 }

@@ -155,6 +155,7 @@ local function Pie(props)
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = position,
 					BackgroundColor3 = background,
+					BorderSizePixel = 0,
 				}
 				local _condition_1 = theme.components.charts.pie.labels.backgroundTransparency
 				if _condition_1 == nil then
@@ -195,6 +196,7 @@ local function Pie(props)
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = position,
 					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
 				}, label.content)
 				table.insert(labels, _arg0_1)
 			end
@@ -229,10 +231,12 @@ local function Pie(props)
 	end
 	_attributes.key = _condition
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	_attributes.Size = UDim2.fromScale(1, 1)
 	return React.createElement("canvasgroup", _attributes, shadowPadding, React.createElement("frame", {
 		key = "HitArea",
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		Size = UDim2.fromScale(1, 1),
 		Event = {
 			MouseLeave = function()

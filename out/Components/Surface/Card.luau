@@ -460,6 +460,7 @@ local Card = React.forwardRef(function(props, ref)
 		_attributes_1.key = _condition_1
 		_attributes_1.ref = overlayWrapperRef
 		_attributes_1.BackgroundTransparency = 1
+		_attributes_1.BorderSizePixel = 0
 		_attributes_1.ClipsDescendants = false
 		_attributes_1.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1))
 		_attributes_1.AutomaticSize = SizeHelper:GetAutoSize(props)

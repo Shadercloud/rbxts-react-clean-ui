@@ -85,9 +85,18 @@ function PaginationItemVisual(props: PaginationItemVisualProps) {
         props.disabled ? "disabled" : hover?.isSelected ? "focus" : hover?.hover ? "hover" : "default",
         theme.components.pagination.item.intents,
     );
+    const borderThickness = theme.components.pagination.item.borderThickness;
 
     return (
         <>
+            {borderThickness > 0 && (
+                <uistroke
+                    key="Stroke"
+                    ApplyStrokeMode={Enum.ApplyStrokeMode.Border}
+                    Thickness={borderThickness}
+                    Color={colors.borderColor}
+                />
+            )}
             <Corners radius={theme.components.pagination.item.cornerRadius} />
             <Padding
                 resolvedPadding={SpacingHelper.GetResolvedPadding(
@@ -163,8 +172,7 @@ function PaginationButton(props: {
                 BackgroundTransparency: props.disabled
                     ? state.disabledColors.backgroundTransparency
                     : state.defaultColors.backgroundTransparency,
-                BorderSizePixel: theme.components.pagination.item.borderThickness,
-                BorderColor3: props.disabled ? state.disabledColors.borderColor : state.defaultColors.borderColor,
+                BorderSizePixel: 0,
                 AutoButtonColor: false,
                 Image: state.defaultImage.Image,
                 ImageColor3: state.defaultImage.ImageColor3,
@@ -185,7 +193,6 @@ function PaginationButton(props: {
                     : {
                           BackgroundColor3: state.hoverColors.backgroundColor,
                           BackgroundTransparency: state.hoverColors.backgroundTransparency,
-                          BorderColor3: state.hoverColors.borderColor,
                           Image: state.hoverImage.Image,
                           ImageColor3: state.hoverImage.ImageColor3,
                           ImageTransparency: state.hoverImage.ImageTransparency,
@@ -198,7 +205,6 @@ function PaginationButton(props: {
             focus={{
                 BackgroundColor3: state.focusColors.backgroundColor,
                 BackgroundTransparency: state.focusColors.backgroundTransparency,
-                BorderColor3: state.focusColors.borderColor,
                 Image: state.focusImage.Image,
                 ImageColor3: state.focusImage.ImageColor3,
                 ImageTransparency: state.focusImage.ImageTransparency,

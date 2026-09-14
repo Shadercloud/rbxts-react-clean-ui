@@ -31,6 +31,7 @@ local Text = React.forwardRef(function(props, ref)
 		_attributes.AutomaticSize = Enum.AutomaticSize.XY
 		_attributes.AnchorPoint = props.AnchorPoint
 		_attributes.BackgroundTransparency = 1
+		_attributes.BorderSizePixel = 0
 		_attributes.Position = props.Position
 		_attributes.ZIndex = props.ZIndex
 		_attributes.LayoutOrder = props.LayoutOrder
@@ -53,6 +54,7 @@ local Text = React.forwardRef(function(props, ref)
 				Size = UDim2.fromScale(0, 0),
 				AutomaticSize = Enum.AutomaticSize.XY,
 				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
 				TextColor3 = props.TextColor3 or theme.colors.intents.primary.default.textColor,
 				Text = character,
 			}
@@ -127,7 +129,7 @@ local Text = React.forwardRef(function(props, ref)
 	_attributes.BackgroundColor3 = props.BackgroundColor3
 	_attributes.BorderColor3 = props.BorderColor3
 	_attributes.BorderMode = props.BorderMode
-	_attributes.BorderSizePixel = props.BorderSizePixel
+	_attributes.BorderSizePixel = if props.BorderSizePixel == nil then 0 else props.BorderSizePixel
 	_attributes.ClipsDescendants = props.ClipsDescendants
 	_attributes.Selectable = props.Selectable
 	_attributes.SelectionImageObject = props.SelectionImageObject

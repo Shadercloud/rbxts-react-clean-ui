@@ -255,6 +255,7 @@ local function RenderedAccordionItem(props)
 	})), mounted and (React.createElement("frame", {
 		key = "ContentClip",
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		ClipsDescendants = true,
 		Size = height:map(function(value)
 			local _exp = UDim2.fromScale(1, 0)
@@ -265,6 +266,7 @@ local function RenderedAccordionItem(props)
 		key = "Content",
 		BackgroundColor3 = theme.components.accordion.content.backgroundColor,
 		BackgroundTransparency = theme.components.accordion.content.backgroundTransparency,
+		BorderSizePixel = 0,
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Change = {

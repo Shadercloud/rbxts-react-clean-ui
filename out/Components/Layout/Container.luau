@@ -34,7 +34,7 @@ local Container = React.forwardRef(function(props, ref)
 	_attributes.BackgroundTransparency = _condition_1
 	_attributes.BorderColor3 = props.BorderColor3
 	_attributes.BorderMode = props.BorderMode
-	_attributes.BorderSizePixel = props.BorderSizePixel
+	_attributes.BorderSizePixel = if props.BorderSizePixel == nil then 0 else props.BorderSizePixel
 	_attributes.ClipsDescendants = props.ClipsDescendants
 	_attributes.Interactable = props.Interactable
 	_attributes.LayoutOrder = props.LayoutOrder
@@ -93,6 +93,7 @@ local Container = React.forwardRef(function(props, ref)
 		key = if props.name ~= nil then `{props.name}CenterWrapper` else "ContainerCenterWrapper",
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		ZIndex = props.ZIndex,
 		LayoutOrder = props.LayoutOrder,
 	}, React.createElement("uilistlayout", {

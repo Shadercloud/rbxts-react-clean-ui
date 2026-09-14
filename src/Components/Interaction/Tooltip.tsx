@@ -117,8 +117,9 @@ function TooltipPopup(props: TooltipPopup) {
             AutomaticSize={Enum.AutomaticSize.XY}
             GroupTransparency={groupTransparency}
             BackgroundTransparency={1}
+            BorderSizePixel={0}
         >
-            <frame key="ShadowPadding" Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY} BackgroundTransparency={1}>
+            <frame key="ShadowPadding" Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY} BackgroundTransparency={1} BorderSizePixel={0}>
                 <Padding resolvedPadding={resolvedPadding} />
                 <frame
                     key="Content"
@@ -126,6 +127,7 @@ function TooltipPopup(props: TooltipPopup) {
                     AutomaticSize={Enum.AutomaticSize.XY}
                     BackgroundColor3={intent.backgroundColor}
                     BackgroundTransparency={intent.backgroundTransparency}
+                    BorderSizePixel={0}
                 >
                     <BoxShadow {...props} value={theme.components.tooltip.boxShadow} />
                     <Corners radius={theme.components.button.cornerRadius} />

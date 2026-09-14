@@ -17,6 +17,7 @@ local function OverlayProvider(props)
 		end,
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		ZIndex = 100000,
 		Active = false,
 	}))

@@ -113,6 +113,7 @@ export function Toast({
             Size={UDim2.fromScale(0, 0)}
             AutomaticSize={Enum.AutomaticSize.XY}
             BackgroundTransparency={1}
+            BorderSizePixel={0}
             GroupTransparency={groupTransparency}
         >
 

@@ -147,10 +147,17 @@ local function PaginationItemVisual(props)
 		_result = _result_2
 	end
 	local colors = ColorHelper:getIntentColors(theme, "primary", _result, theme.components.pagination.item.intents)
-	local _exp = React.createElement(Corners, {
+	local borderThickness = theme.components.pagination.item.borderThickness
+	local _exp = borderThickness > 0 and (React.createElement("uistroke", {
+		key = "Stroke",
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		Thickness = borderThickness,
+		Color = colors.borderColor,
+	}))
+	local _exp_1 = React.createElement(Corners, {
 		radius = theme.components.pagination.item.cornerRadius,
 	})
-	local _exp_1 = React.createElement(Padding, {
+	local _exp_2 = React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.pagination.item.spacing, theme.components.pagination.item.padding),
 	})
 	local _attributes = {}
@@ -159,7 +166,7 @@ local function PaginationItemVisual(props)
 		_condition = theme.components.pagination.item.boxShadow
 	end
 	_attributes.value = _condition
-	return React.createElement(React.Fragment, nil, _exp, _exp_1, React.createElement(BoxShadow, _attributes), if props.text ~= nil then (React.createElement(Text, {
+	return React.createElement(React.Fragment, nil, _exp, _exp_1, _exp_2, React.createElement(BoxShadow, _attributes), if props.text ~= nil then (React.createElement(Text, {
 		name = "PaginationItemText",
 		text = props.text,
 		TextColor3 = colors.textColor,
@@ -202,8 +209,7 @@ local function PaginationButton(props)
 			AutomaticSize = Enum.AutomaticSize.XY,
 			BackgroundColor3 = if props.disabled then state.disabledColors.backgroundColor else state.defaultColors.backgroundColor,
 			BackgroundTransparency = if props.disabled then state.disabledColors.backgroundTransparency else state.defaultColors.backgroundTransparency,
-			BorderSizePixel = theme.components.pagination.item.borderThickness,
-			BorderColor3 = if props.disabled then state.disabledColors.borderColor else state.defaultColors.borderColor,
+			BorderSizePixel = 0,
 			AutoButtonColor = false,
 			Image = state.defaultImage.Image,
 			ImageColor3 = state.defaultImage.ImageColor3,
@@ -223,7 +229,6 @@ local function PaginationButton(props)
 		hover = if props.disabled then nil else {
 			BackgroundColor3 = state.hoverColors.backgroundColor,
 			BackgroundTransparency = state.hoverColors.backgroundTransparency,
-			BorderColor3 = state.hoverColors.borderColor,
 			Image = state.hoverImage.Image,
 			ImageColor3 = state.hoverImage.ImageColor3,
 			ImageTransparency = state.hoverImage.ImageTransparency,
@@ -235,7 +240,6 @@ local function PaginationButton(props)
 		focus = {
 			BackgroundColor3 = state.focusColors.backgroundColor,
 			BackgroundTransparency = state.focusColors.backgroundTransparency,
-			BorderColor3 = state.focusColors.borderColor,
 			Image = state.focusImage.Image,
 			ImageColor3 = state.focusImage.ImageColor3,
 			ImageTransparency = state.focusImage.ImageTransparency,

@@ -53,6 +53,7 @@ local BreakpointProvider = React.forwardRef(function(props, ref)
 	_attributes.LayoutOrder = props.LayoutOrder
 	_attributes.Size = UDim2.fromScale(1, 1)
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	_attributes.Change = {
 		AbsoluteSize = function(instance)
 			return resolve(instance.AbsoluteSize.X)

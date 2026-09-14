@@ -67,6 +67,7 @@ local function Input(props)
 	_attributes.LayoutOrder = props.LayoutOrder
 	_attributes.Visible = props.Visible
 	_attributes.ZIndex = props.ZIndex
+	_attributes.BorderSizePixel = 0
 	_attributes.Image = backgroundImage.Image
 	_attributes.ImageColor3 = backgroundImage.ImageColor3
 	_attributes.ImageTransparency = backgroundImage.ImageTransparency
@@ -123,7 +124,7 @@ local function Input(props)
 	_attributes_2.Archivable = props.Archivable
 	_attributes_2.BorderColor3 = props.BorderColor3
 	_attributes_2.BorderMode = props.BorderMode
-	_attributes_2.BorderSizePixel = props.BorderSizePixel
+	_attributes_2.BorderSizePixel = if props.BorderSizePixel == nil then 0 else props.BorderSizePixel
 	_attributes_2.ClipsDescendants = props.ClipsDescendants
 	_attributes_2.Rotation = props.Rotation
 	_attributes_2.Selectable = props.Selectable

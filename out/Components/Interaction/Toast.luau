@@ -122,6 +122,7 @@ local function Toast(_param)
 	_attributes.Size = UDim2.fromScale(0, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	_attributes.GroupTransparency = groupTransparency
 	local _condition_1 = children ~= nil and children
 	if not _condition_1 then

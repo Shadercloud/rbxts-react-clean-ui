@@ -42,7 +42,7 @@ function FieldsetLabel(props: FieldsetSlotProps) {
             ShrinkRatio={0}
             GrowRatio={0}
         >
-            <imagebutton key="FieldsetLabelButton" Size={UDim2.fromOffset(0, 0)} BackgroundTransparency={1} AutomaticSize={Enum.AutomaticSize.XY}
+            <imagebutton key="FieldsetLabelButton" Size={UDim2.fromOffset(0, 0)} BackgroundTransparency={1} BorderSizePixel={0} AutomaticSize={Enum.AutomaticSize.XY}
                 Event={{
                     Activated: () => {
                         context.labelActivated.Fire();

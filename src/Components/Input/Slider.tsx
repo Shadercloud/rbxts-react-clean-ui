@@ -332,7 +332,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                 BackgroundTransparency={props.BackgroundTransparency ?? 1}
                 BorderColor3={props.BorderColor3}
                 BorderMode={props.BorderMode}
-                BorderSizePixel={props.BorderSizePixel}
+                BorderSizePixel={props.BorderSizePixel === undefined ? 0 : props.BorderSizePixel}
                 ClipsDescendants={props.ClipsDescendants}
                 Interactable={props.Interactable}
                 LayoutOrder={props.LayoutOrder}
@@ -366,6 +366,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                     AnchorPoint={new Vector2(0.5, 0.5)}
                     BackgroundTransparency={theme.bar.backgroundTransparency}
                     BackgroundColor3={theme.bar.backgroundColor}
+                    BorderSizePixel={0}
                 >
                     <uistroke
                         key="Stroke"
@@ -384,6 +385,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                     ref={containerRef}
                     Size={UDim2.fromScale(1, 1).sub(new UDim2(padding.add(padding), new UDim(0, 0)))}
                     BackgroundTransparency={1}
+                    BorderSizePixel={0}
                     Position={UDim2.fromScale(0.5, 0.5)}
                     AnchorPoint={new Vector2(0.5, 0.5)}
                 >
@@ -392,6 +394,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                             key="Highlight"
                             BackgroundColor3={theme.bar.highlight.backgroundColor}
                             BackgroundTransparency={theme.bar.highlight.backgroundTransparency}
+                            BorderSizePixel={0}
                             Position={
                                 props.highlight === "start"
                                     ? UDim2.fromScale(0, 0.5).sub(new UDim2(padding, new UDim(0, 0)))

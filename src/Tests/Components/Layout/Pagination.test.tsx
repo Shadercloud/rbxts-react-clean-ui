@@ -4,6 +4,8 @@ import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/luni
 
 const { Skip } = Decorators;
 import { Pagination } from "../../../Components/Layout/Pagination";
+import { ThemeProvider } from "../../../Providers/theme.provider";
+import { createTheme } from "../../../Theme";
 
 function renderPagination(element: React.ReactElement) {
 	const host = new Instance("Folder");
@@ -154,6 +156,58 @@ class PaginationMountValidation {
 		Assert.true(previous.Selectable);
 		Assert.false(nextButton.Active);
 		Assert.false(nextButton.Selectable);
+
+		unmount(root, host);
+	}
+
+	@Skip(!Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	@DisplayName("With the default zero item border thickness buttons have no native border and no Stroke")
+	@Test
+	public noItemStrokeByDefault() {
+		const { host, root } = renderPagination(<Pagination page={1} totalPages={3} onPageChange={() => {}} />);
+
+		for (const name of ["PaginationPrev", "PaginationItem-1", "PaginationItem-2", "PaginationNext"]) {
+			const button = getButton(host, name);
+			Assert.equal(button.BorderSizePixel, 0, `${name} BorderSizePixel`);
+			Assert.undefined(button.FindFirstChild("Stroke"), `${name} should have no Stroke`);
+		}
+
+		unmount(root, host);
+	}
+
+	@Skip(!Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	@DisplayName("A positive item border thickness renders a Border-mode Stroke with the state colour instead of a native border")
+	@Test
+	public itemStrokeWhenThemed() {
+		const disabledBorder = Color3.fromHex("#FF0000");
+		const theme = createTheme({
+			components: {
+				pagination: {
+					item: {
+						borderThickness: 2,
+						intents: { primary: { disabled: { borderColor: disabledBorder } } },
+					},
+				},
+			},
+		});
+		const { host, root } = renderPagination(
+			<ThemeProvider theme={theme}>
+				<Pagination page={1} totalPages={3} onPageChange={() => {}} />
+			</ThemeProvider>,
+		);
+
+		for (const name of ["PaginationPrev", "PaginationItem-1", "PaginationItem-2", "PaginationNext"]) {
+			const button = getButton(host, name);
+			Assert.equal(button.BorderSizePixel, 0, `${name} BorderSizePixel`);
+			const stroke = button.FindFirstChild("Stroke");
+			Assert.notUndefined(stroke, `${name} should have a Stroke`);
+			Assert.true(stroke!.IsA("UIStroke"));
+			Assert.equal((stroke as UIStroke).Thickness, 2);
+			Assert.equal((stroke as UIStroke).ApplyStrokeMode, Enum.ApplyStrokeMode.Border);
+		}
+
+		const previousStroke = getButton(host, "PaginationPrev").FindFirstChild("Stroke") as UIStroke;
+		Assert.equal(previousStroke.Color.ToHex().upper(), "FF0000");
 
 		unmount(root, host);
 	}

@@ -19,6 +19,7 @@ local function FieldsetLabel(props)
 		key = "FieldsetLabelButton",
 		Size = UDim2.fromOffset(0, 0),
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		Event = {
 			Activated = function()

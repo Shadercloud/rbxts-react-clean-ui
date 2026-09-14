@@ -225,6 +225,7 @@ export function Modal(props: ModalProps) {
                         AutoButtonColor={false}
                         AutomaticSize={panelAutomaticSize}
                         BackgroundTransparency={1}
+                        BorderSizePixel={0}
                         ImageTransparency={1}
                         Position={props.draggable ? UDim2.fromScale(0.5, 0.5) : undefined}
                         Size={panelSize}
@@ -253,6 +254,7 @@ export function Modal(props: ModalProps) {
                         Active={true}
                         BackgroundColor3={theme.components.modal.backdrop.backgroundColor}
                         BackgroundTransparency={backdropTransparency}
+                        BorderSizePixel={0}
                         ZIndex={backdropZIndex}
                         Event={{
                             Activated: () => {
@@ -266,6 +268,7 @@ export function Modal(props: ModalProps) {
                             key="ModalPanel"
                             Size={UDim2.fromScale(1, 1)}
                             BackgroundTransparency={1}
+                            BorderSizePixel={0}
                             GroupTransparency={panelTransparency}
                             ZIndex={2}
                         >

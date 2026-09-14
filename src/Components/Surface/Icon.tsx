@@ -25,7 +25,7 @@ function SpinningIcon(props: IconProps) {
         tween.start()
 
     });
-    return <frame key={props.name ?? "Icon"} BackgroundTransparency={1} Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY}>
+    return <frame key={props.name ?? "Icon"} BackgroundTransparency={1} BorderSizePixel={0} Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY}>
         <Icon Size={props.Size} color={props.color} icon={props.icon} scale={props.scale} Rotation={rotation} />
     </frame>
 }
@@ -65,7 +65,7 @@ export function Icon(props: IconProps) {
             BackgroundColor3={props.BackgroundColor3}
             BorderColor3={props.BorderColor3}
             BorderMode={props.BorderMode}
-            BorderSizePixel={props.BorderSizePixel}
+            BorderSizePixel={props.BorderSizePixel === undefined ? 0 : props.BorderSizePixel}
             ClipsDescendants={props.ClipsDescendants}
             Selectable={props.Selectable}
             SelectionImageObject={props.SelectionImageObject}

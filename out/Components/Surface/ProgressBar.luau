@@ -166,6 +166,7 @@ local ProgressBar = React.forwardRef(function(props, ref)
 		local _attributes_2 = {
 			key = "Stripe",
 			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
 		}
 		local _condition_8 = resolvedStripeImage.ImageTransparency
 		if _condition_8 == nil then
@@ -195,6 +196,7 @@ local ProgressBar = React.forwardRef(function(props, ref)
 	end
 	_attributes_2.key = _condition_8
 	_attributes_2.BackgroundTransparency = 1
+	_attributes_2.BorderSizePixel = 0
 	_attributes_2.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 0))
 	_attributes_2.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes_2.Position = SizeHelper:GetPosition(props)
@@ -207,6 +209,7 @@ local ProgressBar = React.forwardRef(function(props, ref)
 	}, React.createElement("frame", {
 		key = "ProgressBarHeader",
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 	}, React.createElement(HStack, {

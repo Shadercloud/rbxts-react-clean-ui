@@ -215,6 +215,7 @@ local function Modal(props)
 				AutoButtonColor = false,
 				AutomaticSize = panelAutomaticSize,
 				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
 				ImageTransparency = 1,
 				Position = if props.draggable then UDim2.fromScale(0.5, 0.5) else nil,
 				Size = panelSize,
@@ -229,6 +230,7 @@ local function Modal(props)
 				Active = true,
 				BackgroundColor3 = theme.components.modal.backdrop.backgroundColor,
 				BackgroundTransparency = backdropTransparency,
+				BorderSizePixel = 0,
 				ZIndex = backdropZIndex,
 				Event = {
 					Activated = function()
@@ -241,6 +243,7 @@ local function Modal(props)
 				key = "ModalPanel",
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
 				GroupTransparency = panelTransparency,
 				ZIndex = 2,
 			}, not props.draggable and (React.createElement("uilistlayout", {

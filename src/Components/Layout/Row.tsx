@@ -26,6 +26,7 @@ export const Row = React.forwardRef<Frame, RowProps>(
                 Size={UDim2.fromScale(1, 1)}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 BackgroundTransparency={1}
+                BorderSizePixel={0}
                 Change={{
                     AbsoluteSize: (instance) => {
                         const nextWidth = instance.AbsoluteSize.X;

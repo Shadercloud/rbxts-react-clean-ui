@@ -38,6 +38,7 @@ local Column = React.forwardRef(function(props, ref)
 	_attributes.Size = UDim2.new(widthScale, widthOffset, 0, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	return React.createElement("frame", _attributes, props.children)
 end)
 return {

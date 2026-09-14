@@ -64,6 +64,7 @@ function GroupElement(props: GroupElementProps) {
         <frame
             key={props.name ?? "GroupElement"}
             BackgroundTransparency={1}
+            BorderSizePixel={0}
             AutomaticSize={Enum.AutomaticSize.XY}
             Change={{
                 AbsoluteSize: (instance) => {

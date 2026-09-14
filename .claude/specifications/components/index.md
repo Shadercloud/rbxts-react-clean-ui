@@ -37,6 +37,7 @@ A component built on `PositionElementProps` (which declares `top`/`left`/`right`
 
 - Components compose from other library components (layout primitives, `Icon`, `Text`, decorators) rather than hand-rolling equivalent Roblox instances inline, so behavior/theming stays centralized.
 - A component that needs a corner radius, drop shadow, or padding applies it via the shared decorator components rather than reimplementing the underlying `Instance` properties directly.
+- Every native `GuiObject` the library renders (`frame`, `imagelabel`, `imagebutton`, `textlabel`, `textbox`, `scrollingframe`, `canvasgroup`, ...) has `BorderSizePixel` `0` unless it is explicitly set; visible borders are drawn with `UIStroke`. Where a component forwards native props, an explicit caller `BorderSizePixel` still wins (pass-through as `props.BorderSizePixel === undefined ? 0 : props.BorderSizePixel`, or `BorderSizePixel={0}` placed before a props spread). Anything rendered through `Container` inherits this.
 - Unless a component's spec says otherwise, it sizes to fill the width made available by its parent and sizes its height automatically to its content.
 
 ## Interaction

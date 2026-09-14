@@ -201,6 +201,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 AutoButtonColor={false}
                 LayoutOrder={props.LayoutOrder}
                 ZIndex={props.ZIndex}
+                BorderSizePixel={0}
 
                 Image={backgroundImage.Image}
                 ImageColor3={backgroundImage.ImageColor3}

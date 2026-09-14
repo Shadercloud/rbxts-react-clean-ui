@@ -51,7 +51,7 @@ export const Container = React.forwardRef<ImageLabel, ContainerProps>(
                 }
                 BorderColor3={props.BorderColor3}
                 BorderMode={props.BorderMode}
-                BorderSizePixel={props.BorderSizePixel}
+                BorderSizePixel={props.BorderSizePixel === undefined ? 0 : props.BorderSizePixel}
                 ClipsDescendants={props.ClipsDescendants}
                 Interactable={props.Interactable}
                 LayoutOrder={props.LayoutOrder}
@@ -107,6 +107,7 @@ export const Container = React.forwardRef<ImageLabel, ContainerProps>(
                 key={props.name !== undefined ? `${props.name}CenterWrapper` : "ContainerCenterWrapper"}
                 Size={UDim2.fromScale(1, 1)}
                 BackgroundTransparency={1}
+                BorderSizePixel={0}
                 ZIndex={props.ZIndex}
                 LayoutOrder={props.LayoutOrder}
             >

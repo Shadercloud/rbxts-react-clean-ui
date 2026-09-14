@@ -359,6 +359,7 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
                 key={props.name ?? "CardOverlayWrapper"}
                 ref={overlayWrapperRef}
                 BackgroundTransparency={1}
+                BorderSizePixel={0}
                 ClipsDescendants={false}
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 1))}
                 AutomaticSize={SizeHelper.GetAutoSize(props)}

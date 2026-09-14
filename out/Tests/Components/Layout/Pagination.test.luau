@@ -12,6 +12,8 @@ local DisplayName = _lunit.DisplayName
 local _binding = Decorators
 local Skip = _binding.Skip
 local Pagination = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "Pagination").Pagination
+local ThemeProvider = TS.import(script, script.Parent.Parent.Parent.Parent, "Providers", "theme.provider").ThemeProvider
+local createTheme = TS.import(script, script.Parent.Parent.Parent.Parent, "Theme").createTheme
 local function renderPagination(element)
 	local host = Instance.new("Folder")
 	local root = ReactRoblox.createRoot(host)
@@ -197,6 +199,61 @@ do
 		Assert["true"](Assert, previous.Selectable)
 		Assert["false"](Assert, nextButton.Active)
 		Assert["false"](Assert, nextButton.Selectable)
+		unmount(root, host)
+	end
+	function PaginationMountValidation:noItemStrokeByDefault()
+		local _binding_1 = renderPagination(React.createElement(Pagination, {
+			page = 1,
+			totalPages = 3,
+			onPageChange = function() end,
+		}))
+		local host = _binding_1.host
+		local root = _binding_1.root
+		for _, name in { "PaginationPrev", "PaginationItem-1", "PaginationItem-2", "PaginationNext" } do
+			local button = getButton(host, name)
+			Assert:equal(button.BorderSizePixel, 0, `{name} BorderSizePixel`)
+			Assert:undefined(button:FindFirstChild("Stroke"), `{name} should have no Stroke`)
+		end
+		unmount(root, host)
+	end
+	function PaginationMountValidation:itemStrokeWhenThemed()
+		local disabledBorder = Color3.fromHex("#FF0000")
+		local theme = createTheme({
+			components = {
+				pagination = {
+					item = {
+						borderThickness = 2,
+						intents = {
+							primary = {
+								disabled = {
+									borderColor = disabledBorder,
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+		local _binding_1 = renderPagination(React.createElement(ThemeProvider, {
+			theme = theme,
+		}, React.createElement(Pagination, {
+			page = 1,
+			totalPages = 3,
+			onPageChange = function() end,
+		})))
+		local host = _binding_1.host
+		local root = _binding_1.root
+		for _, name in { "PaginationPrev", "PaginationItem-1", "PaginationItem-2", "PaginationNext" } do
+			local button = getButton(host, name)
+			Assert:equal(button.BorderSizePixel, 0, `{name} BorderSizePixel`)
+			local stroke = button:FindFirstChild("Stroke")
+			Assert:notUndefined(stroke, `{name} should have a Stroke`)
+			Assert["true"](Assert, stroke:IsA("UIStroke"))
+			Assert:equal(stroke.Thickness, 2)
+			Assert:equal(stroke.ApplyStrokeMode, Enum.ApplyStrokeMode.Border)
+		end
+		local previousStroke = getButton(host, "PaginationPrev"):FindFirstChild("Stroke")
+		Assert:equal(string.upper(previousStroke.Color:ToHex()), "FF0000")
 		unmount(root, host)
 	end
 	function PaginationMountValidation:customChildren()
@@ -442,84 +499,124 @@ do
 		PaginationMountValidation.lastPageState = _descriptor_20.value
 	end
 	local _decorator_14 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
-	local _decorator_15 = DisplayName("Passing a lone Pagination.Item child omits the default Prev, Next and List entirely")
-	local _descriptor_21 = Test(PaginationMountValidation, "customChildren", {
-		value = PaginationMountValidation.customChildren,
+	local _decorator_15 = DisplayName("With the default zero item border thickness buttons have no native border and no Stroke")
+	local _descriptor_21 = Test(PaginationMountValidation, "noItemStrokeByDefault", {
+		value = PaginationMountValidation.noItemStrokeByDefault,
 	})
 	if _descriptor_21 then
-		PaginationMountValidation.customChildren = _descriptor_21.value
+		PaginationMountValidation.noItemStrokeByDefault = _descriptor_21.value
 	end
-	local _descriptor_22 = _decorator_15(PaginationMountValidation, "customChildren", {
-		value = PaginationMountValidation.customChildren,
+	local _descriptor_22 = _decorator_15(PaginationMountValidation, "noItemStrokeByDefault", {
+		value = PaginationMountValidation.noItemStrokeByDefault,
 	})
 	if _descriptor_22 then
-		PaginationMountValidation.customChildren = _descriptor_22.value
+		PaginationMountValidation.noItemStrokeByDefault = _descriptor_22.value
 	end
-	local _descriptor_23 = _decorator_14(PaginationMountValidation, "customChildren", {
-		value = PaginationMountValidation.customChildren,
+	local _descriptor_23 = _decorator_14(PaginationMountValidation, "noItemStrokeByDefault", {
+		value = PaginationMountValidation.noItemStrokeByDefault,
 	})
 	if _descriptor_23 then
-		PaginationMountValidation.customChildren = _descriptor_23.value
+		PaginationMountValidation.noItemStrokeByDefault = _descriptor_23.value
 	end
 	local _decorator_16 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
-	local _decorator_17 = DisplayName("Items placed inside an explicit Pagination.List render as-is instead of the computed page window")
-	local _descriptor_24 = Test(PaginationMountValidation, "customList", {
-		value = PaginationMountValidation.customList,
+	local _decorator_17 = DisplayName("A positive item border thickness renders a Border-mode Stroke with the state colour instead of a native border")
+	local _descriptor_24 = Test(PaginationMountValidation, "itemStrokeWhenThemed", {
+		value = PaginationMountValidation.itemStrokeWhenThemed,
 	})
 	if _descriptor_24 then
-		PaginationMountValidation.customList = _descriptor_24.value
+		PaginationMountValidation.itemStrokeWhenThemed = _descriptor_24.value
 	end
-	local _descriptor_25 = _decorator_17(PaginationMountValidation, "customList", {
-		value = PaginationMountValidation.customList,
+	local _descriptor_25 = _decorator_17(PaginationMountValidation, "itemStrokeWhenThemed", {
+		value = PaginationMountValidation.itemStrokeWhenThemed,
 	})
 	if _descriptor_25 then
-		PaginationMountValidation.customList = _descriptor_25.value
+		PaginationMountValidation.itemStrokeWhenThemed = _descriptor_25.value
 	end
-	local _descriptor_26 = _decorator_16(PaginationMountValidation, "customList", {
-		value = PaginationMountValidation.customList,
+	local _descriptor_26 = _decorator_16(PaginationMountValidation, "itemStrokeWhenThemed", {
+		value = PaginationMountValidation.itemStrokeWhenThemed,
 	})
 	if _descriptor_26 then
-		PaginationMountValidation.customList = _descriptor_26.value
+		PaginationMountValidation.itemStrokeWhenThemed = _descriptor_26.value
 	end
 	local _decorator_18 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
-	local _decorator_19 = DisplayName("Stepping from page 6 to 7 to 8 keeps LayoutOrder ascending with ellipses in the right slots")
-	local _descriptor_27 = Test(PaginationMountValidation, "visualOrder", {
-		value = PaginationMountValidation.visualOrder,
+	local _decorator_19 = DisplayName("Passing a lone Pagination.Item child omits the default Prev, Next and List entirely")
+	local _descriptor_27 = Test(PaginationMountValidation, "customChildren", {
+		value = PaginationMountValidation.customChildren,
 	})
 	if _descriptor_27 then
-		PaginationMountValidation.visualOrder = _descriptor_27.value
+		PaginationMountValidation.customChildren = _descriptor_27.value
 	end
-	local _descriptor_28 = _decorator_19(PaginationMountValidation, "visualOrder", {
-		value = PaginationMountValidation.visualOrder,
+	local _descriptor_28 = _decorator_19(PaginationMountValidation, "customChildren", {
+		value = PaginationMountValidation.customChildren,
 	})
 	if _descriptor_28 then
-		PaginationMountValidation.visualOrder = _descriptor_28.value
+		PaginationMountValidation.customChildren = _descriptor_28.value
 	end
-	local _descriptor_29 = _decorator_18(PaginationMountValidation, "visualOrder", {
-		value = PaginationMountValidation.visualOrder,
+	local _descriptor_29 = _decorator_18(PaginationMountValidation, "customChildren", {
+		value = PaginationMountValidation.customChildren,
 	})
 	if _descriptor_29 then
-		PaginationMountValidation.visualOrder = _descriptor_29.value
+		PaginationMountValidation.customChildren = _descriptor_29.value
 	end
 	local _decorator_20 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
-	local _decorator_21 = DisplayName("Items plus ellipses always total siblingCount * 2 + 5 no matter which page is current")
-	local _descriptor_30 = Test(PaginationMountValidation, "constantItemCount", {
-		value = PaginationMountValidation.constantItemCount,
+	local _decorator_21 = DisplayName("Items placed inside an explicit Pagination.List render as-is instead of the computed page window")
+	local _descriptor_30 = Test(PaginationMountValidation, "customList", {
+		value = PaginationMountValidation.customList,
 	})
 	if _descriptor_30 then
-		PaginationMountValidation.constantItemCount = _descriptor_30.value
+		PaginationMountValidation.customList = _descriptor_30.value
 	end
-	local _descriptor_31 = _decorator_21(PaginationMountValidation, "constantItemCount", {
-		value = PaginationMountValidation.constantItemCount,
+	local _descriptor_31 = _decorator_21(PaginationMountValidation, "customList", {
+		value = PaginationMountValidation.customList,
 	})
 	if _descriptor_31 then
-		PaginationMountValidation.constantItemCount = _descriptor_31.value
+		PaginationMountValidation.customList = _descriptor_31.value
 	end
-	local _descriptor_32 = _decorator_20(PaginationMountValidation, "constantItemCount", {
-		value = PaginationMountValidation.constantItemCount,
+	local _descriptor_32 = _decorator_20(PaginationMountValidation, "customList", {
+		value = PaginationMountValidation.customList,
 	})
 	if _descriptor_32 then
-		PaginationMountValidation.constantItemCount = _descriptor_32.value
+		PaginationMountValidation.customList = _descriptor_32.value
+	end
+	local _decorator_22 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	local _decorator_23 = DisplayName("Stepping from page 6 to 7 to 8 keeps LayoutOrder ascending with ellipses in the right slots")
+	local _descriptor_33 = Test(PaginationMountValidation, "visualOrder", {
+		value = PaginationMountValidation.visualOrder,
+	})
+	if _descriptor_33 then
+		PaginationMountValidation.visualOrder = _descriptor_33.value
+	end
+	local _descriptor_34 = _decorator_23(PaginationMountValidation, "visualOrder", {
+		value = PaginationMountValidation.visualOrder,
+	})
+	if _descriptor_34 then
+		PaginationMountValidation.visualOrder = _descriptor_34.value
+	end
+	local _descriptor_35 = _decorator_22(PaginationMountValidation, "visualOrder", {
+		value = PaginationMountValidation.visualOrder,
+	})
+	if _descriptor_35 then
+		PaginationMountValidation.visualOrder = _descriptor_35.value
+	end
+	local _decorator_24 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	local _decorator_25 = DisplayName("Items plus ellipses always total siblingCount * 2 + 5 no matter which page is current")
+	local _descriptor_36 = Test(PaginationMountValidation, "constantItemCount", {
+		value = PaginationMountValidation.constantItemCount,
+	})
+	if _descriptor_36 then
+		PaginationMountValidation.constantItemCount = _descriptor_36.value
+	end
+	local _descriptor_37 = _decorator_25(PaginationMountValidation, "constantItemCount", {
+		value = PaginationMountValidation.constantItemCount,
+	})
+	if _descriptor_37 then
+		PaginationMountValidation.constantItemCount = _descriptor_37.value
+	end
+	local _descriptor_38 = _decorator_24(PaginationMountValidation, "constantItemCount", {
+		value = PaginationMountValidation.constantItemCount,
+	})
+	if _descriptor_38 then
+		PaginationMountValidation.constantItemCount = _descriptor_38.value
 	end
 	PaginationMountValidation = Tag("Studio")(PaginationMountValidation) or PaginationMountValidation
 end

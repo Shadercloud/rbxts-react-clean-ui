@@ -104,6 +104,7 @@ function Placeholder(props: React.InstanceProps<Frame>) {
     const theme = React.useContext(CleanThemeContext)
     return <frame
         key="DraggablePlaceholder"
+        BorderSizePixel={0}
         {...props}
         BackgroundTransparency={theme.components.draggable.placeholder.backgroundTransparency}
         BackgroundColor3={theme.components.draggable.placeholder.backgroundColor}

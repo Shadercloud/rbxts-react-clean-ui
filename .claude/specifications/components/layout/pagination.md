@@ -30,7 +30,13 @@
 - The default (no-children) composition provides its own non-wrapping horizontal layout wrapping `Prev`, `List`, and `Next`. `Pagination.List` creates a separate auto-sized container for its own non-wrapping horizontal layout.
 - Defaults live under `theme.components.pagination`: root background, border, corner radius, spacing, and padding style the outer control; `item` supplies border thickness, corner radius, padding, typography, shadow, and primary intent colors (including a `disabled` variant) shared by page and navigation buttons.
 - Controls use `HoverButton`; default, hover, selected/focus, and disabled visuals resolve through `ColorHelper`. Prev/Next use the disabled variant when at their respective bounds. Navigation chevrons render inside `Container` wrappers.
+- Item buttons have no native border (`BorderSizePixel` `0`). When `item.borderThickness` is greater than `0`, each button gets a `UIStroke` child named `Stroke` with `ApplyStrokeMode` `Border`, the default (outer) stroke position, `Thickness` = `item.borderThickness`, and `Color` = the resolved `borderColor` for the button's current state (disabled, else selected/focus, else hover, else default). At thickness `0` (every shipped theme) no stroke is rendered. The stroke follows the item's corner radius.
 
 ## Animation
 
 - Page and hover-state changes are instantaneous.
+
+## Implementation notes
+
+- The item `Stroke` is rendered inside `PaginationItemVisual`, not `PaginationButton`: the stroke colour depends on hover/selected state, which is only readable via `HoverButtonContext` below `HoverButton`. Its state resolution must stay in sync with the `default`/`hover`/`focus` prop sets passed to `HoverButton` in `PaginationButton`.
+- Custom subpart content cannot bypass `PaginationItemVisual` (Item/Prev/Next always render it), so every item button gets the stroke.

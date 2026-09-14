@@ -71,6 +71,7 @@ local function SelectOption(props)
 	_attributes.Size = UDim2.new(1, 0, 0, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes.BackgroundTransparency = 0
+	_attributes.BorderSizePixel = 0
 	_attributes.BackgroundColor3 = ColorHelper:getIntentColors(theme, "primary", if context.selected == props.index then "focus" elseif hover then "hover" else "default", theme.components.select.intents).backgroundColor
 	_attributes.AutoButtonColor = false
 	local _attributes_1 = table.clone(props)
@@ -202,6 +203,7 @@ local function SelectSearchInput(props)
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 	}, _exp, React.createElement(Input, _attributes))
 end
 local function SelectGroupHeader(props)
@@ -486,6 +488,7 @@ local Select = React.forwardRef(function(props, ref)
 		local _attributes_3 = {
 			key = "SelectDropdown",
 			BackgroundTransparency = 0,
+			BorderSizePixel = 0,
 			BackgroundColor3 = theme.components.select.dropDownBackgroundColor,
 			AnchorPoint = Vector2.zero,
 		}
@@ -532,6 +535,7 @@ local Select = React.forwardRef(function(props, ref)
 		Size = UDim2.fromScale(1, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		Event = {
 			Activated = activateSelect,
 		},

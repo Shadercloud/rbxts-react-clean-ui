@@ -66,6 +66,7 @@ export const BreakpointProvider = React.forwardRef<Frame, BreakpointProviderProp
                 LayoutOrder={props.LayoutOrder}
                 Size={UDim2.fromScale(1, 1)}
                 BackgroundTransparency={1}
+                BorderSizePixel={0}
                 Change={{
                     AbsoluteSize: (instance) => resolve(instance.AbsoluteSize.X),
                 }}

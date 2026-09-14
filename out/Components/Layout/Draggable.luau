@@ -81,6 +81,7 @@ local function Placeholder(props)
 	local theme = React.useContext(CleanThemeContext)
 	local _attributes = {
 		key = "DraggablePlaceholder",
+		BorderSizePixel = 0,
 	}
 	for _k, _v in props do
 		_attributes[_k] = _v

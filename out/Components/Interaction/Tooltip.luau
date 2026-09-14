@@ -115,6 +115,7 @@ local function TooltipPopup(props)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	_attributes.GroupTransparency = groupTransparency
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	local _exp_1 = React.createElement(Padding, {
 		resolvedPadding = resolvedPadding,
 	})
@@ -146,12 +147,14 @@ local function TooltipPopup(props)
 		Size = UDim2.fromOffset(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 	}, _exp_1, React.createElement("frame", {
 		key = "Content",
 		Size = UDim2.fromOffset(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundColor3 = intent.backgroundColor,
 		BackgroundTransparency = intent.backgroundTransparency,
+		BorderSizePixel = 0,
 	}, _exp_2, _exp_3, _exp_4, _exp_5, if type(_content) == "string" then React.createElement(Text, {
 		name = "TooltipText",
 		text = props.content,

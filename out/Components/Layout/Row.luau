@@ -23,6 +23,7 @@ local Row = React.forwardRef(function(props, ref)
 	_attributes.Size = UDim2.fromScale(1, 1)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	_attributes.Change = {
 		AbsoluteSize = function(instance)
 			local nextWidth = instance.AbsoluteSize.X

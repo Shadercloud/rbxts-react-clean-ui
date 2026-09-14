@@ -222,6 +222,7 @@ local Button = React.forwardRef(function(props, ref)
 	_attributes.AutoButtonColor = false
 	_attributes.LayoutOrder = props.LayoutOrder
 	_attributes.ZIndex = props.ZIndex
+	_attributes.BorderSizePixel = 0
 	_attributes.Image = backgroundImage.Image
 	_attributes.ImageColor3 = backgroundImage.ImageColor3
 	_attributes.ImageTransparency = backgroundImage.ImageTransparency

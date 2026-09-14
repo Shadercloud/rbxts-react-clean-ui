@@ -27,6 +27,7 @@ local function SpinningIcon(props)
 	end
 	_attributes.key = _condition_1
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	_attributes.Size = UDim2.fromOffset(0, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	return React.createElement("frame", _attributes, React.createElement(Icon, {
@@ -81,7 +82,7 @@ function Icon(props)
 	_attributes.BackgroundColor3 = props.BackgroundColor3
 	_attributes.BorderColor3 = props.BorderColor3
 	_attributes.BorderMode = props.BorderMode
-	_attributes.BorderSizePixel = props.BorderSizePixel
+	_attributes.BorderSizePixel = if props.BorderSizePixel == nil then 0 else props.BorderSizePixel
 	_attributes.ClipsDescendants = props.ClipsDescendants
 	_attributes.Selectable = props.Selectable
 	_attributes.SelectionImageObject = props.SelectionImageObject

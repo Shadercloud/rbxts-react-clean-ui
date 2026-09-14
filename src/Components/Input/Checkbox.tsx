@@ -63,6 +63,7 @@ export function Checkbox(props: CheckboxProps) {
             theme.components.checkbox.intents,
         ).backgroundColor}
         AutoButtonColor={false}
+        BorderSizePixel={0}
 
         Image={backgroundImage.Image}
         ImageColor3={backgroundImage.ImageColor3}

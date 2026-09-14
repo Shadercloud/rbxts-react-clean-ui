@@ -83,6 +83,7 @@ local function GroupElement(props)
 	end
 	_attributes.key = _condition_4
 	_attributes.BackgroundTransparency = 1
+	_attributes.BorderSizePixel = 0
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	_attributes.Change = {
 		AbsoluteSize = function(instance)

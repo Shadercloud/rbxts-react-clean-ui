@@ -95,6 +95,7 @@ local function Switch(props)
 	_attributes.AutoButtonColor = false
 	_attributes.Size = UDim2.new(trackWidth, trackHeight)
 	_attributes.ZIndex = props.ZIndex
+	_attributes.BorderSizePixel = 0
 	_attributes.BackgroundColor3 = trackBackgroundColor
 	local _result
 	if props.disabled then

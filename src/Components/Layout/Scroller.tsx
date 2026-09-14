@@ -73,6 +73,7 @@ export function Scroller(props: ScrollerProps) {
                 Size={new UDim2(1, isScrolling ? -thickness - (spacing) : 0, 0, 0)}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 BackgroundTransparency={1}
+                BorderSizePixel={0}
             >
                 {props.children}
             </frame>

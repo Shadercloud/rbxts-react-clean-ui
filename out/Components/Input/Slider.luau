@@ -243,7 +243,7 @@ local Slider = React.forwardRef(function(props, ref)
 	_attributes.BackgroundTransparency = _condition_2
 	_attributes.BorderColor3 = props.BorderColor3
 	_attributes.BorderMode = props.BorderMode
-	_attributes.BorderSizePixel = props.BorderSizePixel
+	_attributes.BorderSizePixel = if props.BorderSizePixel == nil then 0 else props.BorderSizePixel
 	_attributes.ClipsDescendants = props.ClipsDescendants
 	_attributes.Interactable = props.Interactable
 	_attributes.LayoutOrder = props.LayoutOrder
@@ -273,6 +273,7 @@ local Slider = React.forwardRef(function(props, ref)
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundTransparency = theme.bar.backgroundTransparency,
 		BackgroundColor3 = theme.bar.backgroundColor,
+		BorderSizePixel = 0,
 	}, React.createElement("uistroke", {
 		key = "Stroke",
 		Thickness = theme.bar.borderThickness,
@@ -289,6 +290,7 @@ local Slider = React.forwardRef(function(props, ref)
 	local _uDim2 = UDim2.new(padding + padding, UDim.new(0, 0))
 	_attributes_1.Size = _exp_1 - _uDim2
 	_attributes_1.BackgroundTransparency = 1
+	_attributes_1.BorderSizePixel = 0
 	_attributes_1.Position = UDim2.fromScale(0.5, 0.5)
 	_attributes_1.AnchorPoint = Vector2.new(0.5, 0.5)
 	local _condition_3 = props.highlight ~= nil
@@ -297,6 +299,7 @@ local Slider = React.forwardRef(function(props, ref)
 			key = "Highlight",
 			BackgroundColor3 = theme.bar.highlight.backgroundColor,
 			BackgroundTransparency = theme.bar.highlight.backgroundTransparency,
+			BorderSizePixel = 0,
 		}
 		local _result
 		if props.highlight == "start" then

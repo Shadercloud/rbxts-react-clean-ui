@@ -165,6 +165,7 @@ export function Pie(props: PieProps) {
                         AnchorPoint={new Vector2(0.5, 0.5)}
                         Position={position}
                         BackgroundColor3={background}
+                        BorderSizePixel={0}
                         BackgroundTransparency={
                             theme.components.charts.pie.labels.backgroundTransparency ??
                             theme.components.box.backgroundTransparency
@@ -219,6 +220,7 @@ export function Pie(props: PieProps) {
                         AnchorPoint={new Vector2(0.5, 0.5)}
                         Position={position}
                         BackgroundTransparency={1}
+                        BorderSizePixel={0}
                     >
                         {label.content}
                     </frame>,
@@ -250,12 +252,14 @@ export function Pie(props: PieProps) {
         <canvasgroup
             key={props.name ?? "Pie"}
             BackgroundTransparency={1}
+            BorderSizePixel={0}
             Size={UDim2.fromScale(1, 1)}
         >
             {shadowPadding}
             <frame
                 key="HitArea"
                 BackgroundTransparency={1}
+                BorderSizePixel={0}
                 Size={UDim2.fromScale(1, 1)}
                 Event={{
                     MouseLeave: () => {

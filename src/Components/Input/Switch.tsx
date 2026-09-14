@@ -98,6 +98,7 @@ export function Switch(props: SwitchProps) {
             AutoButtonColor={false}
             Size={new UDim2(trackWidth, trackHeight)}
             ZIndex={props.ZIndex}
+            BorderSizePixel={0}
             BackgroundColor3={trackBackgroundColor}
             BackgroundTransparency={
                 props.disabled

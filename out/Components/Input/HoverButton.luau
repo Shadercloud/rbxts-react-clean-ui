@@ -35,7 +35,7 @@ local function HoverButton(propSet)
 	_attributes.BackgroundTransparency = props.BackgroundTransparency
 	_attributes.BorderColor3 = props.BorderColor3
 	_attributes.BorderMode = props.BorderMode
-	_attributes.BorderSizePixel = props.BorderSizePixel
+	_attributes.BorderSizePixel = if props.BorderSizePixel == nil then 0 else props.BorderSizePixel
 	_attributes.ClipsDescendants = props.ClipsDescendants
 	_attributes.LayoutOrder = props.LayoutOrder
 	_attributes.NextSelectionDown = props.NextSelectionDown
