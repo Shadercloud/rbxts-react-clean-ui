@@ -60,6 +60,7 @@ export interface ButtonTextProps extends ScalableElementProps, IntentElementProp
     text: string;
     disabled?: boolean;
     styleOverride?: ButtonStyleOverride;
+    LayoutOrder?: number;
 }
 
 function ButtonText(props: ButtonTextProps) {
@@ -74,6 +75,7 @@ function ButtonText(props: ButtonTextProps) {
                 props.scale,
                 { ...theme.components.button.typography, ...props.styleOverride?.typography }
             )}
+            LayoutOrder={props.LayoutOrder}
             TextColor3={
                 ColorHelper.getIntentColors(
                     theme,
@@ -229,6 +231,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                         <HStack valign="Center" spacing={props.spacing} Wraps={false}>
                             {props.icon !== undefined &&
                                 <ButtonIcon
+                                    LayoutOrder={1}
                                     scale={props.scale}
                                     intent={props.intent}
                                     disabled={props.disabled}
@@ -238,6 +241,7 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                             }
                             {props.text !== undefined &&
                                 <ButtonText
+                                    LayoutOrder={2}
                                     text={props.text}
                                     intent={props.intent}
                                     disabled={props.disabled}

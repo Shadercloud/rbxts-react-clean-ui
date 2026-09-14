@@ -71,6 +71,7 @@ local function ButtonText(props)
 		end
 	end
 	_attributes.typography = TypographyHelper:getTypography(theme, _exp, _object)
+	_attributes.LayoutOrder = props.LayoutOrder
 	local _exp_1 = props.intent
 	local _exp_2 = if props.disabled then "disabled" else "default"
 	local _exp_3 = theme.components.button.intents
@@ -284,6 +285,7 @@ local Button = React.forwardRef(function(props, ref)
 		spacing = props.spacing,
 		Wraps = false,
 	}, props.icon ~= nil and React.createElement(ButtonIcon, {
+		LayoutOrder = 1,
 		scale = props.scale,
 		intent = props.intent,
 		disabled = props.disabled,
@@ -291,6 +293,7 @@ local Button = React.forwardRef(function(props, ref)
 		spinning = props.spinning,
 		styleOverride = props.styleOverride,
 	}), props.text ~= nil and React.createElement(ButtonText, {
+		LayoutOrder = 2,
 		text = props.text,
 		intent = props.intent,
 		disabled = props.disabled,

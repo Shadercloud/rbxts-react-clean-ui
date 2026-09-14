@@ -20,6 +20,7 @@ export interface ButtonTextProps extends ScalableElementProps, IntentElementProp
     text: string;
     disabled?: boolean;
     styleOverride?: ButtonStyleOverride;
+    LayoutOrder?: number;
 }
 declare function ButtonText(props: ButtonTextProps): React.JSX.Element;
 export interface ButtonIconProps extends IconProps, IntentElementProps {
