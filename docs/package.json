@@ -8,7 +8,6 @@
     "dev": "next dev",
     "start": "next start",
     "types:check": "fumadocs-mdx && next typegen && tsc --noEmit",
-    "vendor-loom-runtime": "node scripts/vendor-loom-runtime.js",
     "postinstall": "fumadocs-mdx",
     "download-icons": "node --env-file-if-exists=.env.local scripts/download-icons.js"
   },
@@ -31,15 +30,10 @@
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
-    "@loom-dev/renderer": "file:./vendor/loom-runtime",
     "@types/react-dom": "^19.2.3",
-    "loom-dev": "^0.11.0",
+    "loom-dev": "^0.13.2",
     "postcss": "^8.5.17",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3"
-  },
-  "overrides": {
-    "@loom-dev/runtime": "file:./vendor/loom-runtime",
-    "@loom-dev/renderer": "$@loom-dev/renderer"
   }
 }

@@ -63,11 +63,31 @@ async function fetchAndCacheFullResolutionAsset(id) {
  * `<base>__loom/asset/<id>` → local PNG when cached, else (with
  * `ROBLOSECURITY` set) a live authenticated full-resolution fetch that's
  * cached for next time, else `next()`.
+ *
+ * loom-dev 0.13 resolves icons in batches first — `<base>__loom/assets?ids=1,2`
+ * answers `{ id: url }` with CDN URLs, and the per-id route above is only its
+ * fallback — so the batch route is answered here too, pointing every id at the
+ * per-id route. That keeps every icon going through the local lookup above;
+ * an id with no local file still ends at loom's own per-id resolution.
  */
 function localIconMiddleware(base) {
 	const assetRoute = `${base}__loom/asset/`;
+	const batchRoute = `${base}__loom/assets`;
 	return function loomLocalIcons(req, res, next) {
-		const pathname = (req.url ?? "/").split("?")[0] ?? "/";
+		const [pathname = "/", query = ""] = (req.url ?? "/").split("?");
+		if (pathname === batchRoute) {
+			const ids = (new URLSearchParams(query).get("ids") ?? "")
+				.split(",")
+				.filter((id) => /^\d+$/.test(id));
+			res.statusCode = 200;
+			res.setHeader("Content-Type", "application/json");
+			res.end(
+				JSON.stringify(
+					Object.fromEntries(ids.map((id) => [id, `${assetRoute}${id}`])),
+				),
+			);
+			return;
+		}
 		if (!pathname.startsWith(assetRoute)) {
 			next();
 			return;

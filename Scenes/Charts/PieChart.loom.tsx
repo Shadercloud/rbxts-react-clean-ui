@@ -6,8 +6,8 @@ import { LoomScene } from "../LoomScene";
 export const preview = {
     render: () => (
         <LoomScene>
-            <Container height="300" width="100%">
-                <Pie
+            <Container width="300" height="300" center>
+                <Pie label-hover
                     values={[
                         { value: 7, label: "Alpha" },
                         { value: 4, label: "Beta" },
