@@ -69,6 +69,22 @@ Use the `placement` prop to control where the tooltip appears relative to its ta
 
 `"Center"` positions the tooltip directly over the middle of its target instead of pointing at an edge, and hides the pointer arrow.
 
+### Staying on screen
+
+The tooltip measures itself before it appears and keeps itself on screen, clear of the Roblox topbar (the core buttons in the top-left corner):
+
+- The side you pick is the **preferred** side. If the tooltip doesn't fit there but fits on the opposite side, it opens on the opposite side instead: a `"Top"` tooltip on a button near the top of the screen opens below it. If it fits on neither side, it uses whichever has more room.
+- It then slides along the edge to stay on screen, and the pointer moves the other way so it still points at the middle of the target.
+- `"Center"` never changes side.
+
+Use `"Auto"` to let the tooltip choose. It prefers a side where it fits and stays centred on the target, then the side with the most room. Ties go to Top, then Bottom, Right and Left.
+
+```tsx
+<Tooltip content="Opens wherever it fits best" placement="Auto">
+    <Button text="Inventory" />
+</Tooltip>
+```
+
 ## Intent
 
 Tooltips support the standard intent colors.
@@ -136,7 +152,7 @@ Pass `open` to control visibility yourself. While `open` is set, hovering no lon
 | Prop        | Type                                                          | Default     | Description                                          |
 | ----------- | -------------------------------------------------------------- | ----------- | ----------------------------------------------------- |
 | `content`   | `string \| React.ReactNode`                                    | Required    | The content displayed inside the tooltip.              |
-| `placement` | `"Top"` \| `"Bottom"` \| `"Left"` \| `"Right"` \| `"Center"`   | `"Top"`     | Controls where the tooltip appears.                    |
+| `placement` | `"Top"` \| `"Bottom"` \| `"Left"` \| `"Right"` \| `"Center"` \| `"Auto"` | `"Top"`     | The preferred side. Flips to the opposite side when it doesn't fit. `"Auto"` picks the best side. |
 | `intent`    | `Intent`                                                       | `"primary"` | Applies one of the standard intent color schemes.      |
 | `spacing`   | `Spacing`                                                      | Theme default | Controls the internal padding of the tooltip.        |
 | `disabled`  | `boolean`                                                      | `false`     | Prevents the tooltip from showing and hides it if open. Overrides `open`. |
@@ -146,6 +162,7 @@ Pass `open` to control visibility yourself. While `open` is set, hovering no lon
 ## Behaviour
 
 - The tooltip is rendered through the nearest overlay provider, so it appears above surrounding content and is not clipped by the target's ancestors. Without an overlay provider it never renders.
-- While visible, the tooltip follows its target if the target moves or resizes.
+- While visible, the tooltip follows its target if the target moves or resizes, and places itself again if its content or the screen changes size.
+- The tooltip keeps `theme.components.tooltip.edgeMargin` pixels (8 by default) from the screen edges and from the bottom of the Roblox topbar. This works whether or not the `ScreenGui` holding the overlay sets `IgnoreGuiInset`.
 - Tooltips inside a `Draggable`'s drag preview never open, and tooltips inside the element being dragged close for the duration of the drag.
 - After being suppressed (by `disabled` or a drag), a hover-driven tooltip does not pop back open on its own. It reopens on the next hover.

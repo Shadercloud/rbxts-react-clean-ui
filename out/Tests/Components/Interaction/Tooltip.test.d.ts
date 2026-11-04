@@ -10,5 +10,9 @@ declare class TooltipMountValidation {
     disabledOverridesOpen(): void;
     nativeChildMounts(): void;
     nativeChildShows(): void;
+    rightEdgeFlips(): void;
+    topEdgeFlips(): void;
+    leftEdgeShifts(): void;
+    autoRightEdge(): void;
 }
 export = TooltipMountValidation;

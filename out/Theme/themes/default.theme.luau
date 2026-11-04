@@ -839,6 +839,7 @@ local DefaultTheme = {
 		tooltip = {
 			fadeDuration = 0.25,
 			pointerSize = 10,
+			edgeMargin = 8,
 			spacing = {
 				xs = 2,
 				sm = 6,

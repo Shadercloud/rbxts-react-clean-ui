@@ -18,6 +18,7 @@ local STUDIO_SKIP_MESSAGE = _layout.STUDIO_SKIP_MESSAGE
 local assertCenteredIn = _layout.assertCenteredIn
 local assertContained = _layout.assertContained
 local findDescendant = _layout.findDescendant
+local formatRect = _layout.formatRect
 local rect = _layout.rect
 local settleFrames = _layout.settleFrames
 local waitForGuiObject = _layout.waitForGuiObject
@@ -80,6 +81,39 @@ end
 local function waitForNativeTarget(host)
 	waitForGuiObject(host, "OverlayProvider")
 	return waitForGuiObject(host, "NativeTarget", nil, "Timed out waiting for the native <frame> inside Tooltip to mount - the tree failed to render (see the Studio output for the React error)")
+end
+local function edgeApp(placement, x, y, width)
+	if width == nil then
+		width = 100
+	end
+	return React.createElement(OverlayProvider, nil, React.createElement(Tooltip, {
+		content = CONTENT,
+		placement = placement,
+		open = true,
+	}, React.createElement("frame", {
+		key = "EdgeTarget",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(width, 40),
+		Position = UDim2.fromOffset(x, y),
+	})))
+end
+local function waitForPlacedPopup(host, placed)
+	local overlay = waitForGuiObject(host, "OverlayProvider")
+	local target = waitForGuiObject(host, "EdgeTarget")
+	local popup = waitForGuiObject(overlay, "Tooltip")
+	for attempt = 0, 59 do
+		if popup.GroupTransparency < 1 and placed(rect(popup), rect(target)) then
+			break
+		end
+		task.wait()
+	end
+	return {
+		popup = popup,
+		target = target,
+		overlay = overlay,
+		popupRect = rect(popup),
+		targetRect = rect(target),
+	}
 end
 local function assertNoPopup(host, message)
 	settleFrames(10)
@@ -242,6 +276,48 @@ do
 			handler(target, 0, 0)
 			local tooltip = waitForGuiObject(mounted.host, "Tooltip")
 			assertCenteredIn(tooltip, target, "x", 1, "native-child tooltip")
+		end)
+	end
+	function TooltipMountValidation:rightEdgeFlips()
+		withMounted(400, 300, edgeApp("Right", 290, 130), function(mounted)
+			local placed = waitForPlacedPopup(mounted.host, function(popup, target)
+				return popup.right <= target.left + 1
+			end)
+			Assert["true"](Assert, placed.popupRect.right <= placed.targetRect.left + 1, `Expected the popup {formatRect(placed.popupRect)} to open left of the target {formatRect(placed.targetRect)}`)
+			assertContained(placed.popup, placed.overlay, "flipped Right tooltip vs overlay")
+		end)
+	end
+	function TooltipMountValidation:topEdgeFlips()
+		withMounted(400, 300, edgeApp("Top", 150, 4), function(mounted)
+			local placed = waitForPlacedPopup(mounted.host, function(popup, target)
+				return popup.top >= target.bottom - 1
+			end)
+			Assert["true"](Assert, placed.popupRect.top >= placed.targetRect.bottom - 1, `Expected the popup {formatRect(placed.popupRect)} to open below the target {formatRect(placed.targetRect)}`)
+			assertContained(placed.popup, placed.overlay, "flipped Top tooltip vs overlay")
+		end)
+	end
+	function TooltipMountValidation:leftEdgeShifts()
+		withMounted(400, 300, edgeApp("Top", 0, 130, 40), function(mounted)
+			local placed = waitForPlacedPopup(mounted.host, function(popup)
+				return popup.left >= 8 - 0.5
+			end)
+			local pointer = findDescendant(placed.popup, "Pointer")
+			local pointerRect = rect(pointer)
+			Assert["true"](Assert, placed.popupRect.bottom <= placed.targetRect.top + 1, `Expected the popup {formatRect(placed.popupRect)} to stay above the target {formatRect(placed.targetRect)}`)
+			Assert["true"](Assert, placed.popupRect.left >= placed.targetRect.left + 8 - 0.5, `Expected the popup {formatRect(placed.popupRect)} to keep the 8px edge margin`)
+			Assert["true"](Assert, pointerRect.centerX >= placed.targetRect.left and pointerRect.centerX <= placed.targetRect.right, `Expected the pointer {formatRect(pointerRect)} to sit over the target {formatRect(placed.targetRect)}`)
+			assertContained(pointer, placed.popup, "shifted pointer vs popup")
+			assertContained(placed.popup, placed.overlay, "shifted Top tooltip vs overlay")
+		end)
+	end
+	function TooltipMountValidation:autoRightEdge()
+		withMounted(400, 300, edgeApp("Auto", 340, 130, 50), function(mounted)
+			local placed = waitForPlacedPopup(mounted.host, function(popup, target)
+				return popup.right <= target.left + 1
+			end)
+			Assert["true"](Assert, placed.popupRect.right <= placed.targetRect.left + 1, `Expected an Auto popup {formatRect(placed.popupRect)} to open left of the target {formatRect(placed.targetRect)}`)
+			assertCenteredIn(placed.popup, placed.target, "y", 1, "Auto tooltip")
+			assertContained(placed.popup, placed.overlay, "Auto tooltip vs overlay")
 		end)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
@@ -470,6 +546,86 @@ do
 	})
 	if _descriptor_33 then
 		TooltipMountValidation.nativeChildShows = _descriptor_33.value
+	end
+	local _decorator_23 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_24 = DisplayName("A Right tooltip on a trigger at the right edge opens to the left and stays inside the overlay")
+	local _descriptor_34 = Test(TooltipMountValidation, "rightEdgeFlips", {
+		value = TooltipMountValidation.rightEdgeFlips,
+	})
+	if _descriptor_34 then
+		TooltipMountValidation.rightEdgeFlips = _descriptor_34.value
+	end
+	local _descriptor_35 = _decorator_24(TooltipMountValidation, "rightEdgeFlips", {
+		value = TooltipMountValidation.rightEdgeFlips,
+	})
+	if _descriptor_35 then
+		TooltipMountValidation.rightEdgeFlips = _descriptor_35.value
+	end
+	local _descriptor_36 = _decorator_23(TooltipMountValidation, "rightEdgeFlips", {
+		value = TooltipMountValidation.rightEdgeFlips,
+	})
+	if _descriptor_36 then
+		TooltipMountValidation.rightEdgeFlips = _descriptor_36.value
+	end
+	local _decorator_25 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_26 = DisplayName("A Top tooltip on a trigger at the top edge opens below it and stays inside the overlay")
+	local _descriptor_37 = Test(TooltipMountValidation, "topEdgeFlips", {
+		value = TooltipMountValidation.topEdgeFlips,
+	})
+	if _descriptor_37 then
+		TooltipMountValidation.topEdgeFlips = _descriptor_37.value
+	end
+	local _descriptor_38 = _decorator_26(TooltipMountValidation, "topEdgeFlips", {
+		value = TooltipMountValidation.topEdgeFlips,
+	})
+	if _descriptor_38 then
+		TooltipMountValidation.topEdgeFlips = _descriptor_38.value
+	end
+	local _descriptor_39 = _decorator_25(TooltipMountValidation, "topEdgeFlips", {
+		value = TooltipMountValidation.topEdgeFlips,
+	})
+	if _descriptor_39 then
+		TooltipMountValidation.topEdgeFlips = _descriptor_39.value
+	end
+	local _decorator_27 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_28 = DisplayName("A Top tooltip on a narrow trigger at the left edge shifts right, clears the edge margin and keeps its pointer over the trigger")
+	local _descriptor_40 = Test(TooltipMountValidation, "leftEdgeShifts", {
+		value = TooltipMountValidation.leftEdgeShifts,
+	})
+	if _descriptor_40 then
+		TooltipMountValidation.leftEdgeShifts = _descriptor_40.value
+	end
+	local _descriptor_41 = _decorator_28(TooltipMountValidation, "leftEdgeShifts", {
+		value = TooltipMountValidation.leftEdgeShifts,
+	})
+	if _descriptor_41 then
+		TooltipMountValidation.leftEdgeShifts = _descriptor_41.value
+	end
+	local _descriptor_42 = _decorator_27(TooltipMountValidation, "leftEdgeShifts", {
+		value = TooltipMountValidation.leftEdgeShifts,
+	})
+	if _descriptor_42 then
+		TooltipMountValidation.leftEdgeShifts = _descriptor_42.value
+	end
+	local _decorator_29 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_30 = DisplayName("Auto on a trigger at the right edge opens to the left, where it needs no sideways shift")
+	local _descriptor_43 = Test(TooltipMountValidation, "autoRightEdge", {
+		value = TooltipMountValidation.autoRightEdge,
+	})
+	if _descriptor_43 then
+		TooltipMountValidation.autoRightEdge = _descriptor_43.value
+	end
+	local _descriptor_44 = _decorator_30(TooltipMountValidation, "autoRightEdge", {
+		value = TooltipMountValidation.autoRightEdge,
+	})
+	if _descriptor_44 then
+		TooltipMountValidation.autoRightEdge = _descriptor_44.value
+	end
+	local _descriptor_45 = _decorator_29(TooltipMountValidation, "autoRightEdge", {
+		value = TooltipMountValidation.autoRightEdge,
+	})
+	if _descriptor_45 then
+		TooltipMountValidation.autoRightEdge = _descriptor_45.value
 	end
 	TooltipMountValidation = Tag("Studio")(TooltipMountValidation) or TooltipMountValidation
 end

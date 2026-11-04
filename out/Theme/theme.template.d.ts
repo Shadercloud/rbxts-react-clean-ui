@@ -345,6 +345,7 @@ export interface ThemeTemplate {
         tooltip: {
             fadeDuration: number;
             pointerSize: number;
+            edgeMargin: number;
             spacing?: ScaleSizeValue<number>;
             boxShadow?: CssShadow;
             cornerRadius: CssSize;

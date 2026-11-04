@@ -16,6 +16,9 @@ export const preview = {
                     <Tooltip content="Appears below the button" placement="Bottom" intent="success">
                         <Button text="Hover me (Bottom)" intent="success" />
                     </Tooltip>
+                    <Tooltip content="Picks the side with the most room" placement="Auto" intent="info">
+                        <Button text="Hover me (Auto)" intent="info" />
+                    </Tooltip>
                 </HStack>
             </Container>
         </LoomScene>

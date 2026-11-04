@@ -48,6 +48,12 @@ function ToolTip(props: { screenshot?: boolean } = {}) {
             <TooltipComponent content="Hello World" placement="Left">
                 <Text text="Testing" />
             </TooltipComponent>
+            <TooltipComponent content="Centered over the trigger" placement="Center">
+                <Button text="Tooltip Centered" />
+            </TooltipComponent>
+            <TooltipComponent content="Opens on the side with the most room" placement="Auto">
+                <Button text="Tooltip Auto" />
+            </TooltipComponent>
         </VStack>
     );
 

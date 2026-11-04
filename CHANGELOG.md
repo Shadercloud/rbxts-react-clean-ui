@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.6.0
+
+### Behaviour changes (check before upgrading)
+
+- **Tooltips stay on screen.** A tooltip now measures itself before it appears and keeps itself inside the overlay, clear of the Roblox topbar. `placement` (`Top`, `Bottom`, `Left`, `Right`, default `Top`) is now the *preferred* side: if the popup doesn't fit there but fits on the opposite side, it opens on the opposite side; if it fits on neither, it takes the side with more room. It then shifts along the edge to stay inside, and the pointer moves the other way so it still points at the middle of the trigger, staying clear of the rounded corners. `Center` never flips. A tooltip that used to open off-screen or under the topbar's core buttons now opens somewhere else.
+- **The topbar band is excluded.** The band's bottom is `GuiService.TopbarInset.Max.Y`, converted into the overlay's ScreenGui space, so it works with `IgnoreGuiInset` on or off, and it follows `TopbarInset` changes.
+- **No flash on show.** The popup stays fully transparent until it has been measured once, and the fade-in starts from there.
+
+### Additions
+
+- **`placement="Auto"`.** Picks the best side for where the trigger is. A side where the popup fits beats one where it doesn't; among those, the one needing the least sideways shift wins (so the popup stays centred on the trigger), then the one with the most room. Ties go to Top, Bottom, Right, Left. If no side fits, the side with the most room wins.
+- **`theme.components.tooltip.edgeMargin`** (number, px, default `8`): the minimum gap between a tooltip and the overlay's edges and the topbar.
+
+### Fixes
+
+- A `Left` / `Right` tooltip's pointer is now centred on the content when the theme's `boxShadow` is uneven. It used to sit a couple of pixels off.
+
 ## 1.5.0
 
 ### Additions

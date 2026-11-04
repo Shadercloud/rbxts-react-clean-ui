@@ -8,7 +8,9 @@ import {
 	STUDIO_SKIP_MESSAGE,
 	assertCenteredIn,
 	assertContained,
+	LayoutRect,
 	findDescendant,
+	formatRect,
 	rect,
 	settleFrames,
 	waitForGuiObject,
@@ -17,6 +19,7 @@ import {
 	withMounted,
 } from "../../Helpers/layout";
 import { findHostFiber } from "../../Helpers/fiber";
+import { TooltipPlacement } from "../../../Components/Interaction/Tooltip.placement";
 
 const CONTENT = "Helpful hint";
 
@@ -100,6 +103,42 @@ function waitForNativeTarget(host: Instance): Frame {
 		undefined,
 		"Timed out waiting for the native <frame> inside Tooltip to mount - the tree failed to render (see the Studio output for the React error)",
 	);
+}
+
+function edgeApp(placement: TooltipPlacement, x: number, y: number, width = 100) {
+	return (
+		<OverlayProvider>
+			<Tooltip content={CONTENT} placement={placement} open={true}>
+				<frame
+					key="EdgeTarget"
+					BackgroundTransparency={1}
+					Size={UDim2.fromOffset(width, 40)}
+					Position={UDim2.fromOffset(x, y)}
+				/>
+			</Tooltip>
+		</OverlayProvider>
+	);
+}
+
+interface PlacedPopup {
+	popup: CanvasGroup;
+	target: Frame;
+	overlay: Frame;
+	popupRect: LayoutRect;
+	targetRect: LayoutRect;
+}
+
+function waitForPlacedPopup(host: Instance, placed: (popup: LayoutRect, target: LayoutRect) => boolean): PlacedPopup {
+	const overlay = waitForGuiObject<Frame>(host, "OverlayProvider");
+	const target = waitForGuiObject<Frame>(host, "EdgeTarget");
+	const popup = waitForGuiObject<CanvasGroup>(overlay, "Tooltip");
+
+	for (let attempt = 0; attempt < 60; attempt++) {
+		if (popup.GroupTransparency < 1 && placed(rect(popup), rect(target))) break;
+		task.wait();
+	}
+
+	return { popup, target, overlay, popupRect: rect(popup), targetRect: rect(target) };
 }
 
 function assertNoPopup(host: Instance, message: string) {
@@ -326,6 +365,80 @@ class TooltipMountValidation {
 
 			const tooltip = waitForGuiObject<CanvasGroup>(mounted.host, "Tooltip");
 			assertCenteredIn(tooltip, target, "x", 1, "native-child tooltip");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A Right tooltip on a trigger at the right edge opens to the left and stays inside the overlay")
+	@Test
+	public rightEdgeFlips() {
+		withMounted(400, 300, edgeApp("Right", 290, 130), (mounted) => {
+			const placed = waitForPlacedPopup(mounted.host, (popup, target) => popup.right <= target.left + 1);
+
+			Assert.true(
+				placed.popupRect.right <= placed.targetRect.left + 1,
+				`Expected the popup ${formatRect(placed.popupRect)} to open left of the target ${formatRect(placed.targetRect)}`,
+			);
+			assertContained(placed.popup, placed.overlay, "flipped Right tooltip vs overlay");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A Top tooltip on a trigger at the top edge opens below it and stays inside the overlay")
+	@Test
+	public topEdgeFlips() {
+		withMounted(400, 300, edgeApp("Top", 150, 4), (mounted) => {
+			const placed = waitForPlacedPopup(mounted.host, (popup, target) => popup.top >= target.bottom - 1);
+
+			Assert.true(
+				placed.popupRect.top >= placed.targetRect.bottom - 1,
+				`Expected the popup ${formatRect(placed.popupRect)} to open below the target ${formatRect(placed.targetRect)}`,
+			);
+			assertContained(placed.popup, placed.overlay, "flipped Top tooltip vs overlay");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName(
+		"A Top tooltip on a narrow trigger at the left edge shifts right, clears the edge margin and keeps its pointer over the trigger",
+	)
+	@Test
+	public leftEdgeShifts() {
+		withMounted(400, 300, edgeApp("Top", 0, 130, 40), (mounted) => {
+			const placed = waitForPlacedPopup(mounted.host, (popup) => popup.left >= 8 - 0.5);
+			const pointer = findDescendant<Frame>(placed.popup, "Pointer");
+			const pointerRect = rect(pointer);
+
+			Assert.true(
+				placed.popupRect.bottom <= placed.targetRect.top + 1,
+				`Expected the popup ${formatRect(placed.popupRect)} to stay above the target ${formatRect(placed.targetRect)}`,
+			);
+			Assert.true(
+				placed.popupRect.left >= placed.targetRect.left + 8 - 0.5,
+				`Expected the popup ${formatRect(placed.popupRect)} to keep the 8px edge margin`,
+			);
+			Assert.true(
+				pointerRect.centerX >= placed.targetRect.left && pointerRect.centerX <= placed.targetRect.right,
+				`Expected the pointer ${formatRect(pointerRect)} to sit over the target ${formatRect(placed.targetRect)}`,
+			);
+			assertContained(pointer, placed.popup, "shifted pointer vs popup");
+			assertContained(placed.popup, placed.overlay, "shifted Top tooltip vs overlay");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Auto on a trigger at the right edge opens to the left, where it needs no sideways shift")
+	@Test
+	public autoRightEdge() {
+		withMounted(400, 300, edgeApp("Auto", 340, 130, 50), (mounted) => {
+			const placed = waitForPlacedPopup(mounted.host, (popup, target) => popup.right <= target.left + 1);
+
+			Assert.true(
+				placed.popupRect.right <= placed.targetRect.left + 1,
+				`Expected an Auto popup ${formatRect(placed.popupRect)} to open left of the target ${formatRect(placed.targetRect)}`,
+			);
+			assertCenteredIn(placed.popup, placed.target, "y", 1, "Auto tooltip");
+			assertContained(placed.popup, placed.overlay, "Auto tooltip vs overlay");
 		});
 	}
 }

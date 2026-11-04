@@ -1,18 +1,24 @@
 import React from "@rbxts/react";
+import { GuiService } from "@rbxts/services";
 import { CleanThemeContext, DragStateContext, OverlayConsumer } from "../../Contexts";
 import { Text } from "../Typography";
 import ReactRoblox from "@rbxts/react-roblox";
 import { BoxShadow, Corners, Padding } from "../Decorator";
-import { ColorHelper, CssHelper, ElementHelper, SpacingHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, ElementHelper, SizeHelper, SpacingHelper } from "../../Helpers";
 import { IntentElementProps, PaddingProps } from "../../Interfaces";
 import { BoxProps } from "../Surface";
 import { useTween } from "@rbxts/react-ripple";
-
-type TooltipPlacement = "Top" | "Bottom" | "Left" | "Right" | "Center"
+import { TooltipPlacement, computeTooltipLayout, getTooltipSafeArea } from "./Tooltip.placement";
 
 interface TooltipTarget {
     position: Vector2;
     size: Vector2;
+}
+
+interface TooltipFrame {
+    position: Vector2;
+    size: Vector2;
+    topbarBottom: number;
 }
 
 interface TooltipPopup extends BoxProps, IntentElementProps {
@@ -23,19 +29,96 @@ interface TooltipPopup extends BoxProps, IntentElementProps {
     placement?: TooltipPlacement;
     visible: boolean;
 }
+
+function getTopbarBottom(overlay: Frame): number {
+    const surface = overlay.FindFirstAncestorWhichIsA("ScreenGui");
+
+    if (surface === undefined || surface.ScreenInsets === Enum.ScreenInsets.TopbarSafeInsets) {
+        return 0;
+    }
+
+    const originY = surface.ScreenInsets === Enum.ScreenInsets.CoreUISafeInsets ? GuiService.GetGuiInset()[0].Y : 0;
+
+    return GuiService.TopbarInset.Max.Y - originY - overlay.AbsolutePosition.Y;
+}
+
+function readFrame(overlay: Frame): TooltipFrame {
+    return {
+        position: overlay.AbsolutePosition,
+        size: overlay.AbsoluteSize,
+        topbarBottom: getTopbarBottom(overlay),
+    };
+}
+
 function TooltipPopup(props: TooltipPopup) {
     const theme = React.useContext(CleanThemeContext);
+
+    const contentRef = React.useRef<Frame>();
+    const [contentSize, setContentSize] = React.useState<Vector2>();
+    const [frame, setFrame] = React.useState(() => readFrame(props.overlay));
 
     const [groupTransparency, transparencyTween] = useTween(1, {
         duration: props.fadeDuration,
         easing: "quadOut",
     });
 
-    React.useEffect(() => {
-        transparencyTween.setGoal(props.visible ? 0 : 1);
-    }, [props.visible, transparencyTween]);
+    const measured = contentSize !== undefined;
 
-    const resolvedPadding = {
+    React.useEffect(() => {
+        transparencyTween.setGoal(props.visible && measured ? 0 : 1);
+    }, [props.visible, measured, transparencyTween]);
+
+    React.useEffect(() => {
+        const overlay = props.overlay;
+        const update = () => {
+            const latest = readFrame(overlay);
+            setFrame((current) =>
+                current.position === latest.position && current.size === latest.size && current.topbarBottom === latest.topbarBottom
+                    ? current
+                    : latest,
+            );
+        };
+
+        update();
+
+        const connections = [
+            overlay.GetPropertyChangedSignal("AbsoluteSize").Connect(update),
+            overlay.GetPropertyChangedSignal("AbsolutePosition").Connect(update),
+            GuiService.GetPropertyChangedSignal("TopbarInset").Connect(update),
+        ];
+
+        return () => {
+            for (const connection of connections) {
+                connection.Disconnect();
+            }
+        };
+    }, [props.overlay]);
+
+    React.useEffect(() => {
+        const content = contentRef.current;
+
+        if (content === undefined) {
+            return;
+        }
+
+        const update = () => {
+            const size = content.AbsoluteSize;
+
+            if (size.X > 0 || size.Y > 0) {
+                setContentSize(size);
+            }
+        };
+
+        update();
+
+        const sizeChanged = content.GetPropertyChangedSignal("AbsoluteSize").Connect(update);
+
+        return () => {
+            sizeChanged.Disconnect();
+        };
+    }, []);
+
+    const shadowPadding = {
         top: 0,
         bottom: 0,
         left: 0,
@@ -44,65 +127,39 @@ function TooltipPopup(props: TooltipPopup) {
 
     const shadow = theme.components.tooltip.boxShadow !== undefined && theme.components.tooltip.boxShadow !== 0 ? CssHelper.parseCssShadow(theme.components.tooltip.boxShadow) : undefined;
     if (shadow !== undefined) {
-        resolvedPadding.top += shadow.blurRadius.Offset + shadow.spread.Y.Offset - shadow.offset.Y.Offset;
-        resolvedPadding.bottom += shadow.blurRadius.Offset + shadow.spread.Y.Offset + shadow.offset.Y.Offset;
-        resolvedPadding.left += shadow.blurRadius.Offset + shadow.spread.X.Offset - shadow.offset.X.Offset;
-        resolvedPadding.right += shadow.blurRadius.Offset + shadow.spread.X.Offset + shadow.offset.X.Offset;
+        shadowPadding.top += shadow.blurRadius.Offset + shadow.spread.Y.Offset - shadow.offset.Y.Offset;
+        shadowPadding.bottom += shadow.blurRadius.Offset + shadow.spread.Y.Offset + shadow.offset.Y.Offset;
+        shadowPadding.left += shadow.blurRadius.Offset + shadow.spread.X.Offset - shadow.offset.X.Offset;
+        shadowPadding.right += shadow.blurRadius.Offset + shadow.spread.X.Offset + shadow.offset.X.Offset;
     }
 
+    const contentWidth = contentSize?.X ?? 0;
+    const contentHeight = contentSize?.Y ?? 0;
+    const cornerRadius = SizeHelper.toUDim(theme.components.button.cornerRadius);
+    const targetPosition = props.target.position.sub(frame.position);
 
-    const pointerSize = props.placement === "Center" ? 0 : theme.components.tooltip.pointerSize;
+    const layout = computeTooltipLayout({
+        target: {
+            left: targetPosition.X,
+            top: targetPosition.Y,
+            right: targetPosition.X + props.target.size.X,
+            bottom: targetPosition.Y + props.target.size.Y,
+        },
+        content: { width: contentWidth, height: contentHeight },
+        bounds: getTooltipSafeArea(
+            { width: frame.size.X, height: frame.size.Y },
+            theme.components.tooltip.edgeMargin,
+            frame.topbarBottom,
+        ),
+        placement: props.placement,
+        pointerSize: theme.components.tooltip.pointerSize,
+        shadow: shadowPadding,
+        cornerRadius: cornerRadius.Offset + cornerRadius.Scale * math.min(contentWidth, contentHeight),
+    });
 
-    let anchor = Vector2.zero;
-    let position = props.target.position.sub(props.overlay.AbsolutePosition);
-    let pointerRotation = 45;
-    let pointerAnchor = new Vector2(0.5, 1);
-    let pointerPosition = new UDim2(0.5, 0, 1, 0);
-
-    const factor = 1.41421356;
-    const pointerHeight = (factor * pointerSize) / 2;
-    const pointerDiff = pointerHeight - (pointerSize / 2);
-
-    switch (props.placement ?? "Top") {
-        case "Top":
-            anchor = new Vector2(0.5, 1);
-            position = position.add(new Vector2(props.target.size.X / 2, 0));
-            pointerPosition = new UDim2(0.5, (resolvedPadding.left - resolvedPadding.right) / 2, 1, -math.max(math.ceil(pointerDiff), resolvedPadding.bottom - pointerDiff));
-            resolvedPadding.bottom = math.max(math.floor(pointerHeight), resolvedPadding.bottom);
-            break;
-        case "Bottom":
-            anchor = new Vector2(0.5, 0);
-            position = position.add(new Vector2(props.target.size.X / 2, props.target.size.Y))
-            pointerAnchor = new Vector2(0.5, 0);
-            pointerRotation = -135;
-            pointerPosition = new UDim2(0.5, (resolvedPadding.left - resolvedPadding.right) / 2, 0, math.max(math.ceil(pointerDiff), resolvedPadding.top - pointerDiff));
-            resolvedPadding.top = math.max(math.floor(pointerHeight), resolvedPadding.top);
-            break;
-        case "Left":
-            anchor = new Vector2(1, 0.5);
-            position = position.add(new Vector2(0, props.target.size.Y / 2));
-            pointerRotation = -45;
-            pointerAnchor = new Vector2(1, 0.5);
-            pointerPosition = new UDim2(1, -math.max(math.ceil(pointerDiff), resolvedPadding.right - pointerDiff), 0.5, 0);
-            resolvedPadding.right = math.max(math.floor(pointerHeight), resolvedPadding.right);
-            break;
-        case "Right":
-            anchor = new Vector2(0, 0.5)
-            position = position.add(new Vector2(props.target.size.X, props.target.size.Y / 2));
-            pointerRotation = 135;
-            pointerAnchor = new Vector2(0, 0.5);
-            pointerPosition = new UDim2(0, math.max(math.ceil(pointerDiff), resolvedPadding.left - pointerDiff), 0.5, 0);
-            resolvedPadding.left = math.max(math.floor(pointerHeight), resolvedPadding.left);
-            break;
-        case "Center":
-            anchor = new Vector2(0.5, 0.5)
-            position = position.add(new Vector2(props.target.size.X / 2, props.target.size.Y / 2));
-            break;
-    }
-
-
-
-
+    const resolvedPadding = layout.padding;
+    const pointer = layout.pointer;
+    const pointerSize = pointer !== undefined ? theme.components.tooltip.pointerSize : 0;
 
     const intent = ColorHelper.getIntentColors(theme, props.intent, "default", theme.components.tooltip.intents);
 
@@ -111,11 +168,11 @@ function TooltipPopup(props: TooltipPopup) {
     return (
         <canvasgroup
             key={props.name ?? "Tooltip"}
-            Position={UDim2.fromOffset(position.X, position.Y)}
-            AnchorPoint={anchor}
+            Position={UDim2.fromOffset(layout.position.x, layout.position.y)}
+            AnchorPoint={new Vector2(layout.anchor.x, layout.anchor.y)}
             Size={UDim2.fromOffset(0, 0)}
             AutomaticSize={Enum.AutomaticSize.XY}
-            GroupTransparency={groupTransparency}
+            GroupTransparency={measured ? groupTransparency : 1}
             BackgroundTransparency={1}
             BorderSizePixel={0}
         >
@@ -123,6 +180,7 @@ function TooltipPopup(props: TooltipPopup) {
                 <Padding resolvedPadding={resolvedPadding} />
                 <frame
                     key="Content"
+                    ref={contentRef}
                     Size={UDim2.fromOffset(0, 0)}
                     AutomaticSize={Enum.AutomaticSize.XY}
                     BackgroundColor3={intent.backgroundColor}
@@ -144,9 +202,9 @@ function TooltipPopup(props: TooltipPopup) {
                         : props.content}
                 </frame>
             </frame>
-            {pointerSize > 0 && <frame key="Pointer" Size={UDim2.fromOffset(pointerSize, pointerSize)}
-                AnchorPoint={pointerAnchor}
-                Position={pointerPosition}
+            {pointer !== undefined && <frame key="Pointer" Size={UDim2.fromOffset(pointerSize, pointerSize)}
+                AnchorPoint={new Vector2(pointer.anchor.x, pointer.anchor.y)}
+                Position={new UDim2(pointer.scale.x, pointer.offset.x, pointer.scale.y, pointer.offset.y)}
                 BorderSizePixel={1}
                 BackgroundColor3={intent.backgroundColor}
                 BorderColor3={props['border-color'] ?? intent.borderColor}
@@ -163,7 +221,7 @@ function TooltipPopup(props: TooltipPopup) {
                             new NumberSequenceKeypoint(1, 0),
                         ])
                     }
-                    Rotation={pointerRotation}
+                    Rotation={pointer.rotation}
 
                 >
 

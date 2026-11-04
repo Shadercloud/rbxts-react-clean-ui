@@ -183,6 +183,9 @@ Implementation notes for src/Tests — test files carry no comments, so non-obvi
 - `disabledKeepsInstance` compares the `HoverTarget` instance by reference across `disabled` false → true → false (`mounted.update` re-renders the same element types, so only a Tooltip-caused remount could change it), then hovers to prove the handlers still work.
 - `controlledOpen` waits 20 frames after `MouseLeave` before checking the popup is still there, longer than the 0.25s fade, so an uncontrolled `hide()` would have removed it.
 - `nativeChildMounts`/`nativeChildShows` wrap a native `<frame>`. As with `Draggable.Handle`, the mount test only waits for the frame to exist (a raw `Event` table on a host element throws and unmounts the root). `nativeChildShows` reads `memoizedProps[React.Event.MouseEnter]` from the frame's host fiber via `findHostFiber` in `fiber.ts`.
+- The edge tests (`rightEdgeFlips`, `topEdgeFlips`, `leftEdgeShifts`, `autoRightEdge`) mount `edgeApp`, a native `EdgeTarget` frame under `open={true}`, so no hover plumbing is needed. The popup is placed only after its content has been measured (a frame or more after it appears, and it is transparent until then), so `waitForPlacedPopup` polls up to 60 frames for `GroupTransparency < 1` and the expected side, then the test asserts with full rects. It does not fail on its own, so a timeout shows up as the assertion message with the last rects.
+- They run in Edit mode, where `GuiService.TopbarInset` and `GetGuiInset()` are zero, so they can't exercise the topbar band. `Tooltip.placement.test.ts` covers it through `getTooltipSafeArea`.
+- `Tooltip.placement.test.ts` is `@Tag("Lune")`: `computeTooltipLayout` takes plain tables, so no Roblox datatypes are needed. Its expected numbers assume `pointerSize = 10` (padding `floor(10 * sqrt(2) / 2) = 7`), a corner radius of 8 and a 400x300 overlay with an 8px margin.
 
 ## `Scroller.test.tsx`
 

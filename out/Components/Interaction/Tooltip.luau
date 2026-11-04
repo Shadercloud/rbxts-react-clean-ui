@@ -1,6 +1,7 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
+local GuiService = TS.import(script, TS.getModule(script, "@rbxts", "services")).GuiService
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local CleanThemeContext = _Contexts.CleanThemeContext
 local DragStateContext = _Contexts.DragStateContext
@@ -15,18 +16,76 @@ local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
 local ElementHelper = _Helpers.ElementHelper
+local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local useTween = TS.import(script, TS.getModule(script, "@rbxts", "react-ripple").src).useTween
+local _Tooltip_placement = TS.import(script, script.Parent, "Tooltip.placement")
+local computeTooltipLayout = _Tooltip_placement.computeTooltipLayout
+local getTooltipSafeArea = _Tooltip_placement.getTooltipSafeArea
+local function getTopbarBottom(overlay)
+	local surface = overlay:FindFirstAncestorWhichIsA("ScreenGui")
+	if surface == nil or surface.ScreenInsets == Enum.ScreenInsets.TopbarSafeInsets then
+		return 0
+	end
+	local originY = if surface.ScreenInsets == Enum.ScreenInsets.CoreUISafeInsets then (GuiService:GetGuiInset()).Y else 0
+	return GuiService.TopbarInset.Max.Y - originY - overlay.AbsolutePosition.Y
+end
+local function readFrame(overlay)
+	return {
+		position = overlay.AbsolutePosition,
+		size = overlay.AbsoluteSize,
+		topbarBottom = getTopbarBottom(overlay),
+	}
+end
 local function TooltipPopup(props)
 	local theme = React.useContext(CleanThemeContext)
+	local contentRef = React.useRef()
+	local contentSize, setContentSize = React.useState()
+	local frame, setFrame = React.useState(function()
+		return readFrame(props.overlay)
+	end)
 	local groupTransparency, transparencyTween = useTween(1, {
 		duration = props.fadeDuration,
 		easing = "quadOut",
 	})
+	local measured = contentSize ~= nil
 	React.useEffect(function()
-		transparencyTween:setGoal(if props.visible then 0 else 1)
-	end, { props.visible, transparencyTween })
-	local resolvedPadding = {
+		transparencyTween:setGoal(if props.visible and measured then 0 else 1)
+	end, { props.visible, measured, transparencyTween })
+	React.useEffect(function()
+		local overlay = props.overlay
+		local update = function()
+			local latest = readFrame(overlay)
+			setFrame(function(current)
+				return if current.position == latest.position and current.size == latest.size and current.topbarBottom == latest.topbarBottom then current else latest
+			end)
+		end
+		update()
+		local connections = { overlay:GetPropertyChangedSignal("AbsoluteSize"):Connect(update), overlay:GetPropertyChangedSignal("AbsolutePosition"):Connect(update), GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(update) }
+		return function()
+			for _, connection in connections do
+				connection:Disconnect()
+			end
+		end
+	end, { props.overlay })
+	React.useEffect(function()
+		local content = contentRef.current
+		if content == nil then
+			return nil
+		end
+		local update = function()
+			local size = content.AbsoluteSize
+			if size.X > 0 or size.Y > 0 then
+				setContentSize(size)
+			end
+		end
+		update()
+		local sizeChanged = content:GetPropertyChangedSignal("AbsoluteSize"):Connect(update)
+		return function()
+			sizeChanged:Disconnect()
+		end
+	end, {})
+	local shadowPadding = {
 		top = 0,
 		bottom = 0,
 		left = 0,
@@ -34,114 +93,96 @@ local function TooltipPopup(props)
 	}
 	local shadow = if theme.components.tooltip.boxShadow ~= nil and theme.components.tooltip.boxShadow ~= 0 then CssHelper:parseCssShadow(theme.components.tooltip.boxShadow) else nil
 	if shadow ~= nil then
-		resolvedPadding.top += shadow.blurRadius.Offset + shadow.spread.Y.Offset - shadow.offset.Y.Offset
-		resolvedPadding.bottom += shadow.blurRadius.Offset + shadow.spread.Y.Offset + shadow.offset.Y.Offset
-		resolvedPadding.left += shadow.blurRadius.Offset + shadow.spread.X.Offset - shadow.offset.X.Offset
-		resolvedPadding.right += shadow.blurRadius.Offset + shadow.spread.X.Offset + shadow.offset.X.Offset
+		shadowPadding.top += shadow.blurRadius.Offset + shadow.spread.Y.Offset - shadow.offset.Y.Offset
+		shadowPadding.bottom += shadow.blurRadius.Offset + shadow.spread.Y.Offset + shadow.offset.Y.Offset
+		shadowPadding.left += shadow.blurRadius.Offset + shadow.spread.X.Offset - shadow.offset.X.Offset
+		shadowPadding.right += shadow.blurRadius.Offset + shadow.spread.X.Offset + shadow.offset.X.Offset
 	end
-	local pointerSize = if props.placement == "Center" then 0 else theme.components.tooltip.pointerSize
-	local anchor = Vector2.zero
+	local _result = contentSize
+	if _result ~= nil then
+		_result = _result.X
+	end
+	local _condition = _result
+	if _condition == nil then
+		_condition = 0
+	end
+	local contentWidth = _condition
+	local _result_1 = contentSize
+	if _result_1 ~= nil then
+		_result_1 = _result_1.Y
+	end
+	local _condition_1 = _result_1
+	if _condition_1 == nil then
+		_condition_1 = 0
+	end
+	local contentHeight = _condition_1
+	local cornerRadius = SizeHelper:toUDim(theme.components.button.cornerRadius)
 	local _position = props.target.position
-	local _absolutePosition = props.overlay.AbsolutePosition
-	local position = _position - _absolutePosition
-	local pointerRotation = 45
-	local pointerAnchor = Vector2.new(0.5, 1)
-	local pointerPosition = UDim2.new(0.5, 0, 1, 0)
-	local factor = 1.41421356
-	local pointerHeight = (factor * pointerSize) / 2
-	local pointerDiff = pointerHeight - (pointerSize / 2)
-	local _exp = props.placement or "Top"
-	repeat
-		if _exp == "Top" then
-			anchor = Vector2.new(0.5, 1)
-			local _position_1 = position
-			local _vector2 = Vector2.new(props.target.size.X / 2, 0)
-			position = _position_1 + _vector2
-			pointerPosition = UDim2.new(0.5, (resolvedPadding.left - resolvedPadding.right) / 2, 1, -math.max(math.ceil(pointerDiff), resolvedPadding.bottom - pointerDiff))
-			resolvedPadding.bottom = math.max(math.floor(pointerHeight), resolvedPadding.bottom)
-			break
-		end
-		if _exp == "Bottom" then
-			anchor = Vector2.new(0.5, 0)
-			local _position_1 = position
-			local _vector2 = Vector2.new(props.target.size.X / 2, props.target.size.Y)
-			position = _position_1 + _vector2
-			pointerAnchor = Vector2.new(0.5, 0)
-			pointerRotation = -135
-			pointerPosition = UDim2.new(0.5, (resolvedPadding.left - resolvedPadding.right) / 2, 0, math.max(math.ceil(pointerDiff), resolvedPadding.top - pointerDiff))
-			resolvedPadding.top = math.max(math.floor(pointerHeight), resolvedPadding.top)
-			break
-		end
-		if _exp == "Left" then
-			anchor = Vector2.new(1, 0.5)
-			local _position_1 = position
-			local _vector2 = Vector2.new(0, props.target.size.Y / 2)
-			position = _position_1 + _vector2
-			pointerRotation = -45
-			pointerAnchor = Vector2.new(1, 0.5)
-			pointerPosition = UDim2.new(1, -math.max(math.ceil(pointerDiff), resolvedPadding.right - pointerDiff), 0.5, 0)
-			resolvedPadding.right = math.max(math.floor(pointerHeight), resolvedPadding.right)
-			break
-		end
-		if _exp == "Right" then
-			anchor = Vector2.new(0, 0.5)
-			local _position_1 = position
-			local _vector2 = Vector2.new(props.target.size.X, props.target.size.Y / 2)
-			position = _position_1 + _vector2
-			pointerRotation = 135
-			pointerAnchor = Vector2.new(0, 0.5)
-			pointerPosition = UDim2.new(0, math.max(math.ceil(pointerDiff), resolvedPadding.left - pointerDiff), 0.5, 0)
-			resolvedPadding.left = math.max(math.floor(pointerHeight), resolvedPadding.left)
-			break
-		end
-		if _exp == "Center" then
-			anchor = Vector2.new(0.5, 0.5)
-			local _position_1 = position
-			local _vector2 = Vector2.new(props.target.size.X / 2, props.target.size.Y / 2)
-			position = _position_1 + _vector2
-			break
-		end
-	until true
+	local _position_1 = frame.position
+	local targetPosition = _position - _position_1
+	local layout = computeTooltipLayout({
+		target = {
+			left = targetPosition.X,
+			top = targetPosition.Y,
+			right = targetPosition.X + props.target.size.X,
+			bottom = targetPosition.Y + props.target.size.Y,
+		},
+		content = {
+			width = contentWidth,
+			height = contentHeight,
+		},
+		bounds = getTooltipSafeArea({
+			width = frame.size.X,
+			height = frame.size.Y,
+		}, theme.components.tooltip.edgeMargin, frame.topbarBottom),
+		placement = props.placement,
+		pointerSize = theme.components.tooltip.pointerSize,
+		shadow = shadowPadding,
+		cornerRadius = cornerRadius.Offset + cornerRadius.Scale * math.min(contentWidth, contentHeight),
+	})
+	local resolvedPadding = layout.padding
+	local pointer = layout.pointer
+	local pointerSize = if pointer ~= nil then theme.components.tooltip.pointerSize else 0
 	local intent = ColorHelper:getIntentColors(theme, props.intent, "default", theme.components.tooltip.intents)
 	local padding = SpacingHelper:ResolveNumberPadding(SpacingHelper:GetPadding(theme, props.spacing, theme.components.tooltip.spacing))
 	local _attributes = {}
-	local _condition = props.name
-	if _condition == nil then
-		_condition = "Tooltip"
+	local _condition_2 = props.name
+	if _condition_2 == nil then
+		_condition_2 = "Tooltip"
 	end
-	_attributes.key = _condition
-	_attributes.Position = UDim2.fromOffset(position.X, position.Y)
-	_attributes.AnchorPoint = anchor
+	_attributes.key = _condition_2
+	_attributes.Position = UDim2.fromOffset(layout.position.x, layout.position.y)
+	_attributes.AnchorPoint = Vector2.new(layout.anchor.x, layout.anchor.y)
 	_attributes.Size = UDim2.fromOffset(0, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
-	_attributes.GroupTransparency = groupTransparency
+	_attributes.GroupTransparency = if measured then groupTransparency else 1
 	_attributes.BackgroundTransparency = 1
 	_attributes.BorderSizePixel = 0
-	local _exp_1 = React.createElement(Padding, {
+	local _exp = React.createElement(Padding, {
 		resolvedPadding = resolvedPadding,
 	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	_attributes_1.value = theme.components.tooltip.boxShadow
-	local _exp_2 = React.createElement(BoxShadow, _attributes_1)
-	local _exp_3 = React.createElement(Corners, {
+	local _exp_1 = React.createElement(BoxShadow, _attributes_1)
+	local _exp_2 = React.createElement(Corners, {
 		radius = theme.components.button.cornerRadius,
 	})
 	local _attributes_2 = table.clone(props)
 	setmetatable(_attributes_2, nil)
 	_attributes_2.resolvedPadding = padding
-	local _exp_4 = React.createElement(Padding, _attributes_2)
+	local _exp_3 = React.createElement(Padding, _attributes_2)
 	local _attributes_3 = {
 		key = "Stroke",
 	}
-	local _condition_1 = props["border-thickness"]
-	if _condition_1 == nil then
-		_condition_1 = theme.components.box.borderThickness
+	local _condition_3 = props["border-thickness"]
+	if _condition_3 == nil then
+		_condition_3 = theme.components.box.borderThickness
 	end
-	_attributes_3.Thickness = _condition_1
+	_attributes_3.Thickness = _condition_3
 	_attributes_3.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 	_attributes_3.Color = props["border-color"] or intent.borderColor
-	local _exp_5 = React.createElement("uistroke", _attributes_3)
+	local _exp_4 = React.createElement("uistroke", _attributes_3)
 	local _content = props.content
 	return React.createElement("canvasgroup", _attributes, React.createElement("frame", {
 		key = "ShadowPadding",
@@ -149,22 +190,23 @@ local function TooltipPopup(props)
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-	}, _exp_1, React.createElement("frame", {
+	}, _exp, React.createElement("frame", {
 		key = "Content",
+		ref = contentRef,
 		Size = UDim2.fromOffset(0, 0),
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundColor3 = intent.backgroundColor,
 		BackgroundTransparency = intent.backgroundTransparency,
 		BorderSizePixel = 0,
-	}, _exp_2, _exp_3, _exp_4, _exp_5, if type(_content) == "string" then React.createElement(Text, {
+	}, _exp_1, _exp_2, _exp_3, _exp_4, if type(_content) == "string" then React.createElement(Text, {
 		name = "TooltipText",
 		text = props.content,
 		TextColor3 = intent.textColor,
-	}) else props.content)), pointerSize > 0 and React.createElement("frame", {
+	}) else props.content)), pointer ~= nil and React.createElement("frame", {
 		key = "Pointer",
 		Size = UDim2.fromOffset(pointerSize, pointerSize),
-		AnchorPoint = pointerAnchor,
-		Position = pointerPosition,
+		AnchorPoint = Vector2.new(pointer.anchor.x, pointer.anchor.y),
+		Position = UDim2.new(pointer.scale.x, pointer.offset.x, pointer.scale.y, pointer.offset.y),
 		BorderSizePixel = 1,
 		BackgroundColor3 = intent.backgroundColor,
 		BorderColor3 = props["border-color"] or intent.borderColor,
@@ -173,7 +215,7 @@ local function TooltipPopup(props)
 	}, React.createElement("uigradient", {
 		key = "Gradient",
 		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.4999, 1), NumberSequenceKeypoint.new(0.5, 0), NumberSequenceKeypoint.new(1, 0) }),
-		Rotation = pointerRotation,
+		Rotation = pointer.rotation,
 	})))
 end
 local function Tooltip(props)
