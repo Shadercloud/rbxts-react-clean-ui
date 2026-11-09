@@ -15,6 +15,27 @@ type ImageButtonProps = React.InstanceProps<ImageButton>;
 
 type HoverButtonStateProps = ImageButtonProps & BorderElementProps;
 
+type ImageButtonEvents = React.InstanceEvent<ImageButton>;
+
+function mergeEvents(base: ImageButtonEvents, extra: ImageButtonEvents | undefined): ImageButtonEvents {
+    if (extra === undefined) {
+        return base;
+    }
+
+    const merged = { ...base } as Record<string, Callback>;
+
+    for (const [name, handler] of pairs(extra as Record<string, Callback>)) {
+        const original = merged[name];
+
+        merged[name] = original === undefined ? handler : (...args: unknown[]) => {
+            original(...args);
+            handler(...args);
+        };
+    }
+
+    return merged as ImageButtonEvents;
+}
+
 interface HoverButtonProps extends BorderElementProps {
     default: HoverButtonStateProps;
     hover?: HoverButtonStateProps;
@@ -24,9 +45,10 @@ interface HoverButtonProps extends BorderElementProps {
     name?: string;
     pressOn?: PressOn;
     onRelease?: PressReleaseCallback;
+    Event?: ImageButtonEvents;
 }
 
-export function HoverButton(propSet: HoverButtonProps) {
+export const HoverButton = React.forwardRef<ImageButton, HoverButtonProps>((propSet, ref) => {
     const [hovering, setHovering] = React.useState(false);
     const trackRelease = usePressRelease(propSet.onRelease);
 
@@ -50,8 +72,10 @@ export function HoverButton(propSet: HoverButtonProps) {
 
     const defaultEvents = propSet.default.Event;
     const stateEvents = stateProps?.Event;
-    const activated = stateEvents?.Activated ?? defaultEvents?.Activated;
-    const inputBegan = stateEvents?.InputBegan ?? defaultEvents?.InputBegan;
+    const topEvents = propSet.Event;
+    const events = mergeEvents({ ...defaultEvents, ...stateEvents }, topEvents);
+    const activated = events.Activated;
+    const inputBegan = events.InputBegan;
 
     return (
         <HoverButtonContext.Provider value={{
@@ -60,6 +84,7 @@ export function HoverButton(propSet: HoverButtonProps) {
         }}>
             <imagebutton
                 key={propSet.name ?? "HoverButton"}
+                ref={ref}
                 Active={props.Active}
                 AnchorPoint={props.AnchorPoint}
                 Archivable={props.Archivable}
@@ -100,8 +125,7 @@ export function HoverButton(propSet: HoverButtonProps) {
                 SliceScale={props.SliceScale}
                 TileSize={props.TileSize}
                 Event={{
-                    ...defaultEvents,
-                    ...stateEvents,
+                    ...events,
 
                     MouseEnter: (button, x, y) => {
                         setHovering(true);
@@ -111,6 +135,8 @@ export function HoverButton(propSet: HoverButtonProps) {
                         if (stateEvents !== defaultEvents) {
                             defaultEvents?.MouseEnter?.(button, x, y);
                         }
+
+                        topEvents?.MouseEnter?.(button, x, y);
                     },
 
                     MouseLeave: (button, x, y) => {
@@ -121,6 +147,8 @@ export function HoverButton(propSet: HoverButtonProps) {
                         if (stateEvents !== defaultEvents) {
                             defaultEvents?.MouseLeave?.(button, x, y);
                         }
+
+                        topEvents?.MouseLeave?.(button, x, y);
                     },
 
                     ...(propSet.pressOn === "down" ? {
@@ -163,4 +191,4 @@ export function HoverButton(propSet: HoverButtonProps) {
             </imagebutton>
         </HoverButtonContext.Provider>
     );
-}
+});

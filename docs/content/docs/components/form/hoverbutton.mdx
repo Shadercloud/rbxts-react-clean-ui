@@ -191,6 +191,26 @@ function Label() {
 
 `HoverButton` has no `disabled` prop, so press-down is blocked instead while the merged state's `Active` is `false`. Gamepad and keyboard activation still go through the native `Activated` at the normal time and never get an `onRelease`.
 
+## Top-level events
+
+`HoverButton` also takes an `Event` prop of its own, with the same shape as the `ImageButton`'s `Event` table. It is merged with the `Event` of `default` and the active state set: when both define the same event, both handlers run, the state set's first, then the top-level one. `HoverButton` also forwards its `ref` to the rendered `ImageButton`.
+
+Together, these let a `HoverButton` be the direct child of a [`Tooltip`](/components/interaction/tooltip), with no `Container` wrapped around it:
+
+```tsx
+<Tooltip content="Open the shop">
+    <HoverButton
+        default={{
+            Size: UDim2.fromOffset(120, 40),
+            BackgroundColor3: Color3.fromHex("#F4F5F7"),
+            BackgroundTransparency: 0,
+            AutoButtonColor: false,
+        }}
+        hover={{ BackgroundColor3: Color3.fromHex("#E1E4E8") }}
+    />
+</Tooltip>
+```
+
 ## Props
 
 ### HoverButton-specific props
@@ -204,6 +224,7 @@ function Label() {
 | `name`       | `string`                 | `"HoverButton"` | Name of the rendered `ImageButton` instance.                                                  |
 | `pressOn`    | `"down" \| "up"`         | `"up"`          | When a mouse/touch press activates the button: on release (`"up"`) or as soon as it begins (`"down"`). |
 | `onRelease`  | `(button: ImageButton, input: InputObject) => void` | `undefined` | With `pressOn="down"`, called when a mouse/touch press that activated the button ends or is cancelled. |
+| `Event`      | `React.InstanceEvent<ImageButton>` | `undefined` | Event handlers merged with the state sets' `Event`. On a shared event, the state set's handler runs first, then this one. |
 | `children`   | `React.ReactNode`        | `undefined`     | Content rendered inside the button, after the border stroke.                                  |
 
 `HoverButtonStateProps` is `React.InstanceProps<ImageButton> & BorderElementProps`.
@@ -232,6 +253,8 @@ The button also supports props inherited from the following interfaces.
 * Only a fixed list of `ImageButton` properties is forwarded from the state sets: layout and sizing, background and native border, image properties, selection and gamepad navigation, `Modal`, `AutoButtonColor`, `Active`, `Visible`, `ZIndex`, `Event`, `Change`, and `Tag`. Other `ImageButton` properties are ignored even if they are set.
 * `BorderSizePixel` defaults to `0` when no state sets it.
 * `Event` handlers are merged as `{ ...default.Event, ...activeState.Event }`. `MouseEnter` and `MouseLeave` are always wrapped internally to track hover. The wrapper still calls the active state's handler, and also the `default` state's handler when the two differ.
+* The top-level `Event` prop is merged on top of the state sets' events. For an event both define, the state set's handler runs first, then the top-level handler.
+* `ref` is forwarded to the rendered `ImageButton`.
 * Hover is tracked in local state through `MouseEnter` and `MouseLeave`.
 * The border props are never forwarded to the `ImageButton`. When drawn, the stroke is a `UIStroke` named `Stroke`, rendered as the button's first child.
 * Without `pressOn="down"`, the event table is built exactly as described above. With it, `Activated` skips mouse and touch input, and an internal `InputBegan` handler runs the active state's own `InputBegan` first, then activates the button unless the merged `Active` is `false`.

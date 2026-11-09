@@ -35,6 +35,12 @@ export function Input(props: InputProps) {
     const [focused, setFocused] = useState(false);
     const [hovered, setHovered] = useState(false);
     const lastValidText = useRef(props.value);
+    const focusedRef = useRef(false);
+    const heldText = useRef<string>();
+    const reportedTexts = useRef(new Set<string>());
+
+    const sourceText = props.controlled ? props.value : value;
+    const displayText = heldText.current ?? sourceText;
 
     const inputTheme = theme.components.input;
     const stateStyle = resolveFieldStateStyle(inputTheme.states, resolveFieldState(props.disabled, focused, hovered));
@@ -78,6 +84,24 @@ export function Input(props: InputProps) {
         }
     }, [props.disabled]);
 
+    React.useEffect(() => {
+        const textBox = ref.current;
+
+        if (focusedRef.current || heldText.current === undefined || textBox === undefined) {
+            return;
+        }
+
+        if (textBox.Text !== sourceText && reportedTexts.current.has(sourceText)) {
+            return;
+        }
+
+        heldText.current = undefined;
+
+        if (textBox.Text !== sourceText) {
+            textBox.Text = sourceText;
+        }
+    }, [focused, sourceText]);
+
     const content = (
         <>
             <Padding {...props} />
@@ -99,7 +123,7 @@ export function Input(props: InputProps) {
                         PlaceholderColor3={props.PlaceholderColor3 ?? placeholderTypography.color}
                         TextScaled={props.TextScaled}
                         LineHeight={typography.lineHeight}
-                        Text={props.controlled ? props.value : value}
+                        Text={displayText}
                         TextColor3={props.TextColor3 ?? typography.color ?? theme.colors.intents.primary.default.textColor}
                         TextTransparency={props.TextTransparency ?? typography.transparency}
 
@@ -136,21 +160,26 @@ export function Input(props: InputProps) {
                         Event={{
                             ...props.Event,
                             Focused: (rbx) => {
+                                focusedRef.current = true;
+                                heldText.current = displayText;
+                                reportedTexts.current.clear();
                                 setFocused(true);
 
                                 props.Event?.Focused?.(rbx);
                             },
                             FocusLost: (rbx, enterPressed, inputThatCausedFocusLoss) => {
-                                setFocused(false);
-
                                 const clampedText = resolveClampedText(props.validation, rbx.Text, props.min, props.max);
 
                                 if (clampedText !== undefined) {
                                     ref.current!.Text = clampedText;
                                     lastValidText.current = clampedText;
+                                    reportedTexts.current.add(clampedText);
                                     setValue(clampedText);
                                     props.onChange?.(clampedText);
                                 }
+
+                                focusedRef.current = false;
+                                setFocused(false);
 
                                 props.Event?.FocusLost?.(rbx, enterPressed, inputThatCausedFocusLoss);
                             },
@@ -167,6 +196,7 @@ export function Input(props: InputProps) {
                                 }
 
                                 lastValidText.current = rbx.Text;
+                                reportedTexts.current.add(rbx.Text);
                                 setValue(rbx.Text)
                                 props.onChange?.(rbx.Text)
 

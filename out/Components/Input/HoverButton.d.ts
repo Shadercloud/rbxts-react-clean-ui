@@ -8,6 +8,7 @@ export interface HoverButtonContextValue {
 export declare const HoverButtonContext: React.Context<HoverButtonContextValue | undefined>;
 type ImageButtonProps = React.InstanceProps<ImageButton>;
 type HoverButtonStateProps = ImageButtonProps & BorderElementProps;
+type ImageButtonEvents = React.InstanceEvent<ImageButton>;
 interface HoverButtonProps extends BorderElementProps {
     default: HoverButtonStateProps;
     hover?: HoverButtonStateProps;
@@ -17,6 +18,7 @@ interface HoverButtonProps extends BorderElementProps {
     name?: string;
     pressOn?: PressOn;
     onRelease?: PressReleaseCallback;
+    Event?: ImageButtonEvents;
 }
-export declare function HoverButton(propSet: HoverButtonProps): React.JSX.Element;
+export declare const HoverButton: React.ForwardRefExoticComponent<HoverButtonProps & React.RefAttributes<ImageButton>>;
 export {};

@@ -38,13 +38,22 @@ local function Input(props)
 	local focused, setFocused = useState(false)
 	local hovered, setHovered = useState(false)
 	local lastValidText = useRef(props.value)
+	local focusedRef = useRef(false)
+	local heldText = useRef()
+	local reportedTexts = useRef({})
+	local sourceText = if props.controlled then props.value else value
+	local _condition = heldText.current
+	if _condition == nil then
+		_condition = sourceText
+	end
+	local displayText = _condition
 	local inputTheme = theme.components.input
 	local stateStyle = resolveFieldStateStyle(inputTheme.states, resolveFieldState(props.disabled, focused, hovered))
-	local _condition = stateStyle.borderThickness
-	if _condition == nil then
-		_condition = inputTheme.borderThickness
+	local _condition_1 = stateStyle.borderThickness
+	if _condition_1 == nil then
+		_condition_1 = inputTheme.borderThickness
 	end
-	local borderThickness = _condition
+	local borderThickness = _condition_1
 	local typography = TypographyHelper:getTypography(theme, props.scale, theme.components.input.typography)
 	local placeholderTypography = TypographyHelper:getTypography(theme, props.scale, theme.components.input.placeholder)
 	local backgroundImage = CssHelper:resolveBackgroundImage(theme.components.input.backgroundImage)
@@ -73,6 +82,19 @@ local function Input(props)
 			end
 		end
 	end, { props.disabled })
+	React.useEffect(function()
+		local textBox = ref.current
+		if focusedRef.current or heldText.current == nil or textBox == nil then
+			return nil
+		end
+		if textBox.Text ~= sourceText and reportedTexts.current[sourceText] ~= nil then
+			return nil
+		end
+		heldText.current = nil
+		if textBox.Text ~= sourceText then
+			textBox.Text = sourceText
+		end
+	end, { focused, sourceText })
 	local _attributes = table.clone(props)
 	setmetatable(_attributes, nil)
 	local _exp = React.createElement(Padding, _attributes)
@@ -91,21 +113,21 @@ local function Input(props)
 		FontFace = TypographyHelper:toFontFace(typography.font, typography.weight or Enum.FontWeight.Regular),
 		FontSize = typography.size,
 	}
-	local _condition_1 = props.PlaceholderText
-	if _condition_1 == nil then
-		_condition_1 = props.placeholder
+	local _condition_2 = props.PlaceholderText
+	if _condition_2 == nil then
+		_condition_2 = props.placeholder
 	end
-	_attributes_1.PlaceholderText = _condition_1
+	_attributes_1.PlaceholderText = _condition_2
 	_attributes_1.PlaceholderColor3 = props.PlaceholderColor3 or placeholderTypography.color
 	_attributes_1.TextScaled = props.TextScaled
 	_attributes_1.LineHeight = typography.lineHeight
-	_attributes_1.Text = if props.controlled then props.value else value
+	_attributes_1.Text = displayText
 	_attributes_1.TextColor3 = props.TextColor3 or typography.color or theme.colors.intents.primary.default.textColor
-	local _condition_2 = props.TextTransparency
-	if _condition_2 == nil then
-		_condition_2 = typography.transparency
+	local _condition_3 = props.TextTransparency
+	if _condition_3 == nil then
+		_condition_3 = typography.transparency
 	end
-	_attributes_1.TextTransparency = _condition_2
+	_attributes_1.TextTransparency = _condition_3
 	_attributes_1.Active = props.Active
 	_attributes_1.Archivable = props.Archivable
 	_attributes_1.BorderColor3 = props.BorderColor3
@@ -125,11 +147,11 @@ local function Input(props)
 	_attributes_1.NextSelectionUp = props.NextSelectionUp
 	_attributes_1.SelectionGroup = props.SelectionGroup
 	_attributes_1.SelectionOrder = props.SelectionOrder
-	local _condition_3 = props.ClearTextOnFocus
-	if _condition_3 == nil then
-		_condition_3 = false
+	local _condition_4 = props.ClearTextOnFocus
+	if _condition_4 == nil then
+		_condition_4 = false
 	end
-	_attributes_1.ClearTextOnFocus = _condition_3
+	_attributes_1.ClearTextOnFocus = _condition_4
 	_attributes_1.CursorPosition = props.CursorPosition
 	_attributes_1.MultiLine = props.MultiLine
 	_attributes_1.SelectionStart = props.SelectionStart
@@ -146,6 +168,9 @@ local function Input(props)
 		end
 	end
 	_object.Focused = function(rbx)
+		focusedRef.current = true
+		heldText.current = displayText
+		table.clear(reportedTexts.current)
 		setFocused(true)
 		local _result = props.Event
 		if _result ~= nil then
@@ -156,17 +181,19 @@ local function Input(props)
 		end
 	end
 	_object.FocusLost = function(rbx, enterPressed, inputThatCausedFocusLoss)
-		setFocused(false)
 		local clampedText = resolveClampedText(props.validation, rbx.Text, props.min, props.max)
 		if clampedText ~= nil then
 			ref.current.Text = clampedText
 			lastValidText.current = clampedText
+			reportedTexts.current[clampedText] = true
 			setValue(clampedText)
 			local _result = props.onChange
 			if _result ~= nil then
 				_result(clampedText)
 			end
 		end
+		focusedRef.current = false
+		setFocused(false)
 		local _result = props.Event
 		if _result ~= nil then
 			_result = _result.FocusLost
@@ -190,6 +217,9 @@ local function Input(props)
 			return nil
 		end
 		lastValidText.current = rbx.Text
+		local _current = reportedTexts.current
+		local _text = rbx.Text
+		_current[_text] = true
 		setValue(rbx.Text)
 		local _result = props.onChange
 		if _result ~= nil then
@@ -209,22 +239,22 @@ local function Input(props)
 		Wraps = false,
 	}, _exp_1, React.createElement(FlexItem, nil, React.createElement("textbox", _attributes_1)))))
 	local _attributes_2 = {}
-	local _condition_4 = props.name
-	if _condition_4 == nil then
-		_condition_4 = "Input"
+	local _condition_5 = props.name
+	if _condition_5 == nil then
+		_condition_5 = "Input"
 	end
-	_attributes_2.key = _condition_4
+	_attributes_2.key = _condition_5
 	_attributes_2.Size = props.Size or UDim2.fromScale(1, 0)
 	_attributes_2.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes_2.BackgroundColor3 = stateStyle.backgroundColor or inputTheme.backgroundColor
-	local _condition_5 = stateStyle.backgroundTransparency
-	if _condition_5 == nil then
-		_condition_5 = inputTheme.backgroundTransparency
-		if _condition_5 == nil then
-			_condition_5 = 1
+	local _condition_6 = stateStyle.backgroundTransparency
+	if _condition_6 == nil then
+		_condition_6 = inputTheme.backgroundTransparency
+		if _condition_6 == nil then
+			_condition_6 = 1
 		end
 	end
-	_attributes_2.BackgroundTransparency = _condition_5
+	_attributes_2.BackgroundTransparency = _condition_6
 	_attributes_2.AnchorPoint = props.AnchorPoint
 	_attributes_2.Position = props.Position
 	_attributes_2.LayoutOrder = props.LayoutOrder

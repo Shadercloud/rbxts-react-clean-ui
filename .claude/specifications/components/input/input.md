@@ -19,7 +19,9 @@
 ## Controlled vs. uncontrolled
 
 - Without `controlled`, `value` seeds internal state (`React.useState(props.value)`) once; the rendered `Text` afterward comes from that internal state, updated as the user types.
-- With `controlled: true`, the rendered `Text` is always `props.value` directly, so the consumer is responsible for feeding back `onChange` into `value`.
+- With `controlled: true`, the field shows `props.value`, so the consumer is responsible for feeding back `onChange` into `value`.
+- In both modes, **while the `TextBox` is focused the box belongs to the user**: changes to `props.value` (or internal state) are not written into it. `onChange` still fires on every keystroke. A parent that reformats on each keystroke (e.g. uppercasing) is therefore only shown once focus is lost.
+- When focus is lost (after `min`/`max` clamping), and on any later value change while unfocused, the box is synced to the current value — unless that value is one `Input` itself reported via `onChange` during the last focus session and the box doesn't show it yet (a stale echo from a parent or store that hasn't caught up); then the box keeps its text until the value changes again or catches up. A value the parent set on its own (reformatting `"4"` to `"4.00"` on blur, switching records, rejecting input) is shown.
 
 ## Validation
 
@@ -74,6 +76,9 @@ input: {
 
 ## Implementation notes
 
+- Focus guard: while focused, `Text` renders `heldText` (the `Text` prop of the last committed render, captured in `Focused`), so React sees no change and never writes. Writing `props.value` every commit lost keystrokes: React could commit a render computed before the next keystroke, writing `"2"` back over `"24"`. Don't go back to `Text={props.controlled ? props.value : value}` unguarded.
+- The unfocused sync is an effect on `[focused, sourceText]` that writes through `ref` and then releases `heldText`. Writing through the ref is required: if the new value equals `heldText`, React would skip the write and leave the user's text in the box. `reportedTexts` (every text passed to `onChange` since the last `Focused`) is what tells a stale echo from a parent's own value; without it an async store still one keystroke behind at blur (typing then Enter) would overwrite the last keystroke or the clamp.
+- `FocusLost` clamps (and reports the clamped text) before clearing `focusedRef`/calling `setFocused(false)`, so the render that ends the focus already sees the clamp.
 - `FontFace` is built with `TypographyHelper.toFontFace` (see [shared-modules.md](../../../architecture/shared-modules.md#srchelperstypographyhelperts)), not `Font.fromName(font.Name, ...)`, so legacy `Enum.Font` values whose name differs from their family file (e.g. `Fantasy`, `SourceSans`) render their real typeface instead of falling back to Builder Sans.
 - `innerShadow` cannot be a plain child of the root: `HStack` is a fragment, so its `UIListLayout` sits on the root and would lay the band out as a row item, and the root's `UIPadding` would inset it. When `innerShadow` is set, the root `Padding` + `HStack` move into a transparent `Content` frame (`Size` scale 1x1, `AutomaticSize.Y`, `ZIndex` 2) and the `InnerShadow` frame is its sibling at `ZIndex` 1, so the band draws under the text. When unset, the tree is the original one, so existing descendant paths don't change. The 1x1 scale on `Content` keeps a fixed-height `Size` vertically centring the row. A child scaled on its auto-sized parent's axis is relied on here and should be checked visually in Studio.
 - `FieldInnerShadow` (`Input.field.tsx`, shared with `Select`) fills the whole interior and fades via a `UIGradient` (`Rotation` 90) whose middle keypoint is `size / measuredHeight`. A band only `size` px tall was rejected: `UICorner` clamps its radius to half the frame height, so a short band's top corners would be less round than the field's and poke out past them. The band stays hidden until its `AbsoluteSize` has been measured.

@@ -14,7 +14,7 @@
   - `pinOnPress?: boolean` (default `false`) — a press (left click or tap) on the trigger pins the popup open.
   - `longPress?: boolean` (default `false`) — on touch, holding a finger on the trigger shows the popup for as long as the finger stays down.
 - Because `TooltipProps` extends `BoxProps`, callers may also pass `spacing`, `'border-thickness'`, `'border-color'`, shadow, size, position, background, and z-index props, which style the popup surface itself (not the wrapped child). Exception: the size props (`Size`, `width`, `height`, and `minWidth`/`maxWidth`/`minHeight`/`maxHeight`) are currently ignored; the popup always sizes to its content (tracked in `.claude/ISSUES.md`).
-- `Tooltip` clones `children`, attaching a `ref` and adding `MouseEnter`/`MouseLeave`/`InputBegan` handlers (`InputBegan` does nothing unless `pinOnPress` or `longPress` is set). The child's own handlers still run first. The child may be a native element (`<frame>`, `<imagebutton>`, ...) or a component that forwards `ref` and `Event` to an instance.
+- `Tooltip` clones `children`, attaching a `ref` and adding `MouseEnter`/`MouseLeave`/`InputBegan` handlers (`InputBegan` does nothing unless `pinOnPress` or `longPress` is set). The child's own handlers still run first. The child may be a native element (`<frame>`, `<imagebutton>`, ...) or a component that forwards `ref` and `Event` to an instance (e.g. `HoverButton`, whose top-level `Event` runs after its state sets' handlers).
 
 ## Show/hide behavior
 

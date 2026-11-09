@@ -219,6 +219,18 @@ Implementation notes for src/Tests — test files carry no comments, so non-obvi
 - `caretCapNoGrow` checks "the cap doesn't grow the field" as root height = field padding (`fieldPaddingY`) + `SelectedText`'s `AbsoluteSize.Y`, polled with `waitForLayout`. It doesn't compare against an uncapped Select (its bare 20px icon can be taller than the text line) or a mounted `Input` (different typography/padding theme keys).
 - Select's `boxShadow`/`dropDown` assertions read the `UIShadow` properties, not pixels. Whether the dropdown's shadow survives its `ClipsDescendants` frame, and how the shadow reads against the fill, can only be judged visually in the story.
 
+## Controlled Input sync (`Input.controlled.test.tsx`)
+
+- Unlike the theme-state tests, these use real focus (`CaptureFocus`/`ReleaseFocus`, polled with `IsFocused`), because the guard under test is "don't write `props.value` into `Text` while the box is focused". `focus` waits two more frames after `IsFocused` so the `Focused` handler's state update has rendered before typing starts.
+- `focusedKeepsTyping` has two `@Each` rows. `defer` is the reported case: `"2"` then `"24"` set in the same frame, with the parent echoing `onChange` through `task.defer`. Under deferred signal behaviour both `Text` change events may read `"24"`, so this row alone may not reproduce the stale overwrite. `delay` makes the race deterministic: a frame passes between keystrokes and the parent applies each echo after `ECHO_DELAY` (0.1s), so the stale `"2"` re-render always lands while `"24"` is in the box. Without the guard that render writes `"2"` back, its `Change.Text` echoes `"2"` again, and the box ends on `"2"`. The test then blurs and expects `"24"`, which checks that FocusLost syncs to the latest `value`.
+- `blurShowsFormatted` starts at `value="4.00"` with an `onChange` echo, types `"4"` (so `value` becomes `"4"`), and sets `"4.00"` again from `Event.FocusLost`. It checks the sync that follows the blur, not the initial render.
+
+## HoverButton events and Tooltip wrapping (`HoverButton.event.test.tsx`, `Tooltip.hoverbutton.test.tsx`)
+
+- Tooltip clones a non-host child with a merged `Event` prop and a `ref` (`ElementHelper.cloneWithEvents`), so a bare `HoverButton` needs both its top-level `Event` prop and ref forwarding. Without the ref, Tooltip's `targetRef` stays unset and `show()` never opens a popup. `opensOnHover` covers both, and `forwardsRef` checks the ref on its own.
+- Hover is fired with `fireHostEvent` on the `ImageButton`. The handler stored in its fiber is HoverButton's own `MouseEnter`/`MouseLeave` wrapper, which has to call Tooltip's injected handler. `opensOnHover` calls `assertNoPopup` before hovering so it can't pass on a popup that was already open.
+- `runsBothHandlers` fires `MouseEnter` from the default state, where the state set and the default set are the same, so the expected log has exactly one `default:` entry.
+
 ## Border, padding and radius props (`Container.test.tsx`, `HoverButton.test.tsx`, `Corners.test.tsx`, `Button.test.tsx`, `Box.test.tsx`, `Card.test.tsx`, `size.helper.test.ts`)
 
 - The `UIStroke`/`UIPadding`/`UICorner` lookups use `FindFirstChildWhichIsA` on the component's own root, so they only see direct children. A decorator that landed on a nested element, or on Container's `ContainerCenterWrapper`, does not count. `centeredDecoratorsOnInner` checks the wrapper has none of the three and the inner `Container` has all of them.
