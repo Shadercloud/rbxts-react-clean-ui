@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2
+
+### Fixes
+
+- **`Slider` keeps its height when only `width` is set.** The default size only applied when both `width` and `height` were unset, so `<Slider width="100%" />` was 0px tall and its track and handles collapsed (in Roblox and in the docs' Loom previews). Each axis now falls back on its own: width to 100%, height to the theme height. A Slider given only `height` is now full width instead of 0px wide.
+
 ## 2.0.1
 
 ### Fixes

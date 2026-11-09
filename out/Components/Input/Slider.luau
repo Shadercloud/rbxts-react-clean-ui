@@ -189,7 +189,6 @@ local Slider = React.forwardRef(function(props, ref)
 			inputEndedListener:Disconnect()
 		end
 	end, { getValueFromInput, updateValue })
-	local height = SizeHelper:toUDim(theme.height)
 	local _condition = props["min-value"]
 	if _condition == nil then
 		_condition = 0
@@ -259,7 +258,22 @@ local Slider = React.forwardRef(function(props, ref)
 	_attributes.SelectionGroup = props.SelectionGroup
 	_attributes.SelectionImageObject = props.SelectionImageObject
 	_attributes.SelectionOrder = props.SelectionOrder
-	_attributes.Size = SizeHelper:GetSize(props, UDim2.new(UDim.new(1, 0), height))
+	local _object = {
+		Size = props.Size,
+	}
+	local _left = "width"
+	local _condition_3 = props.width
+	if _condition_3 == nil then
+		_condition_3 = "100%"
+	end
+	_object[_left] = _condition_3
+	local _left_1 = "height"
+	local _condition_4 = props.height
+	if _condition_4 == nil then
+		_condition_4 = theme.height
+	end
+	_object[_left_1] = _condition_4
+	_attributes.Size = SizeHelper:GetSize(_object)
 	_attributes.SizeConstraint = props.SizeConstraint
 	_attributes.Visible = props.Visible
 	_attributes.ZIndex = props.ZIndex
@@ -300,8 +314,8 @@ local Slider = React.forwardRef(function(props, ref)
 	_attributes_1.BorderSizePixel = 0
 	_attributes_1.Position = UDim2.fromScale(0.5, 0.5)
 	_attributes_1.AnchorPoint = Vector2.new(0.5, 0.5)
-	local _condition_3 = props.highlight ~= nil
-	if _condition_3 then
+	local _condition_5 = props.highlight ~= nil
+	if _condition_5 then
 		local _attributes_2 = {
 			key = "Highlight",
 			BackgroundColor3 = theme.bar.highlight.backgroundColor,
@@ -334,24 +348,24 @@ local Slider = React.forwardRef(function(props, ref)
 		else
 			local _result_2
 			if props.highlight == "end" then
-				local _condition_4 = secondPosition
-				if _condition_4 == nil then
-					_condition_4 = firstPosition
+				local _condition_6 = secondPosition
+				if _condition_6 == nil then
+					_condition_6 = firstPosition
 				end
-				local _uDim2_1 = UDim2.new(UDim.new(1 - _condition_4, 0), SizeHelper:toUDim(theme.bar.height))
+				local _uDim2_1 = UDim2.new(UDim.new(1 - _condition_6, 0), SizeHelper:toUDim(theme.bar.height))
 				local _uDim2_2 = UDim2.new(padding, UDim.new(0, 0))
 				_result_2 = _uDim2_1 + _uDim2_2
 			else
-				local _condition_4 = secondPosition
-				if _condition_4 == nil then
-					_condition_4 = 0
+				local _condition_6 = secondPosition
+				if _condition_6 == nil then
+					_condition_6 = 0
 				end
-				_result_2 = UDim2.new(UDim.new(_condition_4 - firstPosition, 0), SizeHelper:toUDim(theme.bar.height))
+				_result_2 = UDim2.new(UDim.new(_condition_6 - firstPosition, 0), SizeHelper:toUDim(theme.bar.height))
 			end
 			_result_1 = _result_2
 		end
 		_attributes_2.Size = _result_1
-		_condition_3 = (React.createElement("frame", _attributes_2, React.createElement("uistroke", {
+		_condition_5 = (React.createElement("frame", _attributes_2, React.createElement("uistroke", {
 			key = "Stroke",
 			Thickness = theme.bar.borderThickness,
 			Color = theme.bar.highlight.borderColor,
@@ -380,11 +394,11 @@ local Slider = React.forwardRef(function(props, ref)
 		local _attributes_2 = {
 			key = "AspectRatio",
 		}
-		local _condition_4 = theme.handle.aspectRatio
-		if _condition_4 == nil then
-			_condition_4 = 1
+		local _condition_6 = theme.handle.aspectRatio
+		if _condition_6 == nil then
+			_condition_6 = 1
 		end
-		_attributes_2.AspectRatio = _condition_4
+		_attributes_2.AspectRatio = _condition_6
 		_attributes_2.DominantAxis = Enum.DominantAxis.Height
 		_attributes_2.AspectType = Enum.AspectType.ScaleWithParentSize
 		return React.createElement("frame", {
@@ -414,7 +428,7 @@ local Slider = React.forwardRef(function(props, ref)
 		_newValue[_k] = _callback(_v, _k - 1, handles)
 	end
 	-- ▲ ReadonlyArray.map ▲
-	return React.createElement("frame", _attributes, _exp, _exp_1, React.createElement("frame", _attributes_1, _condition_3, _newValue))
+	return React.createElement("frame", _attributes, _exp, _exp_1, React.createElement("frame", _attributes_1, _condition_5, _newValue))
 end)
 return {
 	Slider = Slider,

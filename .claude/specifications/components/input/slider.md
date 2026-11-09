@@ -12,7 +12,7 @@
   - `controlled?: boolean` — when `true`, the rendered/tracked value is derived directly from `props.value` (falling back to bounds if it doesn't match `range`'s expected type) instead of internal state.
   - `range?: boolean` — enables a second handle and `Vector2` values.
   - `highlight?: "start" | "end" | "middle"` — which section of the track is drawn with the highlight styling.
-- `BackgroundTransparency` defaults to `1` (the root frame is otherwise invisible; only the track/handle sub-frames are drawn). The slider's height defaults to `theme.components.slider.height` unless `Size`/`height` overrides it.
+- `BackgroundTransparency` defaults to `1` (the root frame is otherwise invisible; only the track/handle sub-frames are drawn). The slider's height defaults to `theme.components.slider.height` unless `Size`/`height` overrides it, and its width defaults to `100%` unless `Size`/`width` overrides it. Each axis falls back on its own, so `width` alone keeps the theme height and `height` alone keeps the full width.
 - `ContainerProps` includes a `group?: boolean` field (used by `Container` to align widths within a `Group`), but `Slider` builds its own root frame rather than rendering through `Container`, and never reads `props.group` or `GroupContext`. `group` is inert on `Slider`.
 - `minWidth`/`maxWidth`/`minHeight`/`maxHeight` follow [Min and max size](../index.md#min-and-max-size); the `UISizeConstraint` is a direct child of the root `Frame`. The track and handles are scale-sized inside it, so they follow the clamped width. The other `ContainerProps` extras (`padding`, `cornerRadius`, `border*`) remain inert on `Slider`.
 
@@ -47,3 +47,4 @@ Worth demonstrating: a single-value slider with `onDragged`/`onChanged` wired to
 ## Implementation notes
 
 - On drag end, `isDraggingRef` is cleared synchronously before `setDragging(false)`, so `InputChanged` events that arrive before React re-renders stop moving the handle straight away. Gate movement on the ref, not on the `dragging` state.
+- The root `Size` passes `width ?? "100%"` and `height ?? theme.height` to `SizeHelper.GetSize` rather than using its `defaultSize` argument. `GetSize` only uses `defaultSize` when *both* `width` and `height` are unset, so `<Slider width="100%" />` used to get a 0 px tall root: the track and handles collapsed (seen in the docs' Loom preview, and the same in Roblox).

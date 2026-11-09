@@ -269,8 +269,6 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
             };
         }, [getValueFromInput, updateValue]);
 
-        const height = SizeHelper.toUDim(theme.height);
-
         const minValue = props["min-value"] ?? 0;
         const maxValue = props["max-value"];
 
@@ -347,7 +345,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                 SelectionGroup={props.SelectionGroup}
                 SelectionImageObject={props.SelectionImageObject}
                 SelectionOrder={props.SelectionOrder}
-                Size={SizeHelper.GetSize(props, new UDim2(new UDim(1, 0), height))}
+                Size={SizeHelper.GetSize({ Size: props.Size, width: props.width ?? "100%", height: props.height ?? theme.height })}
                 SizeConstraint={props.SizeConstraint}
                 Visible={props.Visible}
                 ZIndex={props.ZIndex}
