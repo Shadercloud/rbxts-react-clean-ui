@@ -9,7 +9,7 @@ icon: SquareCheck
 
 The `Checkbox` component allows users to toggle a boolean value.
 
-It manages its own checked state internally and can optionally be given an initial state using the `checked` prop.
+It can be used uncontrolled, managing its own state from an optional `defaultChecked` starting value, or controlled, showing whatever you pass as `checked`. It can also show its own clickable text `label`.
 
 When used inside a [`Fieldset`](/components/fieldset), clicking the fieldset label also toggles the checkbox.
 
@@ -40,29 +40,85 @@ export function CheckboxExample() {
 
 The checkbox starts unchecked by default.
 
-## Initial checked state
-
-Use the `checked` prop to specify the initial state of the checkbox.
-
-```tsx
-<Checkbox checked />
-```
-
-or
-
-```tsx
-<Checkbox checked={true} />
-```
-
-You can also explicitly start unchecked.
-
-```tsx
-<Checkbox checked={false} />
-```
-
-<Callout type="info">
-The `checked` prop is only used to determine the initial state when the component is created. After that, the checkbox manages its own state internally.
+<Callout type="warn" title="Behaviour change in 2.0.0">
+    Passing `checked` now makes the checkbox **controlled**: it always shows the prop's value, and a click only calls `onChange(!checked)`. A `checked` without an `onChange` that feeds the new value back leaves the checkbox frozen. `onChange` also no longer fires on mount or when the `checked` prop changes, only when the user toggles it. Use `defaultChecked` for the old "initial value only" behaviour, and read the initial value yourself if you relied on the mount-time `onChange` call.
 </Callout>
+
+## Uncontrolled
+
+Leave `checked` unset and the checkbox keeps its own state. Use `defaultChecked` to choose the starting value.
+
+```tsx
+<Checkbox defaultChecked />
+```
+
+```tsx
+<Checkbox
+    defaultChecked={true}
+    onChange={(checked) => {
+        print(`Checked: ${checked}`);
+    }}
+/>
+```
+
+`defaultChecked` is only read when the checkbox mounts. Changing it later has no effect.
+
+## Controlled
+
+Pass `checked` to drive the checkbox from your own state. Clicking it calls `onChange` with the requested value but changes nothing by itself, so feed the value back through `checked`.
+
+```tsx
+import React, { useState } from "@rbxts/react";
+import { Checkbox } from "@rbxts/react-clean-ui";
+
+export function ControlledCheckbox() {
+    const [checked, setChecked] = useState(false);
+
+    return (
+        <Checkbox
+            checked={checked}
+            onChange={setChecked}
+        />
+    );
+}
+```
+
+Because the visual always follows `checked`, you can also reject or change the value in `onChange`, or update `checked` from elsewhere. Changing `checked` from outside does not call `onChange`.
+
+## With a label
+
+Set `label` to show text next to the box. Clicking the text toggles the checkbox, the same as clicking the box.
+
+<Demo preview="Scenes/Form/CheckboxLabel.loom.tsx" previewHeight={240}>
+```tsx
+import React from "@rbxts/react";
+import { Box, Checkbox, Container, VStack } from "@rbxts/react-clean-ui";
+
+export function CheckboxLabelExample() {
+    return (
+        <Container width="80%" height="140" center>
+            <Box>
+                <VStack>
+                    <Container name="RememberRow" LayoutOrder={1}>
+                        <Checkbox label="Remember me" defaultChecked={true} />
+                    </Container>
+                    <Container name="SubscribeRow" LayoutOrder={2}>
+                        <Checkbox
+                            label="Subscribe to updates"
+                            onChange={(checked) => {
+                                print(`Subscribed: ${checked}`);
+                            }}
+                        />
+                    </Container>
+                </VStack>
+            </Box>
+        </Container>
+    );
+}
+```
+</Demo>
+
+The label text uses the theme typography for the checkbox's `scale`, and the gap between box and label is half the checkbox's resolved spacing at that scale, rounded up. Both can be changed through `theme.components.checkbox.label` (see [Theme values](#theme-values)). For richer label content, such as rich text or other components, use a [`Fieldset`](/components/form/fieldset) instead.
 
 ## With a fieldset
 
@@ -158,7 +214,7 @@ The selected intent controls the border and icon colours for each state.
 <Fieldset checkbox>
     <Fieldset.Control>
         <Checkbox
-            checked
+            defaultChecked
             icon-checked="thumbs-up"
             icon-unchecked="thumbs-down"
             intent-checked="info"
@@ -181,8 +237,11 @@ The selected intent controls the border and icon colours for each state.
 
 | Prop               | Type                       | Default     | Description                                            |
 | ------------------ | -------------------------- | ----------- | ------------------------------------------------------ |
-| `checked`          | `boolean`                  | `false`     | The initial checked state of the checkbox.             |
-| `onChange`         | `(value: boolean) => void` | `undefined` | Called whenever the checked state changes.             |
+| `checked`          | `boolean`                  | `undefined` | Controlled checked state. When set, the checkbox always shows this value. |
+| `defaultChecked`   | `boolean`                  | `false`     | Starting state when uncontrolled (`checked` unset). Only read on mount. |
+| `onChange`         | `(value: boolean) => void` | `undefined` | Called with the new value when the user toggles the checkbox. Never called on mount or when `checked` changes. |
+| `label`            | `string`                   | `undefined` | Text shown next to the box. Clicking it toggles the checkbox. |
+| `name`             | `string`                   | `"Checkbox"`| Name of the root instance.                             |
 | `icon-checked`     | `IconName`                 | `"check"`   | Icon displayed while checked.                          |
 | `icon-unchecked`   | `IconName`                 | `undefined` | Icon displayed while unchecked.                        |
 | `intent-checked`   | `Intent`                   | `"success"` | Intent used for the checked border and icon colours.   |
@@ -203,10 +262,11 @@ The checkbox also supports props inherited from the following interfaces.
 ## Behaviour
 
 * The checkbox is unchecked by default.
-* Setting `checked` changes the initial state only.
-* Clicking the checkbox toggles the internal state.
-* When inside a `Fieldset`, clicking the associated label also toggles the checkbox.
-* `onChange` is called whenever the checked state changes.
+* With `checked` set, the checkbox is controlled: it shows `checked`, and a click calls `onChange(!checked)` without changing anything internally. Without `checked`, it starts at `defaultChecked` and flips its own state on each click before calling `onChange`.
+* Clicking the box, its `label`, or a paired `Fieldset.Label` toggles the checkbox.
+* `onChange` only fires in response to a user toggle. It never fires on mount, and never fires when a controlled `checked` prop changes.
+* Without `label`, the checkbox renders a single `ImageButton` named by `name`. With `label`, the root becomes a transparent, content-sized `Frame` named by `name`, holding the box (renamed `"CheckboxBox"`) and a `"CheckboxLabel"` button with the text. The label button is not gamepad-selectable, so gamepad selection stays on the box.
+* Setting or clearing `label` after mount remounts the box.
 
 The state transitions follow this pattern:
 
@@ -223,5 +283,24 @@ The checkbox uses values from `theme.components.checkbox` for:
 * Border and icon colours, based on the checked/unchecked intent
 * Default spacing/padding
 * Background image
+* The optional `label` styling:
+  * `label.typography` — merged over the theme typography for the checkbox's `scale`
+  * `label.textColor` — the label text colour; unset uses `Text`'s default text colour
+  * `label.gap` — the gap between box and label, in pixels; unset uses half the resolved spacing at the checkbox's `scale`, rounded up
+
+No shipped theme sets `checkbox.label`.
+
+```tsx
+const theme = createTheme({
+    components: {
+        checkbox: {
+            label: {
+                textColor: Color3.fromHex("#9CA3AF"),
+                gap: 12,
+            },
+        },
+    },
+});
+```
 
 The solid background colour (based on the `intent` prop's `default` state) and background transparency fall back to the values from `theme.components.button`.

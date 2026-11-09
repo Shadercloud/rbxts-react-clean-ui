@@ -4,7 +4,7 @@
 
 ## Public API
 
-- `ButtonProps` composes `SpacedElementProps`, `ShadowElementProps`, `ZIndexElementProps`, `BackgroundElementProps`, `IntentElementProps`, `ScalableElementProps`, and `IconElementProps`, plus `text?: string`, `fontWeight?: Enum.FontWeight`, `Event?: React.InstanceEvent<ImageButton>`, `children?: React.ReactNode`, `group?: boolean`, `disabled?: boolean`, `spinning?: boolean`, `LayoutOrder?: number`, `name?: string`, `padding?: CssPadding`, `modal?: boolean`, and `styleOverride?: Partial<theme.components.button>`.
+- `ButtonProps` composes `SpacedElementProps`, `ShadowElementProps`, `ZIndexElementProps`, `BackgroundElementProps`, `IntentElementProps`, `ScalableElementProps`, `IconElementProps`, and `Pick<SizeElementProps, "width">`, plus `text?: string`, `fontWeight?: Enum.FontWeight`, `Event?: React.InstanceEvent<ImageButton>`, `children?: React.ReactNode`, `group?: boolean`, `disabled?: boolean`, `spinning?: boolean`, `LayoutOrder?: number`, `name?: string`, `padding?: CssPadding`, `modal?: boolean`, `fill?: boolean`, `pressOn?: "down" | "up"`, `onRelease?: (button: ImageButton, input: InputObject) => void`, and `styleOverride?: Partial<theme.components.button>`. `width`/`fill` are covered under [Sizing](#sizing), `pressOn`/`onRelease` under [Press-down activation](#press-down-activation).
 - `modal` (default `false`) sets the root `imagebutton`'s native `GuiButton.Modal`: while the button is visible, the mouse is freed from first-person/shift-lock. It is unrelated to the library's `Modal` component/provider, and is independent of `disabled` (a disabled modal button still frees the mouse).
 - `styleOverride` lets a caller (or a wrapping component, e.g. `Increment` sourcing it from `theme.components.increment.button`) override any subset of `theme.components.button`'s fields (`backgroundTransparency`, `cornerRadius`, `boxShadow`, `borderThickness`, `typography`, `intents`) for a single `Button` instance, without needing a global theme change. `backgroundTransparency`, `cornerRadius`, and `boxShadow` fall back independently to the normal `theme.components.button` value when `styleOverride` doesn't specify them. `typography` and `intents` layer on top of `theme.components.button`'s value instead of replacing it wholesale: `styleOverride.typography` is shallow-merged over `theme.components.button.typography`, and `styleOverride.intents` is applied as an additional highest-precedence cascade tier on top of `theme.components.button.intents` (via `ColorHelper.getIntentColors`'s cascade — see [Components](../index.md)), so a `styleOverride.intents` entry that only sets e.g. `backgroundImage.tintColor` for one intent/state inherits the rest of that intent/state's fields (`image`, `slice`, other colors) from `theme.components.button.intents` rather than losing them. `Button.Text` and `Button.Icon` also accept `styleOverride` and resolve their `typography`/`intents` from it the same way, so custom `children` built from those sub-parts stay consistent with the parent `Button`'s override.
 - `fontWeight` is accepted as a prop but is not applied anywhere in the implementation — the label always renders with the theme's configured weight.
@@ -14,9 +14,25 @@
 - When neither `icon` nor `text` nor `children` is supplied, the button renders with no content.
 - When both `icon`/`text` and `children` are supplied, the automatic icon/label row renders first, followed by `children`.
 
+## Sizing
+
+- Without `width` or `fill` the button uses `AutomaticSize.XY`, growing to fit its content (see [Grouped buttons](#grouped-buttons) for `group`).
+- `width` (any `Container`-style width: px number, `"25px"`, `"50%"`, a breakpoint table resolved at `sm`, or `"Auto"`) sets the root's X size and switches `AutomaticSize` to `Y`, so the height still hugs the content. `"Auto"` keeps `AutomaticSize.XY`. `width` wins over `group`'s pinned width.
+- `fill: true` adds a `UIFlexItem` named `FlexItem` with `FlexMode = Fill` to the root, so the button grows (and may shrink) along its parent `UIListLayout`'s fill direction to take the free space. Without `width`, the base width drops to `0` (`AutomaticSize.Y`), so several `fill` buttons in one row share it equally regardless of label length (the same model as `Tabs.List fill`); with `width`, that width is the base the flex grows from. With `group` and no `width`, the group's pinned width is the base.
+- `fill` only does anything when the button is a direct child of a frame with a `UIListLayout` (`HStack`, `Row`, `VStack`, ...). Elsewhere a `fill` button without `width` collapses to its padding width.
+- When `width` or `fill` is set, the icon/label row is centred horizontally (`HorizontalAlignment = Center`) inside the wider button. Otherwise alignment is unchanged.
+- The automatic row never wraps, so a `fill`/`width` button narrower than its content overflows rather than wrapping.
+
+## Press-down activation
+
+- `pressOn` (default `"up"`) chooses when a mouse/touch press activates the button. `"up"` = the native `Activated` at release, as before.
+- `pressOn="down"`: a `MouseButton1` or `Touch` `InputBegan` on the button calls the caller's `Event.Activated(button, input, 1)` immediately, and the later native `Activated` for that same mouse/touch press is swallowed, so each press fires exactly once. The caller's own `Event.InputBegan`, if any, still runs first. Other activation sources (gamepad `ButtonA` / keyboard on a selected button, which arrive through the native `Activated` with a non-pointer `UserInputType`) pass through unchanged, at the engine's normal time.
+- `disabled` blocks press-down activation the same way it blocks `Activated`.
+- `onRelease` is only used with `pressOn="down"`. It fires once per press-down activation, when that mouse/touch input ends or is cancelled, wherever the pointer is at that point (dragging off the button still releases). A press that began while enabled still gets its `onRelease` if the button is disabled mid-hold. Each touch is tracked separately, so two fingers on one button give two activations and two releases. Gamepad/keyboard activations never get an `onRelease`. Presses still held when the button unmounts are dropped without calling `onRelease`.
+- Hover, `MouseEnter`/`MouseLeave` and the disabled hover reset are unchanged in both modes.
+
 ## Behavior
 
-- The button always uses `AutomaticSize.XY`, growing to fit its content.
 - Hovering is tracked locally with `MouseEnter`/`MouseLeave` on the root `imagebutton` (this component does not use the `HoverButton` primitive used elsewhere in the library). Hover changes the background and border color to the intent's `hover` state; it does **not** change the label or icon color, which is always resolved for the `default`/`disabled` state (never `hover`).
 - Passing `Event` merges with the component's own `MouseEnter`/`MouseLeave`/`Activated` handlers; both the caller's and the internal handlers run (except while `disabled`, see below).
 
@@ -33,7 +49,7 @@
 ## Grouped buttons
 
 - When `group` is `true` and a `Group` ancestor provides `GroupContext`, the button wraps its icon/text/children in `Group.Element`, which reports its rendered size (content plus resolved padding) into the group.
-- The button's `Size` is then set to `UDim2.fromOffset(group.size.X, 0)` with `AutomaticSize.XY`, so its width is pinned to the widest reporting element in the group while its height still grows automatically.
+- Unless `width`/`fill` is set, the button's `Size` is then set to `UDim2.fromOffset(group.size.X, 0)` with `AutomaticSize.XY`, so its width is pinned to the widest reporting element in the group while its height still grows automatically.
 - Without `group`, or without a `Group` ancestor, sizing is purely automatic in both axes.
 
 ## Theme
@@ -54,7 +70,7 @@ Button defaults live under `theme.components.button`:
 
 Also show `intent="secondary"` next to `primary`.
 
-Worth demonstrating: each `intent`, icon-only vs. text-only vs. both, custom `children` composed from `Button.Icon`/`Button.Text`, a `disabled` example per intent showing the muted color state and inert click, a `Group` of buttons with `group` set on each to show width alignment across differing label lengths, and a `styleOverride` example (e.g. borderless/flat) to contrast against the default themed appearance.
+Worth demonstrating: a row of `fill` buttons sharing the width equally, a fixed-`width` button, a `pressOn="down"` hold button whose label shows held/released via `onRelease`, each `intent`, icon-only vs. text-only vs. both, custom `children` composed from `Button.Icon`/`Button.Text`, a `disabled` example per intent showing the muted color state and inert click, a `Group` of buttons with `group` set on each to show width alignment across differing label lengths, and a `styleOverride` example (e.g. borderless/flat) to contrast against the default themed appearance.
 
 ## Implementation notes
 
@@ -64,3 +80,6 @@ Worth demonstrating: each `intent`, icon-only vs. text-only vs. both, custom `ch
 - `Button.Icon` forwards `LayoutOrder` to `Icon` (the automatic icon passes `1`, the label `2`). With `spinning`, `Icon` puts `LayoutOrder` on its outer `Frame` (the list child), so the order holds either way.
 - `modal` is passed as `props.modal ?? false` rather than raw, so toggling it from `true` back to unset explicitly writes `false` instead of leaving the native `Modal` stuck on.
 - Toggling `spinning` switches `Icon` between an `ImageLabel` and a `Frame`, so the icon instance remounts rather than updating in place.
+- `pressOn="down"` and `onRelease` live in `Button.press.ts` (`isPointerPress`, `usePressRelease`), shared with `HoverButton`. The release is detected from the pressed `InputObject`'s own `UserInputState` changing to `End`/`Cancel`, not from the button's `InputEnded`: a `GuiObject`'s `InputEnded` isn't reliable when the pointer is released off the button, which would leave a hold-to-sprint stuck on.
+- The press-down `InputBegan` handler is only added to `Event` when `pressOn === "down"`, so the default event table (and any caller `InputBegan`) is exactly what it was. Don't fire the caller's handler on press-down *and* on `Activated`: the `isPointerPress` check in `Activated` is what prevents a double fire.
+- `fill` uses a zero base width for the same reason as `Tabs.List fill`: flex only shares out free space, so content-sized buttons would keep unequal widths.

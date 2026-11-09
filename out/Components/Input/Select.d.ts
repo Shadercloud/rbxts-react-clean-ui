@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { CssBackgroundGradient, CssSize, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
+import { CssBackgroundGradient, CssSize, ScalableElementProps, SizeElementProps, SpacedElementProps } from "../../Interfaces";
 import { CssBackgroundImage } from "../../Theme";
-export interface SelectProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<ImageLabel> {
+export interface SelectProps extends ScalableElementProps, SpacedElementProps, Pick<SizeElementProps, "width">, React.InstanceProps<ImageLabel> {
     selected?: number;
     'max-height'?: CssSize;
     backgroundImage?: CssBackgroundImage;
@@ -10,6 +10,7 @@ export interface SelectProps extends ScalableElementProps, SpacedElementProps, R
     name?: string;
     searchable?: boolean;
     searchPlaceholder?: string;
+    disabled?: boolean;
 }
 interface SelectOptionProps {
     text?: string;

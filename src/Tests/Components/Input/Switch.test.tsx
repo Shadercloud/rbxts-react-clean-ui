@@ -1,253 +1,261 @@
 import React from "@rbxts/react";
-import ReactRoblox from "@rbxts/react-roblox";
 import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
-const { Skip } = Decorators;
-import { Switch } from "../../../Components/Input/Switch";
+const { Skip, Each } = Decorators;
+import { Switch, SwitchProps } from "../../../Components/Input/Switch";
 import { FieldsetContext } from "../../../Components/Layout";
+import { SizeHelper } from "../../../Helpers";
+import { ThemeProvider } from "../../../Providers/theme.provider";
+import { DefaultTheme, extendTheme } from "../../../Theme";
+import { activateButton } from "../../Helpers/fiber";
+import { STUDIO_SKIP_MESSAGE, settleFrames, waitForGuiObject, waitForLayout, withMounted } from "../../Helpers/layout";
+
+const SNAP_THEME = extendTheme(DefaultTheme, { components: { switch: { animation: { duration: 0 } } } });
+
+const switchTheme = SNAP_THEME.components.switch;
+const inset = SizeHelper.toUDim(switchTheme.thumb.inset).Offset;
+const THUMB_OFF_X = inset;
+const THUMB_ON_X =
+	SizeHelper.toUDim(switchTheme.width).Offset - inset - (SizeHelper.toUDim(switchTheme.height).Offset - inset * 2);
+
+function snapSwitch(props: SwitchProps) {
+	return (
+		<ThemeProvider theme={SNAP_THEME}>
+			<Switch {...props} />
+		</ThemeProvider>
+	);
+}
+
+function recorder(values: boolean[]) {
+	return (value: boolean) => {
+		values.push(value);
+	};
+}
+
+function checkedFor(label: string): boolean | undefined {
+	return label === "on" ? true : label === "off" ? false : undefined;
+}
+
+function waitForSwitch(host: Instance, name = "Switch"): ImageButton {
+	return waitForGuiObject<ImageButton>(host, name);
+}
+
+function assertThumb(track: Instance, on: boolean, label: string) {
+	const thumb = track.FindFirstChild("Thumb") as Frame | undefined;
+	Assert.notUndefined(thumb, `${label}: expected a Thumb frame inside the track`);
+
+	const expected = on ? THUMB_ON_X : THUMB_OFF_X;
+	Assert.true(
+		math.abs(thumb!.Position.X.Offset - expected) <= 0.5,
+		`${label}: expected the thumb ${on ? "on" : "off"} at X offset ${expected}, got ${thumb!.Position.X.Offset}`,
+	);
+}
 
 @Tag("Studio")
 class SwitchMountValidation {
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
-	@DisplayName("Mounting with checked={true} fires onChange exactly once with true")
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@Each([["on"], ["off"], ["unset"]])
+	@DisplayName("Mounting never calls onChange, whether checked is true, false or left unset")
 	@Test
-	public seedsFromChecked() {
-		const host = new Instance("Folder");
+	public silentMount(label: string) {
+		const values: boolean[] = [];
+		const checked = checkedFor(label);
 
-		const onChangeValues: boolean[] = [];
+		withMounted(200, 100, snapSwitch({ checked, onChange: recorder(values) }), (mounted) => {
+			const track = waitForSwitch(mounted.host);
+			settleFrames(3);
 
-		const root = ReactRoblox.createRoot(host);
-
-		root.render(
-			<Switch
-				checked={true}
-				onChange={(value) => {
-					onChangeValues.push(value);
-				}}
-			/>,
-		);
-
-		task.wait();
-
-		Assert.deepEqual(onChangeValues, [true]);
-
-		root.unmount();
-		host.Destroy();
+			Assert.deepEqual(values, [], `${label}: expected no onChange on mount`);
+			assertThumb(track, checked === true, label);
+		});
 	}
 
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
-	@DisplayName("Mounting without a checked prop fires onChange exactly once with false")
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("An uncontrolled switch with defaultChecked starts on without calling onChange")
 	@Test
-	public defaultsUnchecked() {
-		const host = new Instance("Folder");
+	public defaultCheckedSeeds() {
+		const values: boolean[] = [];
 
-		const onChangeValues: boolean[] = [];
+		withMounted(200, 100, snapSwitch({ defaultChecked: true, onChange: recorder(values) }), (mounted) => {
+			const track = waitForSwitch(mounted.host);
+			settleFrames(3);
 
-		const root = ReactRoblox.createRoot(host);
-
-		root.render(
-			<Switch
-				onChange={(value) => {
-					onChangeValues.push(value);
-				}}
-			/>,
-		);
-
-		task.wait();
-
-		Assert.deepEqual(onChangeValues, [false]);
-
-		root.unmount();
-		host.Destroy();
+			Assert.deepEqual(values, []);
+			assertThumb(track, true, "defaultChecked");
+		});
 	}
 
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
-	@DisplayName("Re-rendering with a flipped checked prop does not fire onChange again when uncontrolled")
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Clicking a controlled switch reports the flipped value but the thumb waits for the prop to change")
 	@Test
-	public uncontrolledIgnoresProp() {
-		const host = new Instance("Folder");
+	public controlledClickReports() {
+		const values: boolean[] = [];
 
-		const onChangeValues: boolean[] = [];
+		withMounted(200, 100, snapSwitch({ checked: false, onChange: recorder(values) }), (mounted) => {
+			const track = waitForSwitch(mounted.host);
 
-		const root = ReactRoblox.createRoot(host);
+			activateButton(mounted, track);
+			settleFrames(3);
 
-		root.render(
-			<Switch
-				checked={false}
-				onChange={(value) => {
-					onChangeValues.push(value);
-				}}
-			/>,
-		);
-		task.wait();
+			Assert.deepEqual(values, [true]);
+			assertThumb(track, false, "after click, before the prop changes");
 
-		root.render(
-			<Switch
-				checked={true}
-				onChange={(value) => {
-					onChangeValues.push(value);
-				}}
-			/>,
-		);
-		task.wait();
+			mounted.update(snapSwitch({ checked: true, onChange: recorder(values) }));
+			settleFrames(2);
 
-		Assert.deepEqual(onChangeValues, [false]);
-
-		root.unmount();
-		host.Destroy();
+			assertThumb(track, true, "after the prop changes");
+			Assert.deepEqual(values, [true], "Expected the prop change not to call onChange");
+		});
 	}
 
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
-	@DisplayName("Firing the Fieldset labelActivated event flips the switch and fires onChange with the new state")
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Flipping a controlled checked prop moves the thumb without calling onChange")
 	@Test
-	public labelToggles() {
-		const host = new Instance("Folder");
+	public propChangeSilent() {
+		const values: boolean[] = [];
+
+		withMounted(200, 100, snapSwitch({ checked: false, onChange: recorder(values) }), (mounted) => {
+			const track = waitForSwitch(mounted.host);
+
+			mounted.update(snapSwitch({ checked: true, onChange: recorder(values) }));
+			settleFrames(2);
+			assertThumb(track, true, "checked prop on");
+
+			mounted.update(snapSwitch({ checked: false, onChange: recorder(values) }));
+			settleFrames(2);
+			assertThumb(track, false, "checked prop off");
+
+			Assert.deepEqual(values, []);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Clicking an uncontrolled switch flips its own state and reports each new value")
+	@Test
+	public uncontrolledClickToggles() {
+		const values: boolean[] = [];
+
+		withMounted(200, 100, snapSwitch({ onChange: recorder(values) }), (mounted) => {
+			const track = waitForSwitch(mounted.host);
+
+			activateButton(mounted, track);
+			settleFrames(1);
+			Assert.deepEqual(values, [true]);
+			assertThumb(track, true, "after first click");
+
+			activateButton(mounted, track);
+			settleFrames(1);
+			Assert.deepEqual(values, [true, false]);
+			assertThumb(track, false, "after second click");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Firing the Fieldset labelActivated event turns an uncontrolled switch on and reports true")
+	@Test
+	public fieldsetLabelToggles() {
 		const labelActivated = new Instance("BindableEvent");
+		const values: boolean[] = [];
 
-		const onChangeValues: boolean[] = [];
+		try {
+			withMounted(
+				200,
+				100,
+				<FieldsetContext.Provider value={{ disabled: false, checkbox: false, labelActivated }}>
+					{snapSwitch({ onChange: recorder(values) })}
+				</FieldsetContext.Provider>,
+				(mounted) => {
+					const track = waitForSwitch(mounted.host);
+					settleFrames(2);
 
-		const root = ReactRoblox.createRoot(host);
+					labelActivated.Fire();
 
-		root.render(
-			<FieldsetContext.Provider value={{ disabled: false, checkbox: false, labelActivated }}>
-				<Switch
-					onChange={(value) => {
-						onChangeValues.push(value);
-					}}
-				/>
-			</FieldsetContext.Provider>,
-		);
+					waitForLayout(
+						() => (values.size() >= 1 ? true : undefined),
+						"Timed out waiting for onChange to fire after labelActivated",
+					);
+					settleFrames(1);
 
-		task.wait();
-
-		labelActivated.Fire();
-
-		for (let attempt = 0; attempt < 10 && onChangeValues.size() < 2; attempt++) {
-			task.wait();
+					Assert.deepEqual(values, [true]);
+					assertThumb(track, true, "after labelActivated");
+				},
+			);
+		} finally {
+			labelActivated.Destroy();
 		}
-
-		Assert.deepEqual(onChangeValues, [false, true]);
-
-		root.unmount();
-		labelActivated.Destroy();
-		host.Destroy();
 	}
 
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
-	@DisplayName("A disabled switch ignores the Fieldset labelActivated event and never fires onChange beyond mount")
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A disabled switch ignores both a click and the Fieldset labelActivated event")
 	@Test
-	public disabledIgnoresLabel() {
-		const host = new Instance("Folder");
+	public disabledBlocksToggle() {
 		const labelActivated = new Instance("BindableEvent");
+		const values: boolean[] = [];
 
-		const onChangeValues: boolean[] = [];
+		try {
+			withMounted(
+				200,
+				100,
+				<FieldsetContext.Provider value={{ disabled: false, checkbox: false, labelActivated }}>
+					{snapSwitch({ disabled: true, onChange: recorder(values) })}
+				</FieldsetContext.Provider>,
+				(mounted) => {
+					const track = waitForSwitch(mounted.host);
 
-		const root = ReactRoblox.createRoot(host);
+					activateButton(mounted, track);
+					labelActivated.Fire();
+					settleFrames(5);
 
-		root.render(
-			<FieldsetContext.Provider value={{ disabled: false, checkbox: false, labelActivated }}>
-				<Switch
-					disabled={true}
-					onChange={(value) => {
-						onChangeValues.push(value);
-					}}
-				/>
-			</FieldsetContext.Provider>,
-		);
-
-		task.wait();
-
-		labelActivated.Fire();
-
-		for (let attempt = 0; attempt < 10; attempt++) {
-			task.wait();
+					Assert.deepEqual(values, []);
+					assertThumb(track, false, "disabled after click and label");
+				},
+			);
+		} finally {
+			labelActivated.Destroy();
 		}
-
-		Assert.deepEqual(onChangeValues, [false]);
-
-		root.unmount();
-		labelActivated.Destroy();
-		host.Destroy();
 	}
 
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	@DisplayName("A disabled switch renders its track ImageButton with Active and Selectable both false")
 	@Test
 	public disabledTrackInert() {
-		const host = new Instance("Folder");
+		withMounted(200, 100, snapSwitch({ disabled: true }), (mounted) => {
+			const track = waitForSwitch(mounted.host);
 
-		const root = ReactRoblox.createRoot(host);
-
-		root.render(<Switch disabled={true} />);
-		task.wait();
-
-		const track = host.FindFirstChildWhichIsA("ImageButton", true) as ImageButton | undefined;
-
-		Assert.notUndefined(track);
-		Assert.false(track!.Active);
-		Assert.false(track!.Selectable);
-
-		root.unmount();
-		host.Destroy();
+			Assert.false(track.Active);
+			Assert.false(track.Selectable);
+		});
 	}
 
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("LayoutOrder reaches the root track, and leaving it unset keeps the engine default of 0")
+	@Test
+	public layoutOrderForwarded() {
+		withMounted(200, 100, snapSwitch({ LayoutOrder: 3 }), (mounted) => {
+			Assert.equal(waitForSwitch(mounted.host).LayoutOrder, 3);
+
+			mounted.update(snapSwitch({}));
+			Assert.equal(waitForSwitch(mounted.host).LayoutOrder, 0);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	@DisplayName("The root instance is named \"Switch\" when no name prop is given")
 	@Test
 	public defaultName() {
-		const host = new Instance("Folder");
-
-		const root = ReactRoblox.createRoot(host);
-
-		root.render(<Switch />);
-		task.wait();
-
-		Assert.notUndefined(host.FindFirstChild("Switch"));
-
-		root.unmount();
-		host.Destroy();
+		withMounted(200, 100, snapSwitch({}), (mounted) => {
+			Assert.notUndefined(mounted.host.FindFirstChild("Switch"));
+		});
 	}
 
-	@Skip(
-		!Runtime.isRoblox(),
-		"Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.",
-	)
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	@DisplayName("Passing a name prop renames the root instance and no \"Switch\" child remains")
 	@Test
 	public customName() {
-		const host = new Instance("Folder");
-
-		const root = ReactRoblox.createRoot(host);
-
-		root.render(<Switch name="MarketingOptIn" />);
-		task.wait();
-
-		Assert.notUndefined(host.FindFirstChild("MarketingOptIn"));
-		Assert.undefined(host.FindFirstChild("Switch"));
-
-		root.unmount();
-		host.Destroy();
+		withMounted(200, 100, snapSwitch({ name: "MarketingOptIn" }), (mounted) => {
+			waitForSwitch(mounted.host, "MarketingOptIn");
+			Assert.undefined(mounted.host.FindFirstChild("Switch"));
+		});
 	}
 }
 

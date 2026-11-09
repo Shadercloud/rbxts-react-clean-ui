@@ -225,8 +225,8 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                     {props.first && (
                         <uicorner
                             key="Corners"
-                            TopLeftRadius={SizeHelper.toUDim(theme.components.accordion.cornerRadius)}
-                            TopRightRadius={SizeHelper.toUDim(theme.components.accordion.cornerRadius)}
+                            TopLeftRadius={SizeHelper.toRadius(theme, theme.components.accordion.cornerRadius)}
+                            TopRightRadius={SizeHelper.toRadius(theme, theme.components.accordion.cornerRadius)}
                             BottomLeftRadius={new UDim(0, 0)}
                             BottomRightRadius={new UDim(0, 0)}
                         />

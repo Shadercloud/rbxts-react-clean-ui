@@ -1,11 +1,12 @@
 import React from "@rbxts/react";
 import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
-const { Skip } = Decorators;
+const { Skip, Each } = Decorators;
 import { Button } from "../../../Components/Input/Button";
 import { Group, HStack } from "../../../Components/Layout";
 import { ThemeProvider } from "../../../Providers/theme.provider";
-import { DefaultTheme, WoodenTheme } from "../../../Theme";
+import { CssRadiusToken } from "../../../Interfaces/";
+import { DefaultTheme, WoodenTheme, extendTheme } from "../../../Theme";
 import {
 	STUDIO_SKIP_MESSAGE,
 	assertAllDescendantsContained,
@@ -242,6 +243,22 @@ class ButtonMountValidation {
 			const button = waitForButton(mounted.host);
 
 			Assert.true(button.Modal, "Expected Modal=true when modal={true} is passed");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@Each([["sm"], ["md"], ["lg"]])
+	@DisplayName("A theme button cornerRadius token renders the root UICorner at that token's pixel radius")
+	@Test
+	public themeRadiusToken(token: CssRadiusToken) {
+		const theme = extendTheme(DefaultTheme, { components: { button: { cornerRadius: token } } });
+
+		withMounted(400, 200, <ThemeProvider theme={theme}><Button text="Save" /></ThemeProvider>, (mounted) => {
+			const button = waitForButton(mounted.host);
+			const corner = button.FindFirstChildWhichIsA("UICorner");
+
+			Assert.notUndefined(corner, "Expected the Button to have a direct UICorner child");
+			Assert.equal(corner!.CornerRadius, new UDim(0, DefaultTheme.radius[token]), `cornerRadius="${token}"`);
 		});
 	}
 }

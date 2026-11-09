@@ -74,6 +74,14 @@ Leave both `width` and `Size` unset to make the table hug its column content hor
 
 Set `width` or `Size` when the table should occupy an explicit horizontal space. The columns retain the proportions of their intrinsic widths within that space, so columns with wider content receive more room while all rows remain aligned. `height` and `AutomaticSize` follow the shared `SizeElementProps` behavior inherited from `Container`.
 
+`minWidth`, `maxWidth`, `minHeight`, and `maxHeight` clamp the table's root (see [min and max size](/components/layout/container#min-and-max-size)). With an explicit `width` such as `"100%"`, the columns share the clamped width proportionally. A table without a `width` or `Size` auto-sizes horizontally to its columns. A maximum doesn't stop that growth, so `maxWidth` doesn't narrow it, and the columns are not shrunk to fit. Set a `width` to cap the table.
+
+```tsx
+<Table width="100%" maxWidth={600}>
+    ...
+</Table>
+```
+
 ## Custom cell content
 
 Heading and body cells accept React children, so a cell can contain another clean-ui component when plain text is not enough.
@@ -107,7 +115,7 @@ String children are rendered as themed table text automatically.
 | Interface | Purpose |
 | --- | --- |
 | `ScalableElementProps` | Supplies `scale` (`"xs" \| "sm" \| "md" \| "lg" \| "xl"`) for cell spacing and typography. |
-| `SizeElementProps` | Configures `width`, `height`, native `Size`, and `AutomaticSize`. Omitting both `width` and `Size` enables intrinsic horizontal sizing. |
+| `SizeElementProps` | Configures `width`, `height`, native `Size`, and `AutomaticSize`. Omitting both `width` and `Size` enables intrinsic horizontal sizing. `minWidth`/`maxWidth`/`minHeight`/`maxHeight` clamp the table's root. |
 
 ### Table.Header
 
@@ -159,6 +167,7 @@ String children are rendered as themed table text automatically.
 
 - The header and body are visual sections of the same table. Every column uses the maximum intrinsic width of the cells at that position across both sections, keeping cell bounds and content aligned between rows.
 - With no `width` or `Size`, the table hugs its measured columns horizontally. With either prop supplied, those intrinsic widths become proportional shares of the explicit table width.
+- On a table without a `width`, a `maxWidth` narrower than the columns' total clips them (the table clips its contents) instead of shrinking them.
 - Intrinsic measurements include resolved cell padding and update when mounted cell content, typography, scale, padding, or composition changes.
 - Sections and rows are displayed in child order.
 - Cell strings use the active table typography and colors; custom React children render in the same cell bounds.

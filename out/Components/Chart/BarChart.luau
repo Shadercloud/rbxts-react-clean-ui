@@ -399,7 +399,7 @@ local function BarChart(props)
 		-- ▲ ReadonlyArray.map ▲
 		return table.concat(_newValue_2, "\n")
 	end
-	local barCornerRadius = SizeHelper:toUDim(barTheme.cornerRadius)
+	local barCornerRadius = SizeHelper:toRadius(theme, barTheme.cornerRadius)
 	local animationProgress, animationTween = useTween(if barTheme.tweenTime > 0 then 0 else 1, {
 		duration = barTheme.tweenTime,
 		easing = "quadOut",

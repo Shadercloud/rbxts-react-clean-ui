@@ -11,5 +11,6 @@ export interface InputProps extends ScalableElementProps, SpacedElementProps, Re
     controlled?: boolean;
     icon?: IconName;
     name?: string;
+    disabled?: boolean;
 }
 export declare function Input(props: InputProps): React.JSX.Element;

@@ -1,6 +1,9 @@
 import { ScaleSizeValue } from "./responsive.types";
 export type CssUnit = "px" | "%";
 export type CssSize = "Auto" | number | `${number}` | `${number}${CssUnit}`;
+export type CssPixelSize = number | `${number}` | `${number}px`;
+export type CssRadiusToken = "sm" | "md" | "lg";
+export type CssRadius = CssSize | CssRadiusToken;
 export type CssCalcSize = CssSize | `${number}% - ${number}px` | `${number}% + ${number}px`;
 export type CssBreakpoint = {
     xs: number;

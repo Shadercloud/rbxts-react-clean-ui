@@ -33,23 +33,50 @@ export function SwitchExample() {
 
 The switch starts off by default.
 
-## Initial checked state
-
-Use the `checked` prop to specify the initial state of the switch.
-
-```tsx
-<Switch checked />
-```
-
-or
-
-```tsx
-<Switch checked={true} />
-```
-
-<Callout type="info">
-The `checked` prop is only used to determine the initial state when the component is created, matching `Checkbox`'s convention. After that, the switch manages its own state internally — changing the `checked` prop later has no further effect.
+<Callout type="warn" title="Behaviour change in 2.0.0">
+    Passing `checked` now makes the switch **controlled**: it always shows the prop's value, and a click only calls `onChange(!checked)`. A `checked` without an `onChange` that feeds the new value back leaves the switch frozen. `onChange` also no longer fires on mount or when the `checked` prop changes, only when the user toggles it. Use `defaultChecked` for the old "initial value only" behaviour, and read the initial value yourself if you relied on the mount-time `onChange` call.
 </Callout>
+
+## Uncontrolled
+
+Leave `checked` unset and the switch keeps its own state. Use `defaultChecked` to choose the starting value.
+
+```tsx
+<Switch defaultChecked />
+```
+
+```tsx
+<Switch
+    defaultChecked={true}
+    onChange={(checked) => {
+        print(`Checked: ${checked}`);
+    }}
+/>
+```
+
+`defaultChecked` is only read when the switch mounts. Changing it later has no effect.
+
+## Controlled
+
+Pass `checked` to drive the switch from your own state, the same contract as [`Checkbox`](/components/form/checkbox#controlled). Clicking it calls `onChange` with the requested value but changes nothing by itself, so feed the value back through `checked`.
+
+```tsx
+import React, { useState } from "@rbxts/react";
+import { Switch } from "@rbxts/react-clean-ui";
+
+export function ControlledSwitch() {
+    const [enabled, setEnabled] = useState(false);
+
+    return (
+        <Switch
+            checked={enabled}
+            onChange={setEnabled}
+        />
+    );
+}
+```
+
+The thumb animates whenever the `checked` prop changes, including when you change it from elsewhere. Changing `checked` from outside does not call `onChange`.
 
 ## With a fieldset
 
@@ -78,8 +105,8 @@ When the user clicks either the switch or its label, the checked state toggles.
 Set `intent` to control the track's on-state (checked) background and border colors.
 
 ```tsx
-<Switch checked intent="success" />
-<Switch checked intent="danger" />
+<Switch defaultChecked intent="success" />
+<Switch defaultChecked intent="danger" />
 ```
 
 The off-state track color is always the theme's static color, regardless of `intent`. There is no hover state.
@@ -89,8 +116,22 @@ The off-state track color is always the theme's static color, regardless of `int
 Set `disabled` to prevent interaction. The track and thumb render at a flat, dimmed transparency, and both clicking the switch and activating a paired `Fieldset.Label` are ignored.
 
 ```tsx
-<Switch checked disabled />
+<Switch defaultChecked disabled />
 <Switch disabled />
+```
+
+A disabled switch never calls `onChange`. A controlled switch can still be changed through `checked` while disabled.
+
+## Ordering in a layout
+
+Use `LayoutOrder` to position the switch inside a list layout such as `VStack` or `HStack`. When unset, Roblox's default (`0`) is used.
+
+```tsx
+<VStack>
+    <Switch LayoutOrder={1} defaultChecked />
+    <Switch LayoutOrder={2} />
+    <Switch LayoutOrder={3} intent="danger" />
+</VStack>
 ```
 
 ## Props
@@ -99,10 +140,12 @@ Set `disabled` to prevent interaction. The track and thumb render at a flat, dim
 
 | Prop       | Type                        | Default     | Description                                                                              |
 | ---------- | --------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `checked`  | `boolean`                   | `false`     | The initial checked state of the switch.                                                  |
-| `onChange` | `(value: boolean) => void`  | `undefined` | Called once immediately after mount with the initial value, then again on every toggle.   |
+| `checked`  | `boolean`                   | `undefined` | Controlled checked state. When set, the switch always shows this value.                   |
+| `defaultChecked` | `boolean`             | `false`     | Starting state when uncontrolled (`checked` unset). Only read on mount.                   |
+| `onChange` | `(value: boolean) => void`  | `undefined` | Called with the new value when the user toggles the switch. Never called on mount or when `checked` changes. |
 | `disabled` | `boolean`                   | `false`     | Disables interaction and renders a dimmed appearance.                                     |
 | `name`     | `string`                    | `"Switch"`  | Sets the rendered instance's `Name`.                                                      |
+| `LayoutOrder` | `number`                 | `undefined` | Native Roblox layout order. Unset leaves Roblox's default `0`.                            |
 
 ### Shared props
 
@@ -117,9 +160,9 @@ The switch also supports props inherited from the following interfaces.
 ## Behaviour
 
 * The switch is off by default.
-* Setting `checked` changes the initial state only; the switch is uncontrolled after mount.
-* Clicking the switch, or a paired `Fieldset.Label`, toggles the internal state, unless `disabled`.
-* `onChange` is called from an effect on the internal checked state, so it fires once immediately after mount with the initial value, in addition to firing on every subsequent toggle.
+* With `checked` set, the switch is controlled: it shows `checked`, and a click calls `onChange(!checked)` without changing anything internally. Without `checked`, it starts at `defaultChecked` and flips its own state on each click before calling `onChange`.
+* Clicking the switch, or a paired `Fieldset.Label`, toggles it, unless `disabled`.
+* `onChange` only fires in response to a user toggle. It never fires on mount, never fires when a controlled `checked` prop changes, and never fires while `disabled`.
 * The thumb's horizontal position and the track's background/border colors animate together, driven by a single tween progress value, over `theme.components.switch.animation.duration` seconds. A duration of `0` snaps instantly instead of animating.
 * The on-state track/border colors are resolved from `intent` (layered over `theme.colors.intents`); the off-state colors are always the theme's static, non-intent colors.
 * When `disabled`, both the track and thumb render at a flat dimmed transparency, overriding rather than blending with their normal transparency.

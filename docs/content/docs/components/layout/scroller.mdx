@@ -54,6 +54,16 @@ export function ScrollerExample() {
 
 Give it a fixed height whenever it sits inside a container that doesn't already constrain its own height, so there's a bounded window for content to scroll within.
 
+`minWidth`, `maxWidth`, `minHeight`, and `maxHeight` clamp the scroller's visible window, not its scrolling canvas (see [min and max size](/components/layout/container#min-and-max-size)). Content taller than a clamped window still scrolls.
+
+```tsx
+<Scroller width="100%" height="100%" maxHeight={400}>
+    ...
+</Scroller>
+```
+
+Setting any of these props wraps the scroller in a transparent `Frame` (named `Scroller` unless you pass `name`) and puts the `UISizeConstraint` on that wrapper. Roblox applies a `UISizeConstraint` under a `ScrollingFrame` to its automatic canvas too, so a constraint there would cap the canvas at the window size and stop the content scrolling. The ref still points at the `ScrollingFrame`. As with a decorated scroller (see [Theme values](#theme-values)), a scroller with min or max props can't size itself from its content, so give it an explicit or parent-relative size.
+
 ## Spacing
 
 The `spacing` prop reserves room for the scrollbar so it doesn't overlap the content. When the scrollbar is visible, the content area is inset by the scrollbar's thickness plus this spacing value.
@@ -74,14 +84,117 @@ Roblox doesn't recalculate a parent's `AutomaticSize` correctly when its only ch
 </Scroller>
 ```
 
+## Stable gutter
+
+By default the content area only narrows to make room for the scrollbar once content actually overflows, so content shifts sideways the moment the scrollbar appears. Set `stableGutter` to always reserve the scrollbar's gutter (like CSS `scrollbar-gutter: stable`), so the content has the same width whether or not it overflows. The third scroller in the [Theme values](#theme-values) demo shows this.
+
+```tsx
+<Scroller height="200" spacing="sm" stableGutter>
+    ...
+</Scroller>
+```
+
+## Scroll events
+
+`onScroll` is called every time the scroller's `CanvasPosition` changes, whether the user scrolled or your code moved it. It receives the new canvas position and the underlying `ScrollingFrame`.
+
+```tsx
+<Scroller
+    height="200"
+    onScroll={(canvasPosition, scroller) => {
+        print(`Scrolled to ${canvasPosition.Y} of ${scroller.AbsoluteCanvasSize.Y}`);
+    }}
+>
+    ...
+</Scroller>
+```
+
+## Near-end callback
+
+`onNearEnd` fires when the bottom of the visible window comes within `nearEndThreshold` pixels of the end of the content (default `0`, meaning the very end). Use it to load the next page of an infinite or cursor-paged list.
+
+```tsx
+import React from "@rbxts/react";
+import { Scroller, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function InfiniteList() {
+    const [items, setItems] = React.useState<string[]>([]);
+    const [loading, setLoading] = React.useState(false);
+    const [hasMore, setHasMore] = React.useState(true);
+
+    const loadMore = () => {
+        if (loading || !hasMore) return;
+        setLoading(true);
+
+        task.spawn(() => {
+            const page = fetchNextPage();
+            setItems((previous) => [...previous, ...page.items]);
+            setHasMore(page.hasMore);
+            setLoading(false);
+        });
+    };
+
+    return (
+        <Scroller width="100%" height="300" nearEndThreshold={100} onNearEnd={loadMore}>
+            <VStack spacing="sm">
+                {items.map((item) => (
+                    <Text key={item} text={item} />
+                ))}
+                {loading && <Text text="Loading..." />}
+            </VStack>
+        </Scroller>
+    );
+}
+```
+
+`onNearEnd` fires once per approach. After firing, it stays quiet until it is re-armed, either because the canvas grew (for example, a new page was appended) or because the user scrolled more than `nearEndThreshold` away from the end. If the canvas grows but the end is still within the threshold, because the new page didn't fill the window, it fires again.
+
+Content that doesn't overflow counts as being at the end, so an empty or short list fires `onNearEnd` on mount. Guard your handler against loads that are already in flight, as `loading` does above.
+
+## Ref
+
+`Scroller` forwards its ref to the underlying `ScrollingFrame`, so you can read or set properties such as `CanvasPosition` directly. `ScrollerProps` is exported for wrapping components.
+
+```tsx
+import React from "@rbxts/react";
+import { Button, Scroller, VStack } from "@rbxts/react-clean-ui";
+
+export function ScrollToTop() {
+    const scrollerRef = React.useRef<ScrollingFrame>();
+
+    return (
+        <VStack spacing="sm">
+            <Scroller ref={scrollerRef} width="100%" height="200">
+                ...
+            </Scroller>
+            <Button
+                text="Back to top"
+                Event={{
+                    Activated: () => {
+                        if (scrollerRef.current) scrollerRef.current.CanvasPosition = Vector2.zero;
+                    },
+                }}
+            />
+        </VStack>
+    );
+}
+```
+
+The ref always points at the `ScrollingFrame`, including when the scroller is wrapped in a `Frame` because the theme draws a custom track or thumb (see [Theme values](#theme-values)) or a min or max size prop is set (see [Sizing](#sizing)).
+
 ## Props
 
 ### Scroller-specific props
 
-| Prop                  | Type              | Default     | Description                                                                                       |
-| --------------------- | ----------------- | ----------- | --------------------------------------------------------------------------------------------------- |
-| `children`            | `React.ReactNode` | `undefined` | Content rendered inside the scrolling area.                                                        |
-| `AutomaticSizeParent` | `boolean`         | `false`     | Adds an internal `UIListLayout` so an ancestor using `AutomaticSize` can size around the scroller. |
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `React.ReactNode` | `undefined` | Content rendered inside the scrolling area. |
+| `AutomaticSizeParent` | `boolean` | `false` | Adds an internal `UIListLayout` so an ancestor using `AutomaticSize` can size around the scroller. |
+| `stableGutter` | `boolean` | `false` | Always reserves the scrollbar's gutter, so content doesn't shift sideways when the scrollbar appears. |
+| `onScroll` | `(canvasPosition: Vector2, scroller: ScrollingFrame) => void` | `undefined` | Called every time `CanvasPosition` changes, from user input or from code. |
+| `onNearEnd` | `() => void` | `undefined` | Called once each time the end of the content comes within `nearEndThreshold` pixels of the window's bottom edge. |
+| `nearEndThreshold` | `number` | `0` | Distance in pixels from the end of the content at which `onNearEnd` fires. Negative values are treated as `0`. |
+| `ref` | `React.Ref<ScrollingFrame>` | `undefined` | Forwarded to the underlying `ScrollingFrame`. |
 
 ### Shared props
 
@@ -89,7 +202,7 @@ The scroller also supports props inherited from the following interfaces.
 
 | Interface             | Purpose                                                              |
 | ---------------------- | --------------------------------------------------------------------- |
-| `SizeElementProps`     | Configures the scroller's `width`, `height`, and native `Size`.      |
+| `SizeElementProps`     | Configures the scroller's `width`, `height`, and native `Size`, plus `minWidth`/`maxWidth`/`minHeight`/`maxHeight` to clamp its window (on a wrapper `Frame`, see [Sizing](#sizing)). |
 | `SpacedElementProps`   | Reserves space between the content and the scrollbar.                |
 | `PositionElementProps` | Configures the scroller's position, anchor point, and centering.     |
 
@@ -98,10 +211,69 @@ The scroller also supports props inherited from the following interfaces.
 * Scrolling is vertical only (`ScrollingDirection.Y`); content wider than the scroller is not scrollable horizontally.
 * The scrolling canvas grows automatically to fit its content (`AutomaticCanvasSize.Y`); it does not need a fixed content height.
 * Without an explicit `width`/`height`, the scroller fills 100% of its parent's size.
+* With none of `minWidth`, `maxWidth`, `minHeight`, or `maxHeight` set and a plain theme, the root is the `ScrollingFrame` itself. Setting any of them, or a decorated theme, makes the root a transparent `Frame` (named `Scroller` unless you pass `name`) that wraps a `ScrollingFrame` named `ScrollingFrame`, and the size constraint goes on that wrapper, never on the `ScrollingFrame`.
 * The scrollbar is only rendered when the content's height exceeds the scroller's visible window; it disappears automatically once content shrinks below that threshold.
+* While the scrollbar is visible, the content area is narrowed by the scrollbar's thickness plus `spacing`. With `stableGutter`, it is always narrowed, whether or not content overflows.
+* `onScroll`, `onNearEnd`, and `nearEndThreshold` can change between renders without reconnecting any signals.
+* An empty or non-overflowing list fires `onNearEnd` on mount, because its end is already in view.
 * The scrollbar is 12 pixels thick and inset within the scrolling frame.
 * The scroller's own background is fully transparent and has no border.
 
 ## Theme values
 
-The scroller uses `theme.components.scroller.barColor` to set the scrollbar's colour (`ScrollBarImageColor3`). This value can be changed by providing a custom Clean UI theme.
+The scroller uses values from `theme.components.scroller` for:
+
+* `barColor` — the scrollbar's colour (`ScrollBarImageColor3`), and the fill of the custom thumb when one is drawn
+* `trackColor` (optional) — draws a 12-pixel track behind the scrollbar while content overflows
+* `trackTransparency` (optional, default `0`) — the track's transparency. It has no effect unless `trackColor` is set.
+* `thumbBorderThickness` (optional) — when greater than `0`, outlines the scrollbar thumb with a border of this thickness
+* `thumbBorderColor` (optional) — the thumb border's colour. When unset, the border is black.
+
+The demo below shows a plain scroller, one with a track and thumb border layered over the active theme, and a `stableGutter` scroller whose content doesn't overflow but still leaves room for the scrollbar.
+
+<Demo preview="Scenes/Layout/ScrollerTheme.loom.tsx" previewHeight={360}>
+```tsx
+import React from "@rbxts/react";
+import { DefaultTheme, extendTheme, Scroller, Text, ThemeProvider, VStack } from "@rbxts/react-clean-ui";
+
+const DecoratedTheme = extendTheme(DefaultTheme, {
+    components: {
+        scroller: {
+            trackColor: Color3.fromHex("#888888"),
+            trackTransparency: 0.7,
+            thumbBorderThickness: 2,
+            thumbBorderColor: Color3.fromHex("#FFFFFF"),
+        },
+    },
+});
+
+export function DecoratedScroller() {
+    return (
+        <ThemeProvider theme={DecoratedTheme}>
+            <Scroller width="190" height="160" spacing="sm">
+                <VStack spacing="sm">
+                    <Text text="Item 1" />
+                    <Text text="Item 2" />
+                    <Text text="Item 3" />
+                    <Text text="Item 4" />
+                    <Text text="Item 5" />
+                    <Text text="Item 6" />
+                    <Text text="Item 7" />
+                    <Text text="Item 8" />
+                    <Text text="Item 9" />
+                    <Text text="Item 10" />
+                </VStack>
+            </Scroller>
+        </ThemeProvider>
+    );
+}
+```
+</Demo>
+
+No shipped theme sets the optional keys, so by default the scroller renders Roblox's plain native scrollbar.
+
+Roblox's native scrollbar has no track, and its thumb can't take a border. Setting `trackColor` or a positive `thumbBorderThickness` therefore changes how the scroller is built: it is wrapped in a transparent `Frame` that draws the track and thumb as overlays, and the native thumb is hidden underneath (it still handles dragging). Setting a min or max size prop uses the same wrapper (see [Sizing](#sizing)), but only draws the track and thumb when the theme asks for them. This has a few consequences:
+
+* A wrapped scroller can't size itself from its content, so `AutomaticSize` and `AutomaticSizeParent` won't size it. Give it an explicit or parent-relative size.
+* Switching between a wrapped and an unwrapped scroller at runtime, by changing theme or by adding or removing every min and max prop, remounts the `ScrollingFrame`, which resets its scroll position.
+* The drawn thumb's size and position approximate Roblox's own. On very long content, it may drift slightly from the invisible native thumb you actually drag.

@@ -17,7 +17,7 @@ function Checkbox(props: { screenshot?: boolean } = {}) {
             </Fieldset>
             <Fieldset checkbox>
                 <Fieldset.Control>
-                    <CheckboxComponent checked />
+                    <CheckboxComponent defaultChecked />
                 </Fieldset.Control>
                 <Fieldset.Label>
                     <Text text="Initially Checked" />

@@ -11,9 +11,14 @@ local Tag = _lunit.Tag
 local DisplayName = _lunit.DisplayName
 local _binding = Decorators
 local Skip = _binding.Skip
+local Each = _binding.Each
 local Pagination = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "Pagination").Pagination
 local ThemeProvider = TS.import(script, script.Parent.Parent.Parent.Parent, "Providers", "theme.provider").ThemeProvider
 local createTheme = TS.import(script, script.Parent.Parent.Parent.Parent, "Theme").createTheme
+local activateButton = TS.import(script, script.Parent.Parent.Parent, "Helpers", "fiber").activateButton
+local _layout = TS.import(script, script.Parent.Parent.Parent, "Helpers", "layout")
+local waitForDescendant = _layout.waitForDescendant
+local withMounted = _layout.withMounted
 local function renderPagination(element)
 	local host = Instance.new("Folder")
 	local root = ReactRoblox.createRoot(host)
@@ -46,6 +51,26 @@ local function getButton(host, name)
 	Assert:notUndefined(button)
 	Assert["true"](Assert, button:IsA("ImageButton"))
 	return button
+end
+local function hasNextPageFor(label)
+	return if label == "unset" then nil else label == "true"
+end
+local function countPageItems(host)
+	local _exp = host:GetDescendants()
+	-- ▼ ReadonlyArray.filter ▼
+	local _newValue = {}
+	local _callback = function(descendant)
+		return string.sub(descendant.Name, 1, #"PaginationItem-") == "PaginationItem-"
+	end
+	local _length = 0
+	for _k, _v in _exp do
+		if _callback(_v, _k - 1, _exp) == true then
+			_length += 1
+			_newValue[_length] = _v
+		end
+	end
+	-- ▲ ReadonlyArray.filter ▲
+	return #_newValue
 end
 local function unmount(root, host)
 	root:unmount()
@@ -358,6 +383,85 @@ do
 		end
 		unmount(root, host)
 	end
+	function PaginationMountValidation:cursorPrevNextOnly()
+		local _binding_1 = renderPagination(React.createElement(Pagination, {
+			page = 3,
+			hasNextPage = true,
+			onPageChange = function() end,
+		}))
+		local host = _binding_1.host
+		local root = _binding_1.root
+		Assert:notUndefined(host:FindFirstChild("PaginationPrev", true))
+		Assert:notUndefined(host:FindFirstChild("PaginationNext", true))
+		Assert:undefined(host:FindFirstChild("PaginationList", true))
+		Assert:equal(countPageItems(host), 0)
+		Assert:equal(#getNamedDescendants(host, "PaginationEllipsis"), 0)
+		unmount(root, host)
+	end
+	function PaginationMountValidation:cursorNextNeedsFlag(label, nextEnabled)
+		local _binding_1 = renderPagination(React.createElement(Pagination, {
+			page = 3,
+			hasNextPage = hasNextPageFor(label),
+			onPageChange = function() end,
+		}))
+		local host = _binding_1.host
+		local root = _binding_1.root
+		local previous = getButton(host, "PaginationPrev")
+		local nextButton = getButton(host, "PaginationNext")
+		Assert["true"](Assert, previous.Active)
+		Assert:equal(nextButton.Active, nextEnabled)
+		Assert:equal(nextButton.Selectable, nextEnabled)
+		unmount(root, host)
+	end
+	function PaginationMountValidation:cursorEmitsFloored()
+		local emitted = {}
+		withMounted(400, 100, React.createElement(Pagination, {
+			page = 1.7,
+			hasNextPage = true,
+			onPageChange = function(page)
+				local _page = page
+				table.insert(emitted, _page)
+				return #emitted
+			end,
+		}), function(mounted)
+			local previous = waitForDescendant(mounted.host, "PaginationPrev", function()
+				return true
+			end)
+			local nextButton = waitForDescendant(mounted.host, "PaginationNext", function()
+				return true
+			end)
+			Assert["false"](Assert, previous.Active)
+			activateButton(mounted, previous)
+			activateButton(mounted, nextButton)
+			Assert:deepEqual(emitted, { 2 })
+		end)
+	end
+	function PaginationMountValidation:cursorListEmpty()
+		local _binding_1 = renderPagination(React.createElement(Pagination, {
+			page = 2,
+			onPageChange = function() end,
+		}, React.createElement(Pagination.List)))
+		local host = _binding_1.host
+		local root = _binding_1.root
+		Assert:notUndefined(host:FindFirstChild("PaginationList", true))
+		Assert:equal(countPageItems(host), 0)
+		Assert:equal(#getNamedDescendants(host, "PaginationEllipsis"), 0)
+		unmount(root, host)
+	end
+	function PaginationMountValidation:totalPagesIgnoresFlag()
+		local _binding_1 = renderPagination(React.createElement(Pagination, {
+			page = 3,
+			totalPages = 3,
+			hasNextPage = true,
+			onPageChange = function() end,
+		}))
+		local host = _binding_1.host
+		local root = _binding_1.root
+		Assert["false"](Assert, getButton(host, "PaginationNext").Active)
+		Assert:notUndefined(host:FindFirstChild("PaginationList", true))
+		Assert:equal(countPageItems(host), 3)
+		unmount(root, host)
+	end
 	local _decorator = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
 	local _decorator_1 = DisplayName("Seven pages at siblingCount 1 render every item with no ellipsis")
 	local _descriptor = Test(PaginationMountValidation, "allPages", {
@@ -617,6 +721,113 @@ do
 	})
 	if _descriptor_38 then
 		PaginationMountValidation.constantItemCount = _descriptor_38.value
+	end
+	local _decorator_26 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	local _decorator_27 = DisplayName("Without totalPages the default layout is just Prev and Next with no list or page items")
+	local _descriptor_39 = Test(PaginationMountValidation, "cursorPrevNextOnly", {
+		value = PaginationMountValidation.cursorPrevNextOnly,
+	})
+	if _descriptor_39 then
+		PaginationMountValidation.cursorPrevNextOnly = _descriptor_39.value
+	end
+	local _descriptor_40 = _decorator_27(PaginationMountValidation, "cursorPrevNextOnly", {
+		value = PaginationMountValidation.cursorPrevNextOnly,
+	})
+	if _descriptor_40 then
+		PaginationMountValidation.cursorPrevNextOnly = _descriptor_40.value
+	end
+	local _descriptor_41 = _decorator_26(PaginationMountValidation, "cursorPrevNextOnly", {
+		value = PaginationMountValidation.cursorPrevNextOnly,
+	})
+	if _descriptor_41 then
+		PaginationMountValidation.cursorPrevNextOnly = _descriptor_41.value
+	end
+	local _decorator_28 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	local _decorator_29 = Each({ { "unset", false }, { "false", false }, { "true", true } })
+	local _decorator_30 = DisplayName("Without totalPages Next is enabled only when hasNextPage is true, while Prev follows the page")
+	local _descriptor_42 = Test(PaginationMountValidation, "cursorNextNeedsFlag", {
+		value = PaginationMountValidation.cursorNextNeedsFlag,
+	})
+	if _descriptor_42 then
+		PaginationMountValidation.cursorNextNeedsFlag = _descriptor_42.value
+	end
+	local _descriptor_43 = _decorator_30(PaginationMountValidation, "cursorNextNeedsFlag", {
+		value = PaginationMountValidation.cursorNextNeedsFlag,
+	})
+	if _descriptor_43 then
+		PaginationMountValidation.cursorNextNeedsFlag = _descriptor_43.value
+	end
+	local _descriptor_44 = _decorator_29(PaginationMountValidation, "cursorNextNeedsFlag", {
+		value = PaginationMountValidation.cursorNextNeedsFlag,
+	})
+	if _descriptor_44 then
+		PaginationMountValidation.cursorNextNeedsFlag = _descriptor_44.value
+	end
+	local _descriptor_45 = _decorator_28(PaginationMountValidation, "cursorNextNeedsFlag", {
+		value = PaginationMountValidation.cursorNextNeedsFlag,
+	})
+	if _descriptor_45 then
+		PaginationMountValidation.cursorNextNeedsFlag = _descriptor_45.value
+	end
+	local _decorator_31 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	local _decorator_32 = DisplayName("Without totalPages page 1 disables Prev and a fractional page is floored before emitting")
+	local _descriptor_46 = Test(PaginationMountValidation, "cursorEmitsFloored", {
+		value = PaginationMountValidation.cursorEmitsFloored,
+	})
+	if _descriptor_46 then
+		PaginationMountValidation.cursorEmitsFloored = _descriptor_46.value
+	end
+	local _descriptor_47 = _decorator_32(PaginationMountValidation, "cursorEmitsFloored", {
+		value = PaginationMountValidation.cursorEmitsFloored,
+	})
+	if _descriptor_47 then
+		PaginationMountValidation.cursorEmitsFloored = _descriptor_47.value
+	end
+	local _descriptor_48 = _decorator_31(PaginationMountValidation, "cursorEmitsFloored", {
+		value = PaginationMountValidation.cursorEmitsFloored,
+	})
+	if _descriptor_48 then
+		PaginationMountValidation.cursorEmitsFloored = _descriptor_48.value
+	end
+	local _decorator_33 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	local _decorator_34 = DisplayName("An explicit Pagination.List without totalPages renders the list container with no page items")
+	local _descriptor_49 = Test(PaginationMountValidation, "cursorListEmpty", {
+		value = PaginationMountValidation.cursorListEmpty,
+	})
+	if _descriptor_49 then
+		PaginationMountValidation.cursorListEmpty = _descriptor_49.value
+	end
+	local _descriptor_50 = _decorator_34(PaginationMountValidation, "cursorListEmpty", {
+		value = PaginationMountValidation.cursorListEmpty,
+	})
+	if _descriptor_50 then
+		PaginationMountValidation.cursorListEmpty = _descriptor_50.value
+	end
+	local _descriptor_51 = _decorator_33(PaginationMountValidation, "cursorListEmpty", {
+		value = PaginationMountValidation.cursorListEmpty,
+	})
+	if _descriptor_51 then
+		PaginationMountValidation.cursorListEmpty = _descriptor_51.value
+	end
+	local _decorator_35 = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	local _decorator_36 = DisplayName("With totalPages given, hasNextPage is ignored and Next stays disabled on the last page")
+	local _descriptor_52 = Test(PaginationMountValidation, "totalPagesIgnoresFlag", {
+		value = PaginationMountValidation.totalPagesIgnoresFlag,
+	})
+	if _descriptor_52 then
+		PaginationMountValidation.totalPagesIgnoresFlag = _descriptor_52.value
+	end
+	local _descriptor_53 = _decorator_36(PaginationMountValidation, "totalPagesIgnoresFlag", {
+		value = PaginationMountValidation.totalPagesIgnoresFlag,
+	})
+	if _descriptor_53 then
+		PaginationMountValidation.totalPagesIgnoresFlag = _descriptor_53.value
+	end
+	local _descriptor_54 = _decorator_35(PaginationMountValidation, "totalPagesIgnoresFlag", {
+		value = PaginationMountValidation.totalPagesIgnoresFlag,
+	})
+	if _descriptor_54 then
+		PaginationMountValidation.totalPagesIgnoresFlag = _descriptor_54.value
 	end
 	PaginationMountValidation = Tag("Studio")(PaginationMountValidation) or PaginationMountValidation
 end

@@ -12,5 +12,10 @@ declare class PaginationMountValidation {
     customList(): void;
     visualOrder(): void;
     constantItemCount(): void;
+    cursorPrevNextOnly(): void;
+    cursorNextNeedsFlag(label: string, nextEnabled: boolean): void;
+    cursorEmitsFloored(): void;
+    cursorListEmpty(): void;
+    totalPagesIgnoresFlag(): void;
 }
 export = PaginationMountValidation;

@@ -18,18 +18,20 @@ const flatFieldTheme = createTheme({
     },
 });
 
-function Input(props: { screenshot?: boolean } = {}) {
+function Input(props: { screenshot?: boolean; disabled?: boolean } = {}) {
+    const disabled = props.disabled ?? false;
+
     const content = (
         <Container width={360}>
             <VStack>
-                <InputComponent placeholder="Type here..." value="" />
-                <InputComponent placeholder="Small scale" value="" scale="sm" />
-                <InputComponent placeholder="Large scale" value="" scale="xl" />
-                <InputComponent value="Pre-filled value" />
+                <InputComponent placeholder="Type here..." value="" disabled={disabled} />
+                <InputComponent placeholder="Small scale" value="" scale="sm" disabled={disabled} />
+                <InputComponent placeholder="Large scale" value="" scale="xl" disabled={disabled} />
+                <InputComponent value="Pre-filled value" disabled={disabled} />
                 <ThemeProvider theme={flatFieldTheme}>
                     <VStack>
-                        <InputComponent placeholder="Flat themed field" value="" icon="search" />
-                        <InputComponent value="Flat themed value" icon="user" />
+                        <InputComponent placeholder="Flat themed field" value="" icon="search" disabled={disabled} />
+                        <InputComponent value="Flat themed value" icon="user" disabled={disabled} />
                     </VStack>
                 </ThemeProvider>
             </VStack>

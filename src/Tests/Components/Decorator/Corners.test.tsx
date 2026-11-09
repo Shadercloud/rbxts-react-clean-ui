@@ -3,7 +3,9 @@ import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/luni
 
 const { Skip, Each } = Decorators;
 import { Corners } from "../../../Components/Decorator/Corners";
-import { CssSize } from "../../../Interfaces/";
+import { CssRadiusToken, CssSize } from "../../../Interfaces/";
+import { ThemeProvider } from "../../../Providers/theme.provider";
+import { DefaultTheme, extendTheme } from "../../../Theme";
 import { STUDIO_SKIP_MESSAGE, findDescendant, waitForGuiObject, withMounted } from "../../Helpers/layout";
 
 function targetWith(decorator: React.ReactNode) {
@@ -63,6 +65,46 @@ class CornersMountValidation {
 			const target = waitForGuiObject<Frame>(mounted.host, "Target");
 
 			Assert.undefined(target.FindFirstChildWhichIsA("UICorner"), "Expected no UICorner when radius is omitted");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@Each([["sm"], ["md"], ["lg"]])
+	@DisplayName("A radius token resolves to the matching pixel value from the active theme's radius scale")
+	@Test
+	public tokenFromTheme(token: CssRadiusToken) {
+		withMounted(300, 200, targetWith(<Corners radius={token} />), (mounted) => {
+			const target = waitForGuiObject<Frame>(mounted.host, "Target");
+			const corner = findDescendant<UICorner>(target, "Corners");
+
+			Assert.equal(corner.CornerRadius, new UDim(0, DefaultTheme.radius[token]), `radius="${token}"`);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A radius token follows a ThemeProvider override of the radius scale rather than the default theme")
+	@Test
+	public tokenFollowsTheme() {
+		const theme = extendTheme(DefaultTheme, { radius: { lg: 20 } });
+
+		withMounted(300, 200, <ThemeProvider theme={theme}>{targetWith(<Corners radius="lg" />)}</ThemeProvider>, (mounted) => {
+			const target = waitForGuiObject<Frame>(mounted.host, "Target");
+			const corner = findDescendant<UICorner>(target, "Corners");
+
+			Assert.equal(corner.CornerRadius, new UDim(0, 20));
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A token whose theme value is zero emits no UICorner")
+	@Test
+	public zeroTokenEmitsNothing() {
+		const theme = extendTheme(DefaultTheme, { radius: { sm: 0 } });
+
+		withMounted(300, 200, <ThemeProvider theme={theme}>{targetWith(<Corners radius="sm" />)}</ThemeProvider>, (mounted) => {
+			const target = waitForGuiObject<Frame>(mounted.host, "Target");
+
+			Assert.undefined(target.FindFirstChildWhichIsA("UICorner"), "Expected no UICorner for a zero-valued token");
 		});
 	}
 }

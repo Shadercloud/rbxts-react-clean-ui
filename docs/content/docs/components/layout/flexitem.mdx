@@ -4,7 +4,7 @@ description: Grow, shrink, or fill space inside a parent's flex layout.
 icon: StretchHorizontal
 ---
 
-`FlexItem` is a [`Container`](/components/layout/container) that additionally renders a Roblox [`UIFlexItem`](https://create.roblox.com/docs/reference/engine/classes/UIFlexItem), letting it grow, shrink, or fill leftover space when placed inside a parent governed by a `UIListLayout` — for example `HStack`, `VStack`, `Row`/`Column`, or a raw frame with its own `uilistlayout`. It also lays out its own children in a horizontal row, so it doubles as a small flex container in its own right.
+`FlexItem` is a [`Container`](/components/layout/container) that additionally renders a Roblox [`UIFlexItem`](https://create.roblox.com/docs/reference/engine/classes/UIFlexItem), letting it grow, shrink, or fill leftover space when placed inside a parent governed by a `UIListLayout` — for example `HStack`, `VStack`, `Row`/`Column`, or a raw frame with its own `uilistlayout`. By default it also lays out its own children in a horizontal row, so it doubles as a small flex container in its own right.
 
 ## Import
 
@@ -75,9 +75,13 @@ export function FixedLabelExample() {
 
 The label's `FlexItem` neither grows nor shrinks, so it always stays at its natural content width, while the input's `FlexItem` grows and shrinks to fill whatever space remains.
 
+## Line alignment
+
+In a wrapping list layout, such as the default `HStack`, items sit at the top of their line. Set `ItemLineAlignment` to move one `FlexItem` within its line without changing its siblings. For example, `ItemLineAlignment={Enum.ItemLineAlignment.Center}` centres it vertically beside a taller sibling.
+
 ## Aligning a FlexItem's own children
 
-`FlexItem` arranges its own `children` using an internal horizontal `UIListLayout`. Use `align` to control how those children line up along that row — independent of how the `FlexItem` itself is positioned by its parent's layout.
+By default `FlexItem` arranges its own `children` using an internal horizontal `UIListLayout`. Use `align` to control how those children line up along that row — independent of how the `FlexItem` itself is positioned by its parent's layout.
 
 ```tsx
 <FlexItem align="Right">
@@ -86,6 +90,44 @@ The label's `FlexItem` neither grows nor shrinks, so it always stays at its natu
 ```
 
 Use `HorizontalFlex` to distribute space between multiple children placed inside a single `FlexItem`, the same way the `HorizontalFlex` prop works on `HStack`.
+
+## Vertical direction
+
+Set `direction="vertical"` to stack the `FlexItem`'s own children top to bottom instead. `align` and `HorizontalFlex` still apply to the same internal layout.
+
+```tsx
+<FlexItem direction="vertical" align="Center">
+    <Text text="Level 12" />
+    <Text text="2,450 XP" />
+</FlexItem>
+```
+
+This only changes the internal layout's `FillDirection`. It isn't a `VStack`: there is no gap between children, and `HorizontalFlex` isn't set to `Fill` by default.
+
+## Bringing your own layout
+
+Set `layout={false}` to drop the internal `UIListLayout` entirely, so a child `VStack` or `HStack` can own the layout with its own gap and flex settings. A frame with two `UIListLayout`s lays out unpredictably, so use this whenever a `FlexItem` holds a stack.
+
+```tsx
+import React from "@rbxts/react";
+import { Button, FlexItem, HStack, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function FillingColumnExample() {
+    return (
+        <HStack>
+            <FlexItem layout={false} LayoutOrder={1}>
+                <VStack>
+                    <Text text="Inventory" variant="title" LayoutOrder={1} />
+                    <Text text="12 / 40 slots used" LayoutOrder={2} />
+                </VStack>
+            </FlexItem>
+            <Button text="Sort" LayoutOrder={2} />
+        </HStack>
+    );
+}
+```
+
+The `FlexItem` grows to fill the row beside the button, and the `VStack` inside it stacks the text with the theme's gap. With `layout={false}`, `align`, `HorizontalFlex`, and `direction` have no effect. Use `direction="vertical"` instead when you don't need a gap.
 
 ## Props
 
@@ -96,9 +138,12 @@ Use `HorizontalFlex` to distribute space between multiple children placed inside
 | `mode` | `Enum.UIFlexMode \| "Grow" \| "None" \| "Shrink" \| "Fill" \| "Custom" \| Binding<Enum.UIFlexMode>` | `"Grow"` | Sets `UIFlexItem.FlexMode`, controlling how the item grows or shrinks within its parent's `UIListLayout`. |
 | `GrowRatio` | `number` | Roblox default (`1`) | Sets `UIFlexItem.GrowRatio` — the item's share of extra space relative to other growing siblings, used when `mode` is `"Grow"`, `"Fill"`, or `"Custom"`. |
 | `ShrinkRatio` | `number` | Roblox default (`1`) | Sets `UIFlexItem.ShrinkRatio` — the item's share of shrinkage relative to other shrinking siblings, used when `mode` is `"Shrink"`, `"Fill"`, or `"Custom"`. |
+| `ItemLineAlignment` | `Enum.ItemLineAlignment` | Roblox default (`Automatic`) | Sets `UIFlexItem.ItemLineAlignment` — where the item sits within its line when the parent layout wraps (such as the default `HStack`). Unset, it follows the parent layout, which puts items at the top. |
 | `align` | `Enum.HorizontalAlignment \| "Right" \| "Left" \| "Center" \| Binding<Enum.HorizontalAlignment>` | Roblox default (`Left`) | Horizontal alignment applied to `FlexItem`'s own children, via its internal `UIListLayout`. |
 | `HorizontalFlex` | `Enum.UIFlexAlignment \| "None" \| "SpaceAround" \| "Fill" \| Binding<Enum.UIFlexAlignment>` | Roblox default (`None`) | Space distribution applied between `FlexItem`'s own children, via its internal `UIListLayout`. |
-| `children` | `React.ReactNode` | `undefined` | Content laid out horizontally inside the `FlexItem`. |
+| `direction` | `"horizontal" \| "vertical"` | `"horizontal"` | Sets the internal `UIListLayout`'s `FillDirection`. `"vertical"` stacks children top to bottom with no gap. |
+| `layout` | `boolean` | `true` | When `false`, no internal `UIListLayout` is rendered, so a child `VStack`/`HStack` can own the layout. `align`, `HorizontalFlex`, and `direction` then have no effect. |
+| `children` | `React.ReactNode` | `undefined` | Content laid out inside the `FlexItem` (horizontally by default). |
 
 ### Shared props
 
@@ -115,6 +160,7 @@ Use `HorizontalFlex` to distribute space between multiple children placed inside
 
 ## Behaviour
 
-* `FlexItem` always renders a `UIFlexItem` and a horizontal `UIListLayout` as siblings of `children`, inside the `Container` it wraps. This means multiple children passed to a single `FlexItem` are laid out in a row, not stacked as they would be without it.
+* `FlexItem` always renders a `UIFlexItem` and, unless `layout={false}`, a `UIListLayout` as siblings of `children`, inside the `Container` it wraps. With the default `direction`, multiple children passed to a single `FlexItem` are laid out in a row; with `direction="vertical"` they are stacked with no gap.
+* With `layout={false}` there is no internal `UIListLayout`, so children are positioned only by their own layout (for example a child `VStack`). Don't put a `VStack`/`HStack` inside a `FlexItem` without `layout={false}`: the two `UIListLayout`s on one frame lay out unpredictably.
 * The `UIFlexItem` only has a visible effect while `FlexItem` is a direct child of a frame governed by a `UIListLayout`. Placed elsewhere, `mode`/`GrowRatio`/`ShrinkRatio` are inert.
-* Enabling `group` (inherited from `Container`) moves `FlexItem`'s children — including its own `UIFlexItem` and internal `UIListLayout` — onto the inner measurement frame that `Container` creates for grouped sizing, rather than leaving them on the outer frame that actually participates in the parent's layout. In this combination `mode`/`GrowRatio`/`ShrinkRatio` most likely stop applying to the object the parent layout actually sees, so avoid combining `group` with flex sizing on the same `FlexItem`.
+* Enabling `group` (inherited from `Container`) moves `FlexItem`'s children — including its own `UIFlexItem` and internal `UIListLayout` — onto the inner measurement frame that `Container` creates for grouped sizing, rather than leaving them on the outer frame that actually participates in the parent's layout. In this combination `mode`/`GrowRatio`/`ShrinkRatio` most likely stop applying to the object the parent layout actually sees, so avoid combining `group` with flex sizing on the same `FlexItem`. This applies to the internal `UIListLayout` too, unless `layout={false}`.

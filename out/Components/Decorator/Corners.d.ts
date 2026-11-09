@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { CssSize } from "../../Interfaces/";
+import { CssRadius } from "../../Interfaces/";
 interface CornerProps {
-    radius?: CssSize;
+    radius?: CssRadius;
     name?: string;
 }
 export declare function Corners(props: CornerProps): React.JSX.Element | undefined;

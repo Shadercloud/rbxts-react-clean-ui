@@ -16,6 +16,8 @@ export interface FadeGroupProps
 
 export const FadeGroup = React.forwardRef<CanvasGroup, FadeGroupProps>(
     (props, ref) => {
+        const sizeConstraint = SizeHelper.GetSizeConstraint(props);
+
         return (
             <canvasgroup
                 key={props.name ?? "FadeGroup"}
@@ -54,6 +56,13 @@ export const FadeGroup = React.forwardRef<CanvasGroup, FadeGroupProps>(
                 Change={props.Change}
                 Event={props.Event}
             >
+                {sizeConstraint !== undefined && (
+                    <uisizeconstraint
+                        key="SizeConstraint"
+                        MinSize={sizeConstraint.MinSize}
+                        MaxSize={sizeConstraint.MaxSize}
+                    />
+                )}
                 {props.children}
             </canvasgroup>
         );

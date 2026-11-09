@@ -53,6 +53,10 @@ local function ModalProvider(props)
 		-- ▲ ReadonlyArray.findIndex ▲
 		return _result
 	end, { stack })
+	local isTopmost = React.useCallback(function(id)
+		local top = stackRef.current[#stackRef.current]
+		return top ~= nil and top.id == id
+	end, {})
 	React.useEffect(function()
 		local connection = CustomInputService.InputBegan:Connect(function(input, gameProcessed)
 			if gameProcessed then
@@ -75,8 +79,9 @@ local function ModalProvider(props)
 			register = register,
 			unregister = unregister,
 			getLayerIndex = getLayerIndex,
+			isTopmost = isTopmost,
 		}
-	end, { register, unregister, getLayerIndex })
+	end, { register, unregister, getLayerIndex, isTopmost })
 	return React.createElement(ModalStackContext.Provider, {
 		value = value,
 	}, props.children)

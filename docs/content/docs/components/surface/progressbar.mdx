@@ -235,7 +235,7 @@ The progress bar also supports props inherited from the following interfaces.
 | ----------------------- | ------------------------------------------------------------------------ |
 | `IntentElementProps`   | Configures the fill's color scheme.                                     |
 | `ScalableElementProps` | Configures the track height read from `theme.components.progressBar.height`. |
-| `SizeElementProps`     | Configures `width`, `height`, and native `Size`. The track's height still defaults to the theme scale unless overridden. |
+| `SizeElementProps`     | Configures `width`, `height`, and native `Size`. The track's height still defaults to the theme scale unless overridden. Also supplies `minWidth`, `maxWidth`, `minHeight`, and `maxHeight` (see [min and max size](/components/layout/container#min-and-max-size)). |
 | `PositionElementProps` | Configures `Position`, `AnchorPoint`, `center`, and edge offsets.        |
 | `ZIndexElementProps`   | Configures the progress bar's `ZIndex`.                                 |
 | `React.InstanceProps<ImageLabel>` | Accepts native `ImageLabel` properties, including `Change` and `Event`. `BackgroundColor3` and `BackgroundTransparency` are always overridden by the theme's track values. |
@@ -250,6 +250,7 @@ The progress bar also supports props inherited from the following interfaces.
 * A header row only renders when `label` is set or `showValue` is `true`. Without either, the component renders exactly the same `Container`/`ImageLabel` tree as before these props existed — no wrapper frame, no visual or behavioral change for existing usage.
 * When a header renders, the label and value are laid out with `SpaceBetween` alignment, so the label stays flush to the left and the value stays flush to the right, even when only one of them is present.
 * The ref still forwards to the track `ImageLabel` specifically, not to the wrapping frame that appears when a header is rendered.
+* `minWidth`/`maxWidth`/`minHeight`/`maxHeight` always clamp the track. When a header renders, the wrapping frame is clamped too, so the header row stays as wide as the clamped track. On a labelled bar, height limits apply to the track and to the wrapper (header plus track) separately. The wrapper auto-sizes its height, so `minHeight` raises it, but `maxHeight` doesn't stop it growing to fit the header and track.
 * `valueFormatter`, when provided, is only invoked when `showValue` is `true`.
 * The stripe overlay only renders when the resolved `striped` value is `true` — no extra `ImageLabel` is created, and no animation runs, when it's `false` (the theme default), so a plain bar has zero overhead from this feature.
 * The stripe overlay is one tile wider than the fill and its position loops from `0` to `1` on a linear, infinitely-repeating tween that restarts from the beginning whenever `striped` becomes `true` or `stripeDuration` changes, so the seam between loops is never visible.

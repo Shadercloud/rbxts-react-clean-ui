@@ -1,7 +1,9 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local GuiService = TS.import(script, TS.getModule(script, "@rbxts", "services")).GuiService
+local _services = TS.import(script, TS.getModule(script, "@rbxts", "services"))
+local GuiService = _services.GuiService
+local UserInputService = _services.UserInputService
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local CleanThemeContext = _Contexts.CleanThemeContext
 local DragStateContext = _Contexts.DragStateContext
@@ -22,6 +24,14 @@ local useTween = TS.import(script, TS.getModule(script, "@rbxts", "react-ripple"
 local _Tooltip_placement = TS.import(script, script.Parent, "Tooltip.placement")
 local computeTooltipLayout = _Tooltip_placement.computeTooltipLayout
 local getTooltipSafeArea = _Tooltip_placement.getTooltipSafeArea
+local _Tooltip_layer = TS.import(script, script.Parent, "Tooltip.layer")
+local TooltipLayerContext = _Tooltip_layer.TooltipLayerContext
+local isTooltipCovered = _Tooltip_layer.isTooltipCovered
+local setTooltipHovered = _Tooltip_layer.setTooltipHovered
+local subscribeTooltipHover = _Tooltip_layer.subscribeTooltipHover
+local function isPressInput(input)
+	return input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch
+end
 local function getTopbarBottom(overlay)
 	local surface = overlay:FindFirstAncestorWhichIsA("ScreenGui")
 	if surface == nil or surface.ScreenInsets == Enum.ScreenInsets.TopbarSafeInsets then
@@ -116,7 +126,7 @@ local function TooltipPopup(props)
 		_condition_1 = 0
 	end
 	local contentHeight = _condition_1
-	local cornerRadius = SizeHelper:toUDim(theme.components.button.cornerRadius)
+	local cornerRadius = SizeHelper:toRadius(theme, theme.components.button.cornerRadius)
 	local _position = props.target.position
 	local _position_1 = frame.position
 	local targetPosition = _position - _position_1
@@ -158,6 +168,31 @@ local function TooltipPopup(props)
 	_attributes.GroupTransparency = if measured then groupTransparency else 1
 	_attributes.BackgroundTransparency = 1
 	_attributes.BorderSizePixel = 0
+	_attributes.Active = if props.onHover ~= nil or props.onPress ~= nil then true else nil
+	_attributes.Event = {
+		MouseEnter = function()
+			if props.visible then
+				local _result_2 = props.onHover
+				if _result_2 ~= nil then
+					_result_2(true)
+				end
+			end
+		end,
+		MouseLeave = function()
+			local _result_2 = props.onHover
+			if _result_2 ~= nil then
+				_result_2(false)
+			end
+		end,
+		InputBegan = function(_rbx, input)
+			if props.visible and isPressInput(input) then
+				local _result_2 = props.onPress
+				if _result_2 ~= nil then
+					_result_2()
+				end
+			end
+		end,
+	}
 	local _exp = React.createElement(Padding, {
 		resolvedPadding = resolvedPadding,
 	})
@@ -198,11 +233,13 @@ local function TooltipPopup(props)
 		BackgroundColor3 = intent.backgroundColor,
 		BackgroundTransparency = intent.backgroundTransparency,
 		BorderSizePixel = 0,
-	}, _exp_1, _exp_2, _exp_3, _exp_4, if type(_content) == "string" then React.createElement(Text, {
+	}, _exp_1, _exp_2, _exp_3, _exp_4, React.createElement(TooltipLayerContext.Provider, {
+		value = props.layer,
+	}, if type(_content) == "string" then React.createElement(Text, {
 		name = "TooltipText",
 		text = props.content,
 		TextColor3 = intent.textColor,
-	}) else props.content)), pointer ~= nil and React.createElement("frame", {
+	}) else props.content))), pointer ~= nil and React.createElement("frame", {
 		key = "Pointer",
 		Size = UDim2.fromOffset(pointerSize, pointerSize),
 		AnchorPoint = Vector2.new(pointer.anchor.x, pointer.anchor.y),
@@ -220,20 +257,46 @@ local function TooltipPopup(props)
 end
 local function Tooltip(props)
 	local targetRef = React.useRef()
+	local owner = React.useRef({}).current
 	local hideRequest = React.useRef(0)
+	local closeRequest = React.useRef(0)
+	local closingRef = React.useRef(false)
+	local longPressRequest = React.useRef(0)
+	local touchConnection = React.useRef()
 	local hoveredRef = React.useRef(false)
+	local popupHoveredRef = React.useRef(false)
+	local pinnedRef = React.useRef(false)
+	local longPressedRef = React.useRef(false)
+	local holdsRef = React.useRef(0)
+	local releaseRef = React.useRef()
 	local shownRef = React.useRef(false)
+	local actionsRef = React.useRef()
 	local target, setTarget = React.useState()
 	local visible, setVisible = React.useState(false)
 	local theme = React.useContext(CleanThemeContext)
 	local dragState = React.useContext(DragStateContext)
+	local layer = React.useContext(TooltipLayerContext)
 	local fadeDuration = theme.components.tooltip.fadeDuration
+	local _condition = theme.components.tooltip.closeDelay
+	if _condition == nil then
+		_condition = 0.15
+	end
+	local closeDelay = _condition
+	local _condition_1 = theme.components.tooltip.longPressDelay
+	if _condition_1 == nil then
+		_condition_1 = 0.5
+	end
+	local longPressDelay = _condition_1
 	local suppressed = props.disabled == true or dragState.preview or dragState.dragging
 	local suppressedRef = React.useRef(suppressed)
 	suppressedRef.current = suppressed
 	local controlled = props.open ~= nil
 	local controlledRef = React.useRef(controlled)
 	controlledRef.current = controlled
+	local interactive = props.interactive == true and not controlled
+	local pinOnPress = props.pinOnPress == true and not controlled
+	local longPress = props.longPress == true and not controlled
+	local holdable = interactive or pinOnPress
 	local captureTarget = function()
 		local _result = targetRef.current
 		if _result ~= nil then
@@ -256,46 +319,199 @@ local function Tooltip(props)
 			setTarget(_object)
 		end
 	end
+	local release = function()
+		local releaseHold = releaseRef.current
+		releaseRef.current = nil
+		local _result = releaseHold
+		if _result ~= nil then
+			_result()
+		end
+	end
+	local endTouch = function()
+		longPressRequest.current += 1
+		local _result = touchConnection.current
+		if _result ~= nil then
+			_result:Disconnect()
+		end
+		touchConnection.current = nil
+	end
 	local show = function()
 		shownRef.current = true
 		hideRequest.current += 1
 		captureTarget()
 		setVisible(true)
+		if releaseRef.current == nil and layer.retain ~= nil then
+			releaseRef.current = layer.retain()
+		end
 	end
 	local hide = function()
 		shownRef.current = false
+		closingRef.current = false
+		closeRequest.current += 1
+		popupHoveredRef.current = false
+		setTooltipHovered(owner, nil)
 		setVisible(false)
 		local request = hideRequest.current + 1
 		hideRequest.current = request
 		if fadeDuration <= 0 then
 			setTarget(nil)
+		else
+			task.delay(fadeDuration, function()
+				if hideRequest.current == request then
+					setTarget(nil)
+				end
+			end)
+		end
+		release()
+	end
+	local isWanted = function()
+		if suppressedRef.current then
+			return false
+		end
+		if props.open ~= nil then
+			return props.open
+		end
+		return (hoveredRef.current and not isTooltipCovered(layer.depth, owner)) or popupHoveredRef.current or pinnedRef.current or longPressedRef.current or (holdable and holdsRef.current > 0)
+	end
+	local close = function()
+		if shownRef.current and not isWanted() then
+			hide()
+		end
+	end
+	local update = function()
+		if isWanted() then
+			closeRequest.current += 1
+			closingRef.current = false
+			if not shownRef.current then
+				show()
+			end
 			return nil
 		end
-		task.delay(fadeDuration, function()
-			if hideRequest.current == request then
-				setTarget(nil)
+		if not shownRef.current or closingRef.current then
+			return nil
+		end
+		if not interactive or controlledRef.current or suppressedRef.current then
+			hide()
+			return nil
+		end
+		closingRef.current = true
+		local request = closeRequest.current + 1
+		closeRequest.current = request
+		task.delay(closeDelay, function()
+			if closeRequest.current == request then
+				closingRef.current = false
+				local _result = actionsRef.current
+				if _result ~= nil then
+					_result.close()
+				end
 			end
 		end)
+	end
+	local togglePin = function()
+		if suppressedRef.current or controlledRef.current then
+			return nil
+		end
+		pinnedRef.current = not pinnedRef.current
+		update()
+	end
+	actionsRef.current = {
+		update = update,
+		close = close,
+		togglePin = togglePin,
+	}
+	local childLayer = React.useMemo(function()
+		return {
+			depth = layer.depth + 1,
+			retain = function()
+				local released = false
+				holdsRef.current += 1
+				local _result = actionsRef.current
+				if _result ~= nil then
+					_result.update()
+				end
+				return function()
+					if released then
+						return nil
+					end
+					released = true
+					holdsRef.current -= 1
+					local _result_1 = actionsRef.current
+					if _result_1 ~= nil then
+						_result_1.update()
+					end
+				end
+			end,
+		}
+	end, { layer.depth })
+	local beginLongPress = function(input)
+		endTouch()
+		local request = longPressRequest.current
+		task.delay(longPressDelay, function()
+			if longPressRequest.current == request and not suppressedRef.current and not controlledRef.current then
+				longPressedRef.current = true
+				local _result = actionsRef.current
+				if _result ~= nil then
+					_result.update()
+				end
+			end
+		end)
+		touchConnection.current = input:GetPropertyChangedSignal("UserInputState"):Connect(function()
+			if input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel then
+				return nil
+			end
+			endTouch()
+			if longPressedRef.current then
+				longPressedRef.current = false
+				local _result = actionsRef.current
+				if _result ~= nil then
+					_result.update()
+				end
+			elseif input.UserInputState == Enum.UserInputState.End and pinOnPress then
+				local _result = actionsRef.current
+				if _result ~= nil then
+					_result.togglePin()
+				end
+			end
+		end)
+	end
+	local setPopupHovered = function(hovered)
+		popupHoveredRef.current = hovered
+		setTooltipHovered(owner, if hovered then layer.depth else nil)
+		update()
+	end
+	local unpin = function()
+		if pinnedRef.current then
+			pinnedRef.current = false
+			update()
+		end
 	end
 	React.useEffect(function()
 		if suppressed then
 			hoveredRef.current = false
+			pinnedRef.current = false
+			longPressedRef.current = false
+			endTouch()
 		end
-		local _condition = not suppressed
-		if _condition then
-			local _condition_1 = props.open
-			if _condition_1 == nil then
-				_condition_1 = hoveredRef.current
-			end
-			_condition = _condition_1
-		end
-		local wanted = _condition
-		if wanted and not shownRef.current then
-			show()
-		elseif not wanted and shownRef.current then
-			hide()
-		end
+		update()
 	end, { suppressed, props.open })
+	React.useEffect(function()
+		return subscribeTooltipHover(function()
+			local _result = actionsRef.current
+			if _result ~= nil then
+				_result = _result.update()
+			end
+			return _result
+		end)
+	end, {})
+	React.useEffect(function()
+		return function()
+			hideRequest.current += 1
+			closeRequest.current += 1
+			endTouch()
+			setTooltipHovered(owner, nil)
+			release()
+		end
+	end, {})
 	React.useEffect(function()
 		local instance = targetRef.current
 		if not visible or instance == nil then
@@ -312,15 +528,31 @@ local function Tooltip(props)
 		ref = targetRef,
 	}, {
 		MouseEnter = function()
+			if (pinOnPress or longPress) and UserInputService:GetLastInputType() == Enum.UserInputType.Touch then
+				return nil
+			end
 			hoveredRef.current = true
 			if not controlledRef.current and not suppressedRef.current then
-				show()
+				update()
 			end
 		end,
 		MouseLeave = function()
 			hoveredRef.current = false
 			if not controlledRef.current then
-				hide()
+				update()
+			end
+		end,
+		InputBegan = function(_rbx, input)
+			if (not pinOnPress and not longPress) or controlledRef.current or suppressedRef.current then
+				return nil
+			end
+			if isTooltipCovered(layer.depth, owner) then
+				return nil
+			end
+			if longPress and input.UserInputType == Enum.UserInputType.Touch then
+				beginLongPress(input)
+			elseif pinOnPress and isPressInput(input) then
+				togglePin()
 			end
 		end,
 	})
@@ -338,6 +570,9 @@ local function Tooltip(props)
 			_attributes.overlay = overlay
 			_attributes.target = target
 			_attributes.visible = visible
+			_attributes.layer = childLayer
+			_attributes.onHover = if interactive then setPopupHovered else nil
+			_attributes.onPress = if pinOnPress then unpin else nil
 			return ReactRoblox.createPortal(React.createElement(TooltipPopup, _attributes), overlay)
 		end,
 	})))

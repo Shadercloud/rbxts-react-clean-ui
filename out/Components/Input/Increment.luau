@@ -44,7 +44,7 @@ local Increment = React.forwardRef(function(props, ref)
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
-	_attributes.Size = UDim2.fromScale(1, 0)
+	_attributes.Size = if props.width ~= nil then nil else UDim2.fromScale(1, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
 	return React.createElement(Container, _attributes, React.createElement(HStack, {
 		Wraps = false,

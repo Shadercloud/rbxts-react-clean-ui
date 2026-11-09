@@ -4,6 +4,22 @@ import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/luni
 
 const { Skip } = Decorators;
 import { Increment } from "../../../Components/Input/Increment";
+import {
+	STUDIO_SKIP_MESSAGE,
+	assertAlignedRight,
+	assertSizeApprox,
+	waitForGuiObject,
+	withMounted,
+} from "../../Helpers/layout";
+
+function waitForIncrementWidth(host: Instance, expected: number): ImageLabel {
+	return waitForGuiObject<ImageLabel>(
+		host,
+		"Increment",
+		(gui) => math.abs(gui.AbsoluteSize.X - expected) <= 1 && gui.AbsoluteSize.Y > 0,
+		`Timed out waiting for the Increment root to be ${expected}px wide`,
+	);
+}
 
 @Tag("Studio")
 class IncrementMountValidation {
@@ -121,6 +137,30 @@ class IncrementMountValidation {
 
 		root.unmount();
 		host.Destroy();
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("width={200} pins the stepper to 200px and the plus button still ends at its right edge")
+	@Test
+	public fixedWidth() {
+		withMounted(400, 200, <Increment value={5} width={200} />, (mounted) => {
+			const increment = waitForIncrementWidth(mounted.host, 200);
+			const plus = waitForGuiObject<ImageButton>(increment, "IncrementButton");
+
+			assertSizeApprox(increment, 200, undefined, 1, "width=200 increment");
+			assertAlignedRight(plus, increment, 1, "width=200 plus button");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Without width the stepper stretches to the full width of its parent")
+	@Test
+	public fullWidthDefault() {
+		withMounted(400, 200, <Increment value={5} />, (mounted) => {
+			const increment = waitForIncrementWidth(mounted.host, 400);
+
+			assertSizeApprox(increment, 400, undefined, 1, "unset width increment");
+		});
 	}
 }
 

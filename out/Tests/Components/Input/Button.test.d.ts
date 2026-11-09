@@ -1,3 +1,4 @@
+import { CssRadiusToken } from "../../../Interfaces/";
 declare class ButtonMountValidation {
     mountsContained(): void;
     iconLeadsText(): void;
@@ -11,5 +12,6 @@ declare class ButtonMountValidation {
     paddingKeepsOrder(): void;
     modalDefaultsOff(): void;
     modalForwarded(): void;
+    themeRadiusToken(token: CssRadiusToken): void;
 }
 export = ButtonMountValidation;

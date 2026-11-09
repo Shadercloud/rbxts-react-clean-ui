@@ -216,6 +216,10 @@ export function ToastContainer(props: ToastContainerProps) {
             )}
             Position={position}
             AnchorPoint={anchor}
+            minWidth={props.minWidth}
+            maxWidth={props.maxWidth}
+            minHeight={props.minHeight}
+            maxHeight={props.maxHeight}
         >
             <VStack spacing="xs">
                 {toasts.map((toast) => (

@@ -155,6 +155,85 @@ import { Button, Group, VStack } from "@rbxts/react-clean-ui";
 </Group>
 ```
 
+## Sizing
+
+Without `width` or `fill`, a button grows to fit its content. Use `width` for a fixed or relative width, and `fill` to have the button take the free space in its parent's layout. In both cases the icon and label are centred inside the button.
+
+<Demo preview="Scenes/Form/ButtonSizing.loom.tsx" previewHeight={220}>
+```tsx
+import React from "@rbxts/react";
+import { Button, Container, HStack, VStack } from "@rbxts/react-clean-ui";
+
+export function ButtonSizingExample() {
+    return (
+        <Container width="100%" height="120">
+            <VStack>
+                <Container width="100%" LayoutOrder={1}>
+                    <HStack>
+                        <Button fill LayoutOrder={1} text="Save" intent="primary" />
+                        <Button fill LayoutOrder={2} text="Save and continue" intent="success" />
+                        <Button fill LayoutOrder={3} text="Cancel" intent="danger" />
+                    </HStack>
+                </Container>
+                <Button width={120} LayoutOrder={2} text="Fixed 120px" />
+            </VStack>
+        </Container>
+    );
+}
+```
+</Demo>
+
+### Width
+
+`width` accepts the same values as [`Container`](/components/layout/container)'s `width`: a pixel number, `"120px"`, a percentage such as `"50%"`, or a breakpoint table. The height still fits the content. `width="Auto"` keeps the default fit-to-content sizing.
+
+```tsx
+<Button text="Fixed" width={120} />
+<Button text="Half" width="50%" />
+```
+
+`width` wins over a `Group`'s pinned width, so a grouped button with `width` set keeps its own width.
+
+### Fill
+
+`fill` adds a `UIFlexItem` with `FlexMode` set to `Fill`, so the button grows (and may shrink) along its parent `UIListLayout` to take the free space. Without `width`, the button's base width is `0`, so several `fill` buttons in one row share it equally whatever their label lengths. With `width`, that width is the base the button grows from.
+
+```tsx
+<HStack>
+    <Button fill text="Save" />
+    <Button fill text="Save and continue" />
+</HStack>
+```
+
+`fill` only works when the button is a direct child of a frame with a `UIListLayout`, such as `HStack`, `Row`, or `VStack`. Inside a `VStack` it grows vertically, along that stack's direction. Elsewhere, a `fill` button without `width` collapses to its padding width.
+
+The icon and label row never wraps, so a `fill` or `width` button narrower than its content overflows rather than wrapping.
+
+## Press-down activation
+
+By default a mouse or touch press activates the button on release, through the native `Activated` event. Set `pressOn="down"` to activate it as soon as the press begins instead. Your `Event.Activated` handler is called on `InputBegan` for `MouseButton1` and `Touch`, and the native `Activated` that follows for the same press is swallowed, so each press fires once.
+
+Pair it with `onRelease` to know when the press ends, for example for a hold-to-sprint button:
+
+```tsx
+<Button
+    text="Sprint"
+    pressOn="down"
+    Event={{
+        Activated: () => setSprinting(true),
+    }}
+    onRelease={() => setSprinting(false)}
+/>
+```
+
+* `onRelease` fires once per press-down activation, when that mouse or touch input ends or is cancelled, even if the pointer was dragged off the button.
+* Each touch is tracked separately, so two fingers on one button give two activations and two releases.
+* `disabled` blocks press-down activation. A press that began while the button was enabled still gets its `onRelease` if the button is disabled mid-hold.
+* Gamepad `ButtonA` and keyboard activation of a selected button still go through the native `Activated` at the normal time, and never get an `onRelease`.
+* Presses still held when the button unmounts are dropped without calling `onRelease`.
+
+Because gamepad presses have no release, don't rely on `onRelease` for gamepad hold actions. For a gamepad hold-to-sprint, bind the action separately (for example with `ContextActionService:BindAction`), which reports both the start and the end of the press.
+
 ## Props
 
 ### Button-specific props
@@ -168,6 +247,10 @@ import { Button, Group, VStack } from "@rbxts/react-clean-ui";
 | `group`        | `boolean`                            | `false`     | Matches this button's width to the widest button in its `Group`.  |
 | `disabled`     | `boolean`                            | `false`     | Disables hover/click interaction and switches to disabled colors. |
 | `modal`        | `boolean`                            | `false`     | Sets the native `Modal` property, freeing the mouse cursor while the button is visible (even in first-person or shift-lock). |
+| `width`        | `ResponsiveCssSize`                  | `undefined` | Sets the button's width (px, `"50%"`, or a breakpoint table); the height still fits the content. Wins over a `Group`'s pinned width. |
+| `fill`         | `boolean`                            | `false`     | Adds a `UIFlexItem` (`Fill`) so the button takes the free space along its parent `UIListLayout`. |
+| `pressOn`      | `"down" \| "up"`                     | `"up"`      | When a mouse/touch press activates the button: on release (`"up"`) or as soon as it begins (`"down"`). |
+| `onRelease`    | `(button: ImageButton, input: InputObject) => void` | `undefined` | With `pressOn="down"`, called when a mouse/touch press that activated the button ends or is cancelled. |
 | `LayoutOrder`  | `number`                             | `undefined` | Native Roblox layout order.                                        |
 | `padding`      | `CssPadding`                         | `undefined` | Overrides the spacing-derived internal padding, per side (for example `8`, `"4 12"`, or `"4px 12px 4px 12px"`). |
 | `styleOverride`| `ButtonStyleOverride`                | `undefined` | Overrides theme values (colors, corners, border, etc.) for this instance only. |
@@ -189,10 +272,11 @@ The button also supports props inherited from the following interfaces.
 
 ## Behaviour
 
-* The button automatically grows to fit its content (`AutomaticSize.XY`).
+* Without `width` or `fill`, the button automatically grows to fit its content (`AutomaticSize.XY`). With `width` or `fill`, only the height is automatic, and the icon/label row is centred horizontally.
 * Hovering the button switches its background, border, and text/icon colours to the intent's `hover` state.
 * Setting `disabled` sets `Active={false}`, ignores hover and `Activated` events, and switches colours to the intent's `disabled` state (when defined in the theme).
-* When `group` is set and a `Group` ancestor is present, the button's width is fixed to the widest button reporting into that `Group`; its height still grows automatically.
+* When `group` is set and a `Group` ancestor is present, the button's width is fixed to the widest button reporting into that `Group`, unless `width` is set; its height still grows automatically. With `group` and `fill` but no `width`, the group's width is the base the button grows from.
+* With `pressOn="down"`, your own `Event.InputBegan` handler still runs, before the press-down activation. Hover behaviour is the same in both modes.
 * Without `text`, `icon`, or `children`, the button renders with no content.
 * `modal` is passed straight through to the `ImageButton`'s native `Modal` property; when unset, Roblox's default (`false`) applies.
 * Internal padding comes from `spacing` (against `theme.spacing`, with `"None"` meaning `0`). When `padding` is set, its parsed per-side values replace the spacing-derived ones. The resolved padding is also reported to `Group`, so a grouped button's width includes it.

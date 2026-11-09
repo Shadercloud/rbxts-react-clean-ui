@@ -4,7 +4,7 @@
 
 ## Public API
 
-- `IncrementProps` composes `ScalableElementProps`, `SpacedElementProps`, `IntentElementProps`, and `React.InstanceProps<Frame>`, plus:
+- `IncrementProps` composes `ScalableElementProps`, `SpacedElementProps`, `IntentElementProps`, `Pick<SizeElementProps, "width">`, and `React.InstanceProps<ImageLabel>`, plus:
   - `value: number` (required) — the initial value, unless `controlled` is set.
   - `onChange?: (value: number) => void`.
   - `step?: number` — amount the minus/plus buttons change the value by; defaults to `1`.
@@ -12,7 +12,7 @@
   - `controlled?: boolean` — mirrors `Input`'s controlled/uncontrolled convention.
 - `scale` and `intent` are forwarded to both the minus and plus `Button`s (icon size/color, background/border color). `intent` has no effect on the numeric field, since `Input` has no `intent` prop.
 - `spacing` is forwarded to the root layout gap between the three parts and to the minus/plus `Button`s' and the `Input`'s own internal padding, mirroring how `Button` reuses a single `spacing` prop for both its icon/text gap and its padding.
-- The root renders through `Container`, always at `Size={UDim2.fromScale(1, 0)}` with `AutomaticSize.Y` (full available width, height fit to content) — `Size`/`AutomaticSize` props are not honored (same override behavior as `Select`'s root).
+- The root renders through `Container` at `Size={UDim2.fromScale(1, 0)}` with `AutomaticSize.Y` (full available width, height fit to content). With `width` set, the root's width resolves like `Container`'s `width` instead (height still fit to content) and the field's `FlexItem` fills what the two buttons leave. `Size`/`AutomaticSize` props are not honored (same override behavior as `Select`'s root), and `"Auto"` resolves to a zero width, as on `Select`.
 
 ## Behavior
 

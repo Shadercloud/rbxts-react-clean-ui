@@ -6,10 +6,11 @@ import Select from "./Select";
 export = createStory((props) => (
     <Container center>
         <Box>
-            <Select searchable={props.controls.Searchable} grouped={props.controls.Grouped} />
+            <Select searchable={props.controls.Searchable} grouped={props.controls.Grouped} disabled={props.controls.Disabled} />
         </Box>
     </Container>
 ), {
     Searchable: Boolean(false),
-    Grouped: Boolean(false)
+    Grouped: Boolean(false),
+    Disabled: Boolean(false)
 });

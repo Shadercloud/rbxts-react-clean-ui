@@ -38,6 +38,10 @@ function Increment(props: IncrementProps = {}) {
                         />
                     </Fieldset.Control>
                 </Fieldset>
+                <Text text={`width={200} (value: ${value}):`} />
+                <Container>
+                    <IncrementComponent value={value} width={200} onChange={setValue} />
+                </Container>
             </VStack>
         </Container>
     );

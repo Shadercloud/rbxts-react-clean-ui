@@ -77,7 +77,7 @@ The tooltip measures itself before it appears and keeps itself on screen, clear 
 - It then slides along the edge to stay on screen, and the pointer moves the other way so it still points at the middle of the target.
 - `"Center"` never changes side.
 
-Use `"Auto"` to let the tooltip choose. It prefers a side where it fits and stays centred on the target, then the side with the most room. Ties go to Top, then Bottom, Right and Left.
+Use `"Auto"` to let the tooltip choose. It already picks the side with the most room: it prefers a side where it fits and stays centred on the target, then the side with the most spare space, and if no side fits, the side with the most room. Ties go to Top, then Bottom, Right and Left.
 
 ```tsx
 <Tooltip content="Opens wherever it fits best" placement="Auto">
@@ -147,6 +147,97 @@ Pass `open` to control visibility yourself. While `open` is set, hovering no lon
 
 `disabled` always wins: a tooltip with `disabled` set stays hidden even when `open` is `true`.
 
+## Interactive tooltips
+
+By default a tooltip closes as soon as the pointer leaves its target, so you can't reach anything inside it. Set `interactive` to let the pointer move from the target onto the tooltip and use controls in its content.
+
+<Demo preview="Scenes/Interaction/TooltipInteractive.loom.tsx" previewHeight={300}>
+```tsx
+import React from "@rbxts/react";
+import { Button, HStack, Text, Tooltip, VStack } from "@rbxts/react-clean-ui";
+
+export function InteractiveTooltipExample() {
+    return (
+        <HStack spacing="lg" valign="Center">
+            <Tooltip
+                interactive
+                content={
+                    <>
+                        <VStack spacing="sm" />
+                        <Text text="Move onto me" LayoutOrder={1} />
+                        <Button text="Click me" LayoutOrder={2} />
+                    </>
+                }
+            >
+                <Button text="Hover me (Interactive)" />
+            </Tooltip>
+            <Tooltip pinOnPress intent="info" content="Pinned. Click me or the button to close">
+                <Button text="Click me (Pin on press)" intent="info" />
+            </Tooltip>
+        </HStack>
+    );
+}
+```
+</Demo>
+
+Once nothing keeps an interactive tooltip open, it waits `theme.components.tooltip.closeDelay` seconds (0.15 by default) before closing, giving the pointer time to cross the gap. Moving back onto the target or the tooltip cancels the close. Non-interactive tooltips still close immediately.
+
+An interactive tooltip is `Active`, so clicks on it don't reach whatever is behind it.
+
+## Pin on press
+
+Set `pinOnPress` to let a left click or tap on the target pin the tooltip open. Pressing the target again unpins it, and so does pressing anywhere on the tooltip itself.
+
+```tsx
+<Tooltip content="Pinned until you press again" pinOnPress>
+    <Button text="Details" />
+</Tooltip>
+```
+
+If the pointer is still over the target or the tooltip when it is unpinned, it stays open until the pointer leaves.
+
+## Long press
+
+Set `longPress` to open the tooltip on touch devices by holding a finger on the target. After `theme.components.tooltip.longPressDelay` seconds (0.5 by default) it opens, and stays open until the finger is lifted.
+
+```tsx
+<Tooltip content="Restores 50 health" longPress pinOnPress>
+    <imagebutton Size={UDim2.fromOffset(48, 48)} Image="rbxassetid://0000000" />
+</Tooltip>
+```
+
+A touch released before the delay counts as a tap. With `pinOnPress` also set, a short tap toggles the pin (on release), and a long press shows the tooltip only while held. Without `pinOnPress`, a short tap does nothing. Mouse clicks always follow `pinOnPress`.
+
+When `pinOnPress` or `longPress` is set, a `MouseEnter` caused by touch is ignored. Mobile fires `MouseEnter` on a tap without a matching `MouseLeave`, which would otherwise leave the tooltip stuck open.
+
+`interactive`, `pinOnPress` and `longPress` are all ignored while `open` is set.
+
+## Nested tooltips
+
+A `Tooltip` can be placed inside another tooltip's `content`. While the inner tooltip is open, it keeps the outer one open, but only if the outer tooltip is `interactive` or `pinOnPress`. When the inner tooltip closes, the outer one closes too (after its own `closeDelay`) unless something else keeps it open.
+
+```tsx
+<Tooltip
+    interactive
+    content={
+        <Tooltip interactive content={<Button text="Confirm" />}>
+            <Button text="More options" />
+        </Tooltip>
+    }
+>
+    <Button text="Menu" />
+</Tooltip>
+```
+
+Only the topmost tooltip reacts to the pointer. When the pointer is over an open interactive tooltip, any target underneath it (at the same or a shallower nesting level) is treated as covered: hovering it doesn't open its tooltip, a hover-only tooltip on it closes, and presses on it are ignored. Once the pointer leaves the covering tooltip, a target still under the pointer opens again. Only interactive tooltips cover targets, so ordinary tooltips (for example the `"Center"` tooltips on chart segments) don't block their neighbours.
+
+### Limitations
+
+- Pressing anything inside a pinned tooltip, including a button in its content, unpins it.
+- A long press is not cancelled when the finger moves. It stays open until the finger is lifted, even if it slides off the target.
+- Tapping outside a pinned tooltip does not close it. Press the target or the tooltip to unpin.
+- `pinOnPress` with `placement="Center"` is unreliable. Use a side placement for pinned tooltips.
+
 ## Props
 
 | Prop        | Type                                                          | Default     | Description                                          |
@@ -157,6 +248,9 @@ Pass `open` to control visibility yourself. While `open` is set, hovering no lon
 | `spacing`   | `Spacing`                                                      | Theme default | Controls the internal padding of the tooltip.        |
 | `disabled`  | `boolean`                                                      | `false`     | Prevents the tooltip from showing and hides it if open. Overrides `open`. |
 | `open`      | `boolean`                                                      | —           | Controls visibility directly. When set, hover is ignored. |
+| `interactive` | `boolean`                                                    | `false`     | Lets the pointer move onto the tooltip and interact with its content. Ignored when `open` is set. |
+| `pinOnPress` | `boolean`                                                     | `false`     | A click or tap on the target pins the tooltip open; pressing again (or pressing the tooltip) unpins it. Ignored when `open` is set. |
+| `longPress` | `boolean`                                                      | `false`     | On touch, holding a finger on the target shows the tooltip while held. Ignored when `open` is set. |
 | `children`  | `React.ReactElement`                                           | Required    | The element that triggers the tooltip when hovered. Can be a component or a native element. |
 
 ## Behaviour
@@ -165,4 +259,21 @@ Pass `open` to control visibility yourself. While `open` is set, hovering no lon
 - While visible, the tooltip follows its target if the target moves or resizes, and places itself again if its content or the screen changes size.
 - The tooltip keeps `theme.components.tooltip.edgeMargin` pixels (8 by default) from the screen edges and from the bottom of the Roblox topbar. This works whether or not the `ScreenGui` holding the overlay sets `IgnoreGuiInset`.
 - Tooltips inside a `Draggable`'s drag preview never open, and tooltips inside the element being dragged close for the duration of the drag.
-- After being suppressed (by `disabled` or a drag), a hover-driven tooltip does not pop back open on its own. It reopens on the next hover.
+- After being suppressed (by `disabled` or a drag), a hover-driven tooltip does not pop back open on its own. It reopens on the next hover. Suppression also clears any pin or long press.
+- Interactive and `pinOnPress` tooltips are `Active`, so clicks on them don't pass through to elements behind them.
+- The popup always sizes to its content. Size props (`Size`, `width`, `height`, `minWidth`, `maxWidth`, `minHeight`, `maxHeight`) are currently ignored.
+
+## Theme values
+
+The tooltip uses values from `theme.components.tooltip` for:
+
+* `fadeDuration` — the fade in/out duration in seconds. `0` disables the fade.
+* `pointerSize` — the size of the pointer arrow in pixels. `0` hides it.
+* `edgeMargin` — the minimum gap between the tooltip and the screen edges and topbar. Default `8`.
+* `closeDelay` — seconds an `interactive` tooltip waits before closing once nothing keeps it open. Default `0.15`. Not used by non-interactive tooltips.
+* `longPressDelay` — seconds a touch must be held on a `longPress` target before the tooltip opens. Default `0.5`.
+* `spacing` — the default internal padding.
+* `boxShadow` — an optional drop shadow around the tooltip.
+* `intents` — per-intent background, border and text colours.
+
+These values can be changed by providing a custom Clean UI theme.

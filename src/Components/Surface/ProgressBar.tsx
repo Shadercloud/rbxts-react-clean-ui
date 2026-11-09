@@ -168,6 +168,8 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
             return track;
         }
 
+        const headerSizeConstraint = SizeHelper.GetSizeConstraint(props);
+
         return (
             <frame
                 key={props.name ?? "ProgressBar"}
@@ -179,6 +181,13 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
                 AnchorPoint={SizeHelper.GetAnchor(props)}
                 ZIndex={props.ZIndex}
             >
+                {headerSizeConstraint !== undefined && (
+                    <uisizeconstraint
+                        key="SizeConstraint"
+                        MinSize={headerSizeConstraint.MinSize}
+                        MaxSize={headerSizeConstraint.MaxSize}
+                    />
+                )}
                 <VStack spacing="None" HorizontalFlex={Enum.UIFlexAlignment.None} Padding={new UDim(0, SpacingHelper.GetPadding(theme, props.scale, progressBarTheme.header.spacing))}>
                     <frame
                         key="ProgressBarHeader"

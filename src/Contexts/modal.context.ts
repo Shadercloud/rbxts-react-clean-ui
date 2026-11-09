@@ -10,6 +10,7 @@ export interface ModalStackContextValue {
     register: (layer: ModalStackLayer) => void;
     unregister: (id: string) => void;
     getLayerIndex: (id: string) => number;
+    isTopmost?: (id: string) => boolean;
 }
 
 export const ModalStackContext = React.createContext<ModalStackContextValue | undefined>(

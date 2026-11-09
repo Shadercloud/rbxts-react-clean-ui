@@ -58,6 +58,14 @@ Use the inherited `Size`, `width`, and `height` props to size the panel. `Size` 
 
 Percentage values such as `width="60%"` and `height="50%"`, along with scale components in a `UDim2` supplied through `Size`, resolve against the full overlay. Automatic axes continue to size to their content according to `AutomaticSize`.
 
+Add `minWidth`, `maxWidth`, `minHeight`, or `maxHeight` to clamp the panel in pixels (see [min and max size](/components/layout/container#min-and-max-size)). The panel stays centred, and draggable when `draggable` is set, at its clamped size. Minimums apply to every axis. Maximums cap an axis sized by `width`, `height`, a percentage, or `Size`, such as the default theme width. An automatically sized axis, such as the default height, still grows to fit its content.
+
+```tsx
+<Modal width="90%" maxWidth={720}>
+    ...
+</Modal>
+```
+
 ## Repositioning the panel
 
 Set `draggable` to allow the modal to be repositioned by dragging a direct `Card.Header` child. Releasing the header keeps the panel at its dropped position instead of snapping it back to the center, including through ordinary rerenders while that modal remains mounted and open. Interactions that begin elsewhere in the panel do not start a drag, so body and footer controls remain usable normally.
@@ -137,12 +145,22 @@ By default the modal closes when the dimmed backdrop outside the panel is clicke
 </Modal>
 ```
 
-## Initial focus
+## Focus and selection
 
-Pass a `React.RefObject<GuiObject>` as `initialFocus` to control where gamepad/keyboard selection moves when the modal opens. When omitted, selection moves to the modal panel itself. On close, selection is restored to whatever was selected before the modal opened.
+<Callout type="warn" title="Behaviour change in 2.0.0">
+    By default, a modal now takes the selection ([`GuiService.SelectedObject`](https://create.roblox.com/docs/reference/engine/classes/GuiService#SelectedObject)) only for gamepad players. Mouse, keyboard and touch players no longer get Roblox's selection outline when a modal opens. Gamepad players behave as before. Pass `selectionMode="always"` to keep the old behaviour.
+</Callout>
+
+A player counts as using a gamepad while their last input ([`UserInputService:GetLastInputType()`](https://create.roblox.com/docs/reference/engine/classes/UserInputService#GetLastInputType)) is one of `Gamepad1` to `Gamepad8`. "Inside the modal" covers the backdrop, the panel and everything in it.
+
+* **On open:** the modal remembers what was selected just before it opened. If the player is using a gamepad, selection moves to `initialFocus` if you pass one, otherwise to the panel itself. For anyone else, the selection is left alone.
+* **While open:** the modal follows input switches. When the player switches to a gamepad and nothing inside the modal is selected, the modal selects `initialFocus` (or the panel). Only the topmost open modal does this, so a modal lower in the stack never takes the selection from the one above it. When the player switches away from the gamepad, a selection inside the modal is cleared. A selection outside the modal is left alone.
+* **On close**, after the fade: if the player is using a gamepad, the selection goes back to what was selected before the modal opened. Each modal remembers its own previous selection, so nested modals restore independently. Otherwise, a selection still inside the modal is cleared and nothing is restored, so a mouse player doesn't get an outline when the modal closes.
+
+Pass a `React.RefObject<GuiObject>` as `initialFocus` to choose which element gets selected instead of the panel:
 
 ```tsx
-const confirmRef = React.useRef<TextButton>();
+const confirmRef = React.useRef<ImageButton>();
 
 <Modal open={open} onOpenChange={setOpen} initialFocus={confirmRef}>
     <Card.Body>
@@ -156,6 +174,18 @@ const confirmRef = React.useRef<TextButton>();
     </Card.Footer>
 </Modal>
 ```
+
+### Selecting for every input
+
+Set `selectionMode="always"` to go back to the behaviour from before 2.0.0. The modal then takes the selection every time it opens, whatever input the player is using, never clears it on an input switch, and always restores the previous selection on close.
+
+```tsx
+<Modal open={open} onOpenChange={setOpen} initialFocus={confirmRef} selectionMode="always">
+    {/* ... */}
+</Modal>
+```
+
+A [`GamepadSelectionGuard`](/components/interaction/gamepadselectionguard) mounted in the place still clears the selection for players who aren't using a gamepad, including a selection taken by a `selectionMode="always"` modal. The guard wins.
 
 ## Stacking modals
 
@@ -204,7 +234,8 @@ function NestedModalExample() {
 | `closeOnBackdropClick` | `boolean`                        | `true`      | Whether clicking the dimmed area outside the panel closes the modal.                                             |
 | `closeOnEscape`        | `boolean`                        | `true`      | Whether Escape or the gamepad B button closes the modal. Only ever closes the topmost modal in a stack.          |
 | `draggable`            | `boolean`                        | `false`     | Enables dragging by direct `Card.Header` children and retains the dropped position while mounted and open.       |
-| `initialFocus`         | `React.RefObject<GuiObject>`     | `undefined` | Element to select when the modal opens. Defaults to the modal panel itself.                                     |
+| `initialFocus`         | `React.RefObject<GuiObject>`     | `undefined` | Element to select when the modal takes the selection. Defaults to the modal panel itself.                       |
+| `selectionMode`        | `"gamepad" \| "always"`          | `"gamepad"` | When the modal takes the selection. `"gamepad"` selects only for gamepad players and follows input switches; `"always"` selects on every open whatever the input (the behaviour before 2.0.0). |
 | `children`             | `React.ReactNode`                 | `undefined` | Modal content, composed from `Card.Header`, `Card.Body`, and `Card.Footer`.                                     |
 
 ### Shared props
@@ -213,7 +244,7 @@ The modal also supports props inherited from the following interfaces, forwarded
 
 | Interface             | Purpose                                                                                       |
 | ---------------------- | ---------------------------------------------------------------------------------------------- |
-| `BoxProps`             | Configures the panel's sizing, spacing, background, border, shadow, and position. `Size` takes precedence over `width`/`height`; percentage and scale sizes resolve against the full overlay. |
+| `BoxProps`             | Configures the panel's sizing, spacing, background, border, shadow, and position. `Size` takes precedence over `width`/`height`; percentage and scale sizes resolve against the full overlay. `minWidth`/`maxWidth`/`minHeight`/`maxHeight` clamp the panel in pixels. |
 | `IntentElementProps`   | Configures the intent applied to the panel's `Card`.                                          |
 
 ## Behaviour
@@ -226,7 +257,10 @@ The modal also supports props inherited from the following interfaces, forwarded
 * Fades the backdrop and panel in and out over `theme.components.modal.fadeDuration` seconds; the portal content stays mounted for the duration of the closing fade before actually unmounting. A duration of `0` skips the fade and unmounts immediately.
 * Supports multiple simultaneously open modals by nesting a `<Modal>` inside another's children — each additional layer renders with a higher `ZIndex` than the last, so it visually stacks above it.
 * Escape and the gamepad B button only ever close the topmost visible modal in the stack, never a modal beneath it.
-* On open, gamepad/keyboard selection moves to `initialFocus` (if provided) or otherwise the modal panel itself. On close, selection is restored to whatever was selected immediately before that modal opened — scoped per instance, so nested modals restore focus independently.
+* With the default `selectionMode="gamepad"`, the modal only takes the selection for gamepad players: on open it selects `initialFocus` (if provided) or otherwise the panel itself, and mouse, keyboard and touch players get no selection outline. While open, switching to a gamepad selects into the topmost modal if nothing inside it is selected, and switching away clears a selection inside the modal.
+* On close, a gamepad player's selection is restored to whatever was selected immediately before that modal opened — scoped per instance, so nested modals restore focus independently. For other inputs, a selection left inside the modal is cleared and nothing is restored.
+* With `selectionMode="always"`, the modal selects on every open and restores on every close, whatever the input, and ignores input switches. A mounted `GamepadSelectionGuard` still clears that selection for non-gamepad players.
+* Setting `GuiService.SelectedObject` fails when the modal isn't under a `PlayerGui` (for example in a ui-labs preview); the modal ignores the failure and simply doesn't select anything.
 * When `open` is not provided, the modal manages its own visibility starting from `defaultOpen`.
 
 ## Theme values

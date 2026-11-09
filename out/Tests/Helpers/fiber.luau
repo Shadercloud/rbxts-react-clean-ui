@@ -37,7 +37,20 @@ local function activateButton(mounted, button)
 	handler(button, {}, 1)
 	task.wait()
 end
+local function fireHostEvent(mounted, instance, eventName, ...)
+	local args = { ... }
+	local eventKey = React.Event[eventName]
+	local _result = findHostFiber(mounted, instance).memoizedProps
+	if _result ~= nil then
+		_result = _result[eventKey]
+	end
+	local handler = _result
+	Assert:notUndefined(handler, `Expected {instance.Name} to have a {eventName} handler`)
+	handler(instance, unpack(args))
+	task.wait()
+end
 return {
 	findHostFiber = findHostFiber,
 	activateButton = activateButton,
+	fireHostEvent = fireHostEvent,
 }

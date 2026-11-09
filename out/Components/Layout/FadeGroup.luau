@@ -3,6 +3,7 @@ local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local SizeHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").SizeHelper
 local FadeGroup = React.forwardRef(function(props, ref)
+	local sizeConstraint = SizeHelper:GetSizeConstraint(props)
 	local _attributes = {}
 	local _condition = props.name
 	if _condition == nil then
@@ -51,7 +52,11 @@ local FadeGroup = React.forwardRef(function(props, ref)
 	_attributes.RootLocalizationTable = props.RootLocalizationTable
 	_attributes.Change = props.Change
 	_attributes.Event = props.Event
-	return React.createElement("canvasgroup", _attributes, props.children)
+	return React.createElement("canvasgroup", _attributes, sizeConstraint ~= nil and (React.createElement("uisizeconstraint", {
+		key = "SizeConstraint",
+		MinSize = sizeConstraint.MinSize,
+		MaxSize = sizeConstraint.MaxSize,
+	})), props.children)
 end)
 return {
 	FadeGroup = FadeGroup,

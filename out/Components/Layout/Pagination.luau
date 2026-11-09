@@ -339,18 +339,21 @@ local function PaginationList(props)
 end
 local function PaginationDefaultLayout()
 	local theme = React.useContext(CleanThemeContext)
+	local _binding = usePagination()
+	local totalPages = _binding.totalPages
 	local paginationTheme = theme.components.pagination
 	return React.createElement(HStack, {
 		Wraps = false,
 		valign = "Center",
 		spacing = "None",
 		Padding = UDim.new(0, SpacingHelper:GetPadding(theme, nil, paginationTheme.spacing)),
-	}, React.createElement(PaginationPrev), React.createElement(PaginationList), React.createElement(PaginationNext))
+	}, React.createElement(PaginationPrev), totalPages ~= nil and React.createElement(PaginationList), React.createElement(PaginationNext))
 end
 local Pagination = React.forwardRef(function(props, _ref)
 	local theme = React.useContext(CleanThemeContext)
-	local pageCount = math.max(0, math.floor(props.totalPages))
-	local currentPage = if pageCount == 0 then 0 else math.clamp(math.floor(props.page), 1, pageCount)
+	local unbounded = props.totalPages == nil
+	local pageCount = if props.totalPages == nil then 0 else math.max(0, math.floor(props.totalPages))
+	local currentPage = if unbounded then math.max(1, math.floor(props.page)) elseif pageCount == 0 then 0 else math.clamp(math.floor(props.page), 1, pageCount)
 	local _condition = props.siblingCount
 	if _condition == nil then
 		_condition = 1
@@ -359,7 +362,12 @@ local Pagination = React.forwardRef(function(props, _ref)
 	local items = React.useMemo(function()
 		return computePaginationItems(currentPage, pageCount, siblingCount)
 	end, { currentPage, pageCount, siblingCount })
+	local canGoNext = if unbounded then props.hasNextPage == true else currentPage < pageCount
 	local setPage = function(page)
+		if unbounded then
+			props.onPageChange(math.max(1, math.floor(page)))
+			return nil
+		end
 		if pageCount == 0 then
 			return nil
 		end
@@ -368,13 +376,13 @@ local Pagination = React.forwardRef(function(props, _ref)
 	local contextValue = React.useMemo(function()
 		return {
 			page = currentPage,
-			totalPages = pageCount,
+			totalPages = if unbounded then nil else pageCount,
 			items = items,
 			setPage = setPage,
 			canGoPrev = currentPage > 1,
-			canGoNext = currentPage < pageCount,
+			canGoNext = canGoNext,
 		}
-	end, { currentPage, pageCount, items, props.onPageChange })
+	end, { currentPage, pageCount, unbounded, canGoNext, items, props.onPageChange })
 	local paginationTheme = theme.components.pagination
 	return React.createElement(PaginationContext.Provider, {
 		value = contextValue,

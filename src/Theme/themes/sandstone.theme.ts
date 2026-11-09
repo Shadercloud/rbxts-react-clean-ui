@@ -180,6 +180,8 @@ export const SandstoneTheme = createTheme({
         badge: {
             cornerRadius: 4,
             borderThickness: 1,
+            hoverDarken: 0.08,
+            pressDarken: 0.16,
             intents: {
                 primary: {
                     default: {

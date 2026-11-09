@@ -8,6 +8,9 @@ interface TooltipProps extends BoxProps, IntentElementProps {
     placement?: TooltipPlacement;
     disabled?: boolean;
     open?: boolean;
+    interactive?: boolean;
+    pinOnPress?: boolean;
+    longPress?: boolean;
 }
 export declare function Tooltip(props: TooltipProps): React.JSX.Element;
 export {};

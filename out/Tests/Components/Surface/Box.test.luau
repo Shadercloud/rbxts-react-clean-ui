@@ -3,6 +3,7 @@ local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local _lunit = TS.import(script, TS.getModule(script, "@rbxts", "lunit").out)
 local Test = _lunit.Test
+local Assert = _lunit.Assert
 local Decorators = _lunit.Decorators
 local Runtime = _lunit.Runtime
 local Tag = _lunit.Tag
@@ -79,6 +80,39 @@ do
 			local box = waitForBox(mounted.host)
 			assertSizeApprox(box, 200, 100, 1, "centered box")
 			assertCenteredIn(box, mounted.host, "both", 1, "centered box")
+		end)
+	end
+	function BoxMountValidation:paddingNotDoubled()
+		local props = {
+			width = 200,
+			height = 100,
+			padding = "10",
+		}
+		local _attributes = table.clone(props)
+		setmetatable(_attributes, nil)
+		withMounted(400, 300, React.createElement(Box, _attributes), function(mounted)
+			local box = waitForBox(mounted.host)
+			local _exp = box:GetChildren()
+			-- ▼ ReadonlyArray.filter ▼
+			local _newValue = {}
+			local _callback = function(child)
+				return child:IsA("UIPadding")
+			end
+			local _length = 0
+			for _k, _v in _exp do
+				if _callback(_v, _k - 1, _exp) == true then
+					_length += 1
+					_newValue[_length] = _v
+				end
+			end
+			-- ▲ ReadonlyArray.filter ▲
+			local paddings = _newValue
+			Assert:equal(#paddings, 1, `Expected exactly one UIPadding on the Box, found {#paddings}`)
+			local padding = paddings[1]
+			Assert:equal(padding.PaddingTop, UDim.new(0, 10))
+			Assert:equal(padding.PaddingBottom, UDim.new(0, 10))
+			Assert:equal(padding.PaddingLeft, UDim.new(0, 10))
+			Assert:equal(padding.PaddingRight, UDim.new(0, 10))
 		end)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
@@ -167,6 +201,26 @@ do
 	})
 	if _descriptor_12 then
 		BoxMountValidation.centeredInHost = _descriptor_12.value
+	end
+	local _decorator_9 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_10 = DisplayName("A padding passed to Box is drawn once by Box itself, not a second time by the inner Container")
+	local _descriptor_13 = Test(BoxMountValidation, "paddingNotDoubled", {
+		value = BoxMountValidation.paddingNotDoubled,
+	})
+	if _descriptor_13 then
+		BoxMountValidation.paddingNotDoubled = _descriptor_13.value
+	end
+	local _descriptor_14 = _decorator_10(BoxMountValidation, "paddingNotDoubled", {
+		value = BoxMountValidation.paddingNotDoubled,
+	})
+	if _descriptor_14 then
+		BoxMountValidation.paddingNotDoubled = _descriptor_14.value
+	end
+	local _descriptor_15 = _decorator_9(BoxMountValidation, "paddingNotDoubled", {
+		value = BoxMountValidation.paddingNotDoubled,
+	})
+	if _descriptor_15 then
+		BoxMountValidation.paddingNotDoubled = _descriptor_15.value
 	end
 	BoxMountValidation = Tag("Studio")(BoxMountValidation) or BoxMountValidation
 end

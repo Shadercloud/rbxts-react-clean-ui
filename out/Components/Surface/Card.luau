@@ -128,29 +128,29 @@ local CardHeader = React.forwardRef(function(props, ref)
 	local card = React.useContext(CardContext)
 	local intent = ColorHelper:getIntentColors(theme, props.intent or card.intent or "primary", "default", theme.components.card.header.intents)
 	local padding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.card.header.spacing, theme.components.card.header.padding, "md")
-	local corners = CssHelper:parseCssSize(theme.components.card.cornerRadius)
+	local corners = CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, theme.components.card.cornerRadius))
 	local headerCorners = theme.components.card.header.cornerRadius
 	local noCorner = UDim.new(0, 0)
 	local _result = headerCorners
 	if _result ~= nil then
 		_result = _result.topLeft
 	end
-	local topLeftRadius = if _result ~= nil then CssHelper:parseCssSize(headerCorners.topLeft) else corners
+	local topLeftRadius = if _result ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, headerCorners.topLeft)) else corners
 	local _result_1 = headerCorners
 	if _result_1 ~= nil then
 		_result_1 = _result_1.topRight
 	end
-	local topRightRadius = if _result_1 ~= nil then CssHelper:parseCssSize(headerCorners.topRight) else corners
+	local topRightRadius = if _result_1 ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, headerCorners.topRight)) else corners
 	local _result_2 = headerCorners
 	if _result_2 ~= nil then
 		_result_2 = _result_2.bottomLeft
 	end
-	local bottomLeftRadius = if _result_2 ~= nil then CssHelper:parseCssSize(headerCorners.bottomLeft) else noCorner
+	local bottomLeftRadius = if _result_2 ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, headerCorners.bottomLeft)) else noCorner
 	local _result_3 = headerCorners
 	if _result_3 ~= nil then
 		_result_3 = _result_3.bottomRight
 	end
-	local bottomRightRadius = if _result_3 ~= nil then CssHelper:parseCssSize(headerCorners.bottomRight) else noCorner
+	local bottomRightRadius = if _result_3 ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, headerCorners.bottomRight)) else noCorner
 	local _binding = resolveOverlayPosition(props, theme.components.card.header.position)
 	local overlay = _binding.overlay
 	local positionProps = _binding.positionProps
@@ -164,6 +164,7 @@ local CardHeader = React.forwardRef(function(props, ref)
 	for _k, _v in positionProps do
 		_attributes[_k] = _v
 	end
+	_attributes.padding = nil
 	_attributes.Size = positionProps.Size or UDim2.fromScale(0, 0)
 	_attributes.AutomaticSize = positionProps.AutomaticSize or Enum.AutomaticSize.XY
 	_attributes.BackgroundTransparency = intent.backgroundTransparency
@@ -211,6 +212,7 @@ local CardBody = React.forwardRef(function(props, ref)
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
+	_attributes.padding = nil
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	local _attributes_1 = {}
 	local _result = theme.components.card.body
@@ -229,29 +231,29 @@ local CardFooter = React.forwardRef(function(props, ref)
 	local card = React.useContext(CardContext)
 	local intent = ColorHelper:getIntentColors(theme, props.intent or card.intent or "primary", "default", theme.components.card.footer.intents)
 	local padding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.card.footer.spacing, theme.components.card.footer.padding, "md")
-	local corners = CssHelper:parseCssSize(theme.components.card.cornerRadius)
+	local corners = CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, theme.components.card.cornerRadius))
 	local footerCorners = theme.components.card.footer.cornerRadius
 	local noCorner = UDim.new(0, 0)
 	local _result = footerCorners
 	if _result ~= nil then
 		_result = _result.topLeft
 	end
-	local topLeftRadius = if _result ~= nil then CssHelper:parseCssSize(footerCorners.topLeft) else noCorner
+	local topLeftRadius = if _result ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, footerCorners.topLeft)) else noCorner
 	local _result_1 = footerCorners
 	if _result_1 ~= nil then
 		_result_1 = _result_1.topRight
 	end
-	local topRightRadius = if _result_1 ~= nil then CssHelper:parseCssSize(footerCorners.topRight) else noCorner
+	local topRightRadius = if _result_1 ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, footerCorners.topRight)) else noCorner
 	local _result_2 = footerCorners
 	if _result_2 ~= nil then
 		_result_2 = _result_2.bottomLeft
 	end
-	local bottomLeftRadius = if _result_2 ~= nil then CssHelper:parseCssSize(footerCorners.bottomLeft) else corners
+	local bottomLeftRadius = if _result_2 ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, footerCorners.bottomLeft)) else corners
 	local _result_3 = footerCorners
 	if _result_3 ~= nil then
 		_result_3 = _result_3.bottomRight
 	end
-	local bottomRightRadius = if _result_3 ~= nil then CssHelper:parseCssSize(footerCorners.bottomRight) else corners
+	local bottomRightRadius = if _result_3 ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, footerCorners.bottomRight)) else corners
 	local _binding = resolveOverlayPosition(props, theme.components.card.footer.position)
 	local overlay = _binding.overlay
 	local positionProps = _binding.positionProps
@@ -265,6 +267,7 @@ local CardFooter = React.forwardRef(function(props, ref)
 	for _k, _v in positionProps do
 		_attributes[_k] = _v
 	end
+	_attributes.padding = nil
 	_attributes.Size = positionProps.Size or UDim2.fromScale(0, 0)
 	_attributes.AutomaticSize = positionProps.AutomaticSize or Enum.AutomaticSize.XY
 	_attributes.BackgroundTransparency = intent.backgroundTransparency
@@ -450,6 +453,7 @@ local Card = React.forwardRef(function(props, ref)
 	setmetatable(_object, nil)
 	_object.center = nil
 	local wrapperPositionProps = _object
+	local wrapperSizeConstraint = SizeHelper:GetSizeConstraint(props)
 	local _result_3
 	if hasOverlay then
 		local _attributes_1 = {}
@@ -476,7 +480,11 @@ local Card = React.forwardRef(function(props, ref)
 				return setWrapperAbsoluteSize(instance.AbsoluteSize)
 			end,
 		}
-		_result_3 = (React.createElement("frame", _attributes_1, cardBox, overlayHeader, overlayFooter))
+		_result_3 = (React.createElement("frame", _attributes_1, wrapperSizeConstraint ~= nil and (React.createElement("uisizeconstraint", {
+			key = "SizeConstraint",
+			MinSize = wrapperSizeConstraint.MinSize,
+			MaxSize = wrapperSizeConstraint.MaxSize,
+		})), cardBox, overlayHeader, overlayFooter))
 	else
 		_result_3 = cardBox
 	end

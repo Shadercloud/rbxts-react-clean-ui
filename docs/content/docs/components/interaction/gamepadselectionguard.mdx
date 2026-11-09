@@ -1,0 +1,170 @@
+---
+title: GamepadSelectionGuard
+description: Keep Roblox's selection outline for gamepad players only.
+icon: Gamepad2
+---
+
+`GamepadSelectionGuard` keeps Roblox's selection ([`GuiService.SelectedObject`](https://create.roblox.com/docs/reference/engine/classes/GuiService#SelectedObject)), and the selection outline that comes with it, for gamepad players only. Whenever the player's last input isn't a gamepad, the guard clears the selection. It renders its `children` unchanged and creates no instances of its own. The same logic is available as the `useGamepadSelection` hook, which `Modal` uses to decide when to take the selection.
+
+A player counts as using a gamepad while [`UserInputService:GetLastInputType()`](https://create.roblox.com/docs/reference/engine/classes/UserInputService#GetLastInputType) returns one of `Gamepad1` to `Gamepad8`.
+
+<Callout type="warn">
+    The guard also blocks Roblox's keyboard UI navigation (the backslash `\` toggle), because that sets a selection while the last input is the keyboard. In a game that wants keyboard navigation, don't mount the guard, or pass `enabled={false}` while keyboard navigation is in use.
+</Callout>
+
+## Import
+
+```tsx
+import { GamepadSelectionGuard, useGamepadSelection, GamepadHelper } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+Mount one guard near the root of your UI, for example just inside `CleanUiProvider`. It applies to the whole place, so it only needs to be mounted once. Mounting more than one does no harm.
+
+```tsx
+import React from "@rbxts/react";
+import { CleanUiProvider, DefaultTheme, GamepadSelectionGuard } from "@rbxts/react-clean-ui";
+
+export function App() {
+    return (
+        <CleanUiProvider theme={DefaultTheme}>
+            <GamepadSelectionGuard>
+                <MainMenu />
+            </GamepadSelectionGuard>
+        </CleanUiProvider>
+    );
+}
+```
+
+Mouse, keyboard and touch players never see a selection outline after clicking or tapping a button. Gamepad players can still select and navigate as usual.
+
+## Turning the guard off
+
+Pass `enabled={false}` to pause the guard, for example while a settings screen lets the player navigate with the keyboard. While it is disabled, the guard does nothing.
+
+```tsx
+const [keyboardNavigation, setKeyboardNavigation] = React.useState(false);
+
+<GamepadSelectionGuard enabled={!keyboardNavigation}>
+    <SettingsMenu onKeyboardNavigationChange={setKeyboardNavigation} />
+</GamepadSelectionGuard>
+```
+
+## useGamepadSelection
+
+`useGamepadSelection` is the hook behind the guard and `Modal`. Use it when a component should take the selection for gamepad players and give it up for everyone else.
+
+```tsx
+useGamepadSelection(target?: GamepadSelectionTarget, options?: GamepadSelectionOptions): void
+```
+
+`target` is what to select while the player is using a gamepad. It is either a `React.RefObject<GuiObject>` or a function that returns a `GuiObject` (or `undefined`). Leave it out to only clear the selection.
+
+```tsx
+import React from "@rbxts/react";
+import { Box, Button, useGamepadSelection } from "@rbxts/react-clean-ui";
+
+function PauseMenu(props: { open: boolean }) {
+    const panelRef = React.useRef<ImageLabel>();
+    const resumeRef = React.useRef<ImageButton>();
+
+    useGamepadSelection(resumeRef, {
+        enabled: props.open,
+        scope: panelRef,
+        restoreOnRelease: true,
+    });
+
+    if (!props.open) {
+        return undefined;
+    }
+
+    return (
+        <Box ref={panelRef}>
+            <Button ref={resumeRef} text="Resume" />
+            <Button text="Quit" />
+        </Box>
+    );
+}
+```
+
+### What the hook does
+
+"Inside the scope" means the selected object is the `scope` instance or one of its descendants. Without a `scope`, any selection counts as inside.
+
+* **When it becomes enabled:** if the player is using a gamepad (or `mode` is `"always"`), it selects `target`. Otherwise it clears the selection if it is inside the scope.
+* **When the player switches to a gamepad:** if nothing inside the scope is selected and `canTakeSelection` allows it, it selects `target`.
+* **When the player switches away from a gamepad:** it clears the selection if it is inside the scope. A selection outside the scope is left alone.
+* **When it becomes disabled or unmounts:** with `restoreOnRelease`, it restores the selection from when it was enabled if the player is using a gamepad (or `mode` is `"always"`), and otherwise clears the selection if it is inside the scope. Without `restoreOnRelease`, it leaves the selection as it is.
+
+### Options
+
+| Option                   | Type                         | Default     | Description                                                                                                  |
+| ------------------------ | ---------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
+| `enabled`                | `boolean`                    | `true`      | Whether the hook is active. It only listens for input and selection changes while `true`.                    |
+| `scope`                  | `React.RefObject<Instance>`  | `undefined` | Limits which selections the hook treats as its own: the scope instance and its descendants. Without it, any selection counts. |
+| `mode`                   | `"gamepad" \| "always"`      | `"gamepad"` | `"always"` selects `target` when enabled whatever the input, and never clears on an input switch.            |
+| `restoreOnRelease`       | `boolean`                    | `false`     | On disable or unmount, restore the selection from when the hook was enabled (gamepad or `"always"`), or clear a selection inside the scope (other inputs). |
+| `clearOnSelectionChange` | `boolean`                    | `false`     | Also clear a selection set inside the scope while the player isn't using a gamepad, one frame later. Read when the hook becomes enabled. |
+| `canTakeSelection`       | `() => boolean`              | `undefined` | Checked before selecting `target` on a switch to a gamepad (not when the hook becomes enabled). Return `false` to leave the selection alone, for example when another panel is on top. |
+
+`GamepadSelectionGuard` is `useGamepadSelection(undefined, { enabled, clearOnSelectionChange: true })`: no target and no scope, so it clears any selection made while the player isn't using a gamepad.
+
+## GamepadHelper
+
+`GamepadHelper` exposes the static methods the hook is built on.
+
+| Method                                  | Returns   | Description                                                                                         |
+| --------------------------------------- | --------- | --------------------------------------------------------------------------------------------------- |
+| `isGamepadInputType(inputType)`         | `boolean` | Whether `inputType` is one of `Enum.UserInputType.Gamepad1` to `Gamepad8`.                          |
+| `isGamepadActive()`                     | `boolean` | Whether the player's last input (`UserInputService:GetLastInputType()`) was a gamepad.              |
+| `trySetSelectedObject(target)`          | `void`    | Sets `GuiService.SelectedObject` to `target` (or clears it with `undefined`), ignoring the error Roblox throws when the target isn't under a `PlayerGui`. |
+| `isSelectionWithin(selected, scope)`    | `boolean` | Whether `selected` is `scope` or one of its descendants. `false` when either is `undefined`.        |
+
+```tsx
+import { GamepadHelper } from "@rbxts/react-clean-ui";
+
+if (GamepadHelper.isGamepadActive()) {
+    GamepadHelper.trySetSelectedObject(startButtonRef.current);
+}
+```
+
+## Testing in Studio
+
+The guard has no visual output, so there is no live preview on this page. To check it in Studio:
+
+1. Mount the guard in your UI and start a Play session, so the UI is under a `PlayerGui`.
+2. Click a button with the mouse, or press `\` to try keyboard navigation. No selection outline should stay on screen.
+3. Open the Controller Emulator from Studio's **Test** tab and press a button on the emulated controller. The last input is now a gamepad, so selecting and navigating works as normal.
+4. Move the mouse or press a key to switch back. A selection set while the mouse or keyboard is the last input is cleared on the next frame.
+
+The library's `GamepadSelectionGuard` story shows the same thing, with a status line for the current last input type and selected object. In a ui-labs preview, the last input type is whatever Studio reports, and setting a selection silently fails because the preview isn't under a `PlayerGui`.
+
+## Props
+
+### GamepadSelectionGuard-specific props
+
+| Prop       | Type              | Default     | Description                                                |
+| ---------- | ----------------- | ----------- | ---------------------------------------------------------- |
+| `enabled`  | `boolean`         | `true`      | Whether the guard clears selections. While `false` it does nothing. |
+| `children` | `React.ReactNode` | `undefined` | Content rendered as-is.                                    |
+
+### Hooks
+
+| Hook                                   | Returns | Description                                                                                           |
+| -------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
+| `useGamepadSelection(target, options)` | `void`  | Takes the selection for gamepad players and gives it up for other inputs. See [useGamepadSelection](#usegamepadselection). |
+
+## Behaviour
+
+* Applies to the whole place: it clears whatever `GuiService.SelectedObject` is, not only objects inside its children.
+* Renders its children unchanged and creates no instances.
+* While enabled and the player isn't using a gamepad, it clears the selection once on mount, whenever the last input switches from a gamepad to anything else, and whenever something sets a selection. That last clear happens one frame later, after checking the input type again.
+* Never selects anything itself. When the player switches to a gamepad, choosing what to select is left to your game or to components such as `Modal`.
+* Overrides a `Modal` with `selectionMode="always"` for players who aren't using a gamepad.
+* Blocks Roblox's keyboard UI navigation toggle, because that navigation sets a selection while the last input is the keyboard.
+* Doesn't restore any selection when it unmounts.
+
+## Theme values
+
+`GamepadSelectionGuard` has no `theme.components` entry and doesn't read the theme.

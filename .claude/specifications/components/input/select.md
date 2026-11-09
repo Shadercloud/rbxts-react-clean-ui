@@ -4,7 +4,8 @@
 
 ## Public API
 
-- `SelectProps` composes `ScalableElementProps`, `SpacedElementProps`, and `React.InstanceProps<ImageLabel>` (it renders through `Container`, so it accepts native `ImageLabel` properties, not `TextBox` properties), plus `selected?: number`, `'max-height'?: CssSize`, `backgroundImage?: CssBackgroundImage`, `backgroundGradient?: CssBackgroundGradient`, `onChange?: (selected: number, value?: string) => void`, `searchable?: boolean`, and `searchPlaceholder?: string` (defaults to `"Search"`).
+- `SelectProps` composes `ScalableElementProps`, `SpacedElementProps`, `Pick<SizeElementProps, "width">`, and `React.InstanceProps<ImageLabel>` (it renders through `Container`, so it accepts native `ImageLabel` properties, not `TextBox` properties), plus `selected?: number`, `'max-height'?: CssSize`, `backgroundImage?: CssBackgroundImage`, `backgroundGradient?: CssBackgroundGradient`, `onChange?: (selected: number, value?: string) => void`, `searchable?: boolean`, `searchPlaceholder?: string` (defaults to `"Search"`), and `disabled?: boolean`. With `disabled`, the control cannot be opened (by click or `Fieldset.Label`), an open dropdown closes, and the field takes `states.disabled`. Unset/`false` = unchanged behaviour.
+- The root is full width (`Size = UDim2.fromScale(1, 0)`, `AutomaticSize.Y`) unless `width` is set, in which case the width resolves like `Container`'s `width` (px, `"25px"`, `"50%"`, breakpoint table at `sm`) and the height still hugs the content. The dropdown opens at the control's measured width either way. `Size`/`AutomaticSize` props stay ignored. `"Auto"` resolves to a zero width (there is no content-hugging width for this control), so pass a real size.
 - `Select.Option` accepts `text?: string`, `children?: React.ReactNode`, `Event?: React.InstanceEvent<ImageButton>`, and `BackgroundColor3?: Color3`. `index` and `value` are assigned/consumed internally; `index` must not be set by a consumer (`Select` assigns it based on child position).
 - `Select.OptGroup` accepts `label: string` and `children?: React.ReactNode` (expected to be `Select.Option` elements). It renders nothing itself — like `Accordion.Item`/`Header`/`Content`, it's a structural marker that `Select` walks to build its own render tree — and only groups one level deep: a `Select.OptGroup` nested inside another `Select.OptGroup` is ignored, along with any non-`Select.Option` children of a group.
 - `Select.Option` is recognized both as a direct child of `Select` and as a child of a `Select.OptGroup` that is itself a direct child of `Select`; an option nested any deeper (or inside any other element) does not receive a valid `index` and its `Select.Option` internals will assert (`"Select.Option must be a direct child of Select or Select.OptGroup"`). Index assignment is a single sequential counter across the whole `children` tree (ungrouped options and every group's options interleave in document order), so index order matches the order options are declared regardless of grouping.
@@ -14,7 +15,7 @@
 
 ## Behavior
 
-- Clicking the closed control, or an already-open dropdown's control, toggles the dropdown open/closed (`activateSelect`). Opening measures the control's `AbsoluteSize`/`AbsolutePosition` relative to the overlay to position the dropdown directly below the control.
+- Clicking the closed control, or an already-open dropdown's control, toggles the dropdown open/closed (`activateSelect`). Opening measures the control's `AbsoluteSize`/`AbsolutePosition` relative to the overlay to position the dropdown directly below the control, offset down by `dropDown.gap` (default `0`, flush).
 - Selecting a `Select.Option` calls `context.setSelected(index, value)` — which calls `onChange(index, value)` and updates the selected index — then closes the dropdown.
 - Per the [Input](./index.md) convention, activating a paired `Fieldset.Label` also calls `activateSelect`, toggling the dropdown.
 - The dropdown is rendered via `ReactRoblox.createPortal` into `OverlayContext.overlay`. If the dropdown is opened while no overlay is available (`overlay.overlay === undefined`), the component `warn`s but still attempts to render nothing extra (the portal is skipped for that render).
@@ -33,22 +34,64 @@
 
 `theme.components.select` supplies:
 
-- `borderColor`, `borderThickness` (`Inner` stroke on the control, `Outer` stroke on the dropdown), `cornerRadius` for both the control and the dropdown.
+- `borderColor`, `borderThickness` (`Inner` stroke on the control, `Outer` stroke on the dropdown), `cornerRadius` for both the control and the dropdown (the dropdown's can be overridden via `dropDown`).
 - `dropDownBackgroundColor`.
 - `backgroundColor?: Color3` and `backgroundTransparency?: number` (default `1`, invisible) — a flat fill on the closed field's root `Container` (the `Select` `ImageLabel`). Instance `BackgroundColor3`/`BackgroundTransparency` props still win. When the theme `backgroundTransparency` is below `1`, the root also gets a `uicorner` named `Corners` from `cornerRadius` (none at `0`) so the fill follows the stroke's rounding. The `backgroundImage` sits on the same instance and draws over the fill. Unset in every shipped theme.
 - `textColor?: Color3` — `TextColor3` of the closed field's `SelectedText`. Unset = `Text`'s own default (`theme.colors.intents.primary.default.textColor`).
 - `iconColor?: Color3` — colour of the `SelectCaret` icon. Unset = `theme.colors.intents.primary.default.textColor`, as before.
-- `typography`, resolved via `TypographyHelper.getTypography`.
+- `typography`, resolved via `TypographyHelper.getTypography`. The `SelectedText` is vertically centred in the row whatever the caret's height.
 - Optional `backgroundImage`, overridden per instance by the matching `SelectProps.backgroundImage`, renders directly on the root `Container` using the shared `CssBackgroundImage` shape and resolution behavior.
 - Optional `backgroundGradient`, overridden per instance by the matching `SelectProps.backgroundGradient`, renders on the root `Container` using the shared `CssBackgroundGradient` shape and resolution behavior (see [Box](../surface/box.md#backgroundgradient)).
 - `intents` for the `default`/`hover`/`focus` (selected) option colors.
 - `maxDropDownHeight`, the fallback for `'max-height'`.
+- `boxShadow?: CssShadow | CssBoxShadow` and `innerShadow?: { color, transparency, size }` — same shapes and drawing as [Input](./input.md#theme), applied to the closed field's root `Container`. The inner shadow is inset by the control's current border thickness and drawn under the `SelectButton` (which gets `ZIndex` 2 only while `innerShadow` is set). The outer shadow follows the root `Corners`, so it is only rounded when the root fill is visible.
+- `states?: { hover?, focus?, disabled? }` (`FieldStateStyle`, same as Input) override `borderColor`/`borderThickness` on the control's stroke and `backgroundColor`/`backgroundTransparency`/`backgroundGradient` on the root, key by key. `focus` = dropdown open, `hover` = pointer over the `SelectButton`, `disabled` = the `disabled` prop; precedence is disabled > focus > hover > base keys. Instance `BackgroundColor3`/`BackgroundTransparency`/`backgroundGradient` props still beat every state. The root `Corners` gate uses the state-resolved theme transparency.
+- `caret?: { size?: CssSize; backgroundColor?: Color3; backgroundTransparency?: number; backgroundGradient?: CssBackgroundGradient; borderColor?: Color3; borderThickness?: number; cornerRadius?: CssSize; iconColor?: Color3; margin?: CssPadding }` — when set, the `SelectCaret` icon sits centred in a `size` x `size` box (`SelectCaretCap` > `Cap`, default size = the theme icon size at `theme.default.scale`) with an `Inner` stroke (none when `borderThickness` is `0`/unset), `Corners`, and an optional gradient. The fill is opaque when `backgroundColor` or `backgroundGradient` is set, otherwise transparent, unless `backgroundTransparency` says otherwise. `margin` is a CSS-order quad that may be negative: the row slot is `size + left + right` wide and the box sits `left` px in, so `"0px -6px 0px 0px"` lets the cap overlap 6px into the field's right padding. Vertically the cap may overlap the field's top/bottom padding (but not its border): the slot is only `max(0, size + top + bottom - (paddingTop + paddingBottom - 2 * borderThickness))` tall, both slot and box are vertically centred in the row, and the box is shifted by `(top - bottom) / 2`. So a cap that fits inside the padded field does not make the Select taller than the text line plus padding (an `Input` with the same theme); only a taller cap grows it, to exactly fit inside the border. Icon colour: `caret.iconColor ?? iconColor ?? primary default textColor`. Unset = the bare icon, as before.
+- `dropDown?: { cornerRadius?: CssSize; borderColor?: Color3; borderThickness?: number; boxShadow?: CssShadow | CssBoxShadow; gap?: number }` — dropdown-only overrides, falling back to the field's `cornerRadius`/`borderColor`/`borderThickness`, with no shadow and a `0` gap when unset. `gap` is measured to the dropdown frame's edge, and its `Outer` stroke grows outward into that gap.
 - `optGroup.textColor` (required) plus optional `typography`, `backgroundColor`, `backgroundTransparency` (defaults to `1`, i.e. invisible, when unset), `spacing`, and `padding` (the latter two resolved via `SpacingHelper.GetResolvedPadding`) for a `Select.OptGroup` header row.
 - `search.spacing`/`padding` (resolved via `SpacingHelper.GetResolvedPadding`) — the outer margin around the search row's `Input` box within the dropdown. The search row's icon color, text typography, and placeholder typography now come from `theme.components.input` (via the `Input` it renders), not from `theme.components.select.search` — see [Input](./input.md).
 
+## Theme example: sunk "ink well"
+
+Matches the mockup (`.field`, `.field.focus` = open, `.chev`, `.menu`, `.menu .on`):
+
+```ts
+select: {
+    borderColor: Color3.fromHex("#3D2712"),
+    borderThickness: 2,
+    cornerRadius: 8,
+    backgroundColor: Color3.fromHex("#FFFFFF"),
+    backgroundTransparency: 0,
+    backgroundGradient: { colors: [Color3.fromHex("#173A66"), Color3.fromHex("#214C84"), Color3.fromHex("#295896")], stops: [0, 0.45, 1], rotation: 90 },
+    boxShadow: { shadow: "0px 1px 0px 0px", color: Color3.fromHex("#A87A45"), transparency: 0 },
+    innerShadow: { color: Color3.fromHex("#000000"), transparency: 0.5, size: 8 },
+    states: { focus: { borderColor: Color3.fromHex("#F2A65A") } },
+    caret: {
+        size: 30,
+        backgroundColor: Color3.fromHex("#173A66"),
+        borderColor: Color3.fromHex("#3D2712"),
+        borderThickness: 2,
+        cornerRadius: 6,
+        iconColor: Color3.fromHex("#FFF7CF"),
+        margin: "0px -6px 0px 0px",
+    },
+    dropDownBackgroundColor: Color3.fromHex("#214C84"),
+    dropDown: {
+        cornerRadius: 8,
+        borderThickness: 2,
+        borderColor: Color3.fromHex("#3D2712"),
+        boxShadow: { shadow: "0px 6px 14px 0px", color: Color3.fromHex("#000000"), transparency: 0.5 },
+        gap: 6,
+    },
+    intents: { primary: { focus: { backgroundColor: Color3.fromHex("#3A6DB0") } } },
+}
+```
+
+`gap: 6` = the CSS `margin-top: 4px` plus the 2px `Outer` stroke. A theme extending `WoodenTheme` also needs `backgroundImage: { image: "" }`.
+
 ## Story
 
-Worth demonstrating: default (uncontrolled) selection, a controlled selection that reads back through `onChange`, options with custom `children` in addition to `text`, enough options to trigger the scrollable/max-height dropdown behavior, `searchable` filtering, and `Select.OptGroup` sectioning (including a mix of grouped and ungrouped options, and searching within groups). Requires wrapping the story in an `OverlayProvider` for the dropdown to render.
+Worth demonstrating: default (uncontrolled) selection, a controlled selection that reads back through `onChange`, options with custom `children` in addition to `text`, enough options to trigger the scrollable/max-height dropdown behavior, `searchable` filtering, `Select.OptGroup` sectioning (including a mix of grouped and ungrouped options, and searching within groups), `disabled`, and a themed sunk field (inner/outer shadow, focus border while open, caret cap, dropdown gap/shadow). Requires wrapping the story in an `OverlayProvider` for the dropdown to render.
 
 ## Implementation notes
 
@@ -56,3 +99,8 @@ Worth demonstrating: default (uncontrolled) selection, a controlled selection th
 - `textColor` is a dedicated key rather than `typography.color`, because `Text` ignores `typography.color`, and wiring it through would recolour Select for any theme whose base `typography.body.color` is set.
 
 - `parseSelectChildren` keeps `flatOptions` gap-free, so `flatOptions[i].index === i` always holds. The closed control finds the selected option by position (`flatOptions[selected]`), so any change to how indices are assigned must keep that invariant.
+- `innerShadow` can be a direct child of the root `Container` (unlike Input's): the root has no `UIListLayout` or `UIPadding` (`Padding` lives on `SelectButton`). See Input's notes for why `FieldInnerShadow` fills the whole interior instead of being a short band.
+- The row is an `HStack` with `Wraps`, so its children are aligned per flex line by `ItemLineAlignment` (which starts at the top), not by `VerticalAlignment`. That is why the text's `FlexItem` and the `SelectCaretCap` slot each carry `ItemLineAlignment = Center` on their own `UIFlexItem`; without it a cap taller than the text left the text at the top of the row. The uncapped `SelectCaret` icon is deliberately left alone so existing themes are pixel-identical.
+- `SelectCaretCap`'s `inset` = field padding (resolved the same way `Padding {...props}` does) minus twice the *base* `borderThickness`. Base, not state-resolved, so a hover/focus border change can't change the field height. The slot can be 0 px tall (the cap fits in the padding); `waitForGuiObject` on `SelectCaretCap` then times out, so wait on `Cap` instead.
+- The caret cap's negative `margin` is done by sizing the outer `SelectCaretCap` slot smaller than the `Cap` box, because `UIListLayout` has no negative spacing. Keep the icon named `SelectCaret` inside the cap: tests and consumers look it up by that name.
+- The `dropDown.boxShadow` `UIShadow` sits on the `SelectDropdown` frame, which has `ClipsDescendants`. Whether a parent's own shadow survives that clipping should be checked visually in Studio.

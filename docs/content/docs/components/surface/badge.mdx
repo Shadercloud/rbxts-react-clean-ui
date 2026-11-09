@@ -1,10 +1,10 @@
 ---
 title: Badge
-description: A small, non-interactive pill for counts, statuses, and short labels.
+description: A small pill for counts, statuses, and short labels, optionally clickable.
 icon: Tag
 ---
 
-`Badge` is a compact, themed label built on Roblox's native [`ImageLabel`](https://create.roblox.com/docs/reference/engine/classes/ImageLabel). It shows a count, status, or short piece of text, optionally preceded by an icon, and sizes itself to its content.
+`Badge` is a compact, themed label built on Roblox's native [`ImageLabel`](https://create.roblox.com/docs/reference/engine/classes/ImageLabel). It shows a count, status, or short piece of text, optionally preceded by an icon, and sizes itself to its content. It is non-interactive unless you give it `onClick`.
 
 ## Import
 
@@ -61,7 +61,7 @@ In the default theme, `primary` is a neutral light-grey pill with dark text, whi
 
 ## Icons
 
-Set `icon` to draw an icon before the text. The icon is tinted with the same color as the text.
+Set `icon` to draw an icon before the text. By default the icon is tinted with the same color as the text; set `iconColor` to tint it separately (see [Custom colors](#custom-colors)).
 
 <Demo preview="Scenes/Surface/BadgeIcons.loom.tsx" previewHeight={200}>
 ```tsx
@@ -179,9 +179,130 @@ Outside a layout, set `Position` and `AnchorPoint` to place the badge yourself.
 />
 ```
 
+## Custom colors
+
+Each color can be overridden on a single badge. Anything you don't set falls back to the intent's theme value.
+
+* `BackgroundColor3` and `BackgroundTransparency` set the fill.
+* `textColor` sets the text color.
+* `iconColor` sets the icon color. When unset, the icon uses the resolved text color, so `textColor` alone tints both.
+* `borderColor`, `borderThickness`, `borderTransparency`, and `borderPosition` (`"inner"` or `"outer"`, default `"inner"`) shape the border. `borderThickness` falls back to the theme's `badge.borderThickness`, and the border only renders when the resolved thickness is greater than `0`.
+* `padding` overrides the theme padding at the badge's scale, per side, in CSS shorthand.
+
+<Demo preview="Scenes/Surface/BadgeCustom.loom.tsx" previewHeight={260}>
+```tsx
+import React from "@rbxts/react";
+import { Badge, Box, Container, HStack, VStack } from "@rbxts/react-clean-ui";
+
+export function BadgeCustomExample() {
+    const [likes, setLikes] = React.useState(0);
+    const [follows, setFollows] = React.useState(0);
+
+    return (
+        <Container width="80%" height="160" center>
+            <Box>
+                <VStack>
+                    <Container name="StyledRow" LayoutOrder={1}>
+                        <HStack valign="Center" Wraps={false}>
+                            <Badge
+                                LayoutOrder={1}
+                                text="Custom"
+                                BackgroundColor3={Color3.fromHex("#6B3FA0")}
+                                textColor={Color3.fromHex("#FFFFFF")}
+                                borderColor={Color3.fromHex("#C9A8F0")}
+                                borderThickness={2}
+                            />
+                            <Badge
+                                LayoutOrder={2}
+                                text="Outlined"
+                                icon="star"
+                                BackgroundTransparency={1}
+                                textColor={Color3.fromHex("#D4A017")}
+                                borderColor={Color3.fromHex("#D4A017")}
+                            />
+                            <Badge
+                                LayoutOrder={3}
+                                text="Roomy"
+                                intent="success"
+                                padding="6px 16px"
+                            />
+                        </HStack>
+                    </Container>
+                    <Container name="ClickableRow" LayoutOrder={2}>
+                        <HStack valign="Center" Wraps={false}>
+                            <Badge
+                                LayoutOrder={1}
+                                text={`Likes ${likes}`}
+                                icon="thumbs-up"
+                                intent="info"
+                                onClick={() => setLikes(likes + 1)}
+                            />
+                            <Badge
+                                LayoutOrder={2}
+                                text={`Follow ${follows}`}
+                                intent="primary"
+                                hoverStyle={{ backgroundColor: Color3.fromHex("#2E9D63"), textColor: new Color3(1, 1, 1) }}
+                                pressStyle={{ backgroundColor: Color3.fromHex("#1F6E45") }}
+                                onClick={() => setFollows(follows + 1)}
+                            />
+                        </HStack>
+                    </Container>
+                </VStack>
+            </Box>
+        </Container>
+    );
+}
+```
+</Demo>
+
+The first row overrides colors, border, and padding per instance. The second row has clickable badges, described next: "Likes" uses the theme's hover/press shading, and "Follow" sets `hoverStyle`/`pressStyle`.
+
+## Clickable badges
+
+Pass `onClick` to make the badge clickable. The whole pill is the click target.
+
+```tsx
+import React, { useState } from "@rbxts/react";
+import { Badge } from "@rbxts/react-clean-ui";
+
+export function LikeBadge() {
+    const [likes, setLikes] = useState(0);
+
+    return (
+        <Badge
+            text={`Likes ${likes}`}
+            icon="thumbs-up"
+            intent="info"
+            onClick={() => setLikes(likes + 1)}
+        />
+    );
+}
+```
+
+The badge is hovered while the pointer is over it or it holds gamepad selection, and pressed while the left mouse button or a touch is held down on it. By default the background is shaded in these states using the theme's `badge.hoverDarken` and `badge.pressDarken` (see [Theme values](#theme-values)). There is no disabled state.
+
+Use `hoverStyle` and `pressStyle` to pick the colors yourself. Both take a `BadgeStateStyle`, with optional `backgroundColor`, `backgroundTransparency`, `textColor`, `iconColor`, and `borderColor`.
+
+```tsx
+<Badge
+    text="Follow"
+    intent="primary"
+    hoverStyle={{ backgroundColor: Color3.fromHex("#2E9D63"), textColor: new Color3(1, 1, 1) }}
+    pressStyle={{ backgroundColor: Color3.fromHex("#1F6E45") }}
+    onClick={() => print("Followed")}
+/>
+```
+
+While pressed, `pressStyle` is layered over `hoverStyle`, so a field you only set in `hoverStyle` (like `textColor` above) still applies while pressed. Each color resolves, highest priority first:
+
+* **Hovered:** `hoverStyle`, then the instance prop (for example `textColor`), then the intent value.
+* **Pressed:** `pressStyle`, then `hoverStyle`, then the instance prop, then the intent value.
+
+When neither style sets `backgroundColor`, the resting background is shaded by the theme instead. `hoverStyle` and `pressStyle` are ignored unless `onClick` is set.
+
 ## Theming
 
-`Badge` has no color, padding, or size props of its own; its look comes entirely from `theme.components.badge`. Use `createTheme` (or `extendTheme`) to change it theme-wide, then apply it with `ThemeProvider`.
+`theme.components.badge` sets the look of every badge. Use `createTheme` (or `extendTheme`) to change it theme-wide, then apply it with `ThemeProvider`.
 
 ```tsx
 import { Badge, createTheme, ThemeProvider } from "@rbxts/react-clean-ui";
@@ -223,11 +344,19 @@ Set `backgroundColor`, `borderColor`, and `textColor` for every intent you custo
 | Prop          | Type       | Default     | Description                                                   |
 | ------------- | ---------- | ----------- | ------------------------------------------------------------- |
 | `text`        | `string`   | Required    | The label shown in the badge. Never wraps.                    |
-| `icon`        | `IconName` | `undefined` | Renders an icon before the text, tinted with the text color.  |
+| `icon`        | `IconName` | `undefined` | Renders an icon before the text, tinted with `iconColor` or the text color. |
+| `textColor`   | `Color3`   | `undefined` | Text color. Unset uses the intent's text color.               |
+| `iconColor`   | `Color3`   | `undefined` | Icon color. Unset uses the resolved text color.               |
+| `padding`     | `CssPadding` | `undefined` | Per-side padding override over the theme padding at the badge's scale. |
+| `onClick`     | `() => void` | `undefined` | Makes the badge clickable and calls this when it is activated. |
+| `hoverStyle`  | `BadgeStateStyle` | `undefined` | Colors used while hovered. Only used with `onClick`.    |
+| `pressStyle`  | `BadgeStateStyle` | `undefined` | Colors used while pressed, layered over `hoverStyle`. Only used with `onClick`. |
 | `name`        | `string`   | `"Badge"`   | Name assigned to the underlying `ImageLabel`.                 |
 | `LayoutOrder` | `number`   | `undefined` | Native Roblox layout order.                                   |
 | `Position`    | `UDim2`    | `undefined` | Native Roblox position.                                       |
 | `AnchorPoint` | `Vector2`  | `undefined` | Native Roblox anchor point.                                   |
+
+`BadgeStateStyle` is exported. Its fields are all optional: `backgroundColor`, `textColor`, `iconColor`, and `borderColor` (`Color3`), and `backgroundTransparency` (`number`).
 
 ### Shared props
 
@@ -238,15 +367,23 @@ The badge also supports props inherited from the following interfaces.
 | `IntentElementProps`   | Configures the badge's color scheme. Defaults to `primary`.             |
 | `ScalableElementProps` | Configures text size, icon size, padding, and icon/text gap together.   |
 | `IconElementProps`     | Configures the `icon` prop's accepted values.                           |
+| `BackgroundElementProps` | Configures `BackgroundColor3` and `BackgroundTransparency`, overriding the intent's background. Transparency falls back to the intent's value, then `0`. |
+| `BorderElementProps`   | Configures `borderColor`, `borderThickness`, `borderTransparency`, and `borderPosition` (`"inner"` by default). |
 
 ## Behaviour
 
 * The badge sizes to its content (`AutomaticSize.XY` with a zero base size) and never stretches to its parent's width.
-* The badge never takes input: its `ImageLabel` has `Active` and `Selectable` set to `false`, and no events are wired. There are no hover or disabled states; colors always resolve from the intent's `default` state.
+* Without `onClick`, the badge never takes input: its `ImageLabel` has `Active` and `Selectable` set to `false`, and no events are wired.
+* With `onClick`, the root `ImageLabel` keeps the background, corners, border, and gradient, and its content moves into a transparent, content-sized `ImageButton` child named `"BadgeButton"`. The root sizes to that button, so the whole pill is clickable.
+* Hover and press colors never use the theme's button hover colors. They come only from `hoverStyle`/`pressStyle` and the badge's own `hoverDarken`/`pressDarken` shading. Intent colors always resolve from the intent's `default` state.
+* Gamepad selection shows the hover state, but a gamepad button press does not show the pressed visual. Only a held mouse button or touch does. Activating with a gamepad still calls `onClick`.
+* There is no disabled state.
+* Removing `onClick` clears the hover and press state, so adding it back doesn't show a stale state.
 * Content is laid out left to right and vertically centered, without wrapping: the optional icon first, then the text. Text wrapping is disabled.
-* An inner border stroke only renders when the theme's `borderThickness` is greater than `0`.
+* The border stroke only renders when the resolved `borderThickness` (prop, then theme) is greater than `0`.
+* `backgroundImage` and `backgroundGradient` always come from the theme intent; there are no instance props for them.
 * When the resolved intent has no `backgroundImage`, the image is cleared (`Image=""`), so a flat badge never shows a stale image.
-* The ref forwards to the root `ImageLabel`.
+* The ref forwards to the root `ImageLabel`, whether or not the badge is clickable.
 
 ## Theme values
 
@@ -257,5 +394,6 @@ The badge uses values from `theme.components.badge` for:
 * `spacing` / `padding` (optional) — internal padding, resolved per badge `scale` (not `theme.default.spacing`). The default theme uses per-scale padding from `"1px 4px"` (`xs`) to `"6px 14px"` (`xl`)
 * `typography` (optional) — a plain partial typography style or a per-scale one, merged over the theme typography for the badge's scale. The default theme uses bold text from `Size10` (`xs`) to `Size24` (`xl`), with no font so each theme keeps its own
 * `intents` (optional) — per-intent `textColor`, `backgroundColor`, `borderColor`, `backgroundTransparency`, `backgroundImage`, and `backgroundGradient`, layered on top of `theme.colors.intents`
+* `hoverDarken` / `pressDarken` (optional) — how much a clickable badge's resting background is shaded while hovered or pressed, when `hoverStyle`/`pressStyle` set no `backgroundColor`. Positive values lerp toward black, negative values lerp toward white by their absolute value. `pressDarken` falls back to `hoverDarken`; unset or `0` means no shading. Default and Sandstone use `0.08` / `0.16`, Dark uses `-0.1` / `-0.2` (lightening its dark backgrounds), and Wooden inherits Default's values
 
 These values can be changed by providing a custom Clean UI theme.

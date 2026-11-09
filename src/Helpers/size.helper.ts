@@ -1,7 +1,8 @@
 import { Binding } from "@rbxts/react";
-import { CssBreakpointSize, CssSize, ResponsiveCssSize } from "../Interfaces/css.types";
+import { CssBreakpointSize, CssRadius, CssSize, ResponsiveCssSize } from "../Interfaces/css.types";
 import { Breakpoint, ResponsiveValue, BreakpointValue } from "../Interfaces/responsive.types";
 import { SizeElementProps, PositionElementProps } from "../Interfaces/element.props";
+import { ThemeTemplate } from "../Theme";
 
 const breakpointOrder: Breakpoint[] = [
     "xs",
@@ -98,6 +99,21 @@ export class SizeHelper {
         return defaultValue !== undefined ? defaultValue : Enum.AutomaticSize.Y
     }
 
+    public static GetSizeConstraint(props: SizeElementProps): { MinSize: Vector2; MaxSize: Vector2 } | undefined {
+        if (props.minWidth === undefined && props.maxWidth === undefined && props.minHeight === undefined && props.maxHeight === undefined)
+            return undefined
+
+        const minWidth = math.max(props.minWidth !== undefined ? this.toUDim(props.minWidth).Offset : 0, 0);
+        const minHeight = math.max(props.minHeight !== undefined ? this.toUDim(props.minHeight).Offset : 0, 0);
+        const maxWidth = props.maxWidth !== undefined ? math.max(this.toUDim(props.maxWidth).Offset, minWidth) : math.huge;
+        const maxHeight = props.maxHeight !== undefined ? math.max(this.toUDim(props.maxHeight).Offset, minHeight) : math.huge;
+
+        return {
+            MinSize: new Vector2(minWidth, minHeight),
+            MaxSize: new Vector2(maxWidth, maxHeight),
+        };
+    }
+
     public static toUDim(size?: CssSize): UDim {
         if (size === undefined) {
             return new UDim(0, 0);
@@ -121,6 +137,20 @@ export class SizeHelper {
 
         const value = this.parseNumber(text, size);
         return new UDim(0, value);
+    }
+
+    public static resolveRadius(theme: ThemeTemplate, radius: CssRadius): CssSize;
+    public static resolveRadius(theme: ThemeTemplate, radius?: CssRadius): CssSize | undefined;
+    public static resolveRadius(theme: ThemeTemplate, radius?: CssRadius): CssSize | undefined {
+        if (radius === "sm" || radius === "md" || radius === "lg") {
+            return theme.radius[radius];
+        }
+
+        return radius;
+    }
+
+    public static toRadius(theme: ThemeTemplate, radius?: CssRadius): UDim {
+        return this.toUDim(this.resolveRadius(theme, radius));
     }
 
     private static parseNumber(text: string, originalValue: string): number {

@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { IntentElementProps, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
-export interface IncrementProps extends ScalableElementProps, SpacedElementProps, IntentElementProps, React.InstanceProps<ImageLabel> {
+import { IntentElementProps, ScalableElementProps, SizeElementProps, SpacedElementProps } from "../../Interfaces";
+export interface IncrementProps extends ScalableElementProps, SpacedElementProps, IntentElementProps, Pick<SizeElementProps, "width">, React.InstanceProps<ImageLabel> {
     value: number;
     onChange?: (value: number) => void;
     step?: number;

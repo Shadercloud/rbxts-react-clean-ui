@@ -144,7 +144,7 @@ export function BarChart(props: BarChartProps) {
         const value = dataset.values[index] ?? 0;
         return `${dataset.labels?.[index] ?? props.data.labels[index]}: ${value}`;
     }).join("\n");
-    const barCornerRadius = SizeHelper.toUDim(barTheme.cornerRadius);
+    const barCornerRadius = SizeHelper.toRadius(theme, barTheme.cornerRadius);
     const [animationProgress, animationTween] = useTween(barTheme.tweenTime > 0 ? 0 : 1, {
         duration: barTheme.tweenTime,
         easing: "quadOut",

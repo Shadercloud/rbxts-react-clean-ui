@@ -16,12 +16,13 @@ local FlexItem = React.forwardRef(function(props, ref)
 		FlexMode = props.mode or "Grow",
 		GrowRatio = props.GrowRatio,
 		ShrinkRatio = props.ShrinkRatio,
-	}), React.createElement("uilistlayout", {
+		ItemLineAlignment = props.ItemLineAlignment,
+	}), props.layout ~= false and (React.createElement("uilistlayout", {
 		key = "FlexItemLayout",
 		HorizontalFlex = props.HorizontalFlex,
-		FillDirection = Enum.FillDirection.Horizontal,
+		FillDirection = if props.direction == "vertical" then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal,
 		HorizontalAlignment = props.align,
-	}), props.children)
+	})), props.children)
 end)
 return {
 	FlexItem = FlexItem,

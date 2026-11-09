@@ -1,6 +1,6 @@
 import { Binding } from "@rbxts/react";
 import { IconName } from "./icon";
-import { CssSize, CssShadow, CssPadding, ResponsiveCssSize } from "./css.types";
+import { CssSize, CssShadow, CssPadding, CssPixelSize, ResponsiveCssSize } from "./css.types";
 import { ScaleSize, BreakpointValue } from "./responsive.types";
 import { Intent } from "./semantics";
 
@@ -18,6 +18,10 @@ export interface SizeElementProps {
     width?: ResponsiveCssSize;
     height?: CssSize;
     AutomaticSize?: Enum.AutomaticSize | Binding<Enum.AutomaticSize> | "None" | "X" | "Y" | "XY" | undefined;
+    minWidth?: CssPixelSize;
+    maxWidth?: CssPixelSize;
+    minHeight?: CssPixelSize;
+    maxHeight?: CssPixelSize;
 
 }
 
@@ -51,6 +55,13 @@ export interface ShadowElementProps {
     "box-shadow"?: CssShadow;
     "box-shadow-color"?: Color3;
     "box-shadow-transparency"?: number;
+}
+
+export interface BorderElementProps {
+    borderThickness?: number;
+    borderColor?: Color3;
+    borderTransparency?: number;
+    borderPosition?: "inner" | "outer";
 }
 
 export interface IconElementProps {

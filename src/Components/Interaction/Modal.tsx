@@ -1,10 +1,9 @@
 import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
-import { GuiService } from "@rbxts/services";
 import { useTween } from "@rbxts/react-ripple";
 import { CleanThemeContext, OverlayConsumer } from "../../Contexts";
 import { ModalCloseContext, useModalStack } from "../../Contexts/modal.context";
-import { SizeHelper } from "../../Helpers";
+import { GamepadSelectionMode, SizeHelper, useGamepadSelection } from "../../Helpers";
 import { IntentElementProps } from "../../Interfaces";
 import { Draggable } from "../Layout";
 import { BoxProps, Card } from "../Surface";
@@ -17,6 +16,7 @@ export interface ModalProps extends BoxProps, IntentElementProps {
     closeOnEscape?: boolean;
     draggable?: boolean;
     initialFocus?: React.RefObject<GuiObject>;
+    selectionMode?: GamepadSelectionMode;
     children?: React.ReactNode;
 }
 
@@ -25,12 +25,6 @@ let nextModalId = 0;
 function generateModalId() {
     nextModalId++;
     return `modal-${nextModalId}`;
-}
-
-function trySetSelectedObject(target: GuiObject | undefined) {
-    pcall(() => {
-        GuiService.SelectedObject = target;
-    });
 }
 
 function getPanelContentSize(automaticSize: Enum.AutomaticSize | "None" | "X" | "Y" | "XY"): UDim2 {
@@ -63,7 +57,7 @@ export function Modal(props: ModalProps) {
     const dismissingRef = React.useRef(false);
     const fadeThreadRef = React.useRef<thread>();
     const panelRef = React.useRef<ImageLabel>();
-    const previousSelectionRef = React.useRef<GuiObject | undefined>();
+    const backdropRef = React.useRef<ImageButton>();
 
     const onOpenChangeRef = React.useRef(props.onOpenChange);
 
@@ -173,18 +167,13 @@ export function Modal(props: ModalProps) {
         };
     }, [shouldRender]);
 
-    React.useEffect(() => {
-        if (!shouldRender) {
-            return;
-        }
-
-        previousSelectionRef.current = GuiService.SelectedObject;
-        trySetSelectedObject(props.initialFocus?.current ?? panelRef.current);
-
-        return () => {
-            trySetSelectedObject(previousSelectionRef.current);
-        };
-    }, [shouldRender]);
+    useGamepadSelection(() => props.initialFocus?.current ?? panelRef.current, {
+        enabled: shouldRender,
+        scope: backdropRef,
+        mode: props.selectionMode ?? "gamepad",
+        restoreOnRelease: true,
+        canTakeSelection: () => stack.isTopmost?.(id) ?? true,
+    });
 
     if (!shouldRender) {
         return undefined;
@@ -213,6 +202,7 @@ export function Modal(props: ModalProps) {
                 };
                 const panelSize = SizeHelper.GetSize(panelSizingProps);
                 const panelAutomaticSize = SizeHelper.GetAutoSize(panelSizingProps);
+                const panelSizeConstraint = SizeHelper.GetSizeConstraint(props);
                 const panelContentSize = typeIs(panelAutomaticSize, "table") && "map" in panelAutomaticSize
                     ? panelAutomaticSize.map(getPanelContentSize)
                     : getPanelContentSize(panelAutomaticSize);
@@ -231,6 +221,13 @@ export function Modal(props: ModalProps) {
                         Size={panelSize}
                         Event={{ Activated: () => { } }}
                     >
+                        {panelSizeConstraint !== undefined && (
+                            <uisizeconstraint
+                                key="SizeConstraint"
+                                MinSize={panelSizeConstraint.MinSize}
+                                MaxSize={panelSizeConstraint.MaxSize}
+                            />
+                        )}
                         <Card
                             {...props}
                             name={props.name ?? "Modal"}
@@ -249,6 +246,7 @@ export function Modal(props: ModalProps) {
                 return ReactRoblox.createPortal(
                     <imagebutton
                         key="ModalBackdrop"
+                        ref={backdropRef}
                         Size={UDim2.fromScale(1, 1)}
                         AutoButtonColor={false}
                         Active={true}

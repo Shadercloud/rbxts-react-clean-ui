@@ -43,3 +43,6 @@ export declare function assertStackedHorizontally(children: GuiObject[], label: 
 export declare function assertAlignedLeft(child: GuiObject, parent: GuiObject, tolerance?: number, label?: string): void;
 export declare function assertAlignedRight(child: GuiObject, parent: GuiObject, tolerance?: number, label?: string): void;
 export declare function assertAlignedTop(child: GuiObject, parent: GuiObject, tolerance?: number, label?: string): void;
+export declare function sizeConstraintsOf(instance: Instance): UISizeConstraint[];
+export declare function soleSizeConstraint(instance: Instance): UISizeConstraint;
+export declare function waitForWidth(gui: GuiObject, width: number, tolerance?: number): void;

@@ -7,6 +7,7 @@ local CleanThemeContext = _Contexts.CleanThemeContext
 local OverlayContext = _Contexts.OverlayContext
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
+local CssHelper = _Helpers.CssHelper
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
@@ -24,6 +25,11 @@ local VStack = _Layout.VStack
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
 local Input = TS.import(script, script.Parent, "Input").Input
+local _Input_field = TS.import(script, script.Parent, "Input.field")
+local FieldBoxShadow = _Input_field.FieldBoxShadow
+local FieldInnerShadow = _Input_field.FieldInnerShadow
+local resolveFieldState = _Input_field.resolveFieldState
+local resolveFieldStateStyle = _Input_field.resolveFieldStateStyle
 local SelectContext = React.createContext(nil)
 local function SelectOption(props)
 	local theme = React.useContext(CleanThemeContext)
@@ -230,6 +236,66 @@ local function SelectGroupHeader(props)
 		typography = typography,
 	}))
 end
+local function SelectCaretCap(props)
+	local theme = React.useContext(CleanThemeContext)
+	local caret = props.caret
+	local _result
+	if caret.size ~= nil then
+		_result = SizeHelper:toUDim(caret.size).Offset
+	else
+		local _condition = theme.iconSize[theme.default.scale]
+		if _condition == nil then
+			_condition = 0
+		end
+		_result = _condition
+	end
+	local size = _result
+	local margin = if caret.margin ~= nil then CssHelper:parseCssQuad(caret.margin) else SpacingHelper:ResolveNumberPadding(0)
+	local _condition = caret.borderThickness
+	if _condition == nil then
+		_condition = 0
+	end
+	local borderThickness = _condition
+	local filled = caret.backgroundColor ~= nil or caret.backgroundGradient ~= nil
+	local _exp = React.createElement("uiflexitem", {
+		key = "SelectCaretCapFlex",
+		ItemLineAlignment = Enum.ItemLineAlignment.Center,
+	})
+	local _attributes = {
+		key = "Cap",
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, margin.left, 0.5, (margin.top - margin.bottom) / 2),
+		Size = UDim2.fromOffset(size, size),
+		BackgroundColor3 = caret.backgroundColor or Color3.new(1, 1, 1),
+	}
+	local _condition_1 = caret.backgroundTransparency
+	if _condition_1 == nil then
+		_condition_1 = (if filled then 0 else 1)
+	end
+	_attributes.BackgroundTransparency = _condition_1
+	_attributes.BorderSizePixel = 0
+	return React.createElement("frame", {
+		key = "SelectCaretCap",
+		Size = UDim2.fromOffset(math.max(0, size + margin.left + margin.right), math.max(0, size + margin.top + margin.bottom - props.inset)),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, _exp, React.createElement("frame", _attributes, borderThickness > 0 and (React.createElement("uistroke", {
+		key = "Stroke",
+		Thickness = borderThickness,
+		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
+		Color = caret.borderColor,
+	})), React.createElement(Corners, {
+		radius = caret.cornerRadius,
+	}), React.createElement(Gradient, {
+		value = caret.backgroundGradient,
+	}), React.createElement(Icon, {
+		name = "SelectCaret",
+		icon = "caret-down",
+		color = props.color,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+	})))
+end
 local Select = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local overlay = React.useContext(OverlayContext)
@@ -244,6 +310,23 @@ local Select = React.forwardRef(function(props, ref)
 	local dropdownPosition, setDropdownPosition = React.useState(UDim2.fromOffset(0, 0))
 	local contentHeight, setContentHeight = React.useState(0)
 	local query, setQuery = React.useState("")
+	local hovered, setHovered = React.useState(false)
+	local selectTheme = theme.components.select
+	local stateStyle = resolveFieldStateStyle(selectTheme.states, resolveFieldState(props.disabled, open, hovered))
+	local _condition_1 = stateStyle.borderThickness
+	if _condition_1 == nil then
+		_condition_1 = selectTheme.borderThickness
+	end
+	local borderThickness = _condition_1
+	local _result = selectTheme.dropDown
+	if _result ~= nil then
+		_result = _result.gap
+	end
+	local _condition_2 = _result
+	if _condition_2 == nil then
+		_condition_2 = 0
+	end
+	local dropDownGap = _condition_2
 	local buttonRef = React.useRef()
 	local context = React.useMemo(function()
 		return {
@@ -253,9 +336,9 @@ local Select = React.forwardRef(function(props, ref)
 			dropdownPosition = dropdownPosition,
 			buttonRef = buttonRef,
 			setSelected = function(index, value)
-				local _result = props.onChange
-				if _result ~= nil then
-					_result(index, value)
+				local _result_1 = props.onChange
+				if _result_1 ~= nil then
+					_result_1(index, value)
 				end
 				setSelected(index)
 			end,
@@ -280,19 +363,19 @@ local Select = React.forwardRef(function(props, ref)
 	end, { props.children })
 	local sections = _binding.sections
 	local flatOptions = _binding.flatOptions
-	local _result = flatOptions[selected + 1]
-	if _result ~= nil then
-		_result = _result.element
+	local _result_1 = flatOptions[selected + 1]
+	if _result_1 ~= nil then
+		_result_1 = _result_1.element
 	end
-	local _condition_1 = _result
-	if _condition_1 == nil then
-		local _result_1 = flatOptions[1]
-		if _result_1 ~= nil then
-			_result_1 = _result_1.element
+	local _condition_3 = _result_1
+	if _condition_3 == nil then
+		local _result_2 = flatOptions[1]
+		if _result_2 ~= nil then
+			_result_2 = _result_2.element
 		end
-		_condition_1 = _result_1
+		_condition_3 = _result_2
 	end
-	local selectedOption = _condition_1
+	local selectedOption = _condition_3
 	React.useEffect(function()
 		if not open then
 			setQuery("")
@@ -321,7 +404,7 @@ local Select = React.forwardRef(function(props, ref)
 			if #section.group.options == 0 then
 				return nil
 			end
-			local _result_1
+			local _result_2
 			if props.searchable then
 				local _exp = section.group.options
 				-- ▼ ReadonlyArray.filter ▼
@@ -337,11 +420,11 @@ local Select = React.forwardRef(function(props, ref)
 					end
 				end
 				-- ▲ ReadonlyArray.filter ▲
-				_result_1 = _newValue_1
+				_result_2 = _newValue_1
 			else
-				_result_1 = section.group.options
+				_result_2 = section.group.options
 			end
-			local visibleOptions = _result_1
+			local visibleOptions = _result_2
 			if props.searchable and query ~= "" and #visibleOptions == 0 then
 				return nil
 			end
@@ -365,28 +448,28 @@ local Select = React.forwardRef(function(props, ref)
 		-- ▲ ReadonlyArray.map ▲
 		return _newValue
 	end
-	local _condition_2 = not props.searchable or query == ""
-	if not _condition_2 then
+	local _condition_4 = not props.searchable or query == ""
+	if not _condition_4 then
 		-- ▼ ReadonlyArray.some ▼
-		local _result_1 = false
+		local _result_2 = false
 		local _callback = function(option)
 			return optionMatchesQuery(option, normalizedQuery)
 		end
 		for _k, _v in flatOptions do
 			if _callback(_v, _k - 1, flatOptions) then
-				_result_1 = true
+				_result_2 = true
 				break
 			end
 		end
 		-- ▲ ReadonlyArray.some ▲
-		_condition_2 = _result_1
+		_condition_4 = _result_2
 	end
-	local hasVisibleOptions = _condition_2
+	local hasVisibleOptions = _condition_4
 	local dropdownHeight = math.min(contentHeight, if props["max-height"] ~= nil then SizeHelper:toUDim(props["max-height"]).Offset else theme.components.select.maxDropDownHeight)
 	local activateSelect = React.useCallback(function()
 		local button = buttonRef.current
 		local overlayInstance = overlay.overlay
-		if not button or not overlayInstance then
+		if not button or not overlayInstance or props.disabled then
 			return nil
 		end
 		if open then
@@ -399,7 +482,12 @@ local Select = React.forwardRef(function(props, ref)
 		setDropdownPosition(UDim2.fromOffset(localPosition.X, localPosition.Y))
 		setDropdownSize(UDim2.fromOffset(button.AbsoluteSize.X, button.AbsoluteSize.Y))
 		setOpen(true)
-	end, { open, overlay.overlay })
+	end, { open, overlay.overlay, props.disabled })
+	React.useEffect(function()
+		if props.disabled then
+			setOpen(false)
+		end
+	end, { props.disabled })
 	local _exp = function()
 		local _labelActivated = fieldset
 		if _labelActivated ~= nil then
@@ -414,77 +502,105 @@ local Select = React.forwardRef(function(props, ref)
 			return connection:Disconnect()
 		end
 	end
-	local _result_1 = fieldset
-	if _result_1 ~= nil then
-		_result_1 = _result_1.labelActivated
+	local _result_2 = fieldset
+	if _result_2 ~= nil then
+		_result_2 = _result_2.labelActivated
 	end
-	React.useEffect(_exp, { _result_1, activateSelect })
-	local _condition_3 = theme.components.select.backgroundTransparency
-	if _condition_3 == nil then
-		_condition_3 = 1
+	React.useEffect(_exp, { _result_2, activateSelect })
+	local _condition_5 = stateStyle.backgroundTransparency
+	if _condition_5 == nil then
+		_condition_5 = selectTheme.backgroundTransparency
+		if _condition_5 == nil then
+			_condition_5 = 1
+		end
 	end
-	local themeBackgroundTransparency = _condition_3
+	local themeBackgroundTransparency = _condition_5
+	local _result_3 = selectTheme.caret
+	if _result_3 ~= nil then
+		_result_3 = _result_3.iconColor
+	end
+	local _condition_6 = _result_3
+	if _condition_6 == nil then
+		_condition_6 = selectTheme.iconColor or theme.colors.intents.primary.default.textColor
+	end
+	local caretColor = _condition_6
+	local fieldPadding = SpacingHelper:GetResolvedPadding(theme, props)
+	local capInset = fieldPadding.top + fieldPadding.bottom - 2 * selectTheme.borderThickness
 	if open and overlay.overlay == nil then
 		warn("You have used a Select component without using the Overlay Provider")
 	end
 	local _attributes = {}
-	local _condition_4 = props.name
-	if _condition_4 == nil then
-		_condition_4 = "Select"
+	local _condition_7 = props.name
+	if _condition_7 == nil then
+		_condition_7 = "Select"
 	end
-	_attributes.name = _condition_4
+	_attributes.name = _condition_7
 	_attributes.ref = ref
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
-	_attributes.Size = UDim2.fromScale(1, 0)
+	_attributes.Size = if props.width ~= nil then nil else UDim2.fromScale(1, 0)
 	_attributes.AutomaticSize = Enum.AutomaticSize.Y
-	_attributes.BackgroundColor3 = props.BackgroundColor3 or theme.components.select.backgroundColor
-	local _condition_5 = props.BackgroundTransparency
-	if _condition_5 == nil then
-		_condition_5 = themeBackgroundTransparency
+	_attributes.BackgroundColor3 = props.BackgroundColor3 or stateStyle.backgroundColor or selectTheme.backgroundColor
+	local _condition_8 = props.BackgroundTransparency
+	if _condition_8 == nil then
+		_condition_8 = themeBackgroundTransparency
 	end
-	_attributes.BackgroundTransparency = _condition_5
+	_attributes.BackgroundTransparency = _condition_8
 	_attributes.backgroundImage = props.backgroundImage or theme.components.select.backgroundImage
 	local _exp_1 = themeBackgroundTransparency < 1 and React.createElement(Corners, {
 		radius = theme.components.select.cornerRadius,
 	})
 	local _exp_2 = React.createElement(Gradient, {
-		value = props.backgroundGradient or theme.components.select.backgroundGradient,
+		value = props.backgroundGradient or stateStyle.backgroundGradient or selectTheme.backgroundGradient,
 	})
-	local _exp_3 = React.createElement("uistroke", {
+	local _exp_3 = React.createElement(FieldBoxShadow, {
+		value = selectTheme.boxShadow,
+	})
+	local _exp_4 = selectTheme.innerShadow ~= nil and (React.createElement(FieldInnerShadow, {
+		value = selectTheme.innerShadow,
+		cornerRadius = selectTheme.cornerRadius,
+		inset = borderThickness,
+	}))
+	local _exp_5 = React.createElement("uistroke", {
 		key = "Stroke",
-		Thickness = theme.components.select.borderThickness,
+		Thickness = borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
-		Color = theme.components.select.borderColor,
+		Color = stateStyle.borderColor or selectTheme.borderColor,
 	})
-	local _exp_4 = React.createElement(Corners, {
+	local _exp_6 = React.createElement(Corners, {
 		radius = theme.components.select.cornerRadius,
 	})
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
-	local _exp_5 = React.createElement(Padding, _attributes_1)
+	local _exp_7 = React.createElement(Padding, _attributes_1)
 	local _attributes_2 = {
 		name = "SelectedText",
 	}
-	local _result_2 = selectedOption
-	if _result_2 ~= nil then
-		_result_2 = _result_2.props.text
+	local _result_4 = selectedOption
+	if _result_4 ~= nil then
+		_result_4 = _result_4.props.text
 	end
-	local _condition_6 = _result_2
-	if _condition_6 == nil then
-		_condition_6 = "No Options"
+	local _condition_9 = _result_4
+	if _condition_9 == nil then
+		_condition_9 = "No Options"
 	end
-	_attributes_2.text = _condition_6
+	_attributes_2.text = _condition_9
 	_attributes_2.typography = typography
 	_attributes_2.TextColor3 = theme.components.select.textColor
-	local _exp_6 = React.createElement(HStack, nil, React.createElement(FlexItem, nil, React.createElement(Text, _attributes_2)), React.createElement(Icon, {
+	local _exp_8 = React.createElement(HStack, nil, React.createElement(FlexItem, {
+		ItemLineAlignment = Enum.ItemLineAlignment.Center,
+	}, React.createElement(Text, _attributes_2)), if selectTheme.caret == nil then React.createElement(Icon, {
 		name = "SelectCaret",
 		icon = "caret-down",
-		color = theme.components.select.iconColor or theme.colors.intents.primary.default.textColor,
+		color = caretColor,
+	}) else React.createElement(SelectCaretCap, {
+		caret = selectTheme.caret,
+		color = caretColor,
+		inset = capInset,
 	}))
-	local _condition_7 = open and overlay.overlay ~= nil
-	if _condition_7 then
+	local _condition_10 = open and overlay.overlay ~= nil
+	if _condition_10 then
 		local _attributes_3 = {
 			key = "SelectDropdown",
 			BackgroundTransparency = 0,
@@ -492,19 +608,52 @@ local Select = React.forwardRef(function(props, ref)
 			BackgroundColor3 = theme.components.select.dropDownBackgroundColor,
 			AnchorPoint = Vector2.zero,
 		}
-		local _uDim2 = UDim2.new(0, 0, 0, dropdownSize.Y.Offset)
+		local _uDim2 = UDim2.new(0, 0, 0, dropdownSize.Y.Offset + dropDownGap)
 		_attributes_3.Position = dropdownPosition + _uDim2
 		_attributes_3.Size = UDim2.fromOffset(dropdownSize.X.Offset, 0)
 		_attributes_3.AutomaticSize = Enum.AutomaticSize.Y
 		_attributes_3.ClipsDescendants = true
-		_condition_7 = ReactRoblox.createPortal(React.createElement("frame", _attributes_3, React.createElement("uistroke", {
+		local _attributes_4 = {
 			key = "Stroke",
-			Thickness = theme.components.select.borderThickness,
-			BorderStrokePosition = Enum.BorderStrokePosition.Outer,
-			Color = theme.components.select.borderColor,
-		}), React.createElement(Corners, {
-			radius = theme.components.select.cornerRadius,
-		}), React.createElement(VStack, {
+		}
+		local _result_5 = selectTheme.dropDown
+		if _result_5 ~= nil then
+			_result_5 = _result_5.borderThickness
+		end
+		local _condition_11 = _result_5
+		if _condition_11 == nil then
+			_condition_11 = selectTheme.borderThickness
+		end
+		_attributes_4.Thickness = _condition_11
+		_attributes_4.BorderStrokePosition = Enum.BorderStrokePosition.Outer
+		local _result_6 = selectTheme.dropDown
+		if _result_6 ~= nil then
+			_result_6 = _result_6.borderColor
+		end
+		local _condition_12 = _result_6
+		if _condition_12 == nil then
+			_condition_12 = selectTheme.borderColor
+		end
+		_attributes_4.Color = _condition_12
+		local _exp_9 = React.createElement("uistroke", _attributes_4)
+		local _attributes_5 = {}
+		local _result_7 = selectTheme.dropDown
+		if _result_7 ~= nil then
+			_result_7 = _result_7.cornerRadius
+		end
+		local _condition_13 = _result_7
+		if _condition_13 == nil then
+			_condition_13 = selectTheme.cornerRadius
+		end
+		_attributes_5.radius = _condition_13
+		local _exp_10 = React.createElement(Corners, _attributes_5)
+		local _attributes_6 = {}
+		local _result_8 = selectTheme.dropDown
+		if _result_8 ~= nil then
+			_result_8 = _result_8.boxShadow
+		end
+		_attributes_6.value = _result_8
+		_condition_10 = ReactRoblox.createPortal(React.createElement("frame", _attributes_3, _exp_9, _exp_10, React.createElement(FieldBoxShadow, _attributes_6), React.createElement(VStack, {
 			spacing = "None",
 		}, props.searchable and (React.createElement(SelectSearchInput, {
 			value = query,
@@ -527,7 +676,7 @@ local Select = React.forwardRef(function(props, ref)
 			typography = typography,
 		}))))), overlay.overlay)
 	end
-	return React.createElement(Container, _attributes, _exp_1, _exp_2, React.createElement(SelectContext.Provider, {
+	return React.createElement(Container, _attributes, _exp_1, _exp_2, _exp_3, _exp_4, React.createElement(SelectContext.Provider, {
 		value = context,
 	}, React.createElement("imagebutton", {
 		key = "SelectButton",
@@ -536,10 +685,17 @@ local Select = React.forwardRef(function(props, ref)
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
+		ZIndex = if selectTheme.innerShadow ~= nil then 2 else nil,
 		Event = {
 			Activated = activateSelect,
+			MouseEnter = function()
+				return setHovered(true)
+			end,
+			MouseLeave = function()
+				return setHovered(false)
+			end,
 		},
-	}, _exp_3, _exp_4, _exp_5, _exp_6, _condition_7)))
+	}, _exp_5, _exp_6, _exp_7, _exp_8, _condition_10)))
 end)
 Select.Option = SelectOption
 Select.OptGroup = SelectOptGroup

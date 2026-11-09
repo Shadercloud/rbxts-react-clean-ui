@@ -21,6 +21,16 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 - `ElementHelper.cloneWithEvents(element, props, events)` clones an element and adds event handlers. The original handler runs first, then the new one. Use it instead of `React.cloneElement(child, { Event: {...} })` whenever the child may be a native element. `@rbxts/react` only turns `Event={{...}}` into `React.Event.*` keys inside its own `createElement`. `cloneElement` skips that step, so a raw `Event` table on a host element is assigned as `instance.Event` and throws, unmounting the root. The same applies to reading a native child's existing handler: it lives under `props[React.Event.Name]`, and `props.Event` is always `undefined`. Component children still get a merged `Event` table, because that is what they receive and forward.
 - `React.Event` isn't in `@rbxts/react`'s typings, so `getEventKey` reaches it through a cast. The keys are cached per event name by react-lua, so they compare equal to the ones `createElement` produced.
 
+## src/Helpers/gamepad.helper.ts
+
+- `GamepadHelper` and `useGamepadSelection` are specified with `GamepadSelectionGuard` in [interaction/gamepadselectionguard.md](../specifications/components/interaction/gamepadselectionguard.md). `Modal` uses the hook, so changes affect both.
+- It reads `UserInputService` directly, not `CustomInputService`: ui-labs' `Environment.InputListener` has no `GetLastInputType`/`LastInputTypeChanged`. In a ui-labs preview the last input type is whatever Studio reports, and assignments to `SelectedObject` fail silently (see `trySetSelectedObject`).
+- `trySetSelectedObject` wraps the assignment in `pcall`, because it throws when the target isn't under a `PlayerGui`.
+- `targetRef`/`optionsRef` are synced by an effect with no dependency array declared before the main effect, so the main effect (keyed on `enabled` only) always sees the latest target, scope and callbacks without reconnecting. `clearOnSelectionChange` is the exception: it decides whether a connection exists, so it is read once when the hook becomes enabled.
+- If the target doesn't resolve on enable, the hook polls on `RunService.Heartbeat` (`pendingSelect`) until it does, instead of adding the target to the effect's dependencies: the target is usually a ref or a closure, so a dependency wouldn't change when the instance appears.
+- The main effect remembers the last non-nil `scope.current` (`lastScope`). React detaches refs before passive cleanups run on unmount, so reading `scope.current` at cleanup alone would see `undefined`. A `scope` option that is set but unresolved counts as "nothing inside", never as "whole place".
+- `typeIs(target, "function")` tells a getter from a ref. React refs are plain tables in Luau.
+
 ## src/Helpers/gui.helper.ts
 
 - `getGuiRoot` returns the parent of the element's outermost `LayerCollector` (PlayerGui, CoreGui, PluginGuiService, StarterGui, ...). It used to return PlayerGui whenever the game was running and otherwise require a PluginGuiService ancestor, throwing `"No root"` for anything under CoreGui (where the Studio tests mount).
@@ -32,6 +42,10 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 ## src/Helpers/size.helper.ts
 
 - `"Auto"` for `width`/`height`: `GetAutoSize` treats it as unset when it picks the AutomaticSize axes, while `GetSize` resolves it to `0` on that axis. Together, that gives a zero base size that grows with content.
+
+- `resolveRadius(theme, radius)` maps a radius token (`"sm"`/`"md"`/`"lg"`) to `theme.radius[token]` and returns any other value unchanged, so a call site keeps its own size parser (`toUDim` or `CssHelper.parseCssSize`, which differ on whitespace and invalid input) and existing pixel/percent values resolve exactly as before. `toRadius(theme, radius)` is `toUDim(resolveRadius(...))`. Every call site that turns a theme or prop radius into a `UDim` must go through one of them (or through `Corners`), or tokens fail: `toUDim("md")` asserts. `theme.radius.default` is not a token and isn't read anywhere.
+- `size.helper.ts` imports `ThemeTemplate` from `../Theme` for types only. The import is elided in the compiled Luau, so there is no runtime require cycle with the theme files.
+- `GetSizeConstraint(props)` returns `undefined` when none of `minWidth`/`maxWidth`/`minHeight`/`maxHeight` is set, so call sites render no `UISizeConstraint` at all and the instance tree is unchanged for existing code. Otherwise an unset minimum maps to `0` and an unset maximum to `math.huge` (the engine defaults). Values go through `toUDim(...).Offset`, so `"25px"`/`"25"`/numbers all work. Negative minimums clamp to `0`, and each maximum is raised to at least its minimum, because a `MaxSize` below `MinSize` is not a valid pair for `UISizeConstraint`. The engine applies `MinSize` to auto-sized instances but `MaxSize` doesn't stop `AutomaticSize` growth from child instances, so maximums only take effect on explicit or `%` axes (and on a `TextLabel`'s own wrapped text).
 
 ## src/Helpers/spacing.helper.ts
 
@@ -46,11 +60,23 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 
 ## src/Interfaces/css.types.ts
 
+- `CssRadius` (`CssSize | CssRadiusToken`) is likewise kept separate from `CssSize` and used only for radius values, so a token can't leak into a width/position/padding value, where nothing resolves it.
 - `CssCalcSize` is kept separate from `CssSize` on purpose. Folding the calc template literals into `CssSize` multiplies through `CssDual`/`CssQuad` and hits TypeScript's "union type that is too complex to represent" error at call sites that spread props with several quad fields (e.g. `<BoxShadow {...props} />` in `Button`). Use `CssCalcSize` only where a calc term is needed (currently `CssPosition.width`).
+- `CssPixelSize` (`number | "<n>" | "<n>px"`) is the pixel-only subset of `CssSize`, used by the `SizeElementProps` min/max props. `UISizeConstraint` only takes pixel `Vector2`s, so `%` and `"Auto"` are excluded at the type level instead of being silently dropped at runtime.
+
+## src/Interfaces/element.props.ts
+
+- `BorderElementProps` (`borderThickness`, `borderColor`, `borderTransparency`, `borderPosition`) is shared by `Container` and `HoverButton`. Values are plain, not `Binding`s, because `borderThickness > 0` decides whether a `UIStroke` is rendered at all. The theme-driven borders elsewhere (`Box`'s `border-thickness`/`border-color`, `IntentScheme.borderThickness`) are unrelated and unchanged.
+- `SizeElementProps.minWidth`/`maxWidth`/`minHeight`/`maxHeight` are separate props rendered as one `UISizeConstraint`, rather than a CSS `clamp(min, val, max)` form of `CssSize`. A clamp form was rejected because the engine constraint is a separate instance from `Size` and pixel-only: a clamp string would still need a pixel-only outer pair while the middle term carries `%`, would need a new parser, and couldn't sit on `Size` bindings or responsive `width`. Plain values, not `Binding`s: whether a `UISizeConstraint` exists at all depends on them being set.
+- Each consumer draws the constraint on every instance whose `Size` comes from the component's size props (`Container`'s inner `ImageLabel`, `FadeGroup`, `Scroller`, `Slider`, plus `Card`'s overlay wrapper, `ProgressBar`'s labelled outer frame and `Modal`'s input-shield panel, alongside the inner box that also gets it). It is never drawn on a full-parent centring wrapper whose `Size` is `fromScale(1, 1)`. A consumer that also passes its own `<uisizeconstraint>` child alongside these props gets two; Roblox honours only one.
 
 ## src/Contexts/breakpoint.context.ts
 
 - `BreakpointContext`, `useBreakpoint` and `useBreakpointValue` are specified with their provider in [layout/breakpointprovider.md](../specifications/components/layout/breakpointprovider.md), including the implementation notes on hook ordering and the camera/viewport fallback.
+
+## src/Contexts/modal.context.ts
+
+- `ModalStackContextValue.isTopmost` is optional so hand-built context values (tests, custom providers) still type-check; callers optional-chain it and treat a missing one as "topmost". `ModalProvider` implements it from `stackRef`, so it reflects the latest committed stack without changing the context value's identity.
 
 ## src/Contexts/draggable.context.ts
 

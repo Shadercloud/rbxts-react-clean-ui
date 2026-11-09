@@ -11,9 +11,9 @@ export const preview = {
             <Container width="80%" height="140" center>
                 <Box>
                     <HStack>
-                        <Switch checked={false} />
-                        <Switch checked={true} />
-                        <Switch checked={true} intent="success" disabled />
+                        <Switch defaultChecked={false} />
+                        <Switch defaultChecked={true} />
+                        <Switch defaultChecked={true} intent="success" disabled />
                     </HStack>
                 </Box>
             </Container>

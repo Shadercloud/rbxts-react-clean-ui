@@ -2,6 +2,7 @@ import React from "@rbxts/react";
 import {
     IntentElementProps,
     ScalableElementProps,
+    SizeElementProps,
     SpacedElementProps,
 } from "../../Interfaces";
 import { CleanThemeContext } from "../../Contexts/";
@@ -14,6 +15,7 @@ export interface IncrementProps
     extends ScalableElementProps,
     SpacedElementProps,
     IntentElementProps,
+    Pick<SizeElementProps, "width">,
     React.InstanceProps<ImageLabel> {
     value: number;
     onChange?: (value: number) => void;
@@ -63,7 +65,7 @@ export const Increment = React.forwardRef<ImageLabel, IncrementProps>(
                 name={props.name ?? "Increment"}
                 ref={ref}
                 {...props}
-                Size={UDim2.fromScale(1, 0)}
+                Size={props.width !== undefined ? undefined : UDim2.fromScale(1, 0)}
                 AutomaticSize={Enum.AutomaticSize.Y}
             >
                 <HStack Wraps={false} valign="Center" spacing={props.spacing}>

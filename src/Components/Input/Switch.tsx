@@ -8,9 +8,11 @@ import { BackgroundElementProps, IntentElementProps, ZIndexElementProps } from "
 
 export interface SwitchProps extends IntentElementProps, BackgroundElementProps, ZIndexElementProps {
     checked?: boolean;
+    defaultChecked?: boolean;
     onChange?: (value: boolean) => void;
     disabled?: boolean;
     name?: string;
+    LayoutOrder?: number;
 }
 
 function lerpUDim(from: UDim, to: UDim, alpha: number): UDim {
@@ -25,7 +27,24 @@ export function Switch(props: SwitchProps) {
     const fieldset = React.useContext(FieldsetContext);
     const switchTheme = theme.components.switch;
 
-    const [checked, setChecked] = React.useState(props.checked ?? false);
+    const controlled = props.checked !== undefined;
+    const [internalChecked, setInternalChecked] = React.useState(props.defaultChecked ?? false);
+    const checked = controlled ? props.checked === true : internalChecked;
+
+    const requestChange = (value: boolean) => {
+        if (props.disabled) {
+            return;
+        }
+
+        if (!controlled) {
+            setInternalChecked(value);
+        }
+
+        props.onChange?.(value);
+    };
+
+    const toggleRef = React.useRef<() => void>();
+    toggleRef.current = () => requestChange(!checked);
 
     React.useEffect(() => {
         if (!fieldset) {
@@ -33,21 +52,13 @@ export function Switch(props: SwitchProps) {
         }
 
         const connection = fieldset.labelActivated?.Event.Connect(() => {
-            if (props.disabled) {
-                return;
-            }
-
-            setChecked((current) => !current);
+            toggleRef.current?.();
         });
 
         return () => {
             connection?.Disconnect();
         };
-    }, [fieldset, props.disabled]);
-
-    React.useEffect(() => {
-        props.onChange?.(checked);
-    }, [checked]);
+    }, [fieldset]);
 
     const duration = switchTheme.animation.duration;
 
@@ -98,6 +109,7 @@ export function Switch(props: SwitchProps) {
             AutoButtonColor={false}
             Size={new UDim2(trackWidth, trackHeight)}
             ZIndex={props.ZIndex}
+            LayoutOrder={props.LayoutOrder}
             BorderSizePixel={0}
             BackgroundColor3={trackBackgroundColor}
             BackgroundTransparency={
@@ -107,11 +119,7 @@ export function Switch(props: SwitchProps) {
             }
             Event={{
                 Activated: () => {
-                    if (props.disabled) {
-                        return;
-                    }
-
-                    setChecked(!checked);
+                    requestChange(!checked);
                 },
             }}
         >

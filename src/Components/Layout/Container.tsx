@@ -1,5 +1,8 @@
 import React from "@rbxts/react";
 import {
+    BorderElementProps,
+    CssPadding,
+    CssRadius,
     PositionElementProps,
     SizeElementProps,
     ZIndexElementProps,
@@ -7,17 +10,20 @@ import {
 import { SizeHelper, CssHelper } from "../../Helpers/";
 import { CssBackgroundImage } from "../../Theme";
 import { CssBackgroundGradient } from "../../Interfaces/";
-import { Gradient } from "../Decorator";
+import { Corners, Gradient, Padding } from "../Decorator";
 import { Group, GroupContext } from "./Group";
 
 export interface ContainerProps
     extends SizeElementProps,
     PositionElementProps,
     ZIndexElementProps,
+    BorderElementProps,
     React.InstanceProps<ImageLabel> {
     group?: boolean;
     backgroundImage?: Partial<CssBackgroundImage>;
     backgroundGradient?: Partial<CssBackgroundGradient>;
+    padding?: CssPadding;
+    cornerRadius?: CssRadius;
     name?: string;
 }
 
@@ -35,6 +41,8 @@ export const Container = React.forwardRef<ImageLabel, ContainerProps>(
             isAutoSizeActive;
 
         const backgroundImage = CssHelper.resolveBackgroundImage(props.backgroundImage);
+        const borderThickness = props.borderThickness ?? 0;
+        const sizeConstraint = SizeHelper.GetSizeConstraint(props);
 
         const content = (
             <imagelabel
@@ -91,6 +99,28 @@ export const Container = React.forwardRef<ImageLabel, ContainerProps>(
                 Event={props.Event}
             >
                 <Gradient value={props.backgroundGradient} />
+
+                {borderThickness > 0 && (
+                    <uistroke
+                        key="Stroke"
+                        Thickness={borderThickness}
+                        Color={props.borderColor}
+                        Transparency={props.borderTransparency}
+                        BorderStrokePosition={props.borderPosition === "outer" ? Enum.BorderStrokePosition.Outer : Enum.BorderStrokePosition.Inner}
+                    />
+                )}
+
+                {props.padding !== undefined && <Padding resolvedPadding={CssHelper.parseCssQuad(props.padding)} />}
+
+                <Corners radius={props.cornerRadius} />
+
+                {sizeConstraint !== undefined && (
+                    <uisizeconstraint
+                        key="SizeConstraint"
+                        MinSize={sizeConstraint.MinSize}
+                        MaxSize={sizeConstraint.MaxSize}
+                    />
+                )}
 
                 <Group.Element enabled={props.group}>
                     {props.children}

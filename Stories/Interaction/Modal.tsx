@@ -112,6 +112,41 @@ function StackedModalDemo(props: BasicModalDemoProps) {
 	);
 }
 
+function CappedModalDemo(props: BasicModalDemoProps) {
+	const [open, setOpen] = React.useState(false);
+
+	return (
+		<Container>
+			<Button text="Open Capped Modal" Event={{ Activated: () => setOpen(true) }} />
+			<ModalComponent
+				open={open}
+				onOpenChange={setOpen}
+				width="90%"
+				maxWidth={720}
+				closeOnBackdropClick={props.closeOnBackdropClick}
+				closeOnEscape={props.closeOnEscape}
+				draggable={props.draggable}
+				intent={props.intent}
+			>
+				<Card.Header>
+					<HStack valign="Center">
+						<Text text="Capped Modal" variant="heading" />
+						<FlexItem align="Right">
+							<ModalCloseButton />
+						</FlexItem>
+					</HStack>
+				</Card.Header>
+				<Card.Body>
+					<Text text={'This modal uses width="90%" maxWidth={720}: it fills most of a narrow viewport but stops growing at 720 pixels on a wide one.'} />
+				</Card.Body>
+				<Card.Footer>
+					<Button text="Close" intent={props.intent ?? "primary"} Event={{ Activated: () => setOpen(false) }} />
+				</Card.Footer>
+			</ModalComponent>
+		</Container>
+	);
+}
+
 interface ModalProps {
 	screenshot?: boolean;
 	closeOnBackdropClick?: boolean;
@@ -131,6 +166,12 @@ function Modal(props: ModalProps = {}) {
 					intent={props.intent}
 				/>
 				<StackedModalDemo
+					closeOnBackdropClick={props.closeOnBackdropClick}
+					closeOnEscape={props.closeOnEscape}
+					draggable={props.draggable}
+					intent={props.intent}
+				/>
+				<CappedModalDemo
 					closeOnBackdropClick={props.closeOnBackdropClick}
 					closeOnEscape={props.closeOnEscape}
 					draggable={props.draggable}

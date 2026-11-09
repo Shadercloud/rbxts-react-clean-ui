@@ -6,7 +6,8 @@ local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contex
 local SizeHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").SizeHelper
 local BoxShadow = TS.import(script, script.Parent.Parent, "Decorator").BoxShadow
 local Slider = React.forwardRef(function(props, ref)
-	local theme = React.useContext(CleanThemeContext).components.slider
+	local rootTheme = React.useContext(CleanThemeContext)
+	local theme = rootTheme.components.slider
 	local containerRef = React.useRef()
 	local isDraggingRef = React.useRef(false)
 	local activeHandleRef = React.useRef()
@@ -213,6 +214,7 @@ local Slider = React.forwardRef(function(props, ref)
 	local firstPosition = getPosition(firstValue)
 	local secondPosition = if secondValue ~= nil then getPosition(secondValue) else nil
 	local padding = SizeHelper:toUDim(theme.bar.padding)
+	local sizeConstraint = SizeHelper:GetSizeConstraint(props)
 	local handles = { {
 		index = 0,
 		position = firstPosition,
@@ -266,7 +268,12 @@ local Slider = React.forwardRef(function(props, ref)
 	_attributes.Style = props.Style
 	_attributes.Change = props.Change
 	_attributes.Event = props.Event
-	local _exp = React.createElement("frame", {
+	local _exp = sizeConstraint ~= nil and (React.createElement("uisizeconstraint", {
+		key = "SizeConstraint",
+		MinSize = sizeConstraint.MinSize,
+		MaxSize = sizeConstraint.MaxSize,
+	}))
+	local _exp_1 = React.createElement("frame", {
 		key = "Bar",
 		Size = UDim2.new(UDim.new(1, 0), SizeHelper:toUDim(theme.bar.height)),
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -280,15 +287,15 @@ local Slider = React.forwardRef(function(props, ref)
 		Color = theme.bar.borderColor,
 	}), React.createElement("uicorner", {
 		key = "Corners",
-		CornerRadius = SizeHelper:toUDim(theme.bar.cornerRadius),
+		CornerRadius = SizeHelper:toRadius(rootTheme, theme.bar.cornerRadius),
 	}))
 	local _attributes_1 = {
 		key = "HandleContainer",
 		ref = containerRef,
 	}
-	local _exp_1 = UDim2.fromScale(1, 1)
+	local _exp_2 = UDim2.fromScale(1, 1)
 	local _uDim2 = UDim2.new(padding + padding, UDim.new(0, 0))
-	_attributes_1.Size = _exp_1 - _uDim2
+	_attributes_1.Size = _exp_2 - _uDim2
 	_attributes_1.BackgroundTransparency = 1
 	_attributes_1.BorderSizePixel = 0
 	_attributes_1.Position = UDim2.fromScale(0.5, 0.5)
@@ -303,15 +310,15 @@ local Slider = React.forwardRef(function(props, ref)
 		}
 		local _result
 		if props.highlight == "start" then
-			local _exp_2 = UDim2.fromScale(0, 0.5)
+			local _exp_3 = UDim2.fromScale(0, 0.5)
 			local _uDim2_1 = UDim2.new(padding, UDim.new(0, 0))
-			_result = _exp_2 - _uDim2_1
+			_result = _exp_3 - _uDim2_1
 		else
 			local _result_1
 			if props.highlight == "end" then
-				local _exp_2 = UDim2.fromScale(1, 0.5)
+				local _exp_3 = UDim2.fromScale(1, 0.5)
 				local _uDim2_1 = UDim2.new(padding, UDim.new(0, 0))
-				_result_1 = _exp_2 + _uDim2_1
+				_result_1 = _exp_3 + _uDim2_1
 			else
 				_result_1 = UDim2.fromScale(firstPosition, 0.5)
 			end
@@ -350,7 +357,7 @@ local Slider = React.forwardRef(function(props, ref)
 			Color = theme.bar.highlight.borderColor,
 		}), React.createElement("uicorner", {
 			key = "Corners",
-			CornerRadius = SizeHelper:toUDim(theme.bar.cornerRadius),
+			CornerRadius = SizeHelper:toRadius(rootTheme, theme.bar.cornerRadius),
 		})))
 	end
 	-- ▼ ReadonlyArray.map ▼
@@ -358,16 +365,16 @@ local Slider = React.forwardRef(function(props, ref)
 	local _callback = function(_param)
 		local index = _param.index
 		local position = _param.position
-		local _exp_2 = React.createElement("uistroke", {
+		local _exp_3 = React.createElement("uistroke", {
 			key = "Stroke",
 			Thickness = theme.handle.borderThickness,
 			Color = theme.handle.borderColor,
 		})
-		local _exp_3 = React.createElement("uicorner", {
+		local _exp_4 = React.createElement("uicorner", {
 			key = "Corners",
-			CornerRadius = SizeHelper:toUDim(theme.handle.cornerRadius),
+			CornerRadius = SizeHelper:toRadius(rootTheme, theme.handle.cornerRadius),
 		})
-		local _exp_4 = (hoveredHandle == index or (dragging and activeHandleRef.current == index)) and (React.createElement(BoxShadow, {
+		local _exp_5 = (hoveredHandle == index or (dragging and activeHandleRef.current == index)) and (React.createElement(BoxShadow, {
 			["box-shadow"] = theme.handle.boxShadow,
 		}))
 		local _attributes_2 = {
@@ -401,13 +408,13 @@ local Slider = React.forwardRef(function(props, ref)
 					end)
 				end,
 			},
-		}, _exp_2, _exp_3, _exp_4, React.createElement("uiaspectratioconstraint", _attributes_2))
+		}, _exp_3, _exp_4, _exp_5, React.createElement("uiaspectratioconstraint", _attributes_2))
 	end
 	for _k, _v in handles do
 		_newValue[_k] = _callback(_v, _k - 1, handles)
 	end
 	-- ▲ ReadonlyArray.map ▲
-	return React.createElement("frame", _attributes, _exp, React.createElement("frame", _attributes_1, _condition_3, _newValue))
+	return React.createElement("frame", _attributes, _exp, _exp_1, React.createElement("frame", _attributes_1, _condition_3, _newValue))
 end)
 return {
 	Slider = Slider,

@@ -1,5 +1,5 @@
-import { CssShadow, CssSize, ScaledCssPadding, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow, CssBackgroundGradient } from "../Interfaces/";
-import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors, CssBackgroundImage, CssPosition, CssCornerRadius } from "./theme.style";
+import { CssShadow, CssSize, CssRadius, ScaledCssPadding, Breakpoint, BreakpointValue, ScaleSizeValue, ScaleSize, Intent, IconSet, TextVariant, PositionElementProps, CssBoxShadow, CssBackgroundGradient, CssPadding } from "../Interfaces/";
+import { TypographyStyle, ScaledTypographyStyle, IntentScheme, IntentColors, InlineIntentColors, CssBackgroundImage, CssPosition, CssCornerRadius, FieldStateStyles, InnerShadowStyle } from "./theme.style";
 export interface ThemeTemplate {
     colors: {
         intents: Record<Exclude<Intent, "secondary">, IntentColors> & Partial<Record<"secondary", IntentColors>>;
@@ -32,11 +32,15 @@ export interface ThemeTemplate {
                 backgroundTransparency: number;
                 borderColor: Color3;
                 borderThickness: number;
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
             };
         };
         scroller: {
             barColor: Color3;
+            trackColor?: Color3;
+            trackTransparency?: number;
+            thumbBorderColor?: Color3;
+            thumbBorderThickness?: number;
         };
         boxShadow: {
             color: Color3;
@@ -47,7 +51,7 @@ export interface ThemeTemplate {
             backgroundTransparency: number;
             borderColor: Color3;
             borderThickness: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             spacing?: ScaleSizeValue<number>;
             padding?: ScaledCssPadding;
             boxShadow?: CssShadow;
@@ -56,16 +60,18 @@ export interface ThemeTemplate {
             intents?: Partial<Record<Intent, InlineIntentColors>>;
         };
         badge: {
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             borderThickness: number;
             spacing?: ScaleSizeValue<number>;
             padding?: ScaledCssPadding;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
+            hoverDarken?: number;
+            pressDarken?: number;
         };
         button: {
             backgroundTransparency: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             boxShadow?: CssShadow;
             borderThickness: number;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
@@ -77,7 +83,7 @@ export interface ThemeTemplate {
         input: {
             borderColor: Color3;
             borderThickness: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             backgroundColor?: Color3;
             backgroundTransparency?: number;
             typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
@@ -85,11 +91,14 @@ export interface ThemeTemplate {
             backgroundGradient?: CssBackgroundGradient;
             placeholder?: Partial<TypographyStyle> | ScaledTypographyStyle;
             iconColor?: Color3;
+            boxShadow?: CssShadow | CssBoxShadow;
+            innerShadow?: InnerShadowStyle;
+            states?: FieldStateStyles;
         };
         select: {
             borderColor: Color3;
             borderThickness: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             backgroundColor?: Color3;
             backgroundTransparency?: number;
             textColor?: Color3;
@@ -112,22 +121,48 @@ export interface ThemeTemplate {
                 spacing?: ScaleSizeValue<number>;
                 padding?: ScaledCssPadding;
             };
+            boxShadow?: CssShadow | CssBoxShadow;
+            innerShadow?: InnerShadowStyle;
+            states?: FieldStateStyles;
+            caret?: {
+                size?: CssSize;
+                backgroundColor?: Color3;
+                backgroundTransparency?: number;
+                backgroundGradient?: CssBackgroundGradient;
+                borderColor?: Color3;
+                borderThickness?: number;
+                cornerRadius?: CssRadius;
+                iconColor?: Color3;
+                margin?: CssPadding;
+            };
+            dropDown?: {
+                cornerRadius?: CssRadius;
+                borderColor?: Color3;
+                borderThickness?: number;
+                boxShadow?: CssShadow | CssBoxShadow;
+                gap?: number;
+            };
         };
         checkbox: {
             borderColor: Color3;
             borderThickness: number;
             borderTransparency?: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             intents?: Partial<Record<Intent, InlineIntentColors>>;
             spacing?: ScaleSizeValue<number>;
             padding?: ScaledCssPadding;
             backgroundImage?: CssBackgroundImage;
             backgroundGradient?: CssBackgroundGradient;
+            label?: {
+                typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                textColor?: Color3;
+                gap?: number;
+            };
         };
         switch: {
             width: CssSize;
             height: CssSize;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             borderThickness: number;
             disabledTransparency: number;
             animation: {
@@ -141,7 +176,7 @@ export interface ThemeTemplate {
             };
             thumb: {
                 inset: CssSize;
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
                 backgroundColor: Color3;
                 backgroundTransparency: number;
                 borderColor: Color3;
@@ -155,7 +190,7 @@ export interface ThemeTemplate {
             backgroundImage?: CssBackgroundImage;
             backgroundGradient?: CssBackgroundGradient;
             borderThickness: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             spacing?: ScaleSizeValue<number>;
             padding?: ScaledCssPadding;
             gap?: number;
@@ -165,7 +200,7 @@ export interface ThemeTemplate {
                 backgroundColor?: Color3;
                 backgroundTransparency?: number;
                 borderThickness: number;
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
                 spacing?: ScaleSizeValue<number>;
                 padding?: ScaledCssPadding;
                 backgroundImage?: CssBackgroundImage;
@@ -173,7 +208,7 @@ export interface ThemeTemplate {
             };
             button: {
                 borderThickness: number;
-                cornerRadius: CssSize | CssCornerRadius;
+                cornerRadius: CssRadius | CssCornerRadius;
                 spacing?: ScaleSizeValue<number>;
                 padding?: ScaledCssPadding;
                 boxShadow?: CssShadow;
@@ -187,12 +222,12 @@ export interface ThemeTemplate {
             backgroundTransparency: number;
             borderColor: Color3;
             borderThickness: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             spacing?: ScaleSizeValue<number>;
             padding?: ScaledCssPadding;
             item: {
                 borderThickness: number;
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
                 spacing?: ScaleSizeValue<number>;
                 padding?: ScaledCssPadding;
                 boxShadow?: CssShadow;
@@ -203,7 +238,7 @@ export interface ThemeTemplate {
         accordion: {
             borderColor: Color3;
             borderThickness: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             spacing?: ScaleSizeValue<number>;
             header: {
                 spacing?: ScaleSizeValue<number>;
@@ -228,7 +263,7 @@ export interface ThemeTemplate {
             backgroundTransparency: number;
             borderColor: Color3;
             borderThickness: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             rowDividerColor: Color3;
             rowDividerThickness: number;
             header: {
@@ -244,7 +279,7 @@ export interface ThemeTemplate {
         };
         card: {
             borderThickness: number;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             header: {
                 borderThickness?: number;
                 cornerRadius?: CssCornerRadius;
@@ -273,7 +308,7 @@ export interface ThemeTemplate {
                 padding: CssSize;
                 borderColor: Color3;
                 borderThickness: number;
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
                 backgroundColor: Color3;
                 backgroundTransparency: number;
                 highlight: {
@@ -286,7 +321,7 @@ export interface ThemeTemplate {
                 boxShadow?: CssShadow;
                 borderColor: Color3;
                 borderThickness: number;
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
                 backgroundColor: Color3;
                 backgroundTransparency: number;
                 aspectRatio?: number;
@@ -311,12 +346,12 @@ export interface ThemeTemplate {
                 backgroundTransparency: number;
                 borderColor: Color3;
                 borderThickness: number;
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
                 backgroundImage?: CssBackgroundImage;
                 backgroundGradient?: CssBackgroundGradient;
             };
             fill: {
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
                 stripe?: {
                     enabled: boolean;
@@ -347,9 +382,11 @@ export interface ThemeTemplate {
             fadeDuration: number;
             pointerSize: number;
             edgeMargin: number;
+            closeDelay?: number;
+            longPressDelay?: number;
             spacing?: ScaleSizeValue<number>;
             boxShadow?: CssShadow;
-            cornerRadius: CssSize;
+            cornerRadius: CssRadius;
             intents?: Partial<Record<Intent, Partial<IntentScheme>>>;
         };
         modal: {
@@ -374,7 +411,7 @@ export interface ThemeTemplate {
                     typography?: Partial<TypographyStyle>;
                     borderColor?: Color3;
                     borderThickness?: number;
-                    cornerRadius?: CssSize;
+                    cornerRadius?: CssRadius;
                 };
             };
             bar: {
@@ -382,7 +419,7 @@ export interface ThemeTemplate {
                 unstackedTransparency: number;
                 borderColor: Color3;
                 borderThickness: number;
-                cornerRadius: CssSize;
+                cornerRadius: CssRadius;
                 tweenTime: number;
                 axis: {
                     color: Color3;

@@ -76,6 +76,19 @@ do
 		end
 		return if defaultValue ~= nil then defaultValue else Enum.AutomaticSize.Y
 	end
+	function SizeHelper:GetSizeConstraint(props)
+		if props.minWidth == nil and props.maxWidth == nil and props.minHeight == nil and props.maxHeight == nil then
+			return nil
+		end
+		local minWidth = math.max(if props.minWidth ~= nil then self:toUDim(props.minWidth).Offset else 0, 0)
+		local minHeight = math.max(if props.minHeight ~= nil then self:toUDim(props.minHeight).Offset else 0, 0)
+		local maxWidth = if props.maxWidth ~= nil then math.max(self:toUDim(props.maxWidth).Offset, minWidth) else math.huge
+		local maxHeight = if props.maxHeight ~= nil then math.max(self:toUDim(props.maxHeight).Offset, minHeight) else math.huge
+		return {
+			MinSize = Vector2.new(minWidth, minHeight),
+			MaxSize = Vector2.new(maxWidth, maxHeight),
+		}
+	end
 	function SizeHelper:toUDim(size)
 		if size == nil then
 			return UDim.new(0, 0)
@@ -95,6 +108,15 @@ do
 		end
 		local value = self:parseNumber(text, size)
 		return UDim.new(0, value)
+	end
+	function SizeHelper:resolveRadius(theme, radius)
+		if radius == "sm" or radius == "md" or radius == "lg" then
+			return theme.radius[radius]
+		end
+		return radius
+	end
+	function SizeHelper:toRadius(theme, radius)
+		return self:toUDim(self:resolveRadius(theme, radius))
 	end
 	function SizeHelper:parseNumber(text, originalValue)
 		local value = tonumber(text)

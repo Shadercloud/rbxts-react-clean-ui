@@ -6,6 +6,7 @@ import { TypographyStyle } from "../../Theme";
 import { Corners, Gradient, Padding } from "../Decorator";
 import { FieldsetContext, FlexItem, HStack } from "../Layout";
 import { Icon } from "../Surface";
+import { FieldBoxShadow, FieldInnerShadow, resolveFieldState, resolveFieldStateStyle } from "./Input.field";
 import { resolveClampedText, resolveValidatedText } from "./Input.validation";
 
 export interface InputProps extends ScalableElementProps, SpacedElementProps, React.InstanceProps<TextBox> {
@@ -19,6 +20,7 @@ export interface InputProps extends ScalableElementProps, SpacedElementProps, Re
     controlled?: boolean;
     icon?: IconName;
     name?: string;
+    disabled?: boolean;
 }
 
 export function Input(props: InputProps) {
@@ -30,7 +32,13 @@ export function Input(props: InputProps) {
     const ref = useRef<TextBox>();
 
     const [value, setValue] = useState(props.value);
+    const [focused, setFocused] = useState(false);
+    const [hovered, setHovered] = useState(false);
     const lastValidText = useRef(props.value);
+
+    const inputTheme = theme.components.input;
+    const stateStyle = resolveFieldStateStyle(inputTheme.states, resolveFieldState(props.disabled, focused, hovered));
+    const borderThickness = stateStyle.borderThickness ?? inputTheme.borderThickness;
 
     const typography: TypographyStyle = TypographyHelper.getTypography(
         theme,
@@ -52,45 +60,26 @@ export function Input(props: InputProps) {
         }
 
         const connection = labelActivated.Event.Connect(() => {
+            if (props.disabled) return;
+
             ref.current?.CaptureFocus();
         });
 
         return () => connection.Disconnect();
     }, [
         labelActivated,
-        ref
+        ref,
+        props.disabled
     ]);
 
-    return (
-        <imagelabel
-            key={props.name ?? "Input"}
-            Size={props.Size ?? UDim2.fromScale(1, 0)}
-            AutomaticSize={Enum.AutomaticSize.Y}
-            BackgroundColor3={theme.components.input.backgroundColor}
-            BackgroundTransparency={theme.components.input.backgroundTransparency ?? 1}
-            AnchorPoint={props.AnchorPoint}
-            Position={props.Position}
-            LayoutOrder={props.LayoutOrder}
-            Visible={props.Visible}
-            ZIndex={props.ZIndex}
-            BorderSizePixel={0}
-            Image={backgroundImage.Image}
-            ImageColor3={backgroundImage.ImageColor3}
-            ImageTransparency={backgroundImage.ImageTransparency}
-            ScaleType={backgroundImage.ScaleType}
-            SliceCenter={backgroundImage.SliceCenter}
-            SliceScale={backgroundImage.SliceScale}
-            TileSize={backgroundImage.TileSize}
-        >
-            <uistroke
-                key="Stroke"
-                Thickness={theme.components.input.borderThickness}
-                BorderStrokePosition={Enum.BorderStrokePosition.Inner}
-                Color={theme.components.input.borderColor}
-            />
+    React.useEffect(() => {
+        if (props.disabled) {
+            ref.current?.ReleaseFocus();
+        }
+    }, [props.disabled]);
 
-            <Corners radius={theme.components.input.cornerRadius} />
-            <Gradient value={theme.components.input.backgroundGradient} />
+    const content = (
+        <>
             <Padding {...props} />
             <HStack valign="Center" Wraps={false}>
                 {props.icon !== undefined && (
@@ -139,13 +128,20 @@ export function Input(props: InputProps) {
                         MultiLine={props.MultiLine}
                         SelectionStart={props.SelectionStart}
                         ShowNativeInput={props.ShowNativeInput}
-                        TextEditable={props.TextEditable}
+                        TextEditable={props.disabled ? false : props.TextEditable}
+                        Interactable={props.disabled ? false : undefined}
                         TextTruncate={props.TextTruncate}
                         RichText={props.RichText}
 
                         Event={{
                             ...props.Event,
+                            Focused: (rbx) => {
+                                setFocused(true);
+
+                                props.Event?.Focused?.(rbx);
+                            },
                             FocusLost: (rbx, enterPressed, inputThatCausedFocusLoss) => {
+                                setFocused(false);
 
                                 const clampedText = resolveClampedText(props.validation, rbx.Text, props.min, props.max);
 
@@ -182,6 +178,59 @@ export function Input(props: InputProps) {
                     </textbox>
                 </FlexItem>
             </HStack>
+        </>
+    );
+
+    return (
+        <imagelabel
+            key={props.name ?? "Input"}
+            Size={props.Size ?? UDim2.fromScale(1, 0)}
+            AutomaticSize={Enum.AutomaticSize.Y}
+            BackgroundColor3={stateStyle.backgroundColor ?? inputTheme.backgroundColor}
+            BackgroundTransparency={stateStyle.backgroundTransparency ?? inputTheme.backgroundTransparency ?? 1}
+            AnchorPoint={props.AnchorPoint}
+            Position={props.Position}
+            LayoutOrder={props.LayoutOrder}
+            Visible={props.Visible}
+            ZIndex={props.ZIndex}
+            BorderSizePixel={0}
+            Image={backgroundImage.Image}
+            ImageColor3={backgroundImage.ImageColor3}
+            ImageTransparency={backgroundImage.ImageTransparency}
+            ScaleType={backgroundImage.ScaleType}
+            SliceCenter={backgroundImage.SliceCenter}
+            SliceScale={backgroundImage.SliceScale}
+            TileSize={backgroundImage.TileSize}
+            Event={{
+                MouseEnter: () => setHovered(true),
+                MouseLeave: () => setHovered(false),
+            }}
+        >
+            <uistroke
+                key="Stroke"
+                Thickness={borderThickness}
+                BorderStrokePosition={Enum.BorderStrokePosition.Inner}
+                Color={stateStyle.borderColor ?? inputTheme.borderColor}
+            />
+
+            <Corners radius={inputTheme.cornerRadius} />
+            <Gradient value={stateStyle.backgroundGradient ?? inputTheme.backgroundGradient} />
+            <FieldBoxShadow value={inputTheme.boxShadow} />
+            {inputTheme.innerShadow === undefined ? content : (
+                <>
+                    <FieldInnerShadow value={inputTheme.innerShadow} cornerRadius={inputTheme.cornerRadius} inset={borderThickness} />
+                    <frame
+                        key="Content"
+                        Size={UDim2.fromScale(1, 1)}
+                        AutomaticSize={Enum.AutomaticSize.Y}
+                        BackgroundTransparency={1}
+                        BorderSizePixel={0}
+                        ZIndex={2}
+                    >
+                        {content}
+                    </frame>
+                </>
+            )}
         </imagelabel>
     );
 }

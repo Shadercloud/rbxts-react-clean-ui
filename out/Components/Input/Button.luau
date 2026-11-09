@@ -11,6 +11,7 @@ local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
+local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
@@ -18,6 +19,9 @@ local HStack = TS.import(script, script.Parent.Parent, "Layout").HStack
 local _ = TS.import(script, script.Parent.Parent, "Layout")
 local Group = _.Group
 local GroupContext = _.GroupContext
+local _Button_press = TS.import(script, script.Parent, "Button.press")
+local isPointerPress = _Button_press.isPointerPress
+local usePressRelease = _Button_press.usePressRelease
 local function resolveOwnIntentTransparency(intent, state, intents)
 	if intent == nil or intent == "primary" then
 		return nil
@@ -114,6 +118,8 @@ local Button = React.forwardRef(function(props, ref)
 		end
 	end, { props.disabled })
 	local group = React.useContext(GroupContext)
+	local trackRelease = usePressRelease(props.onRelease)
+	local pressDown = props.pressOn == "down"
 	local padding = SpacingHelper:GetResolvedPadding(theme, props)
 	local state = if props.disabled then "disabled" elseif hover then "hover" else "default"
 	local _exp = props.intent
@@ -182,6 +188,9 @@ local Button = React.forwardRef(function(props, ref)
 		if props.disabled then
 			return nil
 		end
+		if pressDown and isPointerPress(inputObject) then
+			return nil
+		end
 		local _result_2 = props.Event
 		if _result_2 ~= nil then
 			_result_2 = _result_2.Activated
@@ -190,26 +199,62 @@ local Button = React.forwardRef(function(props, ref)
 			end
 		end
 	end
+	for _k, _v in (if pressDown then {
+		InputBegan = function(button, inputObject)
+			local _0 = props.Event
+			if _0 ~= nil then
+				_0 = _0.InputBegan
+				if _0 ~= nil then
+					_0(button, inputObject)
+				end
+			end
+			if props.disabled or not isPointerPress(inputObject) then
+				return nil
+			end
+			local _1 = props.Event
+			if _1 ~= nil then
+				_1 = _1.Activated
+				if _1 ~= nil then
+					_1(button, inputObject, 1)
+				end
+			end
+			if props.onRelease ~= nil then
+				trackRelease(button, inputObject)
+			end
+		end,
+	} else {}) do
+		_object[_k] = _v
+	end
 	_attributes.Event = _object
 	local _result_2
-	if props.group then
-		local _result_3 = group
-		if _result_3 ~= nil then
-			_result_3 = _result_3.size
-			if _result_3 ~= nil then
-				_result_3 = _result_3.X
-			end
-		end
-		local _condition_3 = _result_3
-		if _condition_3 == nil then
-			_condition_3 = 0
-		end
-		_result_2 = _condition_3
+	if props.width ~= nil then
+		_result_2 = SizeHelper:GetSize({
+			width = props.width,
+		})
 	else
-		_result_2 = 0
+		local _result_3
+		if props.group then
+			local _result_4 = group
+			if _result_4 ~= nil then
+				_result_4 = _result_4.size
+				if _result_4 ~= nil then
+					_result_4 = _result_4.X
+				end
+			end
+			local _condition_3 = _result_4
+			if _condition_3 == nil then
+				_condition_3 = 0
+			end
+			_result_3 = _condition_3
+		else
+			_result_3 = 0
+		end
+		_result_2 = UDim2.fromOffset(_result_3, 0)
 	end
-	_attributes.Size = UDim2.fromOffset(_result_2, 0)
-	_attributes.AutomaticSize = Enum.AutomaticSize.XY
+	_attributes.Size = _result_2
+	_attributes.AutomaticSize = if props.width ~= nil then SizeHelper:GetAutoSize({
+		width = props.width,
+	}) elseif props.fill then Enum.AutomaticSize.Y else Enum.AutomaticSize.XY
 	local _condition_3 = props.BackgroundTransparency
 	if _condition_3 == nil then
 		local _result_3 = props.styleOverride
@@ -248,6 +293,10 @@ local Button = React.forwardRef(function(props, ref)
 	end
 	_attributes_1.radius = _condition_4
 	local _exp_3 = React.createElement(Corners, _attributes_1)
+	local _exp_4 = props.fill and React.createElement("uiflexitem", {
+		key = "FlexItem",
+		FlexMode = Enum.UIFlexMode.Fill,
+	})
 	local _attributes_2 = {
 		key = "Stroke",
 	}
@@ -265,7 +314,7 @@ local Button = React.forwardRef(function(props, ref)
 	_attributes_2.Thickness = _condition_5
 	_attributes_2.BorderStrokePosition = Enum.BorderStrokePosition.Inner
 	_attributes_2.Color = intentColors.borderColor
-	local _exp_4 = React.createElement("uistroke", _attributes_2)
+	local _exp_5 = React.createElement("uistroke", _attributes_2)
 	local _attributes_3 = table.clone(props)
 	setmetatable(_attributes_3, nil)
 	local _result_4 = props.styleOverride
@@ -277,19 +326,20 @@ local Button = React.forwardRef(function(props, ref)
 		_condition_6 = theme.components.button.boxShadow
 	end
 	_attributes_3.value = _condition_6
-	local _exp_5 = React.createElement(BoxShadow, _attributes_3)
-	local _exp_6 = React.createElement(Gradient, {
+	local _exp_6 = React.createElement(BoxShadow, _attributes_3)
+	local _exp_7 = React.createElement(Gradient, {
 		value = intentColors.backgroundGradient,
 	})
 	local _attributes_4 = table.clone(props)
 	setmetatable(_attributes_4, nil)
-	return React.createElement("imagebutton", _attributes, _exp_3, _exp_4, _exp_5, _exp_6, React.createElement(Padding, _attributes_4), React.createElement(Group.Element, {
+	return React.createElement("imagebutton", _attributes, _exp_3, _exp_4, _exp_5, _exp_6, _exp_7, React.createElement(Padding, _attributes_4), React.createElement(Group.Element, {
 		enabled = props.group,
 		padding = padding,
 	}, (props.icon ~= nil or props.text ~= nil) and React.createElement(HStack, {
 		valign = "Center",
 		spacing = props.spacing,
 		Wraps = false,
+		HorizontalAlignment = if props.fill or props.width ~= nil then Enum.HorizontalAlignment.Center else nil,
 	}, props.icon ~= nil and React.createElement(ButtonIcon, {
 		LayoutOrder = 1,
 		scale = props.scale,

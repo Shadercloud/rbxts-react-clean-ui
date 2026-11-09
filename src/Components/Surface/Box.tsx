@@ -32,6 +32,7 @@ export const Box = React.forwardRef<ImageLabel, BoxProps>(
                 name={name}
                 ref={ref}
                 {...props}
+                padding={undefined}
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 1))}
                 AutomaticSize={SizeHelper.GetAutoSize(props)}
                 BackgroundTransparency={

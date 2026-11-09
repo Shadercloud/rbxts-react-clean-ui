@@ -113,6 +113,144 @@ Use `typography` to supply a complete typography style, bypassing `variant` enti
 
 When `typography` is provided, `variant` is ignored.
 
+## Fitting text
+
+`maxWidth`, `outline`, and `shrinkToFit` help text fit where it's placed: a label that wraps at a width, an outlined label over a bright background, and a letter-spaced title that shrinks into a fixed-width box.
+
+<Demo preview="Scenes/Typography/TextFit.loom.tsx" previewHeight={340}>
+```tsx
+import React from "@rbxts/react";
+import { Container, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function TextFitExample() {
+    return (
+        <VStack spacing="sm" HorizontalFlex={Enum.UIFlexAlignment.None}>
+            <Text
+                text="With maxWidth this label stays auto-sized but wraps onto new lines once it reaches 260 pixels."
+                maxWidth={260}
+                LayoutOrder={1}
+            />
+            <Container
+                width="100%"
+                height="48"
+                padding="12"
+                BackgroundColor3={Color3.fromHex("#F2C94C")}
+                BackgroundTransparency={0}
+                LayoutOrder={2}
+            >
+                <Text
+                    text="Outlined label"
+                    variant="heading"
+                    TextColor3={Color3.fromHex("#FFFFFF")}
+                    outline={{ color: Color3.fromHex("#1B1B1B"), thickness: 2 }}
+                />
+            </Container>
+            <Container
+                width="180"
+                height="44"
+                padding="8"
+                BackgroundColor3={Color3.fromHex("#3B72E6")}
+                BackgroundTransparency={0}
+                LayoutOrder={3}
+            >
+                <Text
+                    text="SHRINK TO FIT"
+                    variant="title"
+                    letterSpacing={4}
+                    shrinkToFit
+                    TextColor3={Color3.fromHex("#FFFFFF")}
+                />
+            </Container>
+        </VStack>
+    );
+}
+```
+</Demo>
+
+## Min and max size
+
+`Text` accepts the shared `minWidth`, `maxWidth`, `minHeight`, and `maxHeight` props (see [min and max size](/components/layout/container#min-and-max-size)). They render one `UISizeConstraint` on the label (or on the letter-spaced row).
+
+Use `maxWidth` on its own for an auto-sized label that wraps at a width. A text shorter than `maxWidth` keeps its natural single-line size. A longer text is capped at `maxWidth`, wraps onto more lines, and grows in height to fit them.
+
+```tsx
+<Text text="Short label" maxWidth={240} />
+<Text
+    text="This sentence is longer than 240 pixels, so it wraps onto a second line instead of stretching its parent."
+    maxWidth={240}
+/>
+```
+
+Wrapping must be on, which is the default. Use `maxWidth` instead of adding your own `<uisizeconstraint>` child, and don't pass both: Roblox honours only one `UISizeConstraint` per instance.
+
+This works because the label's automatic size comes from its own text, which wraps (`TextWrapped`) at the constrained width. A maximum doesn't stop `AutomaticSize` growing to fit children (see [min and max size](/components/layout/container#min-and-max-size)). So children you pass to `Text` aren't capped by `maxWidth`, and neither is letter-spaced text.
+
+Letter-spaced text is a row of per-character labels that auto-sizes to its characters and can't wrap. `maxWidth` therefore doesn't narrow it, and the row stays at its full natural width. Use [`shrinkToFit`](#shrink-to-fit) for letter-spaced text instead.
+
+## Outline
+
+Use `outline` to draw a `UIStroke` around the glyphs, for text read over the 3D world or a busy background.
+
+```tsx
+<Text text="Outlined" TextColor3={new Color3(1, 1, 1)} outline />
+<Text
+    text="Custom outline"
+    TextColor3={new Color3(1, 1, 1)}
+    outline={{
+        color: Color3.fromHex("#1D2433"),
+        thickness: 2,
+        transparency: 0.2,
+    }}
+/>
+```
+
+The stroke uses `ApplyStrokeMode.Contextual`, so it outlines the text rather than the label's box.
+
+* `outline={true}` uses the typography style's `outline`, or the defaults: black, thickness `1`, transparency `0`.
+* An object overrides the style's `outline` (or the defaults) field by field, so `{ thickness: 2 }` keeps the other fields.
+* `outline={false}` draws no outline, even if the typography style defines one.
+* When `outline` is unset, the style's `outline` is used if it has one; otherwise no outline is drawn.
+
+`outline` is separate from the native `TextStrokeColor3` and `TextStrokeTransparency`, which are still passed through unchanged. Letter-spaced text gets one stroke per character.
+
+## Shrink to fit
+
+Set `shrinkToFit` to scale the whole text down, with a `UIScale`, so that it fits the available width. It's meant for single-line content such as titles and badges, especially letter-spaced text, which can't wrap.
+
+```tsx
+<frame Size={new UDim2(0, 220, 0, 60)} BackgroundTransparency={1}>
+    <Text
+        text="LEADERBOARD"
+        variant="display"
+        letterSpacing={6}
+        shrinkToFit
+        shrinkMinScale={0.5}
+    />
+</frame>
+```
+
+* The available width is `maxWidth` when set. Otherwise it is the parent's width minus the parent's `UIPadding` left and right.
+* While `shrinkToFit` is on, `maxWidth` is the width to shrink into and isn't applied as a size constraint. The other min and max props still apply.
+* The scale never goes above `1`, so short text is never enlarged. `shrinkMinScale` (clamped to `0`–`1`, default `0`) sets the smallest scale; once it is reached, the text overflows.
+* The scale follows changes to the text, the parent's size, and reparenting.
+* The parent's width must not depend on the text. Inside a parent that auto-sizes on X, with no `maxWidth`, the text never shrinks.
+
+## Text size limits
+
+Use `minTextSize` and `maxTextSize` to add a `UITextSizeConstraint`. They mainly matter for `TextScaled` text, which would otherwise grow to fill its box.
+
+```tsx
+<Text
+    text="Scaled"
+    Size={new UDim2(1, 0, 0, 120)}
+    AutomaticSize={Enum.AutomaticSize.None}
+    TextScaled
+    maxTextSize={32}
+/>
+```
+
+Both are clamped to Roblox's `1`–`100` range. An unset minimum is `1` and an unset maximum is `100`; a maximum below the minimum is raised to it. No constraint is rendered when both are unset.
+
 ## Native properties
 
 `Text` extends `React.InstanceProps<TextLabel>`, so native Roblox `TextLabel` properties can be passed directly to it.
@@ -156,14 +294,22 @@ Some properties are managed internally by the component, including:
 | `TextScaled`               | `boolean`                             | `false`                                                 | Scales the text to fit its container.                                       |
 | `BackgroundTransparency`   | `number`                             | `1`                                                     | Overrides the label's background transparency.                              |
 | `letterSpacing`            | `number`                             | The resolved typography style's `letterSpacing`         | Adds spacing, in pixels, between characters. See [Behaviour](#behaviour) for how it's implemented. |
+| `outline`                  | `TypographyOutline \| boolean`       | The resolved typography style's `outline`, if any       | Draws a contextual `UIStroke` around the text. `true` uses the style's outline or the defaults, an object overrides it field by field, `false` disables it. See [Outline](#outline). |
+| `shrinkToFit`              | `boolean`                             | `false`                                                 | Scales the text down with a `UIScale` to fit `maxWidth` or the parent's content width. See [Shrink to fit](#shrink-to-fit). |
+| `shrinkMinScale`           | `number`                             | `0`                                                     | The smallest scale `shrinkToFit` may use, clamped to `0`–`1`.               |
+| `minTextSize`              | `number`                             | `1` (when `maxTextSize` is set)                         | Minimum text size for a `UITextSizeConstraint`, clamped to `1`–`100`.        |
+| `maxTextSize`              | `number`                             | `100` (when `minTextSize` is set)                       | Maximum text size for a `UITextSizeConstraint`, clamped to `minTextSize`–`100`. |
+
+`TypographyOutline` is `{ color?: Color3; thickness?: number; transparency?: number }`. Unset fields default to black, `1`, and `0`.
 
 ### Shared props
 
-The text label also supports props inherited from the following interface.
+The text label also supports props inherited from the following interfaces.
 
 | Interface                        | Purpose                                                                                |
 | --------------------------------- | ---------------------------------------------------------------------------------------- |
 | `React.InstanceProps<TextLabel>` | Accepts native `TextLabel` properties, including `Position`, `ZIndex`, `Change`, and `Event`. |
+| `SizeElementProps` (`minWidth`, `maxWidth`, `minHeight`, `maxHeight` only) | Clamps the label's size with a `UISizeConstraint`. See [Min and max size](#min-and-max-size). |
 
 All other compatible native `TextLabel` properties, such as `AnchorPoint`, `Visible`, `Rotation`, `TextStrokeColor3`, `TextTransparency`, and `TextTruncate`, are also accepted—see [Native properties](#native-properties) above.
 
@@ -175,12 +321,16 @@ All other compatible native `TextLabel` properties, such as `AnchorPoint`, `Visi
 * Without `variant` or `typography`, the theme's `body` typography style is used.
 * The background is fully transparent by default (`BackgroundTransparency={1}`).
 * When a nonzero `letterSpacing` is set (directly or via the typography style), Roblox has no native letter-spacing property, so the text is instead split into one `TextLabel` per character laid out in a `UIListLayout` row. In this mode, `RichText` is forced off (markup can't survive being split apart), wrapping/truncation don't apply since each character auto-sizes to itself, and native properties other than `TextColor3`, `TextStrokeColor3`, `TextStrokeTransparency`, and `TextTransparency` — including `Change` and `Event` — are not forwarded to the underlying instances.
+* With none of `minWidth`, `maxWidth`, `minHeight`, `maxHeight`, `outline`, `shrinkToFit`, `minTextSize`, or `maxTextSize` set, and no `outline` in the typography style, no extra UI objects are added to the label.
+* The `UISizeConstraint` and the shrink `UIScale` go on the label, or on the letter-spaced row. The outline `UIStroke` and the `UITextSizeConstraint` go on the label, or on every character label when letter-spaced.
+* `UIScale` also shrinks the layout footprint, so siblings in a list layout close up around shrunk text.
+* With `shrinkToFit`, the scale stays where it is until the available width is known (no GUI parent, or a width of `0`).
 
 ## Theme values
 
 `Text` reads from the active theme for:
 
-* `theme.typography.<variant>` — the `font`, `size`, `weight`, `lineHeight`, and `letterSpacing` for each of `display`, `title`, `heading`, `body`, `label`, and `caption`.
+* `theme.typography.<variant>` — the `font`, `size`, `weight`, `lineHeight`, `letterSpacing`, and `outline` for each of `display`, `title`, `heading`, `body`, `label`, and `caption`. A style's `outline` is drawn unless the `outline` prop is `false`. No built-in theme sets `outline`.
 * `theme.colors.intents.primary.default.textColor` — the default text color when `TextColor3` is not provided.
 
 These values can be changed by providing a custom Clean UI theme.

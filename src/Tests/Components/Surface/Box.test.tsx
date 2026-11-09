@@ -1,8 +1,8 @@
 import React from "@rbxts/react";
-import { Test, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
+import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
 const { Skip, Each } = Decorators;
-import { Box } from "../../../Components/Surface/Box";
+import { Box, BoxProps } from "../../../Components/Surface/Box";
 import { Text } from "../../../Components/Typography/Text";
 import {
 	STUDIO_SKIP_MESSAGE,
@@ -78,6 +78,25 @@ class BoxMountValidation {
 
 			assertSizeApprox(box, 200, 100, 1, "centered box");
 			assertCenteredIn(box, mounted.host, "both", 1, "centered box");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A padding passed to Box is drawn once by Box itself, not a second time by the inner Container")
+	@Test
+	public paddingNotDoubled() {
+		const props = { width: 200, height: 100, padding: "10" } as BoxProps;
+
+		withMounted(400, 300, <Box {...props} />, (mounted) => {
+			const box = waitForBox(mounted.host);
+			const paddings = box.GetChildren().filter((child) => child.IsA("UIPadding"));
+
+			Assert.equal(paddings.size(), 1, `Expected exactly one UIPadding on the Box, found ${paddings.size()}`);
+			const padding = paddings[0] as UIPadding;
+			Assert.equal(padding.PaddingTop, new UDim(0, 10));
+			Assert.equal(padding.PaddingBottom, new UDim(0, 10));
+			Assert.equal(padding.PaddingLeft, new UDim(0, 10));
+			Assert.equal(padding.PaddingRight, new UDim(0, 10));
 		});
 	}
 }

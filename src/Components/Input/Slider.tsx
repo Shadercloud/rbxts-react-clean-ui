@@ -29,8 +29,8 @@ export interface SliderProps extends
 
 export const Slider = React.forwardRef<Frame, SliderProps>(
     (props, ref) => {
-        const theme =
-            React.useContext(CleanThemeContext).components.slider;
+        const rootTheme = React.useContext(CleanThemeContext);
+        const theme = rootTheme.components.slider;
 
         const containerRef = React.useRef<Frame>();
 
@@ -307,6 +307,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                 : undefined;
 
         const padding = SizeHelper.toUDim(theme.bar.padding);
+        const sizeConstraint = SizeHelper.GetSizeConstraint(props);
 
         const handles: Array<{ index: SliderHandleIndex; position: number; }> = [{
             index: 0,
@@ -359,6 +360,13 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                 Change={props.Change}
                 Event={props.Event}
             >
+                {sizeConstraint !== undefined && (
+                    <uisizeconstraint
+                        key="SizeConstraint"
+                        MinSize={sizeConstraint.MinSize}
+                        MaxSize={sizeConstraint.MaxSize}
+                    />
+                )}
                 <frame
                     key="Bar"
                     Size={new UDim2(new UDim(1, 0), SizeHelper.toUDim(theme.bar.height))}
@@ -376,7 +384,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
 
                     <uicorner
                         key="Corners"
-                        CornerRadius={SizeHelper.toUDim(theme.bar.cornerRadius)}
+                        CornerRadius={SizeHelper.toRadius(rootTheme, theme.bar.cornerRadius)}
                     />
                 </frame>
 
@@ -416,7 +424,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                                 Color={theme.bar.highlight.borderColor}
                             />
 
-                            <uicorner key="Corners" CornerRadius={SizeHelper.toUDim(theme.bar.cornerRadius)} />
+                            <uicorner key="Corners" CornerRadius={SizeHelper.toRadius(rootTheme, theme.bar.cornerRadius)} />
                         </frame>
                     )}
 
@@ -451,7 +459,7 @@ export const Slider = React.forwardRef<Frame, SliderProps>(
                                 Color={theme.handle.borderColor}
                             />
 
-                            <uicorner key="Corners" CornerRadius={SizeHelper.toUDim(theme.handle.cornerRadius)} />
+                            <uicorner key="Corners" CornerRadius={SizeHelper.toRadius(rootTheme, theme.handle.cornerRadius)} />
 
                             {(hoveredHandle === index || (dragging && activeHandleRef.current === index)) && (
                                 <BoxShadow box-shadow={theme.handle.boxShadow} />

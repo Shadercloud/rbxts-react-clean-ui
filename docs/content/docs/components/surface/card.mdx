@@ -111,3 +111,17 @@ import { Card, Text, Button, Column, Row, HStack, Container, Intent } from "@rbx
 </Demo>
 
 An `intent` set directly on `Card.Header` or `Card.Footer` takes priority over the card-level intent.
+
+## Min and max size
+
+`Card` accepts the shared `minWidth`, `maxWidth`, `minHeight`, and `maxHeight` props (see [min and max size](/components/layout/container#min-and-max-size)). They clamp the card's `Box`, never the centring wrapper used with `center`. When an overlay `Card.Header` or `Card.Footer` adds its wrapper frame, the wrapper is clamped too, so overlay sections stay aligned with the clamped card.
+
+```tsx
+<Card width="100%" maxWidth={480}>
+    <Card.Body>
+        <Text text="Fills its parent up to 480 pixels wide." />
+    </Card.Body>
+</Card>
+```
+
+`Card.Body` and `Card.Footer` also accept these props and apply them to their own section.

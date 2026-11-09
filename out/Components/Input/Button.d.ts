@@ -1,9 +1,10 @@
 import React from "@rbxts/react";
-import { BackgroundElementProps, CssPadding, IconElementProps, IntentElementProps, ScalableElementProps, ShadowElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
+import { BackgroundElementProps, CssPadding, IconElementProps, IntentElementProps, ScalableElementProps, ShadowElementProps, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces/";
 import { IconProps } from "../Surface";
 import { ThemeTemplate } from "../../Theme/theme.template";
+import { PressOn, PressReleaseCallback } from "./Button.press";
 export type ButtonStyleOverride = Partial<ThemeTemplate["components"]["button"]>;
-export interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIndexElementProps, BackgroundElementProps, IntentElementProps, ScalableElementProps, IconElementProps {
+export interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIndexElementProps, BackgroundElementProps, IntentElementProps, ScalableElementProps, IconElementProps, Pick<SizeElementProps, "width"> {
     text?: string;
     fontWeight?: Enum.FontWeight;
     Event?: React.InstanceEvent<ImageButton>;
@@ -16,6 +17,9 @@ export interface ButtonProps extends SpacedElementProps, ShadowElementProps, ZIn
     name?: string;
     padding?: CssPadding;
     modal?: boolean;
+    fill?: boolean;
+    pressOn?: PressOn;
+    onRelease?: PressReleaseCallback;
 }
 export interface ButtonTextProps extends ScalableElementProps, IntentElementProps {
     children?: string;

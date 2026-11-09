@@ -2,10 +2,12 @@ import React from "@rbxts/react";
 import ReactRoblox from "@rbxts/react-roblox";
 import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
-const { Skip } = Decorators;
+const { Skip, Each } = Decorators;
 import { Pagination } from "../../../Components/Layout/Pagination";
 import { ThemeProvider } from "../../../Providers/theme.provider";
 import { createTheme } from "../../../Theme";
+import { activateButton } from "../../Helpers/fiber";
+import { waitForDescendant, withMounted } from "../../Helpers/layout";
 
 function renderPagination(element: React.ReactElement) {
 	const host = new Instance("Folder");
@@ -26,6 +28,14 @@ function getButton(host: Instance, name: string) {
 	Assert.notUndefined(button);
 	Assert.true(button!.IsA("ImageButton"));
 	return button as ImageButton;
+}
+
+function hasNextPageFor(label: string): boolean | undefined {
+	return label === "unset" ? undefined : label === "true";
+}
+
+function countPageItems(host: Instance) {
+	return host.GetDescendants().filter((descendant) => descendant.Name.sub(1, "PaginationItem-".size()) === "PaginationItem-").size();
 }
 
 function unmount(root: ReactRoblox.Root, host: Instance) {
@@ -297,6 +307,98 @@ class PaginationMountValidation {
 			task.wait();
 			Assert.equal(countRenderedItems(), expectedItemCount);
 		}
+
+		unmount(root, host);
+	}
+
+	@Skip(!Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	@DisplayName("Without totalPages the default layout is just Prev and Next with no list or page items")
+	@Test
+	public cursorPrevNextOnly() {
+		const { host, root } = renderPagination(<Pagination page={3} hasNextPage={true} onPageChange={() => {}} />);
+
+		Assert.notUndefined(host.FindFirstChild("PaginationPrev", true));
+		Assert.notUndefined(host.FindFirstChild("PaginationNext", true));
+		Assert.undefined(host.FindFirstChild("PaginationList", true));
+		Assert.equal(countPageItems(host), 0);
+		Assert.equal(getNamedDescendants(host, "PaginationEllipsis").size(), 0);
+
+		unmount(root, host);
+	}
+
+	@Skip(!Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	@Each([
+		["unset", false],
+		["false", false],
+		["true", true],
+	])
+	@DisplayName("Without totalPages Next is enabled only when hasNextPage is true, while Prev follows the page")
+	@Test
+	public cursorNextNeedsFlag(label: string, nextEnabled: boolean) {
+		const { host, root } = renderPagination(
+			<Pagination page={3} hasNextPage={hasNextPageFor(label)} onPageChange={() => {}} />,
+		);
+
+		const previous = getButton(host, "PaginationPrev");
+		const nextButton = getButton(host, "PaginationNext");
+		Assert.true(previous.Active);
+		Assert.equal(nextButton.Active, nextEnabled);
+		Assert.equal(nextButton.Selectable, nextEnabled);
+
+		unmount(root, host);
+	}
+
+	@Skip(!Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	@DisplayName("Without totalPages page 1 disables Prev and a fractional page is floored before emitting")
+	@Test
+	public cursorEmitsFloored() {
+		const emitted: number[] = [];
+
+		withMounted(
+			400,
+			100,
+			<Pagination page={1.7} hasNextPage={true} onPageChange={(page) => emitted.push(page)} />,
+			(mounted) => {
+				const previous = waitForDescendant<ImageButton>(mounted.host, "PaginationPrev", () => true);
+				const nextButton = waitForDescendant<ImageButton>(mounted.host, "PaginationNext", () => true);
+
+				Assert.false(previous.Active);
+				activateButton(mounted, previous);
+				activateButton(mounted, nextButton);
+
+				Assert.deepEqual(emitted, [2]);
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	@DisplayName("An explicit Pagination.List without totalPages renders the list container with no page items")
+	@Test
+	public cursorListEmpty() {
+		const { host, root } = renderPagination(
+			<Pagination page={2} onPageChange={() => {}}>
+				<Pagination.List />
+			</Pagination>,
+		);
+
+		Assert.notUndefined(host.FindFirstChild("PaginationList", true));
+		Assert.equal(countPageItems(host), 0);
+		Assert.equal(getNamedDescendants(host, "PaginationEllipsis").size(), 0);
+
+		unmount(root, host);
+	}
+
+	@Skip(!Runtime.isRoblox(), "Requires a real Roblox Instance tree - run inside Roblox Studio via the TestRunner.")
+	@DisplayName("With totalPages given, hasNextPage is ignored and Next stays disabled on the last page")
+	@Test
+	public totalPagesIgnoresFlag() {
+		const { host, root } = renderPagination(
+			<Pagination page={3} totalPages={3} hasNextPage={true} onPageChange={() => {}} />,
+		);
+
+		Assert.false(getButton(host, "PaginationNext").Active);
+		Assert.notUndefined(host.FindFirstChild("PaginationList", true));
+		Assert.equal(countPageItems(host), 3);
 
 		unmount(root, host);
 	}

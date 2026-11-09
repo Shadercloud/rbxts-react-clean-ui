@@ -209,6 +209,10 @@ local function ToastContainer(props)
 	_attributes.Size = SizeHelper:GetSize(props, UDim2.new(SizeHelper:toUDim(theme.components.toast.width), UDim.new(0, 0)))
 	_attributes.Position = position
 	_attributes.AnchorPoint = anchor
+	_attributes.minWidth = props.minWidth
+	_attributes.maxWidth = props.maxWidth
+	_attributes.minHeight = props.minHeight
+	_attributes.maxHeight = props.maxHeight
 	-- ▼ ReadonlyArray.map ▼
 	local _newValue = table.create(#toasts)
 	local _callback = function(toast)

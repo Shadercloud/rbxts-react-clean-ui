@@ -14,6 +14,7 @@
 ## Sizing and positioning
 
 - The sizing and positioning rules are the same as [Container's](./container.md#sizing). With no `Size`, `width` or `height`, `AutomaticSize` is `XY` and the group fits its content. `width`, `height`, `top`, `left`, `right`, `bottom` and `center` resolve the same way they do in `Container`. An explicit `Size`, `Position`, `AnchorPoint` or `AutomaticSize` always wins.
+- `minWidth`/`maxWidth`/`minHeight`/`maxHeight` follow [Min and max size](../index.md#min-and-max-size); the `UISizeConstraint` is a direct child of the `CanvasGroup`.
 - `center` sets `Position` to 50% and `AnchorPoint` to `(0.5, 0.5)` directly. Unlike `Container`, it never adds the centring wrapper frame for automatically sized content.
 - `BackgroundTransparency` defaults to `1` and `BorderSizePixel` defaults to `0`. With no background props set, the group itself is invisible and only its children show.
 

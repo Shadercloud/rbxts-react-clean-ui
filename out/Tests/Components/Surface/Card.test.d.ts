@@ -11,5 +11,6 @@ declare class CardMountValidation {
     respectsExplicitSize(width: number, height: number): void;
     growsWithContent(): void;
     resizeKeepsContained(): void;
+    sectionPaddingNotDoubled(): void;
 }
 export = CardMountValidation;

@@ -106,6 +106,17 @@ The shared `spacing` prop controls the gap between the minus button, field, and 
 <Increment value={5} spacing="lg" />
 ```
 
+## Width
+
+By default the increment fills the full width available to it. Set `width` to give it a fixed or relative width instead. It accepts the same values as [`Container`](/components/layout/container)'s `width`: a pixel number, `"160px"`, a percentage such as `"50%"`, or a breakpoint table. The numeric field grows to fill whatever the minus and plus buttons leave, and the height still fits the content.
+
+```tsx
+<Increment value={5} width={160} />
+<Increment value={5} width="50%" />
+```
+
+`width="Auto"` doesn't make the increment fit its content: it collapses to zero width. Pass a pixel or percentage value instead.
+
 ## Props
 
 ### Increment-specific props
@@ -118,6 +129,7 @@ The shared `spacing` prop controls the gap between the minus button, field, and 
 | `min`        | `number`                   | `undefined` | Inclusive lower bound, enforced by the minus button and on blur of the field.          |
 | `max`        | `number`                   | `undefined` | Inclusive upper bound, enforced by the plus button and on blur of the field.           |
 | `controlled` | `boolean`                  | `false`     | Reads the rendered value directly from `value`, instead of managing it internally.    |
+| `width`      | `ResponsiveCssSize`        | Full width  | Sets the root's width (px, `"50%"`, or a breakpoint table). `"Auto"` collapses it to zero width. |
 
 ### Shared props
 
@@ -132,7 +144,7 @@ The increment also supports props inherited from the following interfaces.
 
 ## Behaviour
 
-* The root renders through `Container` at a fixed `Size={UDim2.fromScale(1, 0)}` with `AutomaticSize.Y` — full available width, height fit to content. `Size`/`AutomaticSize` passed in props are not honored.
+* The root renders through `Container` at `Size={UDim2.fromScale(1, 0)}` with `AutomaticSize.Y` — full available width, height fit to content — unless `width` is set, in which case the width resolves like `Container`'s `width` and the height still fits the content. `Size`/`AutomaticSize` passed in props are not honored.
 * `Increment` manages its own numeric state (separate from `Input`'s internal string state) unless `controlled` is set. The `Input` is always rendered `controlled={true}`.
 * Activating the minus/plus `Button` computes `current - step`/`current + step`, clamps it to `[min, max]`, updates internal state (unless `controlled`), and calls `onChange` with the clamped value.
 * If the value is already at `min` (minus) or `max` (plus), activating that button is a no-op — neither internal state nor `onChange` fire.

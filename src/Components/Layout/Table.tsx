@@ -59,8 +59,8 @@ function TableHeader(props: TableSectionProps) {
 			>
 				<uicorner
 					key="Corners"
-					TopLeftRadius={SizeHelper.toUDim(theme.components.table.cornerRadius)}
-					TopRightRadius={SizeHelper.toUDim(theme.components.table.cornerRadius)}
+					TopLeftRadius={SizeHelper.toRadius(theme, theme.components.table.cornerRadius)}
+					TopRightRadius={SizeHelper.toRadius(theme, theme.components.table.cornerRadius)}
 					BottomLeftRadius={new UDim(0, 0)}
 					BottomRightRadius={new UDim(0, 0)}
 				/>
@@ -258,6 +258,10 @@ const Table = React.forwardRef<ImageLabel, TableProps>((props, ref) => {
 					width={props.width}
 					height={props.height}
 					AutomaticSize={props.AutomaticSize}
+					minWidth={props.minWidth}
+					maxWidth={props.maxWidth}
+					minHeight={props.minHeight}
+					maxHeight={props.maxHeight}
 					BackgroundColor3={theme.components.table.backgroundColor}
 					BackgroundTransparency={theme.components.table.backgroundTransparency}
 					ClipsDescendants

@@ -37,11 +37,11 @@ local function TabButtonCorners()
 			radius = theme.components.tabs.list.cornerRadius,
 		})
 	end
-	local fallback = SizeHelper:toUDim(theme.components.tabs.list.cornerRadius)
-	local topLeftRadius = if cornerRadius.topLeft ~= nil then CssHelper:parseCssSize(cornerRadius.topLeft) else fallback
-	local topRightRadius = if cornerRadius.topRight ~= nil then CssHelper:parseCssSize(cornerRadius.topRight) else fallback
-	local bottomLeftRadius = if cornerRadius.bottomLeft ~= nil then CssHelper:parseCssSize(cornerRadius.bottomLeft) else fallback
-	local bottomRightRadius = if cornerRadius.bottomRight ~= nil then CssHelper:parseCssSize(cornerRadius.bottomRight) else fallback
+	local fallback = SizeHelper:toRadius(theme, theme.components.tabs.list.cornerRadius)
+	local topLeftRadius = if cornerRadius.topLeft ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, cornerRadius.topLeft)) else fallback
+	local topRightRadius = if cornerRadius.topRight ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, cornerRadius.topRight)) else fallback
+	local bottomLeftRadius = if cornerRadius.bottomLeft ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, cornerRadius.bottomLeft)) else fallback
+	local bottomRightRadius = if cornerRadius.bottomRight ~= nil then CssHelper:parseCssSize(SizeHelper:resolveRadius(theme, cornerRadius.bottomRight)) else fallback
 	local isZero = function(radius)
 		return radius.Scale == 0 and radius.Offset == 0
 	end

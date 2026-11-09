@@ -37,8 +37,8 @@ local function TableHeader(props)
 		BackgroundTransparency = theme.components.table.header.backgroundTransparency,
 	}, React.createElement("uicorner", {
 		key = "Corners",
-		TopLeftRadius = SizeHelper:toUDim(theme.components.table.cornerRadius),
-		TopRightRadius = SizeHelper:toUDim(theme.components.table.cornerRadius),
+		TopLeftRadius = SizeHelper:toRadius(theme, theme.components.table.cornerRadius),
+		TopRightRadius = SizeHelper:toRadius(theme, theme.components.table.cornerRadius),
 		BottomLeftRadius = UDim.new(0, 0),
 		BottomRightRadius = UDim.new(0, 0),
 	}), React.createElement(VStack, {
@@ -314,6 +314,10 @@ local Table = React.forwardRef(function(props, ref)
 	_attributes.width = props.width
 	_attributes.height = props.height
 	_attributes.AutomaticSize = props.AutomaticSize
+	_attributes.minWidth = props.minWidth
+	_attributes.maxWidth = props.maxWidth
+	_attributes.minHeight = props.minHeight
+	_attributes.maxHeight = props.maxHeight
 	_attributes.BackgroundColor3 = theme.components.table.backgroundColor
 	_attributes.BackgroundTransparency = theme.components.table.backgroundTransparency
 	_attributes.ClipsDescendants = true

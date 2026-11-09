@@ -180,6 +180,8 @@ export const DarkTheme = createTheme({
         badge: {
             cornerRadius: "50%",
             borderThickness: 1,
+            hoverDarken: -0.1,
+            pressDarken: -0.2,
             intents: {
                 primary: {
                     default: {

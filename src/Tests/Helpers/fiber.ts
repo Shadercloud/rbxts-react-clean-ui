@@ -33,3 +33,13 @@ export function activateButton(mounted: MountedElement, button: GuiButton) {
 	handler!(button, {}, 1);
 	task.wait();
 }
+
+export function fireHostEvent(mounted: MountedElement, instance: Instance, eventName: string, ...args: unknown[]) {
+	const eventKey = (React as unknown as { Event: Record<string, unknown> }).Event[eventName];
+	const handler = findHostFiber(mounted, instance).memoizedProps?.get(eventKey) as
+		((rbx: Instance, ...rest: unknown[]) => void) | undefined;
+
+	Assert.notUndefined(handler, `Expected ${instance.Name} to have a ${eventName} handler`);
+	handler!(instance, ...args);
+	task.wait();
+}

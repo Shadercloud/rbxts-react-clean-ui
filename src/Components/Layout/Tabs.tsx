@@ -46,11 +46,11 @@ function TabButtonCorners() {
         return <Corners radius={theme.components.tabs.list.cornerRadius} />;
     }
 
-    const fallback = SizeHelper.toUDim(theme.components.tabs.list.cornerRadius);
-    const topLeftRadius = cornerRadius.topLeft !== undefined ? CssHelper.parseCssSize(cornerRadius.topLeft) : fallback;
-    const topRightRadius = cornerRadius.topRight !== undefined ? CssHelper.parseCssSize(cornerRadius.topRight) : fallback;
-    const bottomLeftRadius = cornerRadius.bottomLeft !== undefined ? CssHelper.parseCssSize(cornerRadius.bottomLeft) : fallback;
-    const bottomRightRadius = cornerRadius.bottomRight !== undefined ? CssHelper.parseCssSize(cornerRadius.bottomRight) : fallback;
+    const fallback = SizeHelper.toRadius(theme, theme.components.tabs.list.cornerRadius);
+    const topLeftRadius = cornerRadius.topLeft !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, cornerRadius.topLeft)) : fallback;
+    const topRightRadius = cornerRadius.topRight !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, cornerRadius.topRight)) : fallback;
+    const bottomLeftRadius = cornerRadius.bottomLeft !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, cornerRadius.bottomLeft)) : fallback;
+    const bottomRightRadius = cornerRadius.bottomRight !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, cornerRadius.bottomRight)) : fallback;
 
     const isZero = (radius: UDim) => radius.Scale === 0 && radius.Offset === 0;
 

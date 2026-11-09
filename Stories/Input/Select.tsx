@@ -38,9 +38,9 @@ const flatFieldTheme = createTheme({
     },
 });
 
-function CountrySelect(props: { searchable?: boolean; grouped?: boolean }) {
+function CountrySelect(props: { searchable?: boolean; grouped?: boolean; disabled?: boolean; width?: number }) {
     return (
-        <SelectComponent max-height="200px" searchable={props.searchable}>
+        <SelectComponent max-height="200px" searchable={props.searchable} disabled={props.disabled} width={props.width}>
             {props.grouped ? (
                 <>
                     <SelectComponent.OptGroup label="Europe">
@@ -76,23 +76,28 @@ function CountrySelect(props: { searchable?: boolean; grouped?: boolean }) {
     );
 }
 
-function Select(props: { screenshot?: boolean; searchable?: boolean; grouped?: boolean } = {}) {
+function Select(props: { screenshot?: boolean; searchable?: boolean; grouped?: boolean; disabled?: boolean } = {}) {
     const searchable = props.searchable ?? false;
     const grouped = props.grouped ?? false;
+    const disabled = props.disabled ?? false;
 
     const content = (
         <Container width={320}>
             <VStack>
                 <Text text="Default Select" />
-                <CountrySelect searchable={searchable} grouped={grouped} />
+                <CountrySelect searchable={searchable} grouped={grouped} disabled={disabled} />
                 <Text text="Select with theme.components.select.backgroundImage" />
                 <ThemeProvider theme={themeWithBackgroundImage}>
-                    <CountrySelect searchable={searchable} grouped={grouped} />
+                    <CountrySelect searchable={searchable} grouped={grouped} disabled={disabled} />
                 </ThemeProvider>
                 <Text text="Select with a flat themed background" />
                 <ThemeProvider theme={flatFieldTheme}>
-                    <CountrySelect searchable={searchable} grouped={grouped} />
+                    <CountrySelect searchable={searchable} grouped={grouped} disabled={disabled} />
                 </ThemeProvider>
+                <Text text="Select with width={200}" />
+                <Container>
+                    <CountrySelect searchable={searchable} grouped={grouped} disabled={disabled} width={200} />
+                </Container>
             </VStack>
         </Container>
     );

@@ -419,3 +419,25 @@ export function assertAlignedTop(child: GuiObject, parent: GuiObject, tolerance 
 		`${prefix}expected ${describeGui(child)} ${formatRect(childRect)} to be top-aligned with ${describeGui(parent)} ${formatRect(parentRect)} (tolerance ${tolerance})`,
 	);
 }
+
+export function sizeConstraintsOf(instance: Instance): UISizeConstraint[] {
+	const found: UISizeConstraint[] = [];
+	for (const child of instance.GetChildren()) {
+		if (child.IsA("UISizeConstraint")) found.push(child);
+	}
+	return found;
+}
+
+export function soleSizeConstraint(instance: Instance): UISizeConstraint {
+	const found = sizeConstraintsOf(instance);
+	Assert.equal(found.size(), 1, `Expected exactly one UISizeConstraint directly on ${instance.GetFullName()}`);
+	Assert.equal(found[0].Name, "SizeConstraint", `Expected the UISizeConstraint on ${instance.Name} to be named SizeConstraint`);
+	return found[0];
+}
+
+export function waitForWidth(gui: GuiObject, width: number, tolerance = 1) {
+	waitForLayout(
+		() => (math.abs(gui.AbsoluteSize.X - width) <= tolerance ? true : undefined),
+		`Timed out waiting for ${describeGui(gui)} to be ${width}px wide (is ${gui.AbsoluteSize.X})`,
+	);
+}

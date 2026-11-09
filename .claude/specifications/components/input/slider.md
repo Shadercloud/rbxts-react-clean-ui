@@ -14,6 +14,7 @@
   - `highlight?: "start" | "end" | "middle"` — which section of the track is drawn with the highlight styling.
 - `BackgroundTransparency` defaults to `1` (the root frame is otherwise invisible; only the track/handle sub-frames are drawn). The slider's height defaults to `theme.components.slider.height` unless `Size`/`height` overrides it.
 - `ContainerProps` includes a `group?: boolean` field (used by `Container` to align widths within a `Group`), but `Slider` builds its own root frame rather than rendering through `Container`, and never reads `props.group` or `GroupContext`. `group` is inert on `Slider`.
+- `minWidth`/`maxWidth`/`minHeight`/`maxHeight` follow [Min and max size](../index.md#min-and-max-size); the `UISizeConstraint` is a direct child of the root `Frame`. The track and handles are scale-sized inside it, so they follow the clamped width. The other `ContainerProps` extras (`padding`, `cornerRadius`, `border*`) remain inert on `Slider`.
 
 ## Interaction
 

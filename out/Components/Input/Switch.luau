@@ -17,11 +17,29 @@ local function Switch(props)
 	local theme = React.useContext(CleanThemeContext)
 	local fieldset = React.useContext(FieldsetContext)
 	local switchTheme = theme.components.switch
-	local _condition = props.checked
+	local controlled = props.checked ~= nil
+	local _condition = props.defaultChecked
 	if _condition == nil then
 		_condition = false
 	end
-	local checked, setChecked = React.useState(_condition)
+	local internalChecked, setInternalChecked = React.useState(_condition)
+	local checked = if controlled then props.checked == true else internalChecked
+	local requestChange = function(value)
+		if props.disabled then
+			return nil
+		end
+		if not controlled then
+			setInternalChecked(value)
+		end
+		local _result = props.onChange
+		if _result ~= nil then
+			_result(value)
+		end
+	end
+	local toggleRef = React.useRef()
+	toggleRef.current = function()
+		return requestChange(not checked)
+	end
 	React.useEffect(function()
 		if not fieldset then
 			return nil
@@ -29,12 +47,10 @@ local function Switch(props)
 		local _connection = fieldset.labelActivated
 		if _connection ~= nil then
 			_connection = _connection.Event:Connect(function()
-				if props.disabled then
-					return nil
+				local _result = toggleRef.current
+				if _result ~= nil then
+					_result()
 				end
-				setChecked(function(current)
-					return not current
-				end)
 			end)
 		end
 		local connection = _connection
@@ -44,13 +60,7 @@ local function Switch(props)
 				_result:Disconnect()
 			end
 		end
-	end, { fieldset, props.disabled })
-	React.useEffect(function()
-		local _result = props.onChange
-		if _result ~= nil then
-			_result(checked)
-		end
-	end, { checked })
+	end, { fieldset })
 	local duration = switchTheme.animation.duration
 	local progress, progressTween = useTween(if checked then 1 else 0, {
 		duration = duration,
@@ -95,6 +105,7 @@ local function Switch(props)
 	_attributes.AutoButtonColor = false
 	_attributes.Size = UDim2.new(trackWidth, trackHeight)
 	_attributes.ZIndex = props.ZIndex
+	_attributes.LayoutOrder = props.LayoutOrder
 	_attributes.BorderSizePixel = 0
 	_attributes.BackgroundColor3 = trackBackgroundColor
 	local _result
@@ -110,10 +121,7 @@ local function Switch(props)
 	_attributes.BackgroundTransparency = _result
 	_attributes.Event = {
 		Activated = function()
-			if props.disabled then
-				return nil
-			end
-			setChecked(not checked)
+			requestChange(not checked)
 		end,
 	}
 	return React.createElement("imagebutton", _attributes, React.createElement(Corners, {

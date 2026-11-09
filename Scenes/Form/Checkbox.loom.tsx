@@ -11,10 +11,10 @@ export const preview = {
             <Container width="80%" height="140" center>
                 <Box>
                     <HStack>
-                        <Checkbox checked={false} />
-                        <Checkbox checked={true} />
+                        <Checkbox defaultChecked={false} />
+                        <Checkbox defaultChecked={true} />
                         <Checkbox
-                            checked={true}
+                            defaultChecked={true}
                             intent-checked="success"
                             intent-unchecked="danger"
                             icon-unchecked="times"

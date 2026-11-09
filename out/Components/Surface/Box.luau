@@ -30,6 +30,7 @@ local Box = React.forwardRef(function(props, ref)
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
+	_attributes.padding = nil
 	_attributes.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 1))
 	_attributes.AutomaticSize = SizeHelper:GetAutoSize(props)
 	local _condition_2 = props.BackgroundTransparency

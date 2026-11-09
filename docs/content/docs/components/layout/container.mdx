@@ -42,6 +42,7 @@ export function ContainerExample() {
 * Works seamlessly with layout components such as `Row`, `Column`, `HStack`, and `VStack`.
 * Optionally render a background image via the `backgroundImage` prop.
 * Optionally render a background gradient via the `backgroundGradient` prop.
+* Optionally add a border, padding, and rounded corners via the `border*`, `padding`, and `cornerRadius` props.
 * Accepts all native `ImageLabel` properties through React.
 
 ## Sizing
@@ -61,6 +62,60 @@ You can use either percentages or pixels.
     ...
 </Container>
 ```
+
+## Min and max size
+
+`minWidth`, `maxWidth`, `minHeight`, and `maxHeight` clamp the container's resolved size, like CSS `min-width` and `max-width`. A typical use is `width="100%" maxWidth={1200}`, which fills the parent up to a desktop width.
+
+The minimums apply however the size was produced: `Size`, `width`/`height`, a percentage, or `AutomaticSize`. The maximums cap a size set with `Size`, `width`/`height`, or a percentage, but they don't stop `AutomaticSize` growing an axis to fit its children. A container that auto-sizes to a 120-pixel-wide child is still 120 pixels wide with `maxWidth={80}`. To cap an axis, give it a size, for example `width="100%" maxWidth={320}`.
+
+<Demo preview="Scenes/Layout/ContainerMinMax.loom.tsx" previewHeight={300}>
+```tsx
+import React from "@rbxts/react";
+import { Container, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function ContainerMinMaxExample() {
+    return (
+        <Container width="100%" height="200" padding="12">
+            <VStack
+                HorizontalFlex={Enum.UIFlexAlignment.None}
+                HorizontalAlignment={Enum.HorizontalAlignment.Left}
+                valign="Center"
+            >
+                <Container width="100%" height="40" BackgroundColor3={Color3.fromHex("#3B72E6")} BackgroundTransparency={0} cornerRadius="md" center LayoutOrder={1}>
+                    <Text text='width="100%"' TextColor3={Color3.fromHex("#FFFFFF")} />
+                </Container>
+
+                <Container width="100%" maxWidth={320} height="40" BackgroundColor3={Color3.fromHex("#3BE672")} BackgroundTransparency={0} cornerRadius="md" center LayoutOrder={2}>
+                    <Text text='width="100%" maxWidth={320}' />
+                </Container>
+
+                <Container width="10%" minWidth={220} height="40" BackgroundColor3={Color3.fromHex("#F2C94C")} BackgroundTransparency={0} cornerRadius="md" center LayoutOrder={3}>
+                    <Text text='width="10%" minWidth={220}' />
+                </Container>
+            </VStack>
+        </Container>
+    );
+}
+```
+</Demo>
+
+The values are pixels only: a number, `"25"`, or `"25px"` (`CssPixelSize`). Percentages are not accepted, because Roblox's `UISizeConstraint` only takes pixel sizes.
+
+| Prop        | Type           | Default     | Description                                            |
+| ----------- | -------------- | ----------- | ------------------------------------------------------- |
+| `minWidth`  | `CssPixelSize` | `undefined` | Smallest width, in pixels. Unset means `0`.             |
+| `maxWidth`  | `CssPixelSize` | `undefined` | Largest width, in pixels. Unset means no upper limit.   |
+| `minHeight` | `CssPixelSize` | `undefined` | Smallest height, in pixels. Unset means `0`.            |
+| `maxHeight` | `CssPixelSize` | `undefined` | Largest height, in pixels. Unset means no upper limit.  |
+
+* When none of the four is set, no `UISizeConstraint` is added and the container renders exactly as before.
+* When any is set, a single `UISizeConstraint` named `SizeConstraint` is added. An unset minimum is `0` and an unset maximum is unbounded.
+* A negative minimum is treated as `0`, and a maximum below its minimum is raised to the minimum.
+* The constraint goes on the visible container itself. When `center` wraps a content-sized container in an invisible full-size frame, the wrapper isn't clamped.
+* Don't also pass your own `<uisizeconstraint>` child when using these props. The container would end up with two, and Roblox only applies one.
+
+These props come from the shared `SizeElementProps`, so every component that accepts `width` and `height` accepts them too, including `Box`, `Card`, `FlexItem`, `FadeGroup`, `Scroller`, `Slider`, `ProgressBar`, `Modal`, and `Table`. Components that render through `Container` get the constraint on the same visible element. `Scroller` puts it on a wrapper `Frame` around its `ScrollingFrame` instead (see [Scroller sizing](/components/layout/scroller#sizing)). `Tooltip` currently ignores its size props, including these.
 
 ## Centering
 
@@ -113,6 +168,119 @@ Or anchored to another edge.
 </Container>
 ```
 
+## Border
+
+Set `borderThickness` to draw a `UIStroke` around the container. No border is drawn when `borderThickness` is unset or `0`.
+
+<Demo preview="Scenes/Layout/ContainerBorders.loom.tsx" previewHeight={300}>
+```tsx
+import React from "@rbxts/react";
+import { Container, HStack, Text } from "@rbxts/react-clean-ui";
+
+export function ContainerBordersExample() {
+    return (
+        <Container width="100%" height="200">
+            <HStack HorizontalFlex={Enum.UIFlexAlignment.SpaceEvenly} valign="Center">
+                <Container
+                    width="150"
+                    height="90"
+                    BackgroundColor3={Color3.fromHex("#3B72E6")}
+                    BackgroundTransparency={0}
+                    borderThickness={4}
+                    borderColor={Color3.fromHex("#F2C94C")}
+                    borderPosition="inner"
+                    padding="12"
+                    cornerRadius="md"
+                >
+                    <Text text="Inner border" />
+                </Container>
+
+                <Container
+                    width="150"
+                    height="90"
+                    BackgroundColor3={Color3.fromHex("#3B72E6")}
+                    BackgroundTransparency={0}
+                    borderThickness={4}
+                    borderColor={Color3.fromHex("#F2C94C")}
+                    borderPosition="outer"
+                    padding="12"
+                    cornerRadius="md"
+                >
+                    <Text text="Outer border" />
+                </Container>
+
+                <Container
+                    width="150"
+                    height="90"
+                    BackgroundColor3={Color3.fromHex("#3BE672")}
+                    BackgroundTransparency={0}
+                    borderThickness={6}
+                    borderColor={Color3.fromHex("#000000")}
+                    borderTransparency={0.6}
+                    padding="24 8"
+                    cornerRadius="16"
+                >
+                    <Text text="Faded border" />
+                </Container>
+            </HStack>
+        </Container>
+    );
+}
+```
+</Demo>
+
+| Prop                 | Type                   | Default     | Description                                                                                   |
+| -------------------- | ---------------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `borderThickness`    | `number`               | `undefined` | Stroke thickness in pixels. A `UIStroke` is only rendered when this is greater than `0`.       |
+| `borderColor`        | `Color3`               | `undefined` | Stroke colour. When unset, the engine default (black) is used.                                |
+| `borderTransparency` | `number`               | `undefined` | Stroke transparency. When unset, the engine default (`0`) is used.                            |
+| `borderPosition`     | `"inner" \| "outer"`   | `"inner"`   | `"inner"` draws the stroke inside the container's bounds; `"outer"` draws it outside them.    |
+
+The border uses plain values and is not read from the theme, since `Container` is not themed.
+
+## Padding
+
+`padding` adds a `UIPadding` using a CSS-style value of one to four parts, in pixels.
+
+```tsx
+<Container width="300px" padding="8">
+    ...
+</Container>
+
+<Container width="300px" padding="4 12">
+    ...
+</Container>
+
+<Container width="300px" padding="4 8 12 16">
+    ...
+</Container>
+```
+
+Padding is pixel-only, so percentage values resolve to `0`. When `padding` is unset, no `UIPadding` is added. `top`, `left`, `right`, and `bottom` are positioning props (see [Positioning](#positioning)), not padding sides.
+
+## Corner radius
+
+`cornerRadius` rounds the container's corners with a `UICorner`. It accepts a size (`8`, `"8px"`, `"50%"`) or a theme radius token (`"sm"`, `"md"`, or `"lg"`), which resolves to the matching value in the active theme's `radius` scale.
+
+```tsx
+<Container
+    width="200px"
+    height="100px"
+    BackgroundTransparency={0}
+    cornerRadius="md"
+>
+    ...
+</Container>
+```
+
+When `cornerRadius` is unset, or resolves to `0`, no `UICorner` is added.
+
+## Where border, padding, and corners apply
+
+The border, padding, and corners are applied to the visible container itself. When `center` wraps a content-sized container in an invisible full-size frame, that wrapper gets none of them.
+
+Don't combine these props with your own `<uistroke>`, `<uipadding>`, or `<uicorner>` child of the same kind. The container would end up with two of that instance, and Roblox only applies one.
+
 ## Example
 
 ```tsx
@@ -140,4 +308,4 @@ A `Container` is commonly used to:
 * define the bounds of a layout component;
 * wrap sections of an interface before applying additional styling.
 
-Unlike `Box`, which provides visual styling such as padding and shadows, `Container` is primarily concerned with **layout**—controlling **where** content appears and **how much space** it occupies.
+Unlike `Box`, which provides themed visual styling such as backgrounds, padding, and shadows, `Container` is primarily concerned with **layout**—controlling **where** content appears and **how much space** it occupies.

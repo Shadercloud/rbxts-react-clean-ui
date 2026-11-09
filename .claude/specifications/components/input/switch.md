@@ -4,33 +4,42 @@
 
 ## Public API
 
-- `SwitchProps` composes `IntentElementProps`, `BackgroundElementProps`, and `ZIndexElementProps`, plus `checked?: boolean`, `onChange?: (value: boolean) => void`, `disabled?: boolean`, and `name?: string` (sets the rendered instance's `Name`, defaulting to `"Switch"`).
-- `checked` only seeds the component's internal state on mount (`React.useState(props.checked ?? false)`), matching `Checkbox`'s pattern — changing the `checked` prop after the initial render has no further effect. The component is uncontrolled from that point on.
-- `onChange` is called from a `React.useEffect` on the internal checked state, so it fires once immediately after mount with the initial value, in addition to firing on every subsequent toggle.
-- `disabled`, unlike `Checkbox` (which has no disabled state), suppresses both activation (clicking, and a paired `Fieldset.Label` activation) and `onChange`, and renders a distinct dimmed visual state — following `Button`'s disabled convention instead.
-- There is no `Switch.Thumb`/sub-part API — the thumb is an internal implementation detail, not a composable part.
+- `SwitchProps` composes `IntentElementProps`, `BackgroundElementProps`, and `ZIndexElementProps`, plus `checked?: boolean`, `defaultChecked?: boolean`, `onChange?: (value: boolean) => void`, `disabled?: boolean`, `name?: string` (sets the rendered instance's `Name`, default `"Switch"`), and `LayoutOrder?: number` (passed to the root; unset leaves Roblox's default `0`).
+- Controlled/uncontrolled, same contract as [Checkbox](./checkbox.md#public-api): passing `checked` makes the switch controlled (the visual follows the prop, activation calls `onChange(!checked)` and changes nothing internally); leaving it `undefined` makes it uncontrolled, starting at `defaultChecked` (default `false`).
+- `onChange` fires only in response to a user toggle (click or paired `Fieldset.Label`). It never fires on mount and never fires when a controlled `checked` prop changes.
+- `disabled`, unlike `Checkbox` (which has no disabled state), suppresses activation (clicking, and a paired `Fieldset.Label` activation), so `onChange` never fires while disabled, and renders a distinct dimmed visual state, following `Button`'s disabled convention.
+- There is no `Switch.Thumb`/sub-part API; the thumb is internal.
+
+### Breaking changes (2.0.0)
+
+- `checked` used to only seed internal state on mount. It now makes the switch controlled; use `defaultChecked` for the old seed-only behaviour.
+- `onChange` used to fire once right after mount with the initial value. It no longer does.
 
 ## Behavior
 
-- Activating the switch (or, per the [Input](./index.md) fieldset convention, activating a paired `Fieldset.Label`) toggles the internal checked state, unless `disabled`.
-- The thumb animates its horizontal position, and the track animates its background/border color, from the off state to the on state (and back) over `theme.components.switch.animation.duration` seconds. Both animate together, driven by a single 0-to-1 tween progress value: the thumb's X position is linearly interpolated between its off/on offsets, and the track's background/border colors are `Color3.Lerp`'d between the off (`theme.components.switch.track` static colors) and on (intent-resolved) colors, both keyed off that same progress value. A `duration` of `0` snaps instantly instead of animating.
-- The on-state colors are resolved via `ColorHelper.getIntentColors(theme, props.intent, disabled ? "disabled" : "default", theme.components.switch.track.intents)` — there is no hover state, matching `Checkbox`'s "no hover treatment" convention. The off-state colors are always the theme's static `track.backgroundColor`/`track.borderColor`, independent of `intent` and of checked state.
-- When `disabled`, both the track and thumb render at a flat `theme.components.switch.disabledTransparency`, overriding (not blending with) their normal transparency — the same flat-override pattern `Button` uses for its own `disabled` intent entry.
+- Activating the switch (or, per the [Input](./index.md) fieldset convention, a paired `Fieldset.Label`) toggles as described above, unless `disabled`.
+- The thumb animates its horizontal position, and the track animates its background/border colour, between the off and on states over `theme.components.switch.animation.duration` seconds. Both are driven by a single 0-to-1 tween progress value: the thumb's X position is linearly interpolated between its off/on offsets, and the track colours are `Color3.Lerp`'d between the off (`track` static colours) and on (intent-resolved) colours. A `duration` of `0` snaps instantly. In controlled mode the animation runs whenever the `checked` prop changes.
+- The on-state colours are resolved via `ColorHelper.getIntentColors(theme, props.intent, disabled ? "disabled" : "default", theme.components.switch.track.intents)`; there is no hover state. The off-state colours are always the theme's static `track.backgroundColor`/`track.borderColor`.
+- When `disabled`, both the track and thumb render at a flat `theme.components.switch.disabledTransparency`, overriding their normal transparency.
 
 ## Theme
 
 `theme.components.switch` supplies:
 
-- `width`, `height` — the track's fixed size (the control does not auto-size or accept `width`/`height` override props).
-- `cornerRadius`, `borderThickness` — the track's corner rounding and border thickness (rendered via `Corners`/`uistroke`, `BorderStrokePosition.Inner`).
-- `disabledTransparency` — the flat transparency applied to both track and thumb while `disabled`.
-- `animation.duration` — the tween duration described above.
-- `track.backgroundColor`, `track.backgroundTransparency`, `track.borderColor` — the off-state track appearance.
-- `track.intents` — optional per-`Intent` color overrides (`default`/`disabled` states only) layered on top of `theme.colors.intents` for the on-state track appearance, resolved the same three-tier way every other themed component's `intents` map is (see [Components](../index.md#theming)).
-- `thumb.inset` — the gap between the thumb's edge and the track's edge/border, on all four sides. The thumb's diameter is derived as `height - 2 * inset` (not a separate size field) and its off/on X offsets are derived from `inset` and `width` so it never overlaps the track's border, mirroring how `Slider`'s `bar.padding` reserves room for its handle.
-- `thumb.cornerRadius` — the thumb's corner rounding (independently themeable per theme, the same way `Slider`'s `handle.cornerRadius` varies from a full circle to a smaller radius across shipped themes).
-- `thumb.backgroundColor`, `thumb.backgroundTransparency`, `thumb.borderColor`, `thumb.borderThickness`, `thumb.boxShadow?` — the thumb's fixed appearance (not intent- or checked-state-driven).
+- `width`, `height`: the track's fixed size (no auto-size, no size props).
+- `cornerRadius`, `borderThickness`: the track's corner rounding and inner border thickness.
+- `disabledTransparency`: the flat transparency applied to track and thumb while `disabled`.
+- `animation.duration`: the tween duration described above.
+- `track.backgroundColor`, `track.backgroundTransparency`, `track.borderColor`: the off-state track appearance.
+- `track.intents`: optional per-`Intent` colour overrides (`default`/`disabled` states) for the on-state track, resolved the same three-tier way as every other component's `intents` map (see [Components](../index.md#theming)).
+- `thumb.inset`: the gap between the thumb's edge and the track's edge on all four sides. Thumb diameter is `height - 2 * inset` and its off/on X offsets are derived from `inset` and `width`, so it never overlaps the track border.
+- `thumb.cornerRadius`, `thumb.backgroundColor`, `thumb.backgroundTransparency`, `thumb.borderColor`, `thumb.borderThickness`, `thumb.boxShadow?`: the thumb's fixed appearance (not intent- or state-driven).
 
 ## Story
 
-Worth demonstrating: an uncontrolled switch with `onChange` wired to visible state, a `disabled` switch (both checked and unchecked), and a couple of `intent` variants to show the on-state color changing.
+Worth demonstrating: an uncontrolled switch (`defaultChecked`) with `onChange` wired to visible state, a controlled switch driven by story state, a `disabled` switch (both checked and unchecked), a couple of `intent` variants, and switches in a list ordered with `LayoutOrder`.
+
+## Implementation notes
+
+- `toggleRef` holds the latest toggle closure (reassigned each render) so the `Fieldset` `labelActivated` connection, whose effect depends only on `fieldset`, never calls a stale `checked`/`disabled`/`onChange`. The disabled check lives inside that closure (`requestChange`), not in the connection.
+- `onChange` is called from the activation handlers, not from an effect on the checked value; the old effect is what fired it on mount.

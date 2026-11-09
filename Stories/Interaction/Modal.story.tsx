@@ -17,6 +17,7 @@ export = createStory(
 						<Text text="Open the modal, then click its body: it should stay open. The backdrop and explicit close controls should close it." />
 						<Text text="With dragging enabled, drag the modal header and release it to verify the panel remains at its dropped position." />
 						<Text text="The basic modal uses percentage width and height so it scales with the story viewport." />
+						<Text text="The capped modal fills 90% of the viewport width but never grows past 720 pixels; resize the viewport to see it stop." />
 						<Modal
 							closeOnBackdropClick={props.controls.CloseOnBackdropClick}
 							closeOnEscape={props.controls.CloseOnEscape}

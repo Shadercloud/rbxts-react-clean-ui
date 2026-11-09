@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
-import { ButtonFlag } from "../../Interfaces";
+import { BorderElementProps, ButtonFlag } from "../../Interfaces";
+import { isPointerPress, PressOn, PressReleaseCallback, usePressRelease } from "./Button.press";
 
 export interface HoverButtonContextValue {
     hover: boolean;
@@ -12,17 +13,22 @@ export const HoverButtonContext = React.createContext<HoverButtonContextValue | 
 
 type ImageButtonProps = React.InstanceProps<ImageButton>;
 
-interface HoverButtonProps {
-    default: ImageButtonProps;
-    hover?: ImageButtonProps;
-    focus?: ImageButtonProps;
+type HoverButtonStateProps = ImageButtonProps & BorderElementProps;
+
+interface HoverButtonProps extends BorderElementProps {
+    default: HoverButtonStateProps;
+    hover?: HoverButtonStateProps;
+    focus?: HoverButtonStateProps;
     isSelected?: boolean;
     children?: React.ReactNode;
     name?: string;
+    pressOn?: PressOn;
+    onRelease?: PressReleaseCallback;
 }
 
 export function HoverButton(propSet: HoverButtonProps) {
     const [hovering, setHovering] = React.useState(false);
+    const trackRelease = usePressRelease(propSet.onRelease);
 
     const state: ButtonFlag = propSet.isSelected
         ? "focus"
@@ -34,13 +40,18 @@ export function HoverButton(propSet: HoverButtonProps) {
     const stateProps = propSet[state];
 
 
-    const props: ImageButtonProps = {
+    const props: HoverButtonStateProps = {
         ...propSet.default,
         ...stateProps,
     };
 
+    const borderThickness = props.borderThickness ?? propSet.borderThickness ?? 0;
+    const borderPosition = props.borderPosition ?? propSet.borderPosition;
+
     const defaultEvents = propSet.default.Event;
     const stateEvents = stateProps?.Event;
+    const activated = stateEvents?.Activated ?? defaultEvents?.Activated;
+    const inputBegan = stateEvents?.InputBegan ?? defaultEvents?.InputBegan;
 
     return (
         <HoverButtonContext.Provider value={{
@@ -111,10 +122,43 @@ export function HoverButton(propSet: HoverButtonProps) {
                             defaultEvents?.MouseLeave?.(button, x, y);
                         }
                     },
+
+                    ...(propSet.pressOn === "down" ? {
+                        Activated: (button: ImageButton, inputObject: InputObject, clickCount: number) => {
+                            if (isPointerPress(inputObject)) {
+                                return;
+                            }
+
+                            activated?.(button, inputObject, clickCount);
+                        },
+
+                        InputBegan: (button: ImageButton, inputObject: InputObject) => {
+                            inputBegan?.(button, inputObject);
+
+                            if (props.Active === false || !isPointerPress(inputObject)) {
+                                return;
+                            }
+
+                            activated?.(button, inputObject, 1);
+
+                            if (propSet.onRelease !== undefined) {
+                                trackRelease(button, inputObject);
+                            }
+                        },
+                    } : {}),
                 }}
                 Change={props.Change}
                 Tag={props.Tag}
             >
+                {borderThickness > 0 && (
+                    <uistroke
+                        key="Stroke"
+                        Thickness={borderThickness}
+                        Color={props.borderColor ?? propSet.borderColor}
+                        Transparency={props.borderTransparency ?? propSet.borderTransparency}
+                        BorderStrokePosition={borderPosition === "outer" ? Enum.BorderStrokePosition.Outer : Enum.BorderStrokePosition.Inner}
+                    />
+                )}
                 {propSet.children}
             </imagebutton>
         </HoverButtonContext.Provider>

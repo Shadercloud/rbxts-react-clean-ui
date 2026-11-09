@@ -4,5 +4,8 @@ declare class FlexItemMountValidation {
     modeNoneKeepsOwnSize(): void;
     alignPlacesChild(align: FlexAlign): void;
     allContained(): void;
+    defaultHorizontalLayout(): void;
+    verticalDirection(): void;
+    layoutFalseDefersToChild(): void;
 }
 export = FlexItemMountValidation;

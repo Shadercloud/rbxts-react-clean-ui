@@ -1,0 +1,242 @@
+---
+title: HoverButton
+description: A low-level button primitive that swaps its props between default, hover, and selected states.
+icon: Pointer
+---
+
+`HoverButton` is an unthemed primitive built on Roblox's native [`ImageButton`](https://create.roblox.com/docs/reference/engine/classes/ImageButton). You give it one set of `ImageButton` properties for each state (`default`, `hover`, and `focus`), and it renders whichever set matches the current hover or selected state. Clean UI uses it inside interactive controls such as `Accordion` headers and `Tabs` triggers. Use it when you need full control over a button's appearance. For a ready-styled button, use [`Button`](/components/form/button).
+
+## Import
+
+```tsx
+import { HoverButton } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Form/HoverButton.loom.tsx" previewHeight={260}>
+```tsx
+import React from "@rbxts/react";
+import { Container, HStack, HoverButton, Text } from "@rbxts/react-clean-ui";
+
+export function HoverButtonExample() {
+    return (
+        <Container width="100%" height="160">
+            <HStack HorizontalFlex={Enum.UIFlexAlignment.SpaceEvenly} valign="Center">
+                <HoverButton
+                    name="Plain"
+                    default={{
+                        Size: UDim2.fromOffset(150, 60),
+                        BackgroundColor3: Color3.fromHex("#3B72E6"),
+                        BackgroundTransparency: 0,
+                        AutoButtonColor: false,
+                        LayoutOrder: 1,
+                    }}
+                    hover={{ BackgroundColor3: Color3.fromHex("#5A8CF0") }}
+                >
+                    <Text
+                        text="Hover me"
+                        TextColor3={Color3.fromHex("#FFFFFF")}
+                        AnchorPoint={new Vector2(0.5, 0.5)}
+                        Position={UDim2.fromScale(0.5, 0.5)}
+                    />
+                </HoverButton>
+                <HoverButton
+                    name="InnerBorder"
+                    borderThickness={3}
+                    borderColor={Color3.fromHex("#1D3F8A")}
+                    borderPosition="inner"
+                    default={{
+                        Size: UDim2.fromOffset(150, 60),
+                        BackgroundColor3: Color3.fromHex("#3B72E6"),
+                        BackgroundTransparency: 0,
+                        AutoButtonColor: false,
+                        LayoutOrder: 2,
+                    }}
+                    hover={{ borderColor: Color3.fromHex("#F2C94C") }}
+                >
+                    <Text
+                        text="Inner border"
+                        TextColor3={Color3.fromHex("#FFFFFF")}
+                        AnchorPoint={new Vector2(0.5, 0.5)}
+                        Position={UDim2.fromScale(0.5, 0.5)}
+                    />
+                </HoverButton>
+                <HoverButton
+                    name="OuterBorder"
+                    isSelected
+                    borderThickness={3}
+                    borderColor={Color3.fromHex("#000000")}
+                    borderTransparency={0.6}
+                    borderPosition="outer"
+                    default={{
+                        Size: UDim2.fromOffset(150, 60),
+                        BackgroundColor3: Color3.fromHex("#3B72E6"),
+                        BackgroundTransparency: 0,
+                        AutoButtonColor: false,
+                        LayoutOrder: 3,
+                    }}
+                    focus={{
+                        BackgroundColor3: Color3.fromHex("#2E9D63"),
+                        borderColor: Color3.fromHex("#F2C94C"),
+                        borderTransparency: 0,
+                    }}
+                >
+                    <Text
+                        text="Selected (outer)"
+                        TextColor3={Color3.fromHex("#FFFFFF")}
+                        AnchorPoint={new Vector2(0.5, 0.5)}
+                        Position={UDim2.fromScale(0.5, 0.5)}
+                    />
+                </HoverButton>
+            </HStack>
+        </Container>
+    );
+}
+```
+</Demo>
+
+`default` is required and always applies. `hover` and `focus` are optional and are layered on top of `default`, so each one only needs the properties that change in that state.
+
+## States
+
+The active state is chosen in this order:
+
+1. `focus` while `isSelected` is `true`, wherever the pointer is.
+2. `hover` while the pointer is over the button.
+3. `default` alone otherwise.
+
+The rendered props are `{ ...default, ...activeState }`.
+
+```tsx
+<HoverButton
+    isSelected={selected}
+    default={{
+        Size: UDim2.fromOffset(120, 40),
+        BackgroundColor3: Color3.fromHex("#F4F5F7"),
+        BackgroundTransparency: 0,
+        AutoButtonColor: false,
+        Event: {
+            Activated: () => setSelected(!selected),
+        },
+    }}
+    hover={{ BackgroundColor3: Color3.fromHex("#E1E4E8") }}
+    focus={{ BackgroundColor3: Color3.fromHex("#2E9D63") }}
+/>
+```
+
+Set `AutoButtonColor: false` in `default`. Otherwise Roblox's built-in hover and press tinting is applied on top of your own `hover` and `focus` styling.
+
+## Borders
+
+Set `borderThickness` to draw a `UIStroke` around the button. A stroke is drawn only when the resolved thickness is greater than `0`. With no border props anywhere, no stroke is rendered.
+
+You can set the border props on `HoverButton` itself, inside `default`, `hover`, or `focus`, or in more than one place. Each field is resolved separately, and the state value wins over the top-level prop. So a `hover` set can change just the `borderColor` and keep the top-level thickness:
+
+```tsx
+<HoverButton
+    borderThickness={2}
+    borderPosition="inner"
+    default={{
+        Size: UDim2.fromScale(1, 1),
+        BackgroundColor3: Color3.fromHex("#F4F5F7"),
+        BackgroundTransparency: 0,
+        AutoButtonColor: false,
+        borderColor: Color3.fromHex("#8A8F98"),
+    }}
+    hover={{ borderColor: Color3.fromHex("#4A7AC9") }}
+    focus={{
+        borderColor: Color3.fromHex("#2E9D63"),
+        borderThickness: 3,
+    }}
+/>
+```
+
+`borderPosition` defaults to `"inner"`, which keeps the stroke inside the button's bounds. Use `"outer"` to draw it outside them.
+
+## Reacting to state in children
+
+`HoverButton` gives its `children` a `HoverButtonContext` holding `{ hover: boolean; isSelected: boolean }`. Nested content can read the button's current state from it without tracking hover itself.
+
+```tsx
+import React, { useContext } from "@rbxts/react";
+import { HoverButtonContext, Text } from "@rbxts/react-clean-ui";
+
+function Label() {
+    const state = useContext(HoverButtonContext);
+
+    return <Text text={state?.hover ? "Hovered" : "Idle"} />;
+}
+```
+
+## Press-down activation
+
+`HoverButton` supports the same `pressOn` and `onRelease` props as [`Button`](/components/form/button#press-down-activation). With `pressOn="down"`, the active state's `Event.Activated` handler (or `default`'s, if the active state has none) runs as soon as a mouse or touch press begins, and the native `Activated` for that press is swallowed. `onRelease` fires when that press ends or is cancelled, even if the pointer was dragged off the button.
+
+```tsx
+<HoverButton
+    pressOn="down"
+    onRelease={() => setHeld(false)}
+    default={{
+        Size: UDim2.fromOffset(120, 40),
+        BackgroundColor3: Color3.fromHex("#F4F5F7"),
+        BackgroundTransparency: 0,
+        AutoButtonColor: false,
+        Event: {
+            Activated: () => setHeld(true),
+        },
+    }}
+/>
+```
+
+`HoverButton` has no `disabled` prop, so press-down is blocked instead while the merged state's `Active` is `false`. Gamepad and keyboard activation still go through the native `Activated` at the normal time and never get an `onRelease`.
+
+## Props
+
+### HoverButton-specific props
+
+| Prop         | Type                     | Default         | Description                                                                                   |
+| ------------ | ------------------------ | --------------- | --------------------------------------------------------------------------------------------- |
+| `default`    | `HoverButtonStateProps`  | required        | Base `ImageButton` properties (plus border props), always applied.                            |
+| `hover`      | `HoverButtonStateProps`  | `undefined`     | Properties layered over `default` while the pointer is over the button and it is not selected. |
+| `focus`      | `HoverButtonStateProps`  | `undefined`     | Properties layered over `default` while `isSelected` is `true`.                               |
+| `isSelected` | `boolean`                | `false`         | Forces the `focus` state, whatever the hover state is.                                        |
+| `name`       | `string`                 | `"HoverButton"` | Name of the rendered `ImageButton` instance.                                                  |
+| `pressOn`    | `"down" \| "up"`         | `"up"`          | When a mouse/touch press activates the button: on release (`"up"`) or as soon as it begins (`"down"`). |
+| `onRelease`  | `(button: ImageButton, input: InputObject) => void` | `undefined` | With `pressOn="down"`, called when a mouse/touch press that activated the button ends or is cancelled. |
+| `children`   | `React.ReactNode`        | `undefined`     | Content rendered inside the button, after the border stroke.                                  |
+
+`HoverButtonStateProps` is `React.InstanceProps<ImageButton> & BorderElementProps`.
+
+### Border props
+
+These are accepted on `HoverButton` itself and in each of `default`, `hover`, and `focus`. The active state's value wins over the top-level value.
+
+| Prop                 | Type                   | Default     | Description                                                                                 |
+| -------------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| `borderThickness`    | `number`               | `undefined` | Stroke thickness in pixels. A `UIStroke` is only rendered when this is greater than `0`.    |
+| `borderColor`        | `Color3`               | `undefined` | Stroke colour. When unset, the engine default (black) is used.                              |
+| `borderTransparency` | `number`               | `undefined` | Stroke transparency. When unset, the engine default (`0`) is used.                          |
+| `borderPosition`     | `"inner" \| "outer"`   | `"inner"`   | `"inner"` draws the stroke inside the button's bounds; `"outer"` draws it outside them.     |
+
+### Shared props
+
+The button also supports props inherited from the following interfaces.
+
+| Interface            | Purpose                                                             |
+| -------------------- | ------------------------------------------------------------------- |
+| `BorderElementProps` | Configures the optional `UIStroke` border, top-level or per state.  |
+
+## Behaviour
+
+* Only a fixed list of `ImageButton` properties is forwarded from the state sets: layout and sizing, background and native border, image properties, selection and gamepad navigation, `Modal`, `AutoButtonColor`, `Active`, `Visible`, `ZIndex`, `Event`, `Change`, and `Tag`. Other `ImageButton` properties are ignored even if they are set.
+* `BorderSizePixel` defaults to `0` when no state sets it.
+* `Event` handlers are merged as `{ ...default.Event, ...activeState.Event }`. `MouseEnter` and `MouseLeave` are always wrapped internally to track hover. The wrapper still calls the active state's handler, and also the `default` state's handler when the two differ.
+* Hover is tracked in local state through `MouseEnter` and `MouseLeave`.
+* The border props are never forwarded to the `ImageButton`. When drawn, the stroke is a `UIStroke` named `Stroke`, rendered as the button's first child.
+* Without `pressOn="down"`, the event table is built exactly as described above. With it, `Activated` skips mouse and touch input, and an internal `InputBegan` handler runs the active state's own `InputBegan` first, then activates the button unless the merged `Active` is `false`.
+* There is no `disabled` state. To show a disabled look, put it in your own `default`, `hover`, and `focus` sets, for example by setting `Active: false` and matching colours.
+
+## Theme values
+
+`HoverButton` is not themed and has no entry under `theme.components`. Its whole appearance comes from the `default`, `hover`, and `focus` prop sets and the border props.

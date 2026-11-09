@@ -55,7 +55,7 @@ function computePaginationItems(page: number, totalPages: number, siblingCount: 
 
 interface PaginationContextValue {
     page: number;
-    totalPages: number;
+    totalPages: number | undefined;
     items: PaginationItemValue[];
     setPage: (page: number) => void;
     canGoPrev: boolean;
@@ -292,6 +292,7 @@ function PaginationList(props: PaginationListProps) {
 
 function PaginationDefaultLayout() {
     const theme = React.useContext(CleanThemeContext);
+    const { totalPages } = usePagination();
     const paginationTheme = theme.components.pagination;
     return (
         <HStack
@@ -301,7 +302,7 @@ function PaginationDefaultLayout() {
             Padding={new UDim(0, SpacingHelper.GetPadding(theme, undefined, paginationTheme.spacing))}
         >
             <PaginationPrev />
-            <PaginationList />
+            {totalPages !== undefined && <PaginationList />}
             <PaginationNext />
         </HStack>
     );
@@ -309,7 +310,8 @@ function PaginationDefaultLayout() {
 
 export interface PaginationProps {
     page: number;
-    totalPages: number;
+    totalPages?: number;
+    hasNextPage?: boolean;
     siblingCount?: number;
     onPageChange: (page: number) => void;
     children?: React.ReactNode;
@@ -325,27 +327,37 @@ type PaginationComponent = React.ForwardRefExoticComponent<PaginationProps & Rea
 
 const Pagination = React.forwardRef<Frame, PaginationProps>((props, _ref) => {
     const theme = React.useContext(CleanThemeContext);
-    const pageCount = math.max(0, math.floor(props.totalPages));
-    const currentPage = pageCount === 0 ? 0 : math.clamp(math.floor(props.page), 1, pageCount);
+    const unbounded = props.totalPages === undefined;
+    const pageCount = props.totalPages === undefined ? 0 : math.max(0, math.floor(props.totalPages));
+    const currentPage = unbounded
+        ? math.max(1, math.floor(props.page))
+        : pageCount === 0
+          ? 0
+          : math.clamp(math.floor(props.page), 1, pageCount);
     const siblingCount = math.max(0, math.floor(props.siblingCount ?? 1));
     const items = React.useMemo(
         () => computePaginationItems(currentPage, pageCount, siblingCount),
         [currentPage, pageCount, siblingCount],
     );
+    const canGoNext = unbounded ? props.hasNextPage === true : currentPage < pageCount;
     const setPage = (page: number) => {
+        if (unbounded) {
+            props.onPageChange(math.max(1, math.floor(page)));
+            return;
+        }
         if (pageCount === 0) return;
         props.onPageChange(math.clamp(math.floor(page), 1, pageCount));
     };
     const contextValue = React.useMemo<PaginationContextValue>(
         () => ({
             page: currentPage,
-            totalPages: pageCount,
+            totalPages: unbounded ? undefined : pageCount,
             items,
             setPage,
             canGoPrev: currentPage > 1,
-            canGoNext: currentPage < pageCount,
+            canGoNext,
         }),
-        [currentPage, pageCount, items, props.onPageChange],
+        [currentPage, pageCount, unbounded, canGoNext, items, props.onPageChange],
     );
     const paginationTheme = theme.components.pagination;
 

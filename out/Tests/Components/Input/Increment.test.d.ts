@@ -3,5 +3,7 @@ declare class IncrementMountValidation {
     uncontrolledIgnoresProp(): void;
     controlledFollowsProp(): void;
     typingSkipsClamp(): void;
+    fixedWidth(): void;
+    fullWidthDefault(): void;
 }
 export = IncrementMountValidation;

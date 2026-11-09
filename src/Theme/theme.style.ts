@@ -1,5 +1,11 @@
 import { Binding } from "@rbxts/react";
-import { ScaleSize, CssShadow, ButtonFlag, CssDual, CssSliceInset, CssSize, CssCalcSize, CssBackgroundGradient } from "../Interfaces/";
+import { ScaleSize, CssShadow, ButtonFlag, CssDual, CssSliceInset, CssSize, CssRadius, CssCalcSize, CssBackgroundGradient } from "../Interfaces/";
+
+export interface TypographyOutline {
+    color?: Color3;
+    thickness?: number;
+    transparency?: number;
+}
 
 export interface TypographyStyle {
     font: Enum.Font;
@@ -9,6 +15,7 @@ export interface TypographyStyle {
     letterSpacing?: number;
     color?: Color3;
     transparency?: number;
+    outline?: TypographyOutline;
 }
 
 export type ScaledTypographyStyle = Partial<Record<ScaleSize, Partial<TypographyStyle>>>
@@ -56,8 +63,24 @@ export interface CssPosition {
 }
 
 export interface CssCornerRadius {
-    topLeft?: CssSize;
-    topRight?: CssSize;
-    bottomLeft?: CssSize;
-    bottomRight?: CssSize;
+    topLeft?: CssRadius;
+    topRight?: CssRadius;
+    bottomLeft?: CssRadius;
+    bottomRight?: CssRadius;
+}
+
+export interface FieldStateStyle {
+    borderColor?: Color3;
+    borderThickness?: number;
+    backgroundColor?: Color3;
+    backgroundTransparency?: number;
+    backgroundGradient?: CssBackgroundGradient;
+}
+
+export type FieldStateStyles = Partial<Record<Exclude<ButtonFlag, "default">, FieldStateStyle>>;
+
+export interface InnerShadowStyle {
+    color: Color3;
+    transparency: number;
+    size: number;
 }

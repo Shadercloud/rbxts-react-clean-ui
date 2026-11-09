@@ -261,8 +261,8 @@ local function RenderedAccordionItem(props)
 		spacing = "None",
 	}, _condition, React.createElement(HoverButton, _attributes, props.first and (React.createElement("uicorner", {
 		key = "Corners",
-		TopLeftRadius = SizeHelper:toUDim(theme.components.accordion.cornerRadius),
-		TopRightRadius = SizeHelper:toUDim(theme.components.accordion.cornerRadius),
+		TopLeftRadius = SizeHelper:toRadius(theme, theme.components.accordion.cornerRadius),
+		TopRightRadius = SizeHelper:toRadius(theme, theme.components.accordion.cornerRadius),
 		BottomLeftRadius = UDim.new(0, 0),
 		BottomRightRadius = UDim.new(0, 0),
 	})), React.createElement(AccordionHeaderVisual, {

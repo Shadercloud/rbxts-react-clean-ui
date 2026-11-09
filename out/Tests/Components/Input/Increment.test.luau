@@ -12,6 +12,17 @@ local DisplayName = _lunit.DisplayName
 local _binding = Decorators
 local Skip = _binding.Skip
 local Increment = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Input", "Increment").Increment
+local _layout = TS.import(script, script.Parent.Parent.Parent, "Helpers", "layout")
+local STUDIO_SKIP_MESSAGE = _layout.STUDIO_SKIP_MESSAGE
+local assertAlignedRight = _layout.assertAlignedRight
+local assertSizeApprox = _layout.assertSizeApprox
+local waitForGuiObject = _layout.waitForGuiObject
+local withMounted = _layout.withMounted
+local function waitForIncrementWidth(host, expected)
+	return waitForGuiObject(host, "Increment", function(gui)
+		return math.abs(gui.AbsoluteSize.X - expected) <= 1 and gui.AbsoluteSize.Y > 0
+	end, `Timed out waiting for the Increment root to be {expected}px wide`)
+end
 local IncrementMountValidation
 do
 	IncrementMountValidation = setmetatable({}, {
@@ -97,6 +108,25 @@ do
 		root:unmount()
 		host:Destroy()
 	end
+	function IncrementMountValidation:fixedWidth()
+		withMounted(400, 200, React.createElement(Increment, {
+			value = 5,
+			width = 200,
+		}), function(mounted)
+			local increment = waitForIncrementWidth(mounted.host, 200)
+			local plus = waitForGuiObject(increment, "IncrementButton")
+			assertSizeApprox(increment, 200, nil, 1, "width=200 increment")
+			assertAlignedRight(plus, increment, 1, "width=200 plus button")
+		end)
+	end
+	function IncrementMountValidation:fullWidthDefault()
+		withMounted(400, 200, React.createElement(Increment, {
+			value = 5,
+		}), function(mounted)
+			local increment = waitForIncrementWidth(mounted.host, 400)
+			assertSizeApprox(increment, 400, nil, 1, "unset width increment")
+		end)
+	end
 	local _decorator = Skip(not Runtime.isRoblox(), "Requires a real Roblox Instance tree (GetPropertyChangedSignal) - run inside Roblox Studio via the TestRunner, not under Lune.")
 	local _decorator_1 = DisplayName("The TextBox shows the initial value prop as its text on first mount")
 	local _descriptor = Test(IncrementMountValidation, "seedsFromValue", {
@@ -176,6 +206,46 @@ do
 	})
 	if _descriptor_11 then
 		IncrementMountValidation.typingSkipsClamp = _descriptor_11.value
+	end
+	local _decorator_8 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_9 = DisplayName("width={200} pins the stepper to 200px and the plus button still ends at its right edge")
+	local _descriptor_12 = Test(IncrementMountValidation, "fixedWidth", {
+		value = IncrementMountValidation.fixedWidth,
+	})
+	if _descriptor_12 then
+		IncrementMountValidation.fixedWidth = _descriptor_12.value
+	end
+	local _descriptor_13 = _decorator_9(IncrementMountValidation, "fixedWidth", {
+		value = IncrementMountValidation.fixedWidth,
+	})
+	if _descriptor_13 then
+		IncrementMountValidation.fixedWidth = _descriptor_13.value
+	end
+	local _descriptor_14 = _decorator_8(IncrementMountValidation, "fixedWidth", {
+		value = IncrementMountValidation.fixedWidth,
+	})
+	if _descriptor_14 then
+		IncrementMountValidation.fixedWidth = _descriptor_14.value
+	end
+	local _decorator_10 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_11 = DisplayName("Without width the stepper stretches to the full width of its parent")
+	local _descriptor_15 = Test(IncrementMountValidation, "fullWidthDefault", {
+		value = IncrementMountValidation.fullWidthDefault,
+	})
+	if _descriptor_15 then
+		IncrementMountValidation.fullWidthDefault = _descriptor_15.value
+	end
+	local _descriptor_16 = _decorator_11(IncrementMountValidation, "fullWidthDefault", {
+		value = IncrementMountValidation.fullWidthDefault,
+	})
+	if _descriptor_16 then
+		IncrementMountValidation.fullWidthDefault = _descriptor_16.value
+	end
+	local _descriptor_17 = _decorator_10(IncrementMountValidation, "fullWidthDefault", {
+		value = IncrementMountValidation.fullWidthDefault,
+	})
+	if _descriptor_17 then
+		IncrementMountValidation.fullWidthDefault = _descriptor_17.value
 	end
 	IncrementMountValidation = Tag("Studio")(IncrementMountValidation) or IncrementMountValidation
 end

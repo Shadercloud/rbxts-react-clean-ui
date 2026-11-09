@@ -189,6 +189,7 @@ local ProgressBar = React.forwardRef(function(props, ref)
 	if not showHeader then
 		return track
 	end
+	local headerSizeConstraint = SizeHelper:GetSizeConstraint(props)
 	local _attributes_2 = {}
 	local _condition_8 = props.name
 	if _condition_8 == nil then
@@ -202,7 +203,11 @@ local ProgressBar = React.forwardRef(function(props, ref)
 	_attributes_2.Position = SizeHelper:GetPosition(props)
 	_attributes_2.AnchorPoint = SizeHelper:GetAnchor(props)
 	_attributes_2.ZIndex = props.ZIndex
-	return React.createElement("frame", _attributes_2, React.createElement(VStack, {
+	return React.createElement("frame", _attributes_2, headerSizeConstraint ~= nil and (React.createElement("uisizeconstraint", {
+		key = "SizeConstraint",
+		MinSize = headerSizeConstraint.MinSize,
+		MaxSize = headerSizeConstraint.MaxSize,
+	})), React.createElement(VStack, {
 		spacing = "None",
 		HorizontalFlex = Enum.UIFlexAlignment.None,
 		Padding = UDim.new(0, SpacingHelper:GetPadding(theme, props.scale, progressBarTheme.header.spacing)),

@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { GuiService } from "@rbxts/services";
+import { GuiService, UserInputService } from "@rbxts/services";
 import { CleanThemeContext, DragStateContext, OverlayConsumer } from "../../Contexts";
 import { Text } from "../Typography";
 import ReactRoblox from "@rbxts/react-roblox";
@@ -9,6 +9,7 @@ import { IntentElementProps, PaddingProps } from "../../Interfaces";
 import { BoxProps } from "../Surface";
 import { useTween } from "@rbxts/react-ripple";
 import { TooltipPlacement, computeTooltipLayout, getTooltipSafeArea } from "./Tooltip.placement";
+import { TooltipLayer, TooltipLayerContext, isTooltipCovered, setTooltipHovered, subscribeTooltipHover } from "./Tooltip.layer";
 
 interface TooltipTarget {
     position: Vector2;
@@ -28,6 +29,13 @@ interface TooltipPopup extends BoxProps, IntentElementProps {
     fadeDuration: number;
     placement?: TooltipPlacement;
     visible: boolean;
+    layer: TooltipLayer;
+    onHover?: (hovered: boolean) => void;
+    onPress?: () => void;
+}
+
+function isPressInput(input: InputObject): boolean {
+    return input.UserInputType === Enum.UserInputType.MouseButton1 || input.UserInputType === Enum.UserInputType.Touch;
 }
 
 function getTopbarBottom(overlay: Frame): number {
@@ -135,7 +143,7 @@ function TooltipPopup(props: TooltipPopup) {
 
     const contentWidth = contentSize?.X ?? 0;
     const contentHeight = contentSize?.Y ?? 0;
-    const cornerRadius = SizeHelper.toUDim(theme.components.button.cornerRadius);
+    const cornerRadius = SizeHelper.toRadius(theme, theme.components.button.cornerRadius);
     const targetPosition = props.target.position.sub(frame.position);
 
     const layout = computeTooltipLayout({
@@ -175,6 +183,22 @@ function TooltipPopup(props: TooltipPopup) {
             GroupTransparency={measured ? groupTransparency : 1}
             BackgroundTransparency={1}
             BorderSizePixel={0}
+            Active={props.onHover !== undefined || props.onPress !== undefined ? true : undefined}
+            Event={{
+                MouseEnter: () => {
+                    if (props.visible) {
+                        props.onHover?.(true);
+                    }
+                },
+                MouseLeave: () => {
+                    props.onHover?.(false);
+                },
+                InputBegan: (_rbx, input) => {
+                    if (props.visible && isPressInput(input)) {
+                        props.onPress?.();
+                    }
+                },
+            }}
         >
             <frame key="ShadowPadding" Size={UDim2.fromOffset(0, 0)} AutomaticSize={Enum.AutomaticSize.XY} BackgroundTransparency={1} BorderSizePixel={0}>
                 <Padding resolvedPadding={resolvedPadding} />
@@ -197,9 +221,11 @@ function TooltipPopup(props: TooltipPopup) {
                         Color={props['border-color'] ?? intent.borderColor}
                     />
 
-                    {typeIs(props.content, "string")
-                        ? <Text name="TooltipText" text={props.content} TextColor3={intent.textColor} />
-                        : props.content}
+                    <TooltipLayerContext.Provider value={props.layer}>
+                        {typeIs(props.content, "string")
+                            ? <Text name="TooltipText" text={props.content} TextColor3={intent.textColor} />
+                            : props.content}
+                    </TooltipLayerContext.Provider>
                 </frame>
             </frame>
             {pointer !== undefined && <frame key="Pointer" Size={UDim2.fromOffset(pointerSize, pointerSize)}
@@ -238,23 +264,46 @@ interface TooltipProps extends BoxProps, IntentElementProps {
     placement?: TooltipPlacement;
     disabled?: boolean;
     open?: boolean;
+    interactive?: boolean;
+    pinOnPress?: boolean;
+    longPress?: boolean;
+}
+
+interface TooltipActions {
+    update: () => void;
+    close: () => void;
+    togglePin: () => void;
 }
 
 
 export function Tooltip(props: TooltipProps) {
     const targetRef = React.useRef<GuiObject>();
+    const owner = React.useRef({}).current;
 
     const hideRequest = React.useRef(0);
+    const closeRequest = React.useRef(0);
+    const closingRef = React.useRef(false);
+    const longPressRequest = React.useRef(0);
+    const touchConnection = React.useRef<RBXScriptConnection>();
 
     const hoveredRef = React.useRef(false);
+    const popupHoveredRef = React.useRef(false);
+    const pinnedRef = React.useRef(false);
+    const longPressedRef = React.useRef(false);
+    const holdsRef = React.useRef(0);
+    const releaseRef = React.useRef<() => void>();
     const shownRef = React.useRef(false);
+    const actionsRef = React.useRef<TooltipActions>();
 
     const [target, setTarget] = React.useState<TooltipTarget>();
     const [visible, setVisible] = React.useState(false);
 
     const theme = React.useContext(CleanThemeContext);
     const dragState = React.useContext(DragStateContext);
+    const layer = React.useContext(TooltipLayerContext);
     const fadeDuration = theme.components.tooltip.fadeDuration;
+    const closeDelay = theme.components.tooltip.closeDelay ?? 0.15;
+    const longPressDelay = theme.components.tooltip.longPressDelay ?? 0.5;
 
     const suppressed = props.disabled === true || dragState.preview || dragState.dragging;
     const suppressedRef = React.useRef(suppressed);
@@ -264,6 +313,11 @@ export function Tooltip(props: TooltipProps) {
     const controlledRef = React.useRef(controlled);
     controlledRef.current = controlled;
 
+    const interactive = props.interactive === true && !controlled;
+    const pinOnPress = props.pinOnPress === true && !controlled;
+    const longPress = props.longPress === true && !controlled;
+    const holdable = interactive || pinOnPress;
+
     const captureTarget = () => {
         if (targetRef.current?.AbsolutePosition)
             setTarget({
@@ -272,16 +326,36 @@ export function Tooltip(props: TooltipProps) {
             })
     };
 
+    const release = () => {
+        const releaseHold = releaseRef.current;
+        releaseRef.current = undefined;
+        releaseHold?.();
+    };
+
+    const endTouch = () => {
+        longPressRequest.current += 1;
+        touchConnection.current?.Disconnect();
+        touchConnection.current = undefined;
+    };
+
     const show = () => {
         shownRef.current = true;
         hideRequest.current += 1;
 
         captureTarget();
         setVisible(true);
+
+        if (releaseRef.current === undefined && layer.retain !== undefined) {
+            releaseRef.current = layer.retain();
+        }
     };
 
     const hide = () => {
         shownRef.current = false;
+        closingRef.current = false;
+        closeRequest.current += 1;
+        popupHoveredRef.current = false;
+        setTooltipHovered(owner, undefined);
         setVisible(false);
 
         const request = hideRequest.current + 1;
@@ -289,29 +363,163 @@ export function Tooltip(props: TooltipProps) {
 
         if (fadeDuration <= 0) {
             setTarget(undefined);
+        } else {
+            task.delay(fadeDuration, () => {
+                if (hideRequest.current === request) {
+                    setTarget(undefined);
+                }
+            });
+        }
+
+        release();
+    };
+
+    const isWanted = () => {
+        if (suppressedRef.current) {
+            return false;
+        }
+
+        if (props.open !== undefined) {
+            return props.open;
+        }
+
+        return (hoveredRef.current && !isTooltipCovered(layer.depth, owner))
+            || popupHoveredRef.current
+            || pinnedRef.current
+            || longPressedRef.current
+            || (holdable && holdsRef.current > 0);
+    };
+
+    const close = () => {
+        if (shownRef.current && !isWanted()) {
+            hide();
+        }
+    };
+
+    const update = () => {
+        if (isWanted()) {
+            closeRequest.current += 1;
+            closingRef.current = false;
+
+            if (!shownRef.current) {
+                show();
+            }
             return;
         }
 
-        task.delay(fadeDuration, () => {
-            if (hideRequest.current === request) {
-                setTarget(undefined);
+        if (!shownRef.current || closingRef.current) {
+            return;
+        }
+
+        if (!interactive || controlledRef.current || suppressedRef.current) {
+            hide();
+            return;
+        }
+
+        closingRef.current = true;
+        const request = closeRequest.current + 1;
+        closeRequest.current = request;
+
+        task.delay(closeDelay, () => {
+            if (closeRequest.current === request) {
+                closingRef.current = false;
+                actionsRef.current?.close();
             }
         });
+    };
+
+    const togglePin = () => {
+        if (suppressedRef.current || controlledRef.current) {
+            return;
+        }
+
+        pinnedRef.current = !pinnedRef.current;
+        update();
+    };
+
+    actionsRef.current = { update, close, togglePin };
+
+    const childLayer = React.useMemo<TooltipLayer>(() => ({
+        depth: layer.depth + 1,
+        retain: () => {
+            let released = false;
+            holdsRef.current += 1;
+            actionsRef.current?.update();
+
+            return () => {
+                if (released) {
+                    return;
+                }
+                released = true;
+                holdsRef.current -= 1;
+                actionsRef.current?.update();
+            };
+        },
+    }), [layer.depth]);
+
+    const beginLongPress = (input: InputObject) => {
+        endTouch();
+
+        const request = longPressRequest.current;
+
+        task.delay(longPressDelay, () => {
+            if (longPressRequest.current === request && !suppressedRef.current && !controlledRef.current) {
+                longPressedRef.current = true;
+                actionsRef.current?.update();
+            }
+        });
+
+        touchConnection.current = input.GetPropertyChangedSignal("UserInputState").Connect(() => {
+            if (input.UserInputState !== Enum.UserInputState.End && input.UserInputState !== Enum.UserInputState.Cancel) {
+                return;
+            }
+
+            endTouch();
+
+            if (longPressedRef.current) {
+                longPressedRef.current = false;
+                actionsRef.current?.update();
+            } else if (input.UserInputState === Enum.UserInputState.End && pinOnPress) {
+                actionsRef.current?.togglePin();
+            }
+        });
+    };
+
+    const setPopupHovered = (hovered: boolean) => {
+        popupHoveredRef.current = hovered;
+        setTooltipHovered(owner, hovered ? layer.depth : undefined);
+        update();
+    };
+
+    const unpin = () => {
+        if (pinnedRef.current) {
+            pinnedRef.current = false;
+            update();
+        }
     };
 
     React.useEffect(() => {
         if (suppressed) {
             hoveredRef.current = false;
+            pinnedRef.current = false;
+            longPressedRef.current = false;
+            endTouch();
         }
 
-        const wanted = !suppressed && (props.open ?? hoveredRef.current);
-
-        if (wanted && !shownRef.current) {
-            show();
-        } else if (!wanted && shownRef.current) {
-            hide();
-        }
+        update();
     }, [suppressed, props.open]);
+
+    React.useEffect(() => subscribeTooltipHover(() => actionsRef.current?.update()), []);
+
+    React.useEffect(() => {
+        return () => {
+            hideRequest.current += 1;
+            closeRequest.current += 1;
+            endTouch();
+            setTooltipHovered(owner, undefined);
+            release();
+        };
+    }, []);
 
     React.useEffect(() => {
         const instance = targetRef.current;
@@ -331,10 +539,14 @@ export function Tooltip(props: TooltipProps) {
 
     const child = ElementHelper.cloneWithEvents(props.children, { ref: targetRef }, {
         MouseEnter: () => {
+            if ((pinOnPress || longPress) && UserInputService.GetLastInputType() === Enum.UserInputType.Touch) {
+                return;
+            }
+
             hoveredRef.current = true;
 
             if (!controlledRef.current && !suppressedRef.current) {
-                show();
+                update();
             }
         },
 
@@ -342,7 +554,23 @@ export function Tooltip(props: TooltipProps) {
             hoveredRef.current = false;
 
             if (!controlledRef.current) {
-                hide();
+                update();
+            }
+        },
+
+        InputBegan: (_rbx: GuiObject, input: InputObject) => {
+            if ((!pinOnPress && !longPress) || controlledRef.current || suppressedRef.current) {
+                return;
+            }
+
+            if (isTooltipCovered(layer.depth, owner)) {
+                return;
+            }
+
+            if (longPress && input.UserInputType === Enum.UserInputType.Touch) {
+                beginLongPress(input);
+            } else if (pinOnPress && isPressInput(input)) {
+                togglePin();
             }
         },
     });
@@ -364,6 +592,9 @@ export function Tooltip(props: TooltipProps) {
                                 overlay={overlay}
                                 target={target}
                                 visible={visible}
+                                layer={childLayer}
+                                onHover={interactive ? setPopupHovered : undefined}
+                                onPress={pinOnPress ? unpin : undefined}
                             />,
                             overlay,
                         );

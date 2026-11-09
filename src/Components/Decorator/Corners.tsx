@@ -1,17 +1,20 @@
 import React from "@rbxts/react";
-import { CssSize } from "../../Interfaces/";
+import { CssRadius } from "../../Interfaces/";
+import { CleanThemeContext } from "../../Contexts/";
 import { SizeHelper } from "../../Helpers/";
 
 interface CornerProps {
-    radius?: CssSize
+    radius?: CssRadius
     name?: string;
 }
 
 export function Corners(props: CornerProps) {
+    const theme = React.useContext(CleanThemeContext);
+
     if (props.radius === undefined)
         return undefined
 
-    const radius = SizeHelper.toUDim(props.radius);
+    const radius = SizeHelper.toRadius(theme, props.radius);
     if (radius.Scale === 0 && radius.Offset === 0)
         return undefined
 

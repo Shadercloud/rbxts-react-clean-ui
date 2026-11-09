@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { TypographyStyle } from "../../Theme";
-import { TextVariant } from "../../Interfaces/";
-interface TextProps extends React.InstanceProps<TextLabel> {
+import { TypographyOutline, TypographyStyle } from "../../Theme";
+import { SizeElementProps, TextVariant } from "../../Interfaces/";
+interface TextProps extends React.InstanceProps<TextLabel>, Pick<SizeElementProps, "minWidth" | "maxWidth" | "minHeight" | "maxHeight"> {
     text: string;
     variant?: TextVariant;
     typography?: TypographyStyle;
@@ -10,6 +10,11 @@ interface TextProps extends React.InstanceProps<TextLabel> {
     TextWrap?: boolean;
     letterSpacing?: number;
     name?: string;
+    outline?: TypographyOutline | boolean;
+    shrinkToFit?: boolean;
+    shrinkMinScale?: number;
+    minTextSize?: number;
+    maxTextSize?: number;
 }
 export declare const Text: React.ForwardRefExoticComponent<Omit<TextProps, "ref"> & React.RefAttributes<TextLabel>>;
 export {};

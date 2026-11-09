@@ -4,7 +4,10 @@ local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local _ = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local SizeHelper = _.SizeHelper
 local CssHelper = _.CssHelper
-local Gradient = TS.import(script, script.Parent.Parent, "Decorator").Gradient
+local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
+local Corners = _Decorator.Corners
+local Gradient = _Decorator.Gradient
+local Padding = _Decorator.Padding
 local _Group = TS.import(script, script.Parent, "Group")
 local Group = _Group.Group
 local GroupContext = _Group.GroupContext
@@ -14,12 +17,18 @@ local Container = React.forwardRef(function(props, ref)
 	local isAutoSizeActive = autoSize ~= Enum.AutomaticSize.None and autoSize ~= "None"
 	local centerViaLayout = props.center == true and props.Position == nil and props.AnchorPoint == nil and isAutoSizeActive
 	local backgroundImage = CssHelper:resolveBackgroundImage(props.backgroundImage)
-	local _attributes = {}
-	local _condition = props.name
+	local _condition = props.borderThickness
 	if _condition == nil then
-		_condition = "Container"
+		_condition = 0
 	end
-	_attributes.key = _condition
+	local borderThickness = _condition
+	local sizeConstraint = SizeHelper:GetSizeConstraint(props)
+	local _attributes = {}
+	local _condition_1 = props.name
+	if _condition_1 == nil then
+		_condition_1 = "Container"
+	end
+	_attributes.key = _condition_1
 	_attributes.ref = ref
 	_attributes.Archivable = props.Archivable
 	_attributes.Tag = props.Tag
@@ -27,11 +36,11 @@ local Container = React.forwardRef(function(props, ref)
 	_attributes.AnchorPoint = if centerViaLayout then Vector2.zero else SizeHelper:GetAnchor(props)
 	_attributes.AutomaticSize = autoSize
 	_attributes.BackgroundColor3 = props.BackgroundColor3
-	local _condition_1 = props.BackgroundTransparency
-	if _condition_1 == nil then
-		_condition_1 = 1
+	local _condition_2 = props.BackgroundTransparency
+	if _condition_2 == nil then
+		_condition_2 = 1
 	end
-	_attributes.BackgroundTransparency = _condition_1
+	_attributes.BackgroundTransparency = _condition_2
 	_attributes.BorderColor3 = props.BorderColor3
 	_attributes.BorderMode = props.BorderMode
 	_attributes.BorderSizePixel = if props.BorderSizePixel == nil then 0 else props.BorderSizePixel
@@ -58,11 +67,11 @@ local Container = React.forwardRef(function(props, ref)
 				_result_1 = _result_1.X
 			end
 		end
-		local _condition_2 = _result_1
-		if _condition_2 == nil then
-			_condition_2 = 0
+		local _condition_3 = _result_1
+		if _condition_3 == nil then
+			_condition_3 = 0
 		end
-		_result = _condition_2
+		_result = _condition_3
 	else
 		_result = 0
 	end
@@ -83,7 +92,21 @@ local Container = React.forwardRef(function(props, ref)
 	_attributes.Event = props.Event
 	local content = (React.createElement("imagelabel", _attributes, React.createElement(Gradient, {
 		value = props.backgroundGradient,
-	}), React.createElement(Group.Element, {
+	}), borderThickness > 0 and (React.createElement("uistroke", {
+		key = "Stroke",
+		Thickness = borderThickness,
+		Color = props.borderColor,
+		Transparency = props.borderTransparency,
+		BorderStrokePosition = if props.borderPosition == "outer" then Enum.BorderStrokePosition.Outer else Enum.BorderStrokePosition.Inner,
+	})), props.padding ~= nil and React.createElement(Padding, {
+		resolvedPadding = CssHelper:parseCssQuad(props.padding),
+	}), React.createElement(Corners, {
+		radius = props.cornerRadius,
+	}), sizeConstraint ~= nil and (React.createElement("uisizeconstraint", {
+		key = "SizeConstraint",
+		MinSize = sizeConstraint.MinSize,
+		MaxSize = sizeConstraint.MaxSize,
+	})), React.createElement(Group.Element, {
 		enabled = props.group,
 	}, props.children)))
 	if not centerViaLayout then

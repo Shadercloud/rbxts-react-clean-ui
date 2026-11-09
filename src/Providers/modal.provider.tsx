@@ -26,6 +26,12 @@ export function ModalProvider(props: ModalProviderProps) {
         return stack.findIndex((layer) => layer.id === id);
     }, [stack]);
 
+    const isTopmost = React.useCallback((id: string) => {
+        const top = stackRef.current[stackRef.current.size() - 1];
+
+        return top !== undefined && top.id === id;
+    }, []);
+
     React.useEffect(() => {
         const connection = CustomInputService.InputBegan.Connect((input, gameProcessed) => {
             if (gameProcessed) return;
@@ -48,8 +54,9 @@ export function ModalProvider(props: ModalProviderProps) {
             register,
             unregister,
             getLayerIndex,
+            isTopmost,
         }),
-        [register, unregister, getLayerIndex],
+        [register, unregister, getLayerIndex, isTopmost],
     );
 
     return (

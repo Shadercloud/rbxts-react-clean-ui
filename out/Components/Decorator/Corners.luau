@@ -1,12 +1,14 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
+local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local SizeHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").SizeHelper
 local function Corners(props)
+	local theme = React.useContext(CleanThemeContext)
 	if props.radius == nil then
 		return nil
 	end
-	local radius = SizeHelper:toUDim(props.radius)
+	local radius = SizeHelper:toRadius(theme, props.radius)
 	if radius.Scale == 0 and radius.Offset == 0 then
 		return nil
 	end

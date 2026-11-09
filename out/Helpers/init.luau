@@ -13,6 +13,9 @@ end
 for _k, _v in TS.import(script, script, "element.helper") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "gamepad.helper") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "gui.helper") or {} do
 	exports[_k] = _v
 end

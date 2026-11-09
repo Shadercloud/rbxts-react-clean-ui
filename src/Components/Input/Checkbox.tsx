@@ -1,18 +1,21 @@
 import React from "@rbxts/react";
 import { Icon } from "../Surface";
 import { CleanThemeContext } from "../../Contexts";
-import { FieldsetContext } from "../Layout";
+import { FieldsetContext, HStack } from "../Layout";
+import { Text } from "../Typography";
 import { Corners, Gradient, Padding } from "../Decorator";
-import { ColorHelper, CssHelper, SpacingHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { BackgroundElementProps, IconName, Intent, IntentElementProps, PaddingProps, ScalableElementProps, SpacedElementProps } from "../../Interfaces";
 
 interface CheckboxProps extends IntentElementProps, PaddingProps, BackgroundElementProps, SpacedElementProps, ScalableElementProps {
     checked?: boolean;
+    defaultChecked?: boolean;
     onChange?: (value: boolean) => void;
     'icon-checked'?: IconName;
     'icon-unchecked'?: IconName;
     'intent-checked'?: Intent;
     'intent-unchecked'?: Intent;
+    label?: string;
     name?: string;
 
 }
@@ -21,7 +24,20 @@ export function Checkbox(props: CheckboxProps) {
     const theme = React.useContext(CleanThemeContext);
     const fieldset = React.useContext(FieldsetContext);
 
-    const [checked, setChecked] = React.useState(props.checked ?? false);
+    const controlled = props.checked !== undefined;
+    const [internalChecked, setInternalChecked] = React.useState(props.defaultChecked ?? false);
+    const checked = controlled ? props.checked === true : internalChecked;
+
+    const requestChange = (value: boolean) => {
+        if (!controlled) {
+            setInternalChecked(value);
+        }
+
+        props.onChange?.(value);
+    };
+
+    const toggleRef = React.useRef<() => void>();
+    toggleRef.current = () => requestChange(!checked);
 
     React.useEffect(() => {
         if (!fieldset) {
@@ -29,7 +45,7 @@ export function Checkbox(props: CheckboxProps) {
         }
 
         const connection = fieldset.labelActivated?.Event.Connect(() => {
-            setChecked((current) => !current);
+            toggleRef.current?.();
         });
 
         return () => {
@@ -37,19 +53,16 @@ export function Checkbox(props: CheckboxProps) {
         };
     }, [fieldset]);
 
-    React.useEffect(() => {
-        props.onChange?.(checked);
-    }, [checked]);
-
     const backgroundImage = CssHelper.resolveBackgroundImage(theme.components.checkbox.backgroundImage);
 
-    return <imagebutton
-        key={props.name ?? "Checkbox"}
+    const box = <imagebutton
+        key={props.label !== undefined ? "CheckboxBox" : props.name ?? "Checkbox"}
         Size={UDim2.fromOffset(0, 0)}
         AutomaticSize={Enum.AutomaticSize.XY}
+        LayoutOrder={props.label !== undefined ? 1 : undefined}
         Event={{
             Activated: () => {
-                setChecked(!checked);
+                requestChange(!checked);
             }
         }}
         BackgroundTransparency={
@@ -102,6 +115,51 @@ export function Checkbox(props: CheckboxProps) {
                     theme.components.checkbox.intents,
                 ).textColor
             } />
-    </imagebutton>
+    </imagebutton>;
 
+    if (props.label === undefined) {
+        return box;
+    }
+
+    const labelTheme = theme.components.checkbox.label;
+
+    return (
+        <frame
+            key={props.name ?? "Checkbox"}
+            Size={UDim2.fromOffset(0, 0)}
+            AutomaticSize={Enum.AutomaticSize.XY}
+            BackgroundTransparency={1}
+            BorderSizePixel={0}
+        >
+            <HStack
+                valign="Center"
+                Wraps={false}
+                Padding={new UDim(0, labelTheme?.gap ?? math.ceil(SpacingHelper.GetPadding(theme, props.scale, theme.components.checkbox.spacing) / 2))}
+            />
+            {box}
+            <imagebutton
+                key="CheckboxLabel"
+                LayoutOrder={2}
+                Size={UDim2.fromOffset(0, 0)}
+                AutomaticSize={Enum.AutomaticSize.XY}
+                BackgroundTransparency={1}
+                BorderSizePixel={0}
+                AutoButtonColor={false}
+                Selectable={false}
+                Event={{
+                    Activated: () => {
+                        requestChange(!checked);
+                    }
+                }}
+            >
+                <Text
+                    name="CheckboxLabelText"
+                    text={props.label}
+                    TextWrap={false}
+                    typography={TypographyHelper.getTypography(theme, props.scale, labelTheme?.typography)}
+                    TextColor3={labelTheme?.textColor}
+                />
+            </imagebutton>
+        </frame>
+    );
 }

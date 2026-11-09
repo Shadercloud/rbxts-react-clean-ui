@@ -3,6 +3,7 @@ local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local _lunit = TS.import(script, TS.getModule(script, "@rbxts", "lunit").out)
 local Test = _lunit.Test
+local Assert = _lunit.Assert
 local Decorators = _lunit.Decorators
 local Runtime = _lunit.Runtime
 local Tag = _lunit.Tag
@@ -12,6 +13,7 @@ local Skip = _binding.Skip
 local Each = _binding.Each
 local FlexItem = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "FlexItem").FlexItem
 local HStack = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "HStack").HStack
+local VStack = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "VStack").VStack
 local _layout = TS.import(script, script.Parent.Parent.Parent, "Helpers", "layout")
 local STUDIO_SKIP_MESSAGE = _layout.STUDIO_SKIP_MESSAGE
 local assertAlignedLeft = _layout.assertAlignedLeft
@@ -19,6 +21,7 @@ local assertAlignedRight = _layout.assertAlignedRight
 local assertAllDescendantsContained = _layout.assertAllDescendantsContained
 local assertCenteredIn = _layout.assertCenteredIn
 local assertSizeApprox = _layout.assertSizeApprox
+local assertStackedVertically = _layout.assertStackedVertically
 local waitForGuiObject = _layout.waitForGuiObject
 local withMounted = _layout.withMounted
 local STACK_WIDTH = 400
@@ -47,6 +50,28 @@ local function child()
 		BackgroundTransparency = 1,
 		Size = UDim2.fromOffset(50, 20),
 	})
+end
+local function stackedChildren()
+	return { React.createElement("frame", {
+		key = "First",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(50, 20),
+		LayoutOrder = 1,
+	}), React.createElement("frame", {
+		key = "Second",
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(50, 20),
+		LayoutOrder = 2,
+	}) }
+end
+local function listLayoutsOf(instance)
+	local found = {}
+	for _, child in instance:GetChildren() do
+		if child:IsA("UIListLayout") then
+			table.insert(found, child)
+		end
+	end
+	return found
 end
 local function waitForGrownFlexItem(host)
 	return waitForGuiObject(host, "FlexItem", function(gui)
@@ -116,6 +141,52 @@ do
 			local flexItem = waitForGrownFlexItem(stack)
 			waitForGuiObject(flexItem, "Child")
 			assertAllDescendantsContained(flexItem, "flex item children")
+		end)
+	end
+	function FlexItemMountValidation:defaultHorizontalLayout()
+		withMounted(STACK_WIDTH, STACK_HEIGHT, stackWithFlexItem(React.createElement(FlexItem, {
+			LayoutOrder = 2,
+			Size = UDim2.new(0, 0, 0, ITEM_HEIGHT),
+		}, child())), function(mounted)
+			local flexItem = waitForGrownFlexItem(mounted.host)
+			local layouts = listLayoutsOf(flexItem)
+			Assert:equal(#layouts, 1, "Expected exactly one UIListLayout on the FlexItem")
+			Assert:equal(layouts[1].Name, "FlexItemLayout")
+			Assert:equal(layouts[1].FillDirection, Enum.FillDirection.Horizontal)
+		end)
+	end
+	function FlexItemMountValidation:verticalDirection()
+		withMounted(STACK_WIDTH, STACK_HEIGHT, stackWithFlexItem(React.createElement(FlexItem, {
+			LayoutOrder = 2,
+			direction = "vertical",
+			Size = UDim2.new(0, 0, 0, ITEM_HEIGHT * 2),
+		}, stackedChildren())), function(mounted)
+			local flexItem = waitForGrownFlexItem(mounted.host)
+			local layout = flexItem:FindFirstChild("FlexItemLayout")
+			Assert:notUndefined(layout, "Expected a FlexItemLayout on the FlexItem")
+			Assert:equal(layout.FillDirection, Enum.FillDirection.Vertical)
+			local first = waitForGuiObject(flexItem, "First")
+			local second = waitForGuiObject(flexItem, "Second")
+			assertStackedVertically({ first, second }, "direction=vertical children")
+		end)
+	end
+	function FlexItemMountValidation:layoutFalseDefersToChild()
+		withMounted(STACK_WIDTH, STACK_HEIGHT, stackWithFlexItem(React.createElement(FlexItem, {
+			LayoutOrder = 2,
+			layout = false,
+			Size = UDim2.new(0, 0, 0, ITEM_HEIGHT * 2),
+		}, React.createElement(VStack, {
+			spacing = "None",
+		}, stackedChildren()))), function(mounted)
+			local flexItem = waitForGrownFlexItem(mounted.host)
+			local layouts = listLayoutsOf(flexItem)
+			Assert:undefined(flexItem:FindFirstChild("FlexItemLayout"), "Expected no FlexItemLayout with layout={false}")
+			Assert:equal(#layouts, 1, "Expected only the VStack's UIListLayout on the FlexItem")
+			Assert:equal(layouts[1].FillDirection, Enum.FillDirection.Vertical)
+			Assert:notUndefined(flexItem:FindFirstChildWhichIsA("UIFlexItem"), "Expected the UIFlexItem to remain")
+			local first = waitForGuiObject(flexItem, "First")
+			local second = waitForGuiObject(flexItem, "Second")
+			assertStackedVertically({ first, second }, "layout={false} VStack children")
 		end)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
@@ -204,6 +275,66 @@ do
 	})
 	if _descriptor_12 then
 		FlexItemMountValidation.allContained = _descriptor_12.value
+	end
+	local _decorator_9 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_10 = DisplayName("Without direction or layout the FlexItem keeps a single horizontal FlexItemLayout")
+	local _descriptor_13 = Test(FlexItemMountValidation, "defaultHorizontalLayout", {
+		value = FlexItemMountValidation.defaultHorizontalLayout,
+	})
+	if _descriptor_13 then
+		FlexItemMountValidation.defaultHorizontalLayout = _descriptor_13.value
+	end
+	local _descriptor_14 = _decorator_10(FlexItemMountValidation, "defaultHorizontalLayout", {
+		value = FlexItemMountValidation.defaultHorizontalLayout,
+	})
+	if _descriptor_14 then
+		FlexItemMountValidation.defaultHorizontalLayout = _descriptor_14.value
+	end
+	local _descriptor_15 = _decorator_9(FlexItemMountValidation, "defaultHorizontalLayout", {
+		value = FlexItemMountValidation.defaultHorizontalLayout,
+	})
+	if _descriptor_15 then
+		FlexItemMountValidation.defaultHorizontalLayout = _descriptor_15.value
+	end
+	local _decorator_11 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_12 = DisplayName("direction=vertical switches FlexItemLayout to a vertical fill and stacks the children top to bottom")
+	local _descriptor_16 = Test(FlexItemMountValidation, "verticalDirection", {
+		value = FlexItemMountValidation.verticalDirection,
+	})
+	if _descriptor_16 then
+		FlexItemMountValidation.verticalDirection = _descriptor_16.value
+	end
+	local _descriptor_17 = _decorator_12(FlexItemMountValidation, "verticalDirection", {
+		value = FlexItemMountValidation.verticalDirection,
+	})
+	if _descriptor_17 then
+		FlexItemMountValidation.verticalDirection = _descriptor_17.value
+	end
+	local _descriptor_18 = _decorator_11(FlexItemMountValidation, "verticalDirection", {
+		value = FlexItemMountValidation.verticalDirection,
+	})
+	if _descriptor_18 then
+		FlexItemMountValidation.verticalDirection = _descriptor_18.value
+	end
+	local _decorator_13 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_14 = DisplayName("layout={false} drops FlexItemLayout so a child VStack's own layout stacks the children vertically")
+	local _descriptor_19 = Test(FlexItemMountValidation, "layoutFalseDefersToChild", {
+		value = FlexItemMountValidation.layoutFalseDefersToChild,
+	})
+	if _descriptor_19 then
+		FlexItemMountValidation.layoutFalseDefersToChild = _descriptor_19.value
+	end
+	local _descriptor_20 = _decorator_14(FlexItemMountValidation, "layoutFalseDefersToChild", {
+		value = FlexItemMountValidation.layoutFalseDefersToChild,
+	})
+	if _descriptor_20 then
+		FlexItemMountValidation.layoutFalseDefersToChild = _descriptor_20.value
+	end
+	local _descriptor_21 = _decorator_13(FlexItemMountValidation, "layoutFalseDefersToChild", {
+		value = FlexItemMountValidation.layoutFalseDefersToChild,
+	})
+	if _descriptor_21 then
+		FlexItemMountValidation.layoutFalseDefersToChild = _descriptor_21.value
 	end
 	FlexItemMountValidation = Tag("Studio")(FlexItemMountValidation) or FlexItemMountValidation
 end

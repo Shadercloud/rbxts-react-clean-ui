@@ -50,6 +50,29 @@ end
 local function findHeaderText(card)
 	return findDescendantOfClass(findSection(card, "CardHeader"), "TextLabel")
 end
+local function assertSinglePadding(section, vertical, horizontal, label)
+	local _exp = section:GetChildren()
+	-- ▼ ReadonlyArray.filter ▼
+	local _newValue = {}
+	local _callback = function(child)
+		return child:IsA("UIPadding")
+	end
+	local _length = 0
+	for _k, _v in _exp do
+		if _callback(_v, _k - 1, _exp) == true then
+			_length += 1
+			_newValue[_length] = _v
+		end
+	end
+	-- ▲ ReadonlyArray.filter ▲
+	local paddings = _newValue
+	Assert:equal(#paddings, 1, `{label}: expected exactly one UIPadding, found {#paddings}`)
+	local padding = paddings[1]
+	Assert:equal(padding.PaddingTop, UDim.new(0, vertical), `{label}: PaddingTop`)
+	Assert:equal(padding.PaddingBottom, UDim.new(0, vertical), `{label}: PaddingBottom`)
+	Assert:equal(padding.PaddingLeft, UDim.new(0, horizontal), `{label}: PaddingLeft`)
+	Assert:equal(padding.PaddingRight, UDim.new(0, horizontal), `{label}: PaddingRight`)
+end
 local CardMountValidation
 do
 	CardMountValidation = setmetatable({}, {
@@ -187,6 +210,30 @@ do
 			mounted.resize(240, 600)
 			assertContained(card, mounted.host, "after resize (card vs host)")
 			assertAllDescendantsContained(card, "after resize")
+		end)
+	end
+	function CardMountValidation:sectionPaddingNotDoubled()
+		local bodyProps = {
+			padding = "6",
+		}
+		local _exp = React.createElement(Card.Header, {
+			padding = "4 8",
+		}, React.createElement(Text, {
+			text = SHORT_TITLE,
+		}))
+		local _attributes = table.clone(bodyProps)
+		setmetatable(_attributes, nil)
+		withMounted(400, 300, React.createElement(Card, nil, _exp, React.createElement(Card.Body, _attributes, React.createElement(Text, {
+			text = "Body copy for the card under test.",
+		})), React.createElement(Card.Footer, {
+			padding = "2 10",
+		}, React.createElement(Text, {
+			text = "Footer",
+		}))), function(mounted)
+			local card = waitForCard(mounted.host)
+			assertSinglePadding(findSection(card, "CardHeader"), 4, 8, "CardHeader")
+			assertSinglePadding(findSection(card, "CardBody"), 6, 6, "CardBody")
+			assertSinglePadding(findSection(card, "CardFooter"), 2, 10, "CardFooter")
 		end)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
@@ -442,6 +489,26 @@ do
 	})
 	if _descriptor_37 then
 		CardMountValidation.resizeKeepsContained = _descriptor_37.value
+	end
+	local _decorator_26 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_27 = DisplayName("A padding passed to Card.Header, Card.Body and Card.Footer yields one UIPadding per section with that padding")
+	local _descriptor_38 = Test(CardMountValidation, "sectionPaddingNotDoubled", {
+		value = CardMountValidation.sectionPaddingNotDoubled,
+	})
+	if _descriptor_38 then
+		CardMountValidation.sectionPaddingNotDoubled = _descriptor_38.value
+	end
+	local _descriptor_39 = _decorator_27(CardMountValidation, "sectionPaddingNotDoubled", {
+		value = CardMountValidation.sectionPaddingNotDoubled,
+	})
+	if _descriptor_39 then
+		CardMountValidation.sectionPaddingNotDoubled = _descriptor_39.value
+	end
+	local _descriptor_40 = _decorator_26(CardMountValidation, "sectionPaddingNotDoubled", {
+		value = CardMountValidation.sectionPaddingNotDoubled,
+	})
+	if _descriptor_40 then
+		CardMountValidation.sectionPaddingNotDoubled = _descriptor_40.value
 	end
 	CardMountValidation = Tag("Studio")(CardMountValidation) or CardMountValidation
 end

@@ -4,7 +4,7 @@ description: Navigate between pages with an automatic window or a custom compoun
 icon: ListOrdered
 ---
 
-`Pagination` provides a smart default for common page navigation and compound subcomponents for custom layouts. It always keeps page state controlled through `page` and `onPageChange`.
+`Pagination` provides a smart default for common page navigation and compound subcomponents for custom layouts. It always keeps page state controlled through `page` and `onPageChange`. When the total page count isn't known, such as with a cursor-paged API, it can also run with only previous and next buttons.
 
 ## Simple
 
@@ -110,12 +110,64 @@ To control the items inside the list as well, pass explicit children to `Paginat
 
 Explicit list children are rendered exactly as supplied; they do not alter when `page` changes. Use an empty `Pagination.List` when the built-in windowing behavior is preferred.
 
+## Unknown page count
+
+Omit `totalPages` when the total number of pages isn't known, for example with a cursor-paged API that only tells you whether another page exists. The default composition then shows only the previous and next buttons. Previous is enabled above page `1`, and next is enabled only while `hasNextPage` is `true`.
+
+```tsx
+import React from "@rbxts/react";
+import { Pagination, Text, VStack } from "@rbxts/react-clean-ui";
+
+interface CursorPage {
+    entries: string[];
+    nextCursor?: string;
+}
+
+export function CursorPagination() {
+    const [page, setPage] = React.useState(1);
+    const [cursors, setCursors] = React.useState<(string | undefined)[]>([undefined]);
+    const [result, setResult] = React.useState<CursorPage>({ entries: [] });
+
+    React.useEffect(() => {
+        const cursor = cursors[page - 1];
+        const thread = task.spawn(() => {
+            const next = fetchPage(cursor);
+            setResult(next);
+            setCursors((previous) => {
+                const updated = [...previous];
+                updated[page] = next.nextCursor;
+                return updated;
+            });
+        });
+        return () => task.cancel(thread);
+    }, [page]);
+
+    return (
+        <VStack spacing="sm">
+            {result.entries.map((entry) => (
+                <Text key={entry} text={entry} />
+            ))}
+            <Pagination
+                page={page}
+                hasNextPage={result.nextCursor !== undefined}
+                onPageChange={setPage}
+            />
+        </VStack>
+    );
+}
+```
+
+Each page's cursor is stored as it's fetched, so the previous button can return to pages that were already visited.
+
+Without `totalPages`, `page` has no upper bound: it is floored and kept at `1` or above, and so are the pages passed to `onPageChange`. `Pagination.List` renders empty in this mode, so custom compositions typically pair `Pagination.Prev` and `Pagination.Next` with their own status label. `hasNextPage` is ignored when `totalPages` is given.
+
 ## Pagination
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `page` | `number` | — | Current controlled page. Values are floored and clamped to the available range. |
-| `totalPages` | `number` | — | Total number of pages. Values are floored and cannot be lower than zero. |
+| `totalPages` | `number` | `undefined` | Total number of pages. Values are floored and cannot be lower than zero. Omit it when the page count is unknown (see [Unknown page count](#unknown-page-count)). |
+| `hasNextPage` | `boolean` | `false` | Whether the next button is enabled when `totalPages` is omitted. Ignored when `totalPages` is given. |
 | `siblingCount` | `number` | `1` | Number of pages shown on each side of the current page in the calculated window. Values are floored and cannot be lower than zero. |
 | `onPageChange` | `(page: number) => void` | — | Called with the next clamped page when an enabled item or navigation button is activated. |
 | `children` | `React.ReactNode` | Standard layout | Replaces the standard previous/list/next composition with custom content, rendered directly with no layout container applied. |
@@ -128,7 +180,7 @@ When `totalPages` is zero, the calculated list is empty, both navigation buttons
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `children` | `React.ReactNode` | Calculated page window | Custom list contents. Omit this prop to render the root's calculated items and ellipses. |
+| `children` | `React.ReactNode` | Calculated page window | Custom list contents. Omit this prop to render the root's calculated items and ellipses. Without `totalPages` there is no calculated window, so an empty `Pagination.List` renders nothing. |
 
 ### Pagination.Item
 
@@ -140,7 +192,7 @@ When `totalPages` is zero, the calculated list is empty, both navigation buttons
 
 ### Pagination.Prev and Pagination.Next
 
-These components accept no props. They move one page backward or forward and become disabled at the corresponding boundary.
+These components accept no props. They move one page backward or forward and become disabled at the corresponding boundary. Without `totalPages`, `Pagination.Prev` is disabled on page `1` and `Pagination.Next` is disabled unless `hasNextPage` is `true`.
 
 ### Pagination.Ellipsis
 
@@ -152,6 +204,7 @@ All compound subcomponents must be rendered inside `Pagination`.
 
 - `Pagination` is controlled: activating a control calls `onPageChange`, while the selected page changes only when the supplied `page` changes.
 - Page values, totals, and sibling counts are normalized to whole numbers. Requested pages are clamped between `1` and `totalPages`.
+- Without `totalPages`, pages are only kept at `1` or above, the default composition renders just the previous and next buttons, and `Pagination.List` renders empty. The next button follows `hasNextPage`, which counts as `false` when unset.
 - The automatic list shows every page when the total fits within the visible window (`siblingCount * 2 + 5` items). Otherwise it preserves the first page, last page, current-page siblings, and ellipses for gaps, while extending the leading or trailing run of numbers near the start or end of the range so the total item count stays exactly `siblingCount * 2 + 5` at every page — the bar's width never changes as the current page changes.
 - Providing root `children` disables the default composition, including its internal `HStack`; the supplied children are rendered directly, so provide your own layout container (`HStack`, `VStack`, or otherwise) to arrange them. A child `Pagination.List` can still consume the calculated window.
 - Item backgrounds, borders, spacing, typography, and default, hover, selected, and disabled colors come from the active theme.

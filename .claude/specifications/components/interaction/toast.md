@@ -17,6 +17,7 @@
 - `ToastContainer` renders nothing when there are no toasts (returns `undefined`), so it never reserves layout space while empty.
 - Its position and anchor come from `SizeHelper.GetPosition`/`GetAnchor` applied to `theme.components.toast.position` (a `PositionElementProps`); if the theme does not configure a position, it defaults to `UDim2.fromOffset(5, 5)` anchored at `(0, 0)` (top-left, 5px inset).
 - Its width defaults to `theme.components.toast.width` unless overridden by the container's own `SizeElementProps`; height is automatic.
+- `ToastContainer`'s `minWidth`/`maxWidth`/`minHeight`/`maxHeight` follow [Min and max size](../index.md#min-and-max-size) and are forwarded to its root `Container`. Individual `Toast`s don't take size props.
 - Toasts render inside a vertical stack (`VStack`, `xs` spacing) in the order they appear in the `toasts` array (insertion order — newest last). The anchor/position of the container only affects where the whole stack sits on screen; it does not reverse the stacking order, so a newly shown toast always appears visually below previously shown toasts, even when the container is anchored to a bottom corner.
 
 ## Content and layout

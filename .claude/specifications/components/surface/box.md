@@ -10,6 +10,7 @@
 ## Behavior
 
 - Size defaults to `UDim2.fromScale(1, 1)` when none of `Size`, `width`, or `height` is supplied (via `SizeHelper.GetSize`); `AutomaticSize` is always set to `XY` regardless of the resolved base size.
+- `minWidth`/`maxWidth`/`minHeight`/`maxHeight` follow [Min and max size](../index.md#min-and-max-size) and land on `Box`'s own `ImageLabel` (through `Container`).
 - `BackgroundColor3`/`BackgroundTransparency` fall back to `theme.components.box.backgroundColor`/`backgroundTransparency` when not supplied as props.
 - An inner `uistroke` always renders, using `'border-thickness'`/`'border-color'` props, falling back to `theme.components.box.borderThickness`/`borderColor`.
 - A `BoxShadow` decorator applies `theme.components.box.boxShadow`; when that theme value is `undefined`, no shadow renders (the shadow prop-level overrides on `ShadowElementProps` still take precedence when supplied).

@@ -4,24 +4,27 @@ import {
     CleanThemeContext,
     OverlayContext,
 } from "../../Contexts";
-import { ColorHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import {
     CssBackgroundGradient,
     CssSize,
     ScalableElementProps,
     ScaleSize,
+    SizeElementProps,
     SpacedElementProps,
 } from "../../Interfaces";
-import { CssBackgroundImage } from "../../Theme";
+import { CssBackgroundImage, ThemeTemplate } from "../../Theme";
 import { Corners, Gradient, Padding } from "../Decorator";
 import { Container, FieldsetContext, FlexItem, HStack, Scroller, VStack } from "../Layout";
 import { Text } from "../Typography";
 import { Icon } from "../Surface";
 import { Input } from "./Input";
+import { FieldBoxShadow, FieldInnerShadow, resolveFieldState, resolveFieldStateStyle } from "./Input.field";
 
 export interface SelectProps
     extends ScalableElementProps,
     SpacedElementProps,
+    Pick<SizeElementProps, "width">,
     React.InstanceProps<ImageLabel> {
     selected?: number;
     'max-height'?: CssSize;
@@ -31,6 +34,7 @@ export interface SelectProps
     name?: string;
     searchable?: boolean;
     searchPlaceholder?: string;
+    disabled?: boolean;
 }
 
 
@@ -268,6 +272,49 @@ function SelectGroupHeader(props: SelectGroupHeaderProps) {
     );
 }
 
+interface SelectCaretCapProps {
+    caret: NonNullable<ThemeTemplate["components"]["select"]["caret"]>;
+    color: Color3;
+    inset: number;
+}
+
+function SelectCaretCap(props: SelectCaretCapProps) {
+    const theme = React.useContext(CleanThemeContext);
+
+    const caret = props.caret;
+    const size = caret.size !== undefined ? SizeHelper.toUDim(caret.size).Offset : theme.iconSize[theme.default.scale] ?? 0;
+    const margin = caret.margin !== undefined ? CssHelper.parseCssQuad(caret.margin) : SpacingHelper.ResolveNumberPadding(0);
+    const borderThickness = caret.borderThickness ?? 0;
+    const filled = caret.backgroundColor !== undefined || caret.backgroundGradient !== undefined;
+
+    return (
+        <frame
+            key="SelectCaretCap"
+            Size={UDim2.fromOffset(math.max(0, size + margin.left + margin.right), math.max(0, size + margin.top + margin.bottom - props.inset))}
+            BackgroundTransparency={1}
+            BorderSizePixel={0}
+        >
+            <uiflexitem key="SelectCaretCapFlex" ItemLineAlignment={Enum.ItemLineAlignment.Center} />
+            <frame
+                key="Cap"
+                AnchorPoint={new Vector2(0, 0.5)}
+                Position={new UDim2(0, margin.left, 0.5, (margin.top - margin.bottom) / 2)}
+                Size={UDim2.fromOffset(size, size)}
+                BackgroundColor3={caret.backgroundColor ?? new Color3(1, 1, 1)}
+                BackgroundTransparency={caret.backgroundTransparency ?? (filled ? 0 : 1)}
+                BorderSizePixel={0}
+            >
+                {borderThickness > 0 && (
+                    <uistroke key="Stroke" Thickness={borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Inner} Color={caret.borderColor} />
+                )}
+                <Corners radius={caret.cornerRadius} />
+                <Gradient value={caret.backgroundGradient} />
+                <Icon name="SelectCaret" icon="caret-down" color={props.color} AnchorPoint={new Vector2(0.5, 0.5)} Position={UDim2.fromScale(0.5, 0.5)} />
+            </frame>
+        </frame>
+    );
+}
+
 type SelectComponent = React.ForwardRefExoticComponent<
     SelectProps & React.RefAttributes<ImageLabel>
 > & {
@@ -291,6 +338,12 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
     );
     const [contentHeight, setContentHeight] = React.useState(0);
     const [query, setQuery] = React.useState("");
+    const [hovered, setHovered] = React.useState(false);
+
+    const selectTheme = theme.components.select;
+    const stateStyle = resolveFieldStateStyle(selectTheme.states, resolveFieldState(props.disabled, open, hovered));
+    const borderThickness = stateStyle.borderThickness ?? selectTheme.borderThickness;
+    const dropDownGap = selectTheme.dropDown?.gap ?? 0;
 
     const buttonRef = React.useRef<ImageButton>();
 
@@ -392,7 +445,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         const button = buttonRef.current;
         const overlayInstance = overlay.overlay;
 
-        if (!button || !overlayInstance) {
+        if (!button || !overlayInstance || props.disabled) {
             return;
         }
 
@@ -416,7 +469,11 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         ));
 
         setOpen(true);
-    }, [open, overlay.overlay]);
+    }, [open, overlay.overlay, props.disabled]);
+
+    React.useEffect(() => {
+        if (props.disabled) setOpen(false);
+    }, [props.disabled]);
 
     React.useEffect(() => {
         const labelActivated = fieldset?.labelActivated;
@@ -429,7 +486,10 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         return () => connection.Disconnect();
     }, [fieldset?.labelActivated, activateSelect]);
 
-    const themeBackgroundTransparency = theme.components.select.backgroundTransparency ?? 1;
+    const themeBackgroundTransparency = stateStyle.backgroundTransparency ?? selectTheme.backgroundTransparency ?? 1;
+    const caretColor = selectTheme.caret?.iconColor ?? selectTheme.iconColor ?? theme.colors.intents.primary.default.textColor;
+    const fieldPadding = SpacingHelper.GetResolvedPadding(theme, props);
+    const capInset = fieldPadding.top + fieldPadding.bottom - 2 * selectTheme.borderThickness;
 
     if (open && overlay.overlay === undefined) {
         warn(
@@ -442,14 +502,18 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
             name={props.name ?? "Select"}
             ref={ref}
             {...props}
-            Size={UDim2.fromScale(1, 0)}
+            Size={props.width !== undefined ? undefined : UDim2.fromScale(1, 0)}
             AutomaticSize={Enum.AutomaticSize.Y}
-            BackgroundColor3={props.BackgroundColor3 ?? theme.components.select.backgroundColor}
+            BackgroundColor3={props.BackgroundColor3 ?? stateStyle.backgroundColor ?? selectTheme.backgroundColor}
             BackgroundTransparency={props.BackgroundTransparency ?? themeBackgroundTransparency}
             backgroundImage={props.backgroundImage ?? theme.components.select.backgroundImage}
         >
             {themeBackgroundTransparency < 1 && <Corners radius={theme.components.select.cornerRadius} />}
-            <Gradient value={props.backgroundGradient ?? theme.components.select.backgroundGradient} />
+            <Gradient value={props.backgroundGradient ?? stateStyle.backgroundGradient ?? selectTheme.backgroundGradient} />
+            <FieldBoxShadow value={selectTheme.boxShadow} />
+            {selectTheme.innerShadow !== undefined && (
+                <FieldInnerShadow value={selectTheme.innerShadow} cornerRadius={selectTheme.cornerRadius} inset={borderThickness} />
+            )}
             <SelectContext.Provider value={context}>
                 <imagebutton
                     key="SelectButton"
@@ -458,17 +522,20 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                     AutomaticSize={Enum.AutomaticSize.Y}
                     BackgroundTransparency={1}
                     BorderSizePixel={0}
+                    ZIndex={selectTheme.innerShadow !== undefined ? 2 : undefined}
                     Event={{
                         Activated: activateSelect,
+                        MouseEnter: () => setHovered(true),
+                        MouseLeave: () => setHovered(false),
                     }}
                 >
-                    <uistroke key="Stroke" Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Inner} Color={theme.components.select.borderColor} />
+                    <uistroke key="Stroke" Thickness={borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Inner} Color={stateStyle.borderColor ?? selectTheme.borderColor} />
 
                     <Corners radius={theme.components.select.cornerRadius} />
 
                     <Padding {...props} />
                     <HStack>
-                        <FlexItem>
+                        <FlexItem ItemLineAlignment={Enum.ItemLineAlignment.Center}>
                             <Text
                                 name="SelectedText"
                                 text={selectedOption?.props.text ?? "No Options"}
@@ -476,7 +543,9 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                                 TextColor3={theme.components.select.textColor}
                             />
                         </FlexItem>
-                        <Icon name="SelectCaret" icon="caret-down" color={theme.components.select.iconColor ?? theme.colors.intents.primary.default.textColor} />
+                        {selectTheme.caret === undefined
+                            ? <Icon name="SelectCaret" icon="caret-down" color={caretColor} />
+                            : <SelectCaretCap caret={selectTheme.caret} color={caretColor} inset={capInset} />}
                     </HStack>
 
                     {open &&
@@ -490,14 +559,15 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                                     theme.components.select.dropDownBackgroundColor
                                 }
                                 AnchorPoint={Vector2.zero}
-                                Position={dropdownPosition.add(new UDim2(0, 0, 0, dropdownSize.Y.Offset))}
+                                Position={dropdownPosition.add(new UDim2(0, 0, 0, dropdownSize.Y.Offset + dropDownGap))}
                                 Size={UDim2.fromOffset(dropdownSize.X.Offset, 0)}
                                 AutomaticSize={Enum.AutomaticSize.Y}
                                 ClipsDescendants={true}
                             >
-                                <uistroke key="Stroke" Thickness={theme.components.select.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={theme.components.select.borderColor} />
+                                <uistroke key="Stroke" Thickness={selectTheme.dropDown?.borderThickness ?? selectTheme.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={selectTheme.dropDown?.borderColor ?? selectTheme.borderColor} />
 
-                                <Corners radius={theme.components.select.cornerRadius} />
+                                <Corners radius={selectTheme.dropDown?.cornerRadius ?? selectTheme.cornerRadius} />
+                                <FieldBoxShadow value={selectTheme.dropDown?.boxShadow} />
 
                                 <VStack spacing="None">
                                     {props.searchable && (

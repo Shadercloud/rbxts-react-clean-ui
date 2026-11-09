@@ -8,5 +8,25 @@ declare class SelectMountValidation {
     instanceTransparencyWins(): void;
     themedTextAndCaret(): void;
     defaultTextAndCaret(): void;
+    unsetTreeUnchanged(): void;
+    stringShadow(): void;
+    tableShadow(): void;
+    zeroShadowNothing(form: string): void;
+    innerShadowBand(): void;
+    hoverState(): void;
+    focusState(): void;
+    disabledState(): void;
+    cornersFollowState(): void;
+    disabledCannotOpen(): void;
+    disabledClosesOpen(): void;
+    caretCap(): void;
+    caretMarginQuad(): void;
+    caretDefaults(): void;
+    caretCapNoGrow(): void;
+    caretFill(kind: string, expected: number): void;
+    caretIconFallback(source: string): void;
+    dropDownOverrides(): void;
+    dropDownFallback(): void;
+    dropDownGap(gap: number): void;
 }
 export = SelectMountValidation;

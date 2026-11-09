@@ -16,7 +16,8 @@ export interface PaginationListProps {
 declare function PaginationList(props: PaginationListProps): React.JSX.Element;
 export interface PaginationProps {
     page: number;
-    totalPages: number;
+    totalPages?: number;
+    hasNextPage?: boolean;
     siblingCount?: number;
     onPageChange: (page: number) => void;
     children?: React.ReactNode;

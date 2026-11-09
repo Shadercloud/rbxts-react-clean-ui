@@ -179,6 +179,8 @@ export const DefaultTheme: ThemeTemplate = {
         badge: {
             cornerRadius: "50%",
             borderThickness: 1,
+            hoverDarken: 0.08,
+            pressDarken: 0.16,
             padding: {
                 xs: "1px 4px",
                 sm: "2px 6px",
@@ -812,6 +814,8 @@ export const DefaultTheme: ThemeTemplate = {
             fadeDuration: 0.25,
             pointerSize: 10,
             edgeMargin: 8,
+            closeDelay: 0.15,
+            longPressDelay: 0.5,
             spacing: {
                 xs: 2,
                 sm: 6,

@@ -2,6 +2,7 @@ import React from "@rbxts/react";
 import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
 const { Skip, Each } = Decorators;
+import { BoxProps } from "../../../Components/Surface/Box";
 import { Card } from "../../../Components/Surface/Card";
 import { Text } from "../../../Components/Typography/Text";
 import {
@@ -55,6 +56,17 @@ function findSection(card: Instance, name: CardSection): GuiObject {
 
 function findHeaderText(card: Instance): TextLabel {
 	return findDescendantOfClass(findSection(card, "CardHeader"), "TextLabel");
+}
+
+function assertSinglePadding(section: Instance, vertical: number, horizontal: number, label: string) {
+	const paddings = section.GetChildren().filter((child) => child.IsA("UIPadding"));
+
+	Assert.equal(paddings.size(), 1, `${label}: expected exactly one UIPadding, found ${paddings.size()}`);
+	const padding = paddings[0] as UIPadding;
+	Assert.equal(padding.PaddingTop, new UDim(0, vertical), `${label}: PaddingTop`);
+	Assert.equal(padding.PaddingBottom, new UDim(0, vertical), `${label}: PaddingBottom`);
+	Assert.equal(padding.PaddingLeft, new UDim(0, horizontal), `${label}: PaddingLeft`);
+	Assert.equal(padding.PaddingRight, new UDim(0, horizontal), `${label}: PaddingRight`);
 }
 
 @Tag("Studio")
@@ -279,6 +291,36 @@ class CardMountValidation {
 			assertContained(card, mounted.host, "after resize (card vs host)");
 			assertAllDescendantsContained(card, "after resize");
 		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A padding passed to Card.Header, Card.Body and Card.Footer yields one UIPadding per section with that padding")
+	@Test
+	public sectionPaddingNotDoubled() {
+		const bodyProps = { padding: "6" } as BoxProps;
+
+		withMounted(
+			400,
+			300,
+			<Card>
+				<Card.Header padding="4 8">
+					<Text text={SHORT_TITLE} />
+				</Card.Header>
+				<Card.Body {...bodyProps}>
+					<Text text="Body copy for the card under test." />
+				</Card.Body>
+				<Card.Footer padding="2 10">
+					<Text text="Footer" />
+				</Card.Footer>
+			</Card>,
+			(mounted) => {
+				const card = waitForCard(mounted.host);
+
+				assertSinglePadding(findSection(card, "CardHeader"), 4, 8, "CardHeader");
+				assertSinglePadding(findSection(card, "CardBody"), 6, 6, "CardBody");
+				assertSinglePadding(findSection(card, "CardFooter"), 2, 10, "CardFooter");
+			},
+		);
 	}
 }
 

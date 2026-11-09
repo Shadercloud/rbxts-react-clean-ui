@@ -17,7 +17,7 @@ function Switch(props: { screenshot?: boolean } = {}) {
             </Fieldset>
             <Fieldset checkbox>
                 <Fieldset.Control>
-                    <SwitchComponent checked />
+                    <SwitchComponent defaultChecked />
                 </Fieldset.Control>
                 <Fieldset.Label>
                     <Text text="Initially checked" />
@@ -33,7 +33,7 @@ function Switch(props: { screenshot?: boolean } = {}) {
             </Fieldset>
             <Fieldset checkbox disabled>
                 <Fieldset.Control>
-                    <SwitchComponent checked disabled />
+                    <SwitchComponent defaultChecked disabled />
                 </Fieldset.Control>
                 <Fieldset.Label>
                     <Text text="Disabled (on)" />
@@ -41,7 +41,7 @@ function Switch(props: { screenshot?: boolean } = {}) {
             </Fieldset>
             <Fieldset checkbox>
                 <Fieldset.Control>
-                    <SwitchComponent checked intent="success" />
+                    <SwitchComponent defaultChecked intent="success" />
                 </Fieldset.Control>
                 <Fieldset.Label>
                     <Text text="<b>success</b> intent" />
@@ -49,7 +49,7 @@ function Switch(props: { screenshot?: boolean } = {}) {
             </Fieldset>
             <Fieldset checkbox>
                 <Fieldset.Control>
-                    <SwitchComponent checked intent="danger" />
+                    <SwitchComponent defaultChecked intent="danger" />
                 </Fieldset.Control>
                 <Fieldset.Label>
                     <Text text="<b>danger</b> intent" />
@@ -57,7 +57,7 @@ function Switch(props: { screenshot?: boolean } = {}) {
             </Fieldset>
             <Fieldset checkbox>
                 <Fieldset.Control>
-                    <SwitchComponent checked intent="warning" />
+                    <SwitchComponent defaultChecked intent="warning" />
                 </Fieldset.Control>
                 <Fieldset.Label>
                     <Text text="<b>warning</b> intent" />
@@ -65,7 +65,7 @@ function Switch(props: { screenshot?: boolean } = {}) {
             </Fieldset>
             <Fieldset checkbox>
                 <Fieldset.Control>
-                    <SwitchComponent checked intent="info" />
+                    <SwitchComponent defaultChecked intent="info" />
                 </Fieldset.Control>
                 <Fieldset.Label>
                     <Text text="<b>info</b> intent" />

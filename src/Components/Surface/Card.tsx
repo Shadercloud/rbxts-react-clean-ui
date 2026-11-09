@@ -126,19 +126,20 @@ export const CardHeader = React.forwardRef<ImageLabel, CardHeaderProps>(
         const card = React.useContext(CardContext);
         const intent = ColorHelper.getIntentColors(theme, props.intent ?? card.intent ?? "primary", "default", theme.components.card.header.intents);
         const padding = SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.card.header.spacing, theme.components.card.header.padding, "md");
-        const corners = CssHelper.parseCssSize(theme.components.card.cornerRadius);
+        const corners = CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, theme.components.card.cornerRadius));
         const headerCorners = theme.components.card.header.cornerRadius;
         const noCorner = new UDim(0, 0);
-        const topLeftRadius = headerCorners?.topLeft !== undefined ? CssHelper.parseCssSize(headerCorners.topLeft) : corners;
-        const topRightRadius = headerCorners?.topRight !== undefined ? CssHelper.parseCssSize(headerCorners.topRight) : corners;
-        const bottomLeftRadius = headerCorners?.bottomLeft !== undefined ? CssHelper.parseCssSize(headerCorners.bottomLeft) : noCorner;
-        const bottomRightRadius = headerCorners?.bottomRight !== undefined ? CssHelper.parseCssSize(headerCorners.bottomRight) : noCorner;
+        const topLeftRadius = headerCorners?.topLeft !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, headerCorners.topLeft)) : corners;
+        const topRightRadius = headerCorners?.topRight !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, headerCorners.topRight)) : corners;
+        const bottomLeftRadius = headerCorners?.bottomLeft !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, headerCorners.bottomLeft)) : noCorner;
+        const bottomRightRadius = headerCorners?.bottomRight !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, headerCorners.bottomRight)) : noCorner;
         const { overlay, positionProps } = resolveOverlayPosition(props, theme.components.card.header.position);
         return <Container
             name="CardHeader"
             ref={ref}
             {...props}
             {...positionProps}
+            padding={undefined}
             Size={positionProps.Size ?? UDim2.fromScale(0, 0)}
             AutomaticSize={positionProps.AutomaticSize ?? Enum.AutomaticSize.XY}
             BackgroundTransparency={intent.backgroundTransparency}
@@ -171,6 +172,7 @@ export const CardBody = React.forwardRef<ImageLabel, CardBodyProps>(
                 ref={ref}
                 Size={SizeHelper.GetSize(props, UDim2.fromScale(0, 0))}
                 {...props}
+                padding={undefined}
                 AutomaticSize={Enum.AutomaticSize.XY}>
                 <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, paddingSourceProps, theme.components.card.body?.spacing, theme.components.card.body?.padding)} />
                 {props.children}
@@ -190,19 +192,20 @@ export const CardFooter = React.forwardRef<ImageLabel, CardFooterProps>(
         const card = React.useContext(CardContext);
         const intent = ColorHelper.getIntentColors(theme, props.intent ?? card.intent ?? "primary", "default", theme.components.card.footer.intents);
         const padding = SpacingHelper.GetResolvedPadding(theme, props as PaddingProps, theme.components.card.footer.spacing, theme.components.card.footer.padding, "md");
-        const corners = CssHelper.parseCssSize(theme.components.card.cornerRadius);
+        const corners = CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, theme.components.card.cornerRadius));
         const footerCorners = theme.components.card.footer.cornerRadius;
         const noCorner = new UDim(0, 0);
-        const topLeftRadius = footerCorners?.topLeft !== undefined ? CssHelper.parseCssSize(footerCorners.topLeft) : noCorner;
-        const topRightRadius = footerCorners?.topRight !== undefined ? CssHelper.parseCssSize(footerCorners.topRight) : noCorner;
-        const bottomLeftRadius = footerCorners?.bottomLeft !== undefined ? CssHelper.parseCssSize(footerCorners.bottomLeft) : corners;
-        const bottomRightRadius = footerCorners?.bottomRight !== undefined ? CssHelper.parseCssSize(footerCorners.bottomRight) : corners;
+        const topLeftRadius = footerCorners?.topLeft !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, footerCorners.topLeft)) : noCorner;
+        const topRightRadius = footerCorners?.topRight !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, footerCorners.topRight)) : noCorner;
+        const bottomLeftRadius = footerCorners?.bottomLeft !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, footerCorners.bottomLeft)) : corners;
+        const bottomRightRadius = footerCorners?.bottomRight !== undefined ? CssHelper.parseCssSize(SizeHelper.resolveRadius(theme, footerCorners.bottomRight)) : corners;
         const { overlay, positionProps } = resolveOverlayPosition(props, theme.components.card.footer.position);
         return <Container
             name="CardFooter"
             ref={ref}
             {...props}
             {...positionProps}
+            padding={undefined}
             Size={positionProps.Size ?? UDim2.fromScale(0, 0)}
             AutomaticSize={positionProps.AutomaticSize ?? Enum.AutomaticSize.XY}
             BackgroundTransparency={intent.backgroundTransparency}
@@ -351,6 +354,7 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
         );
 
         const wrapperPositionProps: PositionElementProps = { ...props, center: undefined };
+        const wrapperSizeConstraint = SizeHelper.GetSizeConstraint(props);
 
         const boxWithOverlay = hasOverlay ? (
             <frame
@@ -370,6 +374,13 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
                     AbsoluteSize: (instance) => setWrapperAbsoluteSize(instance.AbsoluteSize),
                 }}
             >
+                {wrapperSizeConstraint !== undefined && (
+                    <uisizeconstraint
+                        key="SizeConstraint"
+                        MinSize={wrapperSizeConstraint.MinSize}
+                        MaxSize={wrapperSizeConstraint.MaxSize}
+                    />
+                )}
                 {cardBox}
                 {overlayHeader}
                 {overlayFooter}

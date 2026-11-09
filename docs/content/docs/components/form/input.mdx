@@ -290,6 +290,26 @@ function ControlledInput() {
 }
 ```
 
+## Disabled
+
+Set `disabled` to stop the input from being edited or focused.
+
+```tsx
+<Input
+    value="Read only"
+    disabled
+/>
+```
+
+A disabled input:
+
+* forces `TextEditable` and `Interactable` to `false` on the underlying `TextBox`
+* releases focus if it was focused when `disabled` became `true`
+* ignores activation of a paired `Fieldset.Label`
+* takes the theme's `states.disabled` look, if one is set (see [Field states](#field-states))
+
+When `disabled` is unset or `false`, the input behaves as before, and a `TextEditable` prop you pass is still applied. `disabled` must be set on the `Input` itself: it isn't read from a surrounding `Fieldset`.
+
 ## Native TextBox Properties
 
 `Input` extends `React.InstanceProps<TextBox>`, so native Roblox `TextBox` properties can be passed directly to it.
@@ -340,6 +360,7 @@ A `Change` handler can also be supplied to react to native property-changed even
 | `onChange`          | `(value: string) => void`                 | `undefined`              | Called whenever the input value changes.                           |
 | `icon`              | `IconName`                                | `undefined`              | Renders a leading icon before the text field.                      |
 | `controlled`        | `boolean`                                 | `false`                  | Displays `value` directly instead of managing text internally.     |
+| `disabled`          | `boolean`                                 | `false`                  | Prevents editing and focus, and applies the theme's `states.disabled` look. |
 | `Event`             | `React.InstanceEvent<TextBox>`            | `undefined`              | Native Roblox event handlers for the underlying `TextBox`.         |
 | `scale`             | `ScaleSize`                               | Theme default            | Controls the typography scale.                                     |
 | `spacing`           | `SpaceSize`                               | Theme default            | Controls the internal padding.                                     |
@@ -369,6 +390,9 @@ theme.components.input.backgroundImage
 theme.components.input.backgroundGradient
 theme.components.input.placeholder
 theme.components.input.iconColor
+theme.components.input.boxShadow
+theme.components.input.innerShadow
+theme.components.input.states
 ```
 
 `backgroundColor` and `backgroundTransparency` are optional and give the input a flat fill. `backgroundTransparency` defaults to `1`, so the fill is invisible unless a theme sets it lower. No shipped theme sets either value. A `backgroundImage` draws on top of the fill, so a theme extending one that has a background image (such as `WoodenTheme`) can clear it with `backgroundImage: { image: "" }` to show only the flat colour.
@@ -404,6 +428,82 @@ theme.colors.intents.primary.default.textColor
 ```
 
 These values can be changed by providing a custom Clean UI theme.
+
+`boxShadow`, `innerShadow`, and `states` are optional. No shipped theme sets them, and when they're unset the input looks the same as before.
+
+### Box shadow
+
+`boxShadow` draws an outer shadow around the field. It accepts either a CSS-style shadow string, which uses the global `theme.components.boxShadow` colour and transparency, or a table with its own `color` and `transparency`:
+
+```ts
+input: {
+    boxShadow: { shadow: "0px 1px 0px 0px", color: Color3.fromHex("#A87A45"), transparency: 0 },
+}
+```
+
+The example above draws a 1px light lip under the field. An all-zero shadow draws nothing. The shadow takes the field's shape, so it reads best when the field has a visible fill (`backgroundTransparency` below `1`).
+
+### Inner shadow
+
+`innerShadow` draws an inset shadow inside the field's border, which Roblox has no native instance for:
+
+```ts
+input: {
+    innerShadow: { color: Color3.fromHex("#000000"), transparency: 0.5, size: 8 },
+}
+```
+
+The shadow starts at `transparency` along the top edge and fades to fully transparent `size` pixels down. It sits inside the border, follows `cornerRadius`, and draws under the icon and text.
+
+### Field states
+
+`states` overrides the field's look while it is hovered, focused, or disabled:
+
+```ts
+input: {
+    states: {
+        hover: { borderColor: Color3.fromHex("#5A3A1C") },
+        focus: { borderColor: Color3.fromHex("#F2A65A") },
+        disabled: { backgroundTransparency: 0.5 },
+    },
+}
+```
+
+Each state accepts `borderColor`, `borderThickness`, `backgroundColor`, `backgroundTransparency`, and `backgroundGradient`. The base `input` keys are the default look. The active state replaces only the keys it sets, and states don't inherit from each other.
+
+| State      | Active when                                 |
+| ---------- | ------------------------------------------- |
+| `disabled` | The `disabled` prop is `true`.              |
+| `focus`    | The `TextBox` has focus.                    |
+| `hover`    | The pointer is over the field.              |
+
+When more than one applies, the order of priority is `disabled`, then `focus`, then `hover`. The inner shadow stays inside whichever `borderThickness` is active.
+
+### Sunk well example
+
+These keys together produce a field that looks sunk into the panel: a vertical blue gradient, a dark border, an inner shadow along the top, a light lip underneath, and an orange border while focused.
+
+<Demo preview="Scenes/Form/SunkField.loom.tsx" previewHeight={360}>
+```ts
+const MyTheme = extendTheme(DefaultTheme, {
+    components: {
+        input: {
+            borderColor: Color3.fromHex("#3D2712"),
+            borderThickness: 2,
+            cornerRadius: 8,
+            backgroundColor: Color3.fromHex("#FFFFFF"),
+            backgroundTransparency: 0,
+            backgroundGradient: { colors: [Color3.fromHex("#173A66"), Color3.fromHex("#214C84"), Color3.fromHex("#295896")], stops: [0, 0.45, 1], rotation: 90 },
+            boxShadow: { shadow: "0px 1px 0px 0px", color: Color3.fromHex("#A87A45"), transparency: 0 },
+            innerShadow: { color: Color3.fromHex("#000000"), transparency: 0.5, size: 8 },
+            states: { focus: { borderColor: Color3.fromHex("#F2A65A") } },
+        },
+    },
+});
+```
+</Demo>
+
+`backgroundColor` is white because the gradient multiplies the fill colour. A theme extending `WoodenTheme` also needs `backgroundImage: { image: "" }` to remove Wooden's background image.
 
 ## Complete Example
 

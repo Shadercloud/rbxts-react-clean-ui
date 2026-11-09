@@ -111,6 +111,68 @@ const MyTheme = extendTheme(DefaultTheme, {
 
 All built-in themes define `secondary`.
 
+## Typography outline
+
+A typography style in `theme.typography` can set an `outline` (`TypographyOutline`: `color`, `thickness`, and `transparency`, all optional). Text drawn with that style then gets a contextual `UIStroke` around its glyphs, which helps text that sits over the 3D world.
+
+```tsx
+const MyTheme = extendTheme(DefaultTheme, {
+    typography: {
+        title: {
+            outline: {
+                color: Color3.fromHex("#000000"),
+                thickness: 2,
+            },
+        },
+    },
+});
+```
+
+Unset fields default to black, thickness `1`, and transparency `0`. A `Text` can override the theme outline field by field with an `outline` object, or turn it off with `outline={false}` (see [Text](/components/typography/text#outline)).
+
+The theme outline only affects text drawn through `Text`, including components that pass their typography to `Text`. Components that draw their own `TextLabel` ignore it. No built-in theme sets `outline`.
+
+## Radius
+
+`theme.radius` defines the radius scale: `sm`, `md`, and `lg`, in pixels. Anywhere the library takes a corner radius, you can pass one of these names as a token instead of a size. This includes every `cornerRadius` key under `theme.components` (also the per-corner fields of `card.header`, `card.footer`, and `tabs.button`), `Button`'s `styleOverride.cornerRadius`, the `Corners` decorator's `radius`, and `Container`'s `cornerRadius`.
+
+```tsx
+const MyTheme = extendTheme(DefaultTheme, {
+    radius: {
+        md: 12,
+    },
+
+    components: {
+        input: {
+            cornerRadius: "md",
+        },
+    },
+});
+```
+
+A token resolves against the theme in the component's context, so it follows a nested theme provider. Changing `radius.md` updates every value that uses `"md"`.
+
+### Reading radius values in your own components
+
+A theme `cornerRadius` value, or any radius prop, can now be a token. Convert it with `SizeHelper.toRadius(theme, radius)`, which resolves the token from `theme.radius` before converting the value to a `UDim`. `SizeHelper.toUDim` doesn't understand tokens, and it errors on `"md"`. Code that passed a theme radius to `SizeHelper.toUDim` should switch to `toRadius`.
+
+```tsx
+import React from "@rbxts/react";
+import { CleanThemeContext, SizeHelper } from "@rbxts/react-clean-ui";
+
+export function Panel() {
+    const theme = React.useContext(CleanThemeContext);
+
+    return (
+        <frame Size={new UDim2(0, 200, 0, 100)}>
+            <uicorner CornerRadius={SizeHelper.toRadius(theme, theme.components.box.cornerRadius)} />
+        </frame>
+    );
+}
+```
+
+If all you need is a `UICorner`, render `<Corners radius={...} />` instead, which takes a token or a size and renders nothing when the radius is unset or `0`. `SizeHelper.resolveRadius(theme, radius)` returns the resolved size without converting it, for when you need to parse the value yourself.
+
 ## Using Your Theme
 
 Once you've created your theme, pass it to the `ThemeProvider`.

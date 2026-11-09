@@ -8,17 +8,19 @@ import {
     IntentElementProps,
     ScalableElementProps,
     ShadowElementProps,
+    SizeElementProps,
     SpacedElementProps,
     ZIndexElementProps,
 } from "../../Interfaces/";
 import { CleanThemeContext } from "../../Contexts/";
 import { BoxShadow, Corners, Gradient, Padding } from "../Decorator";
 import { Text } from "../Typography";
-import { ColorHelper, CssHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { Icon, IconProps } from "../Surface";
 import { HStack } from "../Layout";
 import { Group, GroupContext } from "../Layout/";
 import { ThemeTemplate } from "../../Theme/theme.template";
+import { isPointerPress, PressOn, PressReleaseCallback, usePressRelease } from "./Button.press";
 
 export type ButtonStyleOverride = Partial<ThemeTemplate["components"]["button"]>;
 
@@ -43,7 +45,8 @@ export interface ButtonProps extends
     BackgroundElementProps,
     IntentElementProps,
     ScalableElementProps,
-    IconElementProps {
+    IconElementProps,
+    Pick<SizeElementProps, "width"> {
     text?: string;
     fontWeight?: Enum.FontWeight;
     Event?: React.InstanceEvent<ImageButton>;
@@ -56,6 +59,9 @@ export interface ButtonProps extends
     name?: string;
     padding?: CssPadding;
     modal?: boolean;
+    fill?: boolean;
+    pressOn?: PressOn;
+    onRelease?: PressReleaseCallback;
 }
 
 export interface ButtonTextProps extends ScalableElementProps, IntentElementProps {
@@ -137,6 +143,8 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
         }, [props.disabled]);
 
         const group = React.useContext(GroupContext)
+        const trackRelease = usePressRelease(props.onRelease);
+        const pressDown = props.pressOn === "down";
 
         const padding = SpacingHelper.GetResolvedPadding(theme, props);
 
@@ -192,12 +200,36 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                             return;
                         }
 
+                        if (pressDown && isPointerPress(inputObject)) {
+                            return;
+                        }
+
                         props.Event?.Activated?.(button, inputObject, clickCount);
                     },
+
+                    ...(pressDown ? {
+                        InputBegan: (button: ImageButton, inputObject: InputObject) => {
+                            props.Event?.InputBegan?.(button, inputObject);
+
+                            if (props.disabled || !isPointerPress(inputObject)) {
+                                return;
+                            }
+
+                            props.Event?.Activated?.(button, inputObject, 1);
+
+                            if (props.onRelease !== undefined) {
+                                trackRelease(button, inputObject);
+                            }
+                        },
+                    } : {}),
                 }}
 
-                Size={UDim2.fromOffset(props.group ? group?.size?.X ?? 0 : 0, 0)}
-                AutomaticSize={Enum.AutomaticSize.XY}
+                Size={props.width !== undefined
+                    ? SizeHelper.GetSize({ width: props.width })
+                    : UDim2.fromOffset(props.group ? group?.size?.X ?? 0 : 0, 0)}
+                AutomaticSize={props.width !== undefined
+                    ? SizeHelper.GetAutoSize({ width: props.width })
+                    : props.fill ? Enum.AutomaticSize.Y : Enum.AutomaticSize.XY}
                 BackgroundTransparency={
                     props.BackgroundTransparency ??
                     props.styleOverride?.backgroundTransparency ??
@@ -220,6 +252,8 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
             >
                 <Corners radius={props.styleOverride?.cornerRadius ?? theme.components.button.cornerRadius} />
 
+                {props.fill && <uiflexitem key="FlexItem" FlexMode={Enum.UIFlexMode.Fill} />}
+
                 <uistroke
                     key="Stroke"
                     Thickness={intentColors.borderThickness ?? props.styleOverride?.borderThickness ?? theme.components.button.borderThickness}
@@ -233,7 +267,11 @@ const Button = React.forwardRef<ImageButton, ButtonProps>(
                 <Group.Element enabled={props.group} padding={padding}>
 
                     {(props.icon !== undefined || props.text !== undefined) &&
-                        <HStack valign="Center" spacing={props.spacing} Wraps={false}>
+                        <HStack
+                            valign="Center"
+                            spacing={props.spacing}
+                            Wraps={false}
+                            HorizontalAlignment={props.fill || props.width !== undefined ? Enum.HorizontalAlignment.Center : undefined}>
                             {props.icon !== undefined &&
                                 <ButtonIcon
                                     LayoutOrder={1}

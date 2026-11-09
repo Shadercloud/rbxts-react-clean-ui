@@ -4,7 +4,7 @@
 
 ## Public API
 
-- `Pagination` requires `page`, `totalPages`, and `onPageChange`, accepts `siblingCount?: number` (default `1`), and optionally accepts `children`.
+- `Pagination` requires `page` and `onPageChange`, accepts `totalPages?: number`, `hasNextPage?: boolean`, `siblingCount?: number` (default `1`), and optionally accepts `children`.
 - It exposes `Pagination.Prev`, `Pagination.Next`, `Pagination.Item`, `Pagination.Ellipsis`, and `Pagination.List`.
 - `Pagination.Item` requires `value: number`, accepts the shared padding props, and accepts an optional `layoutOrder?: number` forwarded to the underlying button's `LayoutOrder`.
 - `Pagination.List` optionally accepts explicit children. `Prev` and `Next` accept no props. `Ellipsis` accepts an optional `layoutOrder?: number`, forwarded the same way.
@@ -22,6 +22,7 @@
 - When every page fits within the boundary-and-sibling window (`totalPages <= siblingCount * 2 + 5`), every page is rendered without ellipses.
 - Once windowing is active, the total rendered item count (numbered items plus ellipses) is constant at exactly `siblingCount * 2 + 5` regardless of the current page, so the rendered bar's width never changes as the user navigates. Near the start or end of the range, where only one ellipsis is needed, the run of consecutive numbers on that side extends to make up the difference instead of shrinking the total count; the middle case (both ellipses shown) is unaffected.
 - `totalPages` and `siblingCount` are floored and cannot be negative. The effective page and emitted changes are clamped to the valid range. A non-positive page count renders no numbered items and disables both navigation controls.
+- Without `totalPages` (cursor/unknown-length mode), the page is floored and at least `1` with no upper bound. No page items are computed, so `Pagination.List` renders empty and the default composition is just `Prev` and `Next`. `Prev` is enabled above page `1`. `Next` is enabled only when `hasNextPage` is `true` (unset counts as `false`). Emitted pages are floored and at least `1`. `hasNextPage` is ignored when `totalPages` is given.
 - Items use the focus state when selected. Activating an item emits its value. Prev and Next emit the adjacent page and are non-interactive at their bounds.
 
 ## Layout and theme

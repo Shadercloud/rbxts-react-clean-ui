@@ -1,9 +1,10 @@
 import React from "@rbxts/react";
-import { Test, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
+import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
 const { Skip, Each } = Decorators;
 import { FlexItem } from "../../../Components/Layout/FlexItem";
 import { HStack } from "../../../Components/Layout/HStack";
+import { VStack } from "../../../Components/Layout/VStack";
 import {
 	STUDIO_SKIP_MESSAGE,
 	assertAlignedLeft,
@@ -11,6 +12,7 @@ import {
 	assertAllDescendantsContained,
 	assertCenteredIn,
 	assertSizeApprox,
+	assertStackedVertically,
 	waitForGuiObject,
 	withMounted,
 } from "../../Helpers/layout";
@@ -36,6 +38,21 @@ function stackWithFlexItem(flexItem: React.ReactElement) {
 
 function child() {
 	return <frame key="Child" BackgroundTransparency={1} Size={UDim2.fromOffset(50, 20)} />;
+}
+
+function stackedChildren() {
+	return [
+		<frame key="First" BackgroundTransparency={1} Size={UDim2.fromOffset(50, 20)} LayoutOrder={1} />,
+		<frame key="Second" BackgroundTransparency={1} Size={UDim2.fromOffset(50, 20)} LayoutOrder={2} />,
+	];
+}
+
+function listLayoutsOf(instance: Instance): UIListLayout[] {
+	const found: UIListLayout[] = [];
+	for (const child of instance.GetChildren()) {
+		if (child.IsA("UIListLayout")) found.push(child);
+	}
+	return found;
 }
 
 function waitForGrownFlexItem(host: Instance): ImageLabel {
@@ -139,6 +156,82 @@ class FlexItemMountValidation {
 				waitForGuiObject<Frame>(flexItem, "Child");
 
 				assertAllDescendantsContained(flexItem, "flex item children");
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Without direction or layout the FlexItem keeps a single horizontal FlexItemLayout")
+	@Test
+	public defaultHorizontalLayout() {
+		withMounted(
+			STACK_WIDTH,
+			STACK_HEIGHT,
+			stackWithFlexItem(
+				<FlexItem LayoutOrder={2} Size={new UDim2(0, 0, 0, ITEM_HEIGHT)}>
+					{child()}
+				</FlexItem>,
+			),
+			(mounted) => {
+				const flexItem = waitForGrownFlexItem(mounted.host);
+				const layouts = listLayoutsOf(flexItem);
+
+				Assert.equal(layouts.size(), 1, "Expected exactly one UIListLayout on the FlexItem");
+				Assert.equal(layouts[0].Name, "FlexItemLayout");
+				Assert.equal(layouts[0].FillDirection, Enum.FillDirection.Horizontal);
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("direction=vertical switches FlexItemLayout to a vertical fill and stacks the children top to bottom")
+	@Test
+	public verticalDirection() {
+		withMounted(
+			STACK_WIDTH,
+			STACK_HEIGHT,
+			stackWithFlexItem(
+				<FlexItem LayoutOrder={2} direction="vertical" Size={new UDim2(0, 0, 0, ITEM_HEIGHT * 2)}>
+					{stackedChildren()}
+				</FlexItem>,
+			),
+			(mounted) => {
+				const flexItem = waitForGrownFlexItem(mounted.host);
+				const layout = flexItem.FindFirstChild("FlexItemLayout") as UIListLayout | undefined;
+				Assert.notUndefined(layout, "Expected a FlexItemLayout on the FlexItem");
+				Assert.equal(layout!.FillDirection, Enum.FillDirection.Vertical);
+
+				const first = waitForGuiObject<Frame>(flexItem, "First");
+				const second = waitForGuiObject<Frame>(flexItem, "Second");
+				assertStackedVertically([first, second], "direction=vertical children");
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("layout={false} drops FlexItemLayout so a child VStack's own layout stacks the children vertically")
+	@Test
+	public layoutFalseDefersToChild() {
+		withMounted(
+			STACK_WIDTH,
+			STACK_HEIGHT,
+			stackWithFlexItem(
+				<FlexItem LayoutOrder={2} layout={false} Size={new UDim2(0, 0, 0, ITEM_HEIGHT * 2)}>
+					<VStack spacing="None">{stackedChildren()}</VStack>
+				</FlexItem>,
+			),
+			(mounted) => {
+				const flexItem = waitForGrownFlexItem(mounted.host);
+				const layouts = listLayoutsOf(flexItem);
+
+				Assert.undefined(flexItem.FindFirstChild("FlexItemLayout"), "Expected no FlexItemLayout with layout={false}");
+				Assert.equal(layouts.size(), 1, "Expected only the VStack's UIListLayout on the FlexItem");
+				Assert.equal(layouts[0].FillDirection, Enum.FillDirection.Vertical);
+				Assert.notUndefined(flexItem.FindFirstChildWhichIsA("UIFlexItem"), "Expected the UIFlexItem to remain");
+
+				const first = waitForGuiObject<Frame>(flexItem, "First");
+				const second = waitForGuiObject<Frame>(flexItem, "Second");
+				assertStackedVertically([first, second], "layout={false} VStack children");
 			},
 		);
 	}

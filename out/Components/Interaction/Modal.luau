@@ -2,7 +2,6 @@
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local ReactRoblox = TS.import(script, TS.getModule(script, "@rbxts", "react-roblox"))
-local GuiService = TS.import(script, TS.getModule(script, "@rbxts", "services")).GuiService
 local useTween = TS.import(script, TS.getModule(script, "@rbxts", "react-ripple").src).useTween
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local CleanThemeContext = _Contexts.CleanThemeContext
@@ -10,18 +9,15 @@ local OverlayConsumer = _Contexts.OverlayConsumer
 local _modal_context = TS.import(script, script.Parent.Parent.Parent, "Contexts", "modal.context")
 local ModalCloseContext = _modal_context.ModalCloseContext
 local useModalStack = _modal_context.useModalStack
-local SizeHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").SizeHelper
+local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local SizeHelper = _Helpers.SizeHelper
+local useGamepadSelection = _Helpers.useGamepadSelection
 local Draggable = TS.import(script, script.Parent.Parent, "Layout").Draggable
 local Card = TS.import(script, script.Parent.Parent, "Surface").Card
 local nextModalId = 0
 local function generateModalId()
 	nextModalId += 1
 	return `modal-{nextModalId}`
-end
-local function trySetSelectedObject(target)
-	pcall(function()
-		GuiService.SelectedObject = target
-	end)
 end
 local function getPanelContentSize(automaticSize)
 	local autoWidth = automaticSize == Enum.AutomaticSize.X or automaticSize == Enum.AutomaticSize.XY or automaticSize == "X" or automaticSize == "XY"
@@ -61,7 +57,7 @@ local function Modal(props)
 	local dismissingRef = React.useRef(false)
 	local fadeThreadRef = React.useRef()
 	local panelRef = React.useRef()
-	local previousSelectionRef = React.useRef()
+	local backdropRef = React.useRef()
 	local onOpenChangeRef = React.useRef(props.onOpenChange)
 	React.useEffect(function()
 		onOpenChangeRef.current = props.onOpenChange
@@ -152,11 +148,7 @@ local function Modal(props)
 			stack.unregister(id)
 		end
 	end, { shouldRender })
-	React.useEffect(function()
-		if not shouldRender then
-			return nil
-		end
-		previousSelectionRef.current = GuiService.SelectedObject
+	useGamepadSelection(function()
 		local _result = props.initialFocus
 		if _result ~= nil then
 			_result = _result.current
@@ -165,11 +157,24 @@ local function Modal(props)
 		if _condition_4 == nil then
 			_condition_4 = panelRef.current
 		end
-		trySetSelectedObject(_condition_4)
-		return function()
-			trySetSelectedObject(previousSelectionRef.current)
-		end
-	end, { shouldRender })
+		return _condition_4
+	end, {
+		enabled = shouldRender,
+		scope = backdropRef,
+		mode = props.selectionMode or "gamepad",
+		restoreOnRelease = true,
+		canTakeSelection = function()
+			local _result = stack.isTopmost
+			if _result ~= nil then
+				_result = _result(id)
+			end
+			local _condition_4 = _result
+			if _condition_4 == nil then
+				_condition_4 = true
+			end
+			return _condition_4
+		end,
+	})
 	if not shouldRender then
 		return nil
 	end
@@ -194,7 +199,13 @@ local function Modal(props)
 			local panelSizingProps = _object
 			local panelSize = SizeHelper:GetSize(panelSizingProps)
 			local panelAutomaticSize = SizeHelper:GetAutoSize(panelSizingProps)
+			local panelSizeConstraint = SizeHelper:GetSizeConstraint(props)
 			local panelContentSize = if type(panelAutomaticSize) == "table" and panelAutomaticSize.map ~= nil then panelAutomaticSize:map(getPanelContentSize) else getPanelContentSize(panelAutomaticSize)
+			local _exp = panelSizeConstraint ~= nil and (React.createElement("uisizeconstraint", {
+				key = "SizeConstraint",
+				MinSize = panelSizeConstraint.MinSize,
+				MaxSize = panelSizeConstraint.MaxSize,
+			}))
 			local _attributes = table.clone(props)
 			setmetatable(_attributes, nil)
 			local _condition_5 = props.name
@@ -222,9 +233,10 @@ local function Modal(props)
 				Event = {
 					Activated = function() end,
 				},
-			}, React.createElement(Card, _attributes, panelChildren)))
+			}, _exp, React.createElement(Card, _attributes, panelChildren)))
 			return ReactRoblox.createPortal(React.createElement("imagebutton", {
 				key = "ModalBackdrop",
+				ref = backdropRef,
 				Size = UDim2.fromScale(1, 1),
 				AutoButtonColor = false,
 				Active = true,

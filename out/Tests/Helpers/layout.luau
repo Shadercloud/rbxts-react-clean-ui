@@ -331,6 +331,29 @@ local function assertAlignedTop(child, parent, tolerance, label)
 	local prefix = if label ~= "" then `{label}: ` else ""
 	Assert["true"](Assert, math.abs(childRect.top - parentRect.top) <= tolerance, `{prefix}expected {describeGui(child)} {formatRect(childRect)} to be top-aligned with {describeGui(parent)} {formatRect(parentRect)} (tolerance {tolerance})`)
 end
+local function sizeConstraintsOf(instance)
+	local found = {}
+	for _, child in instance:GetChildren() do
+		if child:IsA("UISizeConstraint") then
+			table.insert(found, child)
+		end
+	end
+	return found
+end
+local function soleSizeConstraint(instance)
+	local found = sizeConstraintsOf(instance)
+	Assert:equal(#found, 1, `Expected exactly one UISizeConstraint directly on {instance:GetFullName()}`)
+	Assert:equal(found[1].Name, "SizeConstraint", `Expected the UISizeConstraint on {instance.Name} to be named SizeConstraint`)
+	return found[1]
+end
+local function waitForWidth(gui, width, tolerance)
+	if tolerance == nil then
+		tolerance = 1
+	end
+	waitForLayout(function()
+		return if math.abs(gui.AbsoluteSize.X - width) <= tolerance then true else nil
+	end, `Timed out waiting for {describeGui(gui)} to be {width}px wide (is {gui.AbsoluteSize.X})`)
+end
 return {
 	mountInScreenGui = mountInScreenGui,
 	withMounted = withMounted,
@@ -357,5 +380,8 @@ return {
 	assertAlignedLeft = assertAlignedLeft,
 	assertAlignedRight = assertAlignedRight,
 	assertAlignedTop = assertAlignedTop,
+	sizeConstraintsOf = sizeConstraintsOf,
+	soleSizeConstraint = soleSizeConstraint,
+	waitForWidth = waitForWidth,
 	STUDIO_SKIP_MESSAGE = STUDIO_SKIP_MESSAGE,
 }

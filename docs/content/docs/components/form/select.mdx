@@ -293,6 +293,26 @@ Use `BackgroundColor3` to provide a custom base colour for an option.
 
 Hover and selected-state colours may still be adjusted by the active theme.
 
+## Width
+
+By default the select fills the full width available to it. Set `width` to give it a fixed or relative width instead. It accepts the same values as [`Container`](/components/layout/container)'s `width`: a pixel number, `"200px"`, a percentage such as `"50%"`, or a breakpoint table. The height still fits the content.
+
+```tsx
+<Select width={200}>
+    <Select.Option text="Small" />
+    <Select.Option text="Medium" />
+    <Select.Option text="Large" />
+</Select>
+
+<Select width="50%">
+    <Select.Option text="Half width" />
+</Select>
+```
+
+The dropdown opens at the control's measured width either way.
+
+`width="Auto"` doesn't make the select fit its content: the select has no content width, so it collapses to zero width. Pass a pixel or percentage value instead.
+
 ## Dropdown Height and Scrolling
 
 The dropdown automatically grows to fit its options until it reaches its configured maximum height.
@@ -421,6 +441,25 @@ The `backgroundGradient` prop accepts a `CssBackgroundGradient` object. Its fiel
 
 When `backgroundGradient` is not provided, the select uses `theme.components.select.backgroundGradient` if the active theme defines one. A directly supplied prop overrides the theme value for that select instance.
 
+## Disabled
+
+Set `disabled` to stop the select from being opened.
+
+```tsx
+<Select disabled>
+    <Select.Option text="Oak" />
+    <Select.Option text="Walnut" />
+</Select>
+```
+
+A disabled select:
+
+* doesn't open when clicked or when a paired `Fieldset.Label` is activated
+* closes its dropdown if it was open when `disabled` became `true`
+* takes the theme's `states.disabled` look, if one is set (see [Theme Values](#theme-values))
+
+When `disabled` is unset or `false`, the select behaves as before. `disabled` must be set on the `Select` itself: it isn't read from a surrounding `Fieldset`.
+
 ## Native ImageLabel Properties
 
 `Select` renders its root as a [`Container`](/components/layout/container), so it extends `React.InstanceProps<ImageLabel>` and accepts native Roblox `ImageLabel` properties directly, rather than the `TextBox` properties its underlying control might suggest.
@@ -437,7 +476,7 @@ When `backgroundGradient` is not provided, the select uses `theme.components.sel
 
 See the `Container` documentation for the full set of native `ImageLabel` properties `Select` accepts, such as `AnchorPoint`, `LayoutOrder`, `Visible`, `Change`, and `Event`.
 
-`Size` and `AutomaticSize` are fixed internally (`UDim2.fromScale(1, 0)` with `AutomaticSize.Y` — full available width, height fit to content) and are not honored if passed in.
+`Size` and `AutomaticSize` are fixed internally (`UDim2.fromScale(1, 0)` with `AutomaticSize.Y` — full available width, height fit to content) and are not honored if passed in. Use [`width`](#width) to change the width.
 
 ## Select Properties
 
@@ -450,10 +489,12 @@ See the `Container` documentation for the full set of native `ImageLabel` proper
 | `scale`      | `ScaleSize`                 | Theme default | Controls the typography scale used by the select.                     |
 | `spacing`    | `SpaceSize`                 | Theme default | Controls the internal padding of the select.                          |
 | `max-height` | `CssSize`                   | Theme default | Sets the maximum height of the dropdown before it becomes scrollable. |
+| `width`      | `ResponsiveCssSize`         | Full width    | Sets the control's width (px, `"50%"`, or a breakpoint table). `"Auto"` collapses it to zero width. |
 | `backgroundImage` | `CssBackgroundImage`       | Theme default | Sets the image layered over the closed select control's background.   |
 | `backgroundGradient` | `CssBackgroundGradient` | Theme default | Sets the gradient layered over the closed select control's background. |
 | `searchable` | `boolean`                   | `false`       | Renders a filter textbox above the option list when the dropdown is open. |
 | `searchPlaceholder` | `string`              | `"Search"`    | Placeholder text for the search textbox. Only used when `searchable` is `true`. |
+| `disabled`   | `boolean`                   | `false`       | Prevents the dropdown from opening and applies the theme's `states.disabled` look. |
 | `children`   | `React.ReactNode`           | —             | The `Select.Option` and `Select.OptGroup` components displayed in the dropdown. |
 
 ### Shared and native properties
@@ -582,6 +623,135 @@ const MyTheme = extendTheme(DefaultTheme, {
 ```
 
 `textColor` is a separate key: the selected text doesn't use `typography.color`.
+
+`boxShadow`, `innerShadow`, `states`, `caret`, and `dropDown` are also optional. No shipped theme sets them, and when they're unset the select looks the same as before.
+
+### Shadows
+
+`boxShadow` and `innerShadow` work the same way as on [`Input`](/components/form/input#box-shadow) and apply to the closed control:
+
+```ts
+select: {
+    boxShadow: { shadow: "0px 1px 0px 0px", color: Color3.fromHex("#A87A45"), transparency: 0 },
+    innerShadow: { color: Color3.fromHex("#000000"), transparency: 0.5, size: 8 },
+}
+```
+
+The inner shadow sits inside the control's border and draws under the selected text and caret. The outer shadow only follows `cornerRadius` when the control has a visible fill (theme `backgroundTransparency` below `1`). Otherwise it is square.
+
+### Field states
+
+`states` overrides the closed control's look while it is hovered, open, or disabled. Each state accepts `borderColor`, `borderThickness`, `backgroundColor`, `backgroundTransparency`, and `backgroundGradient`, and replaces only the keys it sets, the same as on [`Input`](/components/form/input#field-states).
+
+```ts
+select: {
+    states: {
+        focus: { borderColor: Color3.fromHex("#F2A65A") },
+        disabled: { backgroundTransparency: 0.5 },
+    },
+}
+```
+
+| State      | Active when                                  |
+| ---------- | -------------------------------------------- |
+| `disabled` | The `disabled` prop is `true`.               |
+| `focus`    | The dropdown is open.                        |
+| `hover`    | The pointer is over the closed control.      |
+
+When more than one applies, the order of priority is `disabled`, then `focus`, then `hover`. The `BackgroundColor3`, `BackgroundTransparency`, and `backgroundGradient` props still take priority over every state.
+
+### Caret
+
+`caret` puts the dropdown caret icon inside a box, like a button cap at the end of the field:
+
+```ts
+select: {
+    caret: {
+        size: 30,
+        backgroundColor: Color3.fromHex("#173A66"),
+        borderColor: Color3.fromHex("#3D2712"),
+        borderThickness: 2,
+        cornerRadius: 6,
+        iconColor: Color3.fromHex("#FFF7CF"),
+        margin: "0px -6px 0px 0px",
+    },
+}
+```
+
+* `size` — width and height of the box. Defaults to the theme's icon size at the default scale.
+* `backgroundColor`, `backgroundTransparency`, and `backgroundGradient` — the box's fill. The fill is opaque when `backgroundColor` or `backgroundGradient` is set, and transparent otherwise, unless `backgroundTransparency` is set.
+* `borderColor` and `borderThickness` — an inner border. No border is drawn when `borderThickness` is `0` or unset.
+* `cornerRadius` — the box's corner radius.
+* `iconColor` — the caret icon colour. Falls back to the select's `iconColor`, then to `theme.colors.intents.primary.default.textColor`.
+* `margin` — CSS-order margin (top, right, bottom, left) around the box. Values can be negative: `"0px -6px 0px 0px"` lets the box extend 6px into the field's right padding.
+
+The box may overlap the field's top and bottom padding, but never its border, so it doesn't make the field taller. A Select with a caret cap is as tall as one without it (and as an `Input` with the same theme). The field only grows when the box is taller than the padded field, and then just enough to fit the box inside the border. The selected text or placeholder is always vertically centred in the field, whatever the box's size.
+
+When `caret` is unset, the caret is drawn as a plain icon, as before.
+
+### Dropdown
+
+`dropDown` overrides the open dropdown's frame separately from the closed control:
+
+```ts
+select: {
+    dropDown: {
+        cornerRadius: 8,
+        borderThickness: 2,
+        borderColor: Color3.fromHex("#3D2712"),
+        boxShadow: { shadow: "0px 6px 14px 0px", color: Color3.fromHex("#000000"), transparency: 0.5 },
+        gap: 6,
+    },
+}
+```
+
+* `cornerRadius`, `borderColor`, and `borderThickness` — fall back to the select's own values when unset.
+* `boxShadow` — a shadow around the dropdown, in the same shape as the select's `boxShadow`. No shadow when unset.
+* `gap` — space in pixels between the closed control and the dropdown. Defaults to `0`, so the dropdown sits directly below the control. The dropdown's border is drawn outside its frame, so it extends into the gap.
+
+### Sunk well example
+
+These keys together produce a control that looks sunk into the panel, with a capped caret and a dropdown that floats just below it:
+
+<Demo preview="Scenes/Form/SunkField.loom.tsx" previewHeight={360}>
+```ts
+const MyTheme = extendTheme(DefaultTheme, {
+    components: {
+        select: {
+            borderColor: Color3.fromHex("#3D2712"),
+            borderThickness: 2,
+            cornerRadius: 8,
+            backgroundColor: Color3.fromHex("#FFFFFF"),
+            backgroundTransparency: 0,
+            backgroundGradient: { colors: [Color3.fromHex("#173A66"), Color3.fromHex("#214C84"), Color3.fromHex("#295896")], stops: [0, 0.45, 1], rotation: 90 },
+            boxShadow: { shadow: "0px 1px 0px 0px", color: Color3.fromHex("#A87A45"), transparency: 0 },
+            innerShadow: { color: Color3.fromHex("#000000"), transparency: 0.5, size: 8 },
+            states: { focus: { borderColor: Color3.fromHex("#F2A65A") } },
+            caret: {
+                size: 30,
+                backgroundColor: Color3.fromHex("#173A66"),
+                borderColor: Color3.fromHex("#3D2712"),
+                borderThickness: 2,
+                cornerRadius: 6,
+                iconColor: Color3.fromHex("#FFF7CF"),
+                margin: "0px -6px 0px 0px",
+            },
+            dropDownBackgroundColor: Color3.fromHex("#214C84"),
+            dropDown: {
+                cornerRadius: 8,
+                borderThickness: 2,
+                borderColor: Color3.fromHex("#3D2712"),
+                boxShadow: { shadow: "0px 6px 14px 0px", color: Color3.fromHex("#000000"), transparency: 0.5 },
+                gap: 6,
+            },
+            intents: { primary: { focus: { backgroundColor: Color3.fromHex("#3A6DB0") } } },
+        },
+    },
+});
+```
+</Demo>
+
+`backgroundColor` is white because the gradient multiplies the fill colour. `gap: 6` leaves a 4px space plus the dropdown's 2px border. A theme extending `WoodenTheme` also needs `backgroundImage: { image: "" }` to remove Wooden's background image.
 
 `theme.components.select.optGroup` controls the appearance of `Select.OptGroup` headers:
 

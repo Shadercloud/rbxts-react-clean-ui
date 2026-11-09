@@ -10,6 +10,7 @@ local Tag = _lunit.Tag
 local DisplayName = _lunit.DisplayName
 local _binding = Decorators
 local Skip = _binding.Skip
+local Each = _binding.Each
 local Button = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Input", "Button").Button
 local _Layout = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout")
 local Group = _Layout.Group
@@ -18,6 +19,7 @@ local ThemeProvider = TS.import(script, script.Parent.Parent.Parent.Parent, "Pro
 local _Theme = TS.import(script, script.Parent.Parent.Parent.Parent, "Theme")
 local DefaultTheme = _Theme.DefaultTheme
 local WoodenTheme = _Theme.WoodenTheme
+local extendTheme = _Theme.extendTheme
 local _layout = TS.import(script, script.Parent.Parent.Parent, "Helpers", "layout")
 local STUDIO_SKIP_MESSAGE = _layout.STUDIO_SKIP_MESSAGE
 local assertAllDescendantsContained = _layout.assertAllDescendantsContained
@@ -214,6 +216,25 @@ do
 		}), function(mounted)
 			local button = waitForButton(mounted.host)
 			Assert["true"](Assert, button.Modal, "Expected Modal=true when modal={true} is passed")
+		end)
+	end
+	function ButtonMountValidation:themeRadiusToken(token)
+		local theme = extendTheme(DefaultTheme, {
+			components = {
+				button = {
+					cornerRadius = token,
+				},
+			},
+		})
+		withMounted(400, 200, React.createElement(ThemeProvider, {
+			theme = theme,
+		}, React.createElement(Button, {
+			text = "Save",
+		})), function(mounted)
+			local button = waitForButton(mounted.host)
+			local corner = button:FindFirstChildWhichIsA("UICorner")
+			Assert:notUndefined(corner, "Expected the Button to have a direct UICorner child")
+			Assert:equal(corner.CornerRadius, UDim.new(0, DefaultTheme.radius[token]), `cornerRadius="{token}"`)
 		end)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
@@ -455,6 +476,33 @@ do
 	})
 	if _descriptor_35 then
 		ButtonMountValidation.modalForwarded = _descriptor_35.value
+	end
+	local _decorator_24 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_25 = Each({ { "sm" }, { "md" }, { "lg" } })
+	local _decorator_26 = DisplayName("A theme button cornerRadius token renders the root UICorner at that token's pixel radius")
+	local _descriptor_36 = Test(ButtonMountValidation, "themeRadiusToken", {
+		value = ButtonMountValidation.themeRadiusToken,
+	})
+	if _descriptor_36 then
+		ButtonMountValidation.themeRadiusToken = _descriptor_36.value
+	end
+	local _descriptor_37 = _decorator_26(ButtonMountValidation, "themeRadiusToken", {
+		value = ButtonMountValidation.themeRadiusToken,
+	})
+	if _descriptor_37 then
+		ButtonMountValidation.themeRadiusToken = _descriptor_37.value
+	end
+	local _descriptor_38 = _decorator_25(ButtonMountValidation, "themeRadiusToken", {
+		value = ButtonMountValidation.themeRadiusToken,
+	})
+	if _descriptor_38 then
+		ButtonMountValidation.themeRadiusToken = _descriptor_38.value
+	end
+	local _descriptor_39 = _decorator_24(ButtonMountValidation, "themeRadiusToken", {
+		value = ButtonMountValidation.themeRadiusToken,
+	})
+	if _descriptor_39 then
+		ButtonMountValidation.themeRadiusToken = _descriptor_39.value
 	end
 	ButtonMountValidation = Tag("Studio")(ButtonMountValidation) or ButtonMountValidation
 end

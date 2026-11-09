@@ -14,13 +14,23 @@ Rendering `ImageLabel` unconditionally (rather than adding a separate `Backgroun
 - `backgroundGradient?: Partial<CssBackgroundGradient>` (see [Box](../surface/box.md#backgroundgradient) for the full field-by-field shape) is resolved via `CssHelper.resolveBackgroundGradient` and rendered by the `Gradient` decorator as a `<uigradient>` child of `Container`'s own `ImageLabel` — unlike `backgroundImage`, it does not set any property directly on `Container`'s root instance. When unset (or `colors` is unset or an empty array), `Gradient` renders nothing, so existing consumers see no visual change.
 - `BackgroundTransparency` defaults to `1` (fully transparent) when not supplied.
 
+## Border, padding and corners
+
+These replace hand-written `<uistroke>`, `<Padding>` and `<Corners>` children. Each is opt-in: with none of them set, `Container` renders no `UIStroke`, `UIPadding` or `UICorner` of its own, exactly as before.
+
+- `borderThickness?: number`, `borderColor?: Color3`, `borderTransparency?: number`, `borderPosition?: "inner" | "outer"` (the shared `BorderElementProps`). A `UIStroke` named `Stroke` is rendered on `Container`'s own `ImageLabel` only when `borderThickness` is greater than `0`; unset or `0` means no border. `borderPosition` defaults to `"inner"` (the stroke is drawn inside the container's bounds, the library's usual border placement); `"outer"` draws it outside the bounds (as `Accordion`/`Table` do for borders that child backgrounds must not overlap). Unset `borderColor`/`borderTransparency` leave the engine `UIStroke` defaults (black, `0`). The border is a plain value, not theme-driven: `Container` stays unthemed.
+- `padding?: CssPadding`: a CSS-style quad (`"8"`, `"4 12"`, `"4 8 12 16"`), resolved to pixel offsets the same way as `Button`'s and `Card`'s `padding`, and applied as a `UIPadding` named `Padding`. Percent values contribute `0` (padding is pixel-only). Unset means no `UIPadding`. There are no `spacing`/per-side padding props: `top`/`left`/`right`/`bottom` are position props on `Container` (see [Components](../index.md#padding-resolution)).
+- `cornerRadius?: CssRadius`: a `CssSize` or a theme radius token (`"sm"`, `"md"`, `"lg"`), rendered through the [`Corners`](../decorator/corners.md) decorator (a `UICorner` named `Corners`). Unset, or a value that resolves to zero, renders no `UICorner`.
+- These render as children of the inner `ImageLabel`, so they apply to the visible container, not to the invisible centering wrapper used by `center` (see Positioning).
+- A consumer that still supplies its own `UIStroke`/`UIPadding`/`UICorner` child alongside the matching prop gets two instances of that class, and Roblox applies only one. Use one or the other.
+
 ## Sizing
 
 - With no `Size`, `width`, or `height` supplied, `AutomaticSize` defaults to `XY` and the container hugs its content on both axes — it does **not** fill its parent by default the way many other components do.
 - Supplying only one of `width`/`height` makes the other axis automatic instead, so the specified axis is fixed and the other hugs content.
 - Supplying an explicit `Size`, or both `width` and `height`, disables `AutomaticSize` entirely (`None`) unless an `AutomaticSize` prop is passed explicitly, which always wins.
 - `width`/`height` accept the shared CSS-like size syntax (plain numbers, `"25px"`, `"25%"`, or `"Auto"` for `width`).
-
+- `minWidth`/`maxWidth`/`minHeight`/`maxHeight` follow [Min and max size](../index.md#min-and-max-size). The `UISizeConstraint` is a child of the inner `ImageLabel`, alongside the stroke, padding and corners, never of the `center` wrapper. Every component that renders through `Container` with its props spread (`Box`, `Card` and its sub-parts, `FlexItem`, `ProgressBar`'s track) gets it this way.
 ## Positioning
 
 - `top`/`left`/`right`/`bottom` position the container relative to the corresponding parent edge; the anchor for the relevant axis is inferred to the far edge automatically when `right`/`bottom` is used instead of `left`/`top`.
@@ -40,3 +50,8 @@ Rendering `ImageLabel` unconditionally (rather than adding a separate `Backgroun
 ## Theme
 
 Not themeable.
+
+## Implementation notes
+
+- `Box`, `Card.Header`, `Card.Body` and `Card.Footer` spread their own props into `Container` and draw their own theme-resolved `<Padding>`. They pass `padding={undefined}` after the spread so a `padding` meant for them isn't also applied by `Container` as a second `UIPadding`. Any new wrapper that spreads props carrying `padding`, `cornerRadius` or `border*` into `Container` while drawing those itself needs the same override.
+- The stroke relies on `UIStroke`'s default `ApplyStrokeMode` (`Contextual`), which strokes an `ImageLabel`'s border, so `BorderStrokePosition` takes effect without setting `ApplyStrokeMode`.

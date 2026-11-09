@@ -5,12 +5,14 @@ const { Skip, Each } = Decorators;
 import { Checkbox } from "../../../Components/Input/Checkbox";
 import { FieldsetContext } from "../../../Components/Layout";
 import { DefaultTheme } from "../../../Theme";
+import { activateButton } from "../../Helpers/fiber";
 import {
 	STUDIO_SKIP_MESSAGE,
 	assertAllDescendantsContained,
 	assertNonZeroSize,
 	assertSizeApprox,
 	findDescendant,
+	settleFrames,
 	waitForGuiObject,
 	waitForLayout,
 	withMounted,
@@ -22,6 +24,22 @@ function waitForCheckbox(host: Instance): ImageButton {
 
 function findIcon(checkbox: Instance): ImageLabel {
 	return findDescendant<ImageLabel>(checkbox, "CheckboxIcon");
+}
+
+function assertShowsChecked(checkbox: Instance, expected: boolean, label: string) {
+	const icon = findIcon(checkbox);
+
+	Assert.equal(
+		icon.Image !== "",
+		expected,
+		`${label}: expected CheckboxIcon.Image to be ${expected ? "set" : "empty"}, got "${icon.Image}"`,
+	);
+}
+
+function recorder(values: boolean[]) {
+	return (value: boolean) => {
+		values.push(value);
+	};
 }
 
 @Tag("Studio")
@@ -43,69 +61,136 @@ class CheckboxMountValidation {
 		["checked", true],
 		["unchecked", false],
 	])
-	@DisplayName("Mounting fires onChange exactly once with the seeded checked value, and only the checked state shows an icon image")
+	@DisplayName("Mounting a controlled Checkbox shows the checked prop and never calls onChange")
 	@Test
-	public seedsFromChecked(variant: string, checked: boolean) {
-		const onChangeValues: boolean[] = [];
+	public silentControlledMount(variant: string, checked: boolean) {
+		const values: boolean[] = [];
+
+		withMounted(200, 200, <Checkbox checked={checked} onChange={recorder(values)} />, (mounted) => {
+			const checkbox = waitForCheckbox(mounted.host);
+			settleFrames(3);
+
+			Assert.deepEqual(values, [], `${variant}: expected no onChange on mount`);
+			assertShowsChecked(checkbox, checked, variant);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@Each([
+		["defaultChecked", true],
+		["defaultUnchecked", false],
+	])
+	@DisplayName("An uncontrolled Checkbox starts at defaultChecked without calling onChange")
+	@Test
+	public defaultCheckedSeeds(variant: string, defaultChecked: boolean) {
+		const values: boolean[] = [];
 
 		withMounted(
 			200,
 			200,
-			<Checkbox
-				checked={checked}
-				onChange={(value) => {
-					onChangeValues.push(value);
-				}}
-			/>,
+			<Checkbox defaultChecked={defaultChecked} onChange={recorder(values)} />,
 			(mounted) => {
 				const checkbox = waitForCheckbox(mounted.host);
-				const icon = findIcon(checkbox);
+				settleFrames(3);
 
-				Assert.deepEqual(onChangeValues, [checked]);
-
-				Assert.equal(
-					icon.Image !== "",
-					checked,
-					`${variant}: expected CheckboxIcon.Image to be ${checked ? "set" : "empty"}, got "${icon.Image}"`,
-				);
+				Assert.deepEqual(values, [], `${variant}: expected no onChange on mount`);
+				assertShowsChecked(checkbox, defaultChecked, variant);
 			},
 		);
 	}
 
 	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	@DisplayName("Firing the Fieldset labelActivated event toggles the checkbox on, firing onChange with true and showing the check icon")
+	@DisplayName("Clicking a controlled Checkbox reports the flipped value but keeps showing the prop until it changes")
 	@Test
-	public labelToggles() {
+	public controlledClickReports() {
+		const values: boolean[] = [];
+
+		withMounted(200, 200, <Checkbox checked={false} onChange={recorder(values)} />, (mounted) => {
+			const checkbox = waitForCheckbox(mounted.host);
+
+			activateButton(mounted, checkbox);
+			settleFrames(3);
+
+			Assert.deepEqual(values, [true]);
+			assertShowsChecked(checkbox, false, "after click, before the prop changes");
+
+			mounted.update(<Checkbox checked={true} onChange={recorder(values)} />);
+			settleFrames(2);
+
+			assertShowsChecked(checkbox, true, "after the prop changes");
+			Assert.deepEqual(values, [true], "Expected the prop change not to call onChange");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Flipping a controlled checked prop re-renders the icon without calling onChange")
+	@Test
+	public propChangeSilent() {
+		const values: boolean[] = [];
+
+		withMounted(200, 200, <Checkbox checked={false} onChange={recorder(values)} />, (mounted) => {
+			const checkbox = waitForCheckbox(mounted.host);
+
+			mounted.update(<Checkbox checked={true} onChange={recorder(values)} />);
+			settleFrames(2);
+			assertShowsChecked(checkbox, true, "checked prop on");
+
+			mounted.update(<Checkbox checked={false} onChange={recorder(values)} />);
+			settleFrames(2);
+			assertShowsChecked(checkbox, false, "checked prop off");
+
+			Assert.deepEqual(values, []);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Clicking an uncontrolled Checkbox flips its own state and reports each new value")
+	@Test
+	public uncontrolledClickToggles() {
+		const values: boolean[] = [];
+
+		withMounted(200, 200, <Checkbox onChange={recorder(values)} />, (mounted) => {
+			const checkbox = waitForCheckbox(mounted.host);
+
+			activateButton(mounted, checkbox);
+			Assert.deepEqual(values, [true]);
+			assertShowsChecked(checkbox, true, "after first click");
+
+			activateButton(mounted, checkbox);
+			Assert.deepEqual(values, [true, false]);
+			assertShowsChecked(checkbox, false, "after second click");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Firing the Fieldset labelActivated event toggles an uncontrolled checkbox on and reports true")
+	@Test
+	public fieldsetLabelToggles() {
 		const labelActivated = new Instance("BindableEvent");
-		const onChangeValues: boolean[] = [];
+		const values: boolean[] = [];
 
 		try {
 			withMounted(
 				200,
 				200,
 				<FieldsetContext.Provider value={{ disabled: false, checkbox: true, labelActivated }}>
-					<Checkbox
-						onChange={(value) => {
-							onChangeValues.push(value);
-						}}
-					/>
+					<Checkbox onChange={recorder(values)} />
 				</FieldsetContext.Provider>,
 				(mounted) => {
 					const checkbox = waitForCheckbox(mounted.host);
-					const icon = findIcon(checkbox);
-
-					Assert.deepEqual(onChangeValues, [false]);
-					Assert.equal(icon.Image, "", "Expected no icon image before the label is activated");
+					settleFrames(2);
+					Assert.deepEqual(values, [], "Expected no onChange before the label is activated");
 
 					labelActivated.Fire();
 
 					waitForLayout(
-						() => (onChangeValues.size() >= 2 ? true : undefined),
+						() => (values.size() >= 1 ? true : undefined),
 						"Timed out waiting for onChange to fire after labelActivated",
 					);
+					settleFrames(1);
 
-					Assert.deepEqual(onChangeValues, [false, true]);
-					Assert.true(icon.Image !== "", "Expected the check icon to render once toggled on");
+					Assert.deepEqual(values, [true]);
+					assertShowsChecked(checkbox, true, "after labelActivated");
 				},
 			);
 		} finally {
