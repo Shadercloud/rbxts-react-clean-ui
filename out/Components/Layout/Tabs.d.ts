@@ -1,9 +1,11 @@
 import React from "@rbxts/react";
-import { CssBackgroundGradient, PaddingProps, ScalableElementProps } from "../../Interfaces";
+import { CssBackgroundGradient, IconName, PaddingProps, ScalableElementProps, ScaleSize } from "../../Interfaces";
 import { CssBackgroundImage } from "../../Theme";
 interface TabTitleProps extends PaddingProps {
     value: string;
-    text: string;
+    text?: string;
+    icon?: IconName;
+    iconScale?: ScaleSize;
 }
 declare function TabTitle(props: TabTitleProps): React.JSX.Element;
 interface TabContentProps {

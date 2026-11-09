@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
-const { Skip } = Decorators;
+const { Skip, Each } = Decorators;
 import { Tabs } from "../../../Components/Layout/Tabs";
 import { Text } from "../../../Components/Typography/Text";
 import { ThemeProvider } from "../../../Providers/theme.provider";
@@ -131,6 +131,45 @@ function settleFrames(count: number) {
 
 function titleTextOf(button: ImageButton): TextLabel {
 	return findDescendant<TextLabel>(button, "TabTitleText");
+}
+
+function titleIconOf(button: ImageButton): ImageLabel {
+	return findDescendant<ImageLabel>(button, "TabTitleIcon");
+}
+
+function iconTabsFixture(selected: string) {
+	return (
+		<Tabs value={selected}>
+			<Tabs.List>
+				<Tabs.Title value="text" text="Text" />
+				<Tabs.Title value="both" icon="home" text="Home" />
+				<Tabs.Title value="icon" icon="cog" />
+				<Tabs.Title value="empty" icon="check" text="" />
+				<Tabs.Title value="pair" icon="check" text="Pair" />
+			</Tabs.List>
+			<Tabs.Body>
+				<Tabs.Content value="text">
+					<Text text="Panel text" />
+				</Tabs.Content>
+				<Tabs.Content value="both">
+					<Text text="Panel both" />
+				</Tabs.Content>
+				<Tabs.Content value="icon">
+					<Text text="Panel icon" />
+				</Tabs.Content>
+				<Tabs.Content value="empty">
+					<Text text="Panel empty" />
+				</Tabs.Content>
+				<Tabs.Content value="pair">
+					<Text text="Panel pair" />
+				</Tabs.Content>
+			</Tabs.Body>
+		</Tabs>
+	);
+}
+
+function themedIconTabs(selected: string) {
+	return <ThemeProvider theme={stateTheme(0)}>{iconTabsFixture(selected)}</ThemeProvider>;
 }
 
 @Tag("Studio")
@@ -555,6 +594,105 @@ class TabsMountValidation {
 			waitForSelectedContent(mounted.host, "one");
 
 			Assert.equal(findDescendant<ImageLabel>(mounted.host, "TabsBody").LayoutOrder, 0);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A title with only text renders its TabTitleText label and no TabTitleIcon")
+	@Test
+	public textOnlyTitle() {
+		withMounted(600, 300, themedIconTabs("both"), (mounted) => {
+			waitForSelectedContent(mounted.host, "both");
+
+			const button = waitForButton(mounted.host, "text");
+			Assert.undefined(button.FindFirstChild("TabTitleIcon", true), "Expected a text-only title to have no TabTitleIcon");
+			Assert.equal(titleTextOf(button).Text, "Text");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A title with an icon and text renders both, with the icon ordered and laid out before the label")
+	@Test
+	public iconBeforeText() {
+		withMounted(600, 300, themedIconTabs("both"), (mounted) => {
+			waitForSelectedContent(mounted.host, "both");
+
+			const button = waitForButton(mounted.host, "both");
+			const icon = waitForGuiObject<ImageLabel>(button, "TabTitleIcon");
+			const label = waitForGuiObject<TextLabel>(button, "TabTitleText");
+
+			Assert.equal(label.Text, "Home");
+			Assert.true(
+				icon.LayoutOrder < label.LayoutOrder,
+				`Expected TabTitleIcon LayoutOrder ${icon.LayoutOrder} to be lower than TabTitleText LayoutOrder ${label.LayoutOrder}`,
+			);
+			assertStackedHorizontally([icon, label], "tab title icon and text");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@Each([["icon"], ["empty"]])
+	@DisplayName("A title with an icon and no text, or empty text, renders TabTitleIcon and no TabTitleText")
+	@Test
+	public iconOnlyTitle(value: string) {
+		withMounted(600, 300, themedIconTabs("both"), (mounted) => {
+			waitForSelectedContent(mounted.host, "both");
+
+			const button = waitForButton(mounted.host, value);
+			waitForGuiObject<ImageLabel>(button, "TabTitleIcon");
+			Assert.undefined(
+				button.FindFirstChild("TabTitleText", true),
+				`Expected TabButton-${value} to render no TabTitleText without text`,
+			);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A selected title's icon takes the focus textColor, the same colour as its own label")
+	@Test
+	public selectedIconColor() {
+		withMounted(600, 300, themedIconTabs("both"), (mounted) => {
+			waitForSelectedContent(mounted.host, "both");
+
+			const button = waitForButton(mounted.host, "both");
+			Assert.equal(titleIconOf(button).ImageColor3, titleTextOf(button).TextColor3);
+			Assert.equal(titleIconOf(button).ImageColor3, FOCUS_TEXT);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Unselected icons, with or without text, take the default textColor that unselected labels use")
+	@Test
+	public unselectedIconColor() {
+		withMounted(600, 300, themedIconTabs("both"), (mounted) => {
+			waitForSelectedContent(mounted.host, "both");
+
+			const pair = waitForButton(mounted.host, "pair");
+			const unselectedText = titleTextOf(pair).TextColor3;
+			Assert.equal(unselectedText, DEFAULT_TEXT);
+			Assert.equal(titleIconOf(pair).ImageColor3, unselectedText);
+			Assert.equal(titleIconOf(waitForButton(mounted.host, "icon")).ImageColor3, unselectedText);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Moving the selection swaps icon colours, so an icon-only title turns focus-coloured once selected")
+	@Test
+	public iconColorFollowsSelection() {
+		withMounted(600, 300, themedIconTabs("both"), (mounted) => {
+			waitForSelectedContent(mounted.host, "both");
+
+			mounted.update(themedIconTabs("icon"));
+			waitForSelectedContent(mounted.host, "icon");
+
+			const iconOnly = titleIconOf(waitForButton(mounted.host, "icon"));
+			const both = waitForButton(mounted.host, "both");
+			waitForLayout(
+				() => (iconOnly.ImageColor3 === FOCUS_TEXT ? true : undefined),
+				`Timed out waiting for the selected icon-only title to take the focus textColor (got ${iconOnly.ImageColor3})`,
+			);
+			Assert.equal(titleIconOf(both).ImageColor3, titleTextOf(both).TextColor3);
+			Assert.equal(titleIconOf(both).ImageColor3, DEFAULT_TEXT);
 		});
 	}
 }

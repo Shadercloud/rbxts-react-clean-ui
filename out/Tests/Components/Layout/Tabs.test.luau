@@ -10,6 +10,7 @@ local Tag = _lunit.Tag
 local DisplayName = _lunit.DisplayName
 local _binding = Decorators
 local Skip = _binding.Skip
+local Each = _binding.Each
 local Tabs = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "Tabs").Tabs
 local Text = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Typography", "Text").Text
 local ThemeProvider = TS.import(script, script.Parent.Parent.Parent.Parent, "Providers", "theme.provider").ThemeProvider
@@ -153,6 +154,57 @@ local function settleFrames(count)
 end
 local function titleTextOf(button)
 	return findDescendant(button, "TabTitleText")
+end
+local function titleIconOf(button)
+	return findDescendant(button, "TabTitleIcon")
+end
+local function iconTabsFixture(selected)
+	return React.createElement(Tabs, {
+		value = selected,
+	}, React.createElement(Tabs.List, nil, React.createElement(Tabs.Title, {
+		value = "text",
+		text = "Text",
+	}), React.createElement(Tabs.Title, {
+		value = "both",
+		icon = "home",
+		text = "Home",
+	}), React.createElement(Tabs.Title, {
+		value = "icon",
+		icon = "cog",
+	}), React.createElement(Tabs.Title, {
+		value = "empty",
+		icon = "check",
+		text = "",
+	}), React.createElement(Tabs.Title, {
+		value = "pair",
+		icon = "check",
+		text = "Pair",
+	})), React.createElement(Tabs.Body, nil, React.createElement(Tabs.Content, {
+		value = "text",
+	}, React.createElement(Text, {
+		text = "Panel text",
+	})), React.createElement(Tabs.Content, {
+		value = "both",
+	}, React.createElement(Text, {
+		text = "Panel both",
+	})), React.createElement(Tabs.Content, {
+		value = "icon",
+	}, React.createElement(Text, {
+		text = "Panel icon",
+	})), React.createElement(Tabs.Content, {
+		value = "empty",
+	}, React.createElement(Text, {
+		text = "Panel empty",
+	})), React.createElement(Tabs.Content, {
+		value = "pair",
+	}, React.createElement(Text, {
+		text = "Panel pair",
+	}))))
+end
+local function themedIconTabs(selected)
+	return React.createElement(ThemeProvider, {
+		theme = stateTheme(0),
+	}, iconTabsFixture(selected))
 end
 local TabsMountValidation
 do
@@ -528,6 +580,65 @@ do
 		}), function(mounted)
 			waitForSelectedContent(mounted.host, "one")
 			Assert:equal(findDescendant(mounted.host, "TabsBody").LayoutOrder, 0)
+		end)
+	end
+	function TabsMountValidation:textOnlyTitle()
+		withMounted(600, 300, themedIconTabs("both"), function(mounted)
+			waitForSelectedContent(mounted.host, "both")
+			local button = waitForButton(mounted.host, "text")
+			Assert:undefined(button:FindFirstChild("TabTitleIcon", true), "Expected a text-only title to have no TabTitleIcon")
+			Assert:equal(titleTextOf(button).Text, "Text")
+		end)
+	end
+	function TabsMountValidation:iconBeforeText()
+		withMounted(600, 300, themedIconTabs("both"), function(mounted)
+			waitForSelectedContent(mounted.host, "both")
+			local button = waitForButton(mounted.host, "both")
+			local icon = waitForGuiObject(button, "TabTitleIcon")
+			local label = waitForGuiObject(button, "TabTitleText")
+			Assert:equal(label.Text, "Home")
+			Assert["true"](Assert, icon.LayoutOrder < label.LayoutOrder, `Expected TabTitleIcon LayoutOrder {icon.LayoutOrder} to be lower than TabTitleText LayoutOrder {label.LayoutOrder}`)
+			assertStackedHorizontally({ icon, label }, "tab title icon and text")
+		end)
+	end
+	function TabsMountValidation:iconOnlyTitle(value)
+		withMounted(600, 300, themedIconTabs("both"), function(mounted)
+			waitForSelectedContent(mounted.host, "both")
+			local button = waitForButton(mounted.host, value)
+			waitForGuiObject(button, "TabTitleIcon")
+			Assert:undefined(button:FindFirstChild("TabTitleText", true), `Expected TabButton-{value} to render no TabTitleText without text`)
+		end)
+	end
+	function TabsMountValidation:selectedIconColor()
+		withMounted(600, 300, themedIconTabs("both"), function(mounted)
+			waitForSelectedContent(mounted.host, "both")
+			local button = waitForButton(mounted.host, "both")
+			Assert:equal(titleIconOf(button).ImageColor3, titleTextOf(button).TextColor3)
+			Assert:equal(titleIconOf(button).ImageColor3, FOCUS_TEXT)
+		end)
+	end
+	function TabsMountValidation:unselectedIconColor()
+		withMounted(600, 300, themedIconTabs("both"), function(mounted)
+			waitForSelectedContent(mounted.host, "both")
+			local pair = waitForButton(mounted.host, "pair")
+			local unselectedText = titleTextOf(pair).TextColor3
+			Assert:equal(unselectedText, DEFAULT_TEXT)
+			Assert:equal(titleIconOf(pair).ImageColor3, unselectedText)
+			Assert:equal(titleIconOf(waitForButton(mounted.host, "icon")).ImageColor3, unselectedText)
+		end)
+	end
+	function TabsMountValidation:iconColorFollowsSelection()
+		withMounted(600, 300, themedIconTabs("both"), function(mounted)
+			waitForSelectedContent(mounted.host, "both")
+			mounted.update(themedIconTabs("icon"))
+			waitForSelectedContent(mounted.host, "icon")
+			local iconOnly = titleIconOf(waitForButton(mounted.host, "icon"))
+			local both = waitForButton(mounted.host, "both")
+			waitForLayout(function()
+				return if iconOnly.ImageColor3 == FOCUS_TEXT then true else nil
+			end, `Timed out waiting for the selected icon-only title to take the focus textColor (got {iconOnly.ImageColor3})`)
+			Assert:equal(titleIconOf(both).ImageColor3, titleTextOf(both).TextColor3)
+			Assert:equal(titleIconOf(both).ImageColor3, DEFAULT_TEXT)
 		end)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
@@ -969,6 +1080,133 @@ do
 	})
 	if _descriptor_65 then
 		TabsMountValidation.bodyLayoutOrderDefault = _descriptor_65.value
+	end
+	local _decorator_44 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_45 = DisplayName("A title with only text renders its TabTitleText label and no TabTitleIcon")
+	local _descriptor_66 = Test(TabsMountValidation, "textOnlyTitle", {
+		value = TabsMountValidation.textOnlyTitle,
+	})
+	if _descriptor_66 then
+		TabsMountValidation.textOnlyTitle = _descriptor_66.value
+	end
+	local _descriptor_67 = _decorator_45(TabsMountValidation, "textOnlyTitle", {
+		value = TabsMountValidation.textOnlyTitle,
+	})
+	if _descriptor_67 then
+		TabsMountValidation.textOnlyTitle = _descriptor_67.value
+	end
+	local _descriptor_68 = _decorator_44(TabsMountValidation, "textOnlyTitle", {
+		value = TabsMountValidation.textOnlyTitle,
+	})
+	if _descriptor_68 then
+		TabsMountValidation.textOnlyTitle = _descriptor_68.value
+	end
+	local _decorator_46 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_47 = DisplayName("A title with an icon and text renders both, with the icon ordered and laid out before the label")
+	local _descriptor_69 = Test(TabsMountValidation, "iconBeforeText", {
+		value = TabsMountValidation.iconBeforeText,
+	})
+	if _descriptor_69 then
+		TabsMountValidation.iconBeforeText = _descriptor_69.value
+	end
+	local _descriptor_70 = _decorator_47(TabsMountValidation, "iconBeforeText", {
+		value = TabsMountValidation.iconBeforeText,
+	})
+	if _descriptor_70 then
+		TabsMountValidation.iconBeforeText = _descriptor_70.value
+	end
+	local _descriptor_71 = _decorator_46(TabsMountValidation, "iconBeforeText", {
+		value = TabsMountValidation.iconBeforeText,
+	})
+	if _descriptor_71 then
+		TabsMountValidation.iconBeforeText = _descriptor_71.value
+	end
+	local _decorator_48 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_49 = Each({ { "icon" }, { "empty" } })
+	local _decorator_50 = DisplayName("A title with an icon and no text, or empty text, renders TabTitleIcon and no TabTitleText")
+	local _descriptor_72 = Test(TabsMountValidation, "iconOnlyTitle", {
+		value = TabsMountValidation.iconOnlyTitle,
+	})
+	if _descriptor_72 then
+		TabsMountValidation.iconOnlyTitle = _descriptor_72.value
+	end
+	local _descriptor_73 = _decorator_50(TabsMountValidation, "iconOnlyTitle", {
+		value = TabsMountValidation.iconOnlyTitle,
+	})
+	if _descriptor_73 then
+		TabsMountValidation.iconOnlyTitle = _descriptor_73.value
+	end
+	local _descriptor_74 = _decorator_49(TabsMountValidation, "iconOnlyTitle", {
+		value = TabsMountValidation.iconOnlyTitle,
+	})
+	if _descriptor_74 then
+		TabsMountValidation.iconOnlyTitle = _descriptor_74.value
+	end
+	local _descriptor_75 = _decorator_48(TabsMountValidation, "iconOnlyTitle", {
+		value = TabsMountValidation.iconOnlyTitle,
+	})
+	if _descriptor_75 then
+		TabsMountValidation.iconOnlyTitle = _descriptor_75.value
+	end
+	local _decorator_51 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_52 = DisplayName("A selected title's icon takes the focus textColor, the same colour as its own label")
+	local _descriptor_76 = Test(TabsMountValidation, "selectedIconColor", {
+		value = TabsMountValidation.selectedIconColor,
+	})
+	if _descriptor_76 then
+		TabsMountValidation.selectedIconColor = _descriptor_76.value
+	end
+	local _descriptor_77 = _decorator_52(TabsMountValidation, "selectedIconColor", {
+		value = TabsMountValidation.selectedIconColor,
+	})
+	if _descriptor_77 then
+		TabsMountValidation.selectedIconColor = _descriptor_77.value
+	end
+	local _descriptor_78 = _decorator_51(TabsMountValidation, "selectedIconColor", {
+		value = TabsMountValidation.selectedIconColor,
+	})
+	if _descriptor_78 then
+		TabsMountValidation.selectedIconColor = _descriptor_78.value
+	end
+	local _decorator_53 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_54 = DisplayName("Unselected icons, with or without text, take the default textColor that unselected labels use")
+	local _descriptor_79 = Test(TabsMountValidation, "unselectedIconColor", {
+		value = TabsMountValidation.unselectedIconColor,
+	})
+	if _descriptor_79 then
+		TabsMountValidation.unselectedIconColor = _descriptor_79.value
+	end
+	local _descriptor_80 = _decorator_54(TabsMountValidation, "unselectedIconColor", {
+		value = TabsMountValidation.unselectedIconColor,
+	})
+	if _descriptor_80 then
+		TabsMountValidation.unselectedIconColor = _descriptor_80.value
+	end
+	local _descriptor_81 = _decorator_53(TabsMountValidation, "unselectedIconColor", {
+		value = TabsMountValidation.unselectedIconColor,
+	})
+	if _descriptor_81 then
+		TabsMountValidation.unselectedIconColor = _descriptor_81.value
+	end
+	local _decorator_55 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_56 = DisplayName("Moving the selection swaps icon colours, so an icon-only title turns focus-coloured once selected")
+	local _descriptor_82 = Test(TabsMountValidation, "iconColorFollowsSelection", {
+		value = TabsMountValidation.iconColorFollowsSelection,
+	})
+	if _descriptor_82 then
+		TabsMountValidation.iconColorFollowsSelection = _descriptor_82.value
+	end
+	local _descriptor_83 = _decorator_56(TabsMountValidation, "iconColorFollowsSelection", {
+		value = TabsMountValidation.iconColorFollowsSelection,
+	})
+	if _descriptor_83 then
+		TabsMountValidation.iconColorFollowsSelection = _descriptor_83.value
+	end
+	local _descriptor_84 = _decorator_55(TabsMountValidation, "iconColorFollowsSelection", {
+		value = TabsMountValidation.iconColorFollowsSelection,
+	})
+	if _descriptor_84 then
+		TabsMountValidation.iconColorFollowsSelection = _descriptor_84.value
 	end
 	TabsMountValidation = Tag("Studio")(TabsMountValidation) or TabsMountValidation
 end

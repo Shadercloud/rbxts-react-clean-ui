@@ -191,6 +191,7 @@ export interface ThemeTemplate {
                 boxShadow?: CssShadow;
                 typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
                 intents?: Partial<Record<Intent, InlineIntentColors>>;
+                iconColor?: Color3;
             },
 
         };

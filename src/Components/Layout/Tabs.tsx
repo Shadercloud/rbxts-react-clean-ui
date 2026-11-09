@@ -6,8 +6,9 @@ import { Container } from "./Container";
 import { CleanThemeContext } from "../../Contexts";
 import { BoxShadow, Corners, Gradient, Padding } from "../Decorator";
 import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
-import { CssBackgroundGradient, PaddingProps, ScalableElementProps } from "../../Interfaces";
+import { CssBackgroundGradient, IconName, PaddingProps, ScalableElementProps, ScaleSize } from "../../Interfaces";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
+import { Icon } from "../Surface/Icon";
 import { CssBackgroundImage } from "../../Theme";
 
 interface TabsContextValue {
@@ -32,7 +33,9 @@ const TabsListContext = React.createContext<TabsListContextValue>({
 
 interface TabTitleProps extends PaddingProps {
     value: string;
-    text: string;
+    text?: string;
+    icon?: IconName;
+    iconScale?: ScaleSize;
 }
 
 function TabButtonCorners() {
@@ -70,6 +73,8 @@ function TabButtonContent(props: TabTitleProps) {
     const { fill } = React.useContext(TabsListContext);
     const intent = ColorHelper.getIntentColors(theme, "primary", hover?.isSelected ? "focus" : hover?.hover ? "hover" : "default", theme.components.tabs.button.intents);
     const borderThickness = intent.borderThickness ?? theme.components.tabs.button.borderThickness;
+    const hasIcon = props.icon !== undefined;
+    const hasText = props.text !== undefined && props.text !== "";
     return <>
         <TabButtonCorners />
         {borderThickness > 0 && (
@@ -83,22 +88,35 @@ function TabButtonContent(props: TabTitleProps) {
         <Gradient value={intent.backgroundGradient} />
         <Padding resolvedPadding={SpacingHelper.GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding)} />
         <BoxShadow value={intent.boxShadow} />
-        {fill && (
+        {(fill || hasIcon) && (
             <uilistlayout
                 key="TitleLayout"
                 FillDirection={Enum.FillDirection.Horizontal}
                 HorizontalAlignment={Enum.HorizontalAlignment.Center}
                 VerticalAlignment={Enum.VerticalAlignment.Center}
                 SortOrder={Enum.SortOrder.LayoutOrder}
+                Padding={hasIcon ? new UDim(0, math.ceil(SpacingHelper.GetPadding(theme) / 2)) : undefined}
             />
         )}
-        <Text
-            name="TabTitleText"
-            TextColor3={intent.textColor}
-            text={props.text}
-            typography={TypographyHelper.getTypography(theme, undefined, intent.typography)}
-
-        /></>
+        {hasIcon && (
+            <Icon
+                name="TabTitleIcon"
+                LayoutOrder={1}
+                icon={props.icon}
+                scale={props.iconScale ?? theme.default.scale}
+                color={theme.components.tabs.button.iconColor ?? intent.textColor}
+            />
+        )}
+        {(!hasIcon || hasText) && (
+            <Text
+                name="TabTitleText"
+                LayoutOrder={hasIcon ? 2 : undefined}
+                TextColor3={intent.textColor}
+                text={props.text ?? ""}
+                typography={TypographyHelper.getTypography(theme, undefined, intent.typography)}
+            />
+        )}
+    </>
 }
 
 function TabTitle(props: TabTitleProps) {

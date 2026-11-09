@@ -118,6 +118,7 @@ Implementation notes for src/Tests — test files carry no comments, so non-obvi
 - `listFillShares` compares title widths rather than exact pixels: with `HorizontalFlex = Fill` and `AutomaticSize.Y` the titles split the list's inner width, which depends on the list padding tokens.
 
 - `bodyLayoutOrder`/`bodyLayoutOrderDefault` read `TabsBody.LayoutOrder` directly. The default case expects `0` because an unset `LayoutOrder` prop leaves the engine default.
+- The icon tests use `iconTabsFixture`, a controlled `Tabs` (so the selection is exactly the `value` passed, with no mount-order claim) with five titles: text only (`text`), icon and text (`both`, `pair`), icon with no `text` (`icon`) and icon with `text=""` (`empty`). It runs under `stateTheme(0)` so the focus and default text colours differ. The icon colour is the `ImageColor3` of the `TabTitleIcon` ImageLabel (`Icon`'s `color` prop). The colour tests assume `theme.components.tabs.button.iconColor` is unset: when a theme sets it, the icon uses that colour in every state instead of the title text colour.
 
 ## `Accordion.test.tsx`
 

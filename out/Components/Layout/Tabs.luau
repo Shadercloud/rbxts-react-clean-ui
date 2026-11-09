@@ -20,6 +20,7 @@ local TypographyHelper = _Helpers.TypographyHelper
 local _HoverButton = TS.import(script, script.Parent.Parent, "Input", "HoverButton")
 local HoverButton = _HoverButton.HoverButton
 local HoverButtonContext = _HoverButton.HoverButtonContext
+local Icon = TS.import(script, script.Parent.Parent, "Surface", "Icon").Icon
 local TabsContext = React.createContext({
 	selected = nil,
 	claimTab = function() end,
@@ -80,29 +81,55 @@ local function TabButtonContent(props)
 		_condition = theme.components.tabs.button.borderThickness
 	end
 	local borderThickness = _condition
-	return React.createElement(React.Fragment, nil, React.createElement(TabButtonCorners), borderThickness > 0 and (React.createElement("uistroke", {
+	local hasIcon = props.icon ~= nil
+	local hasText = props.text ~= nil and props.text ~= ""
+	local _exp = React.createElement(TabButtonCorners)
+	local _exp_1 = borderThickness > 0 and (React.createElement("uistroke", {
 		key = "Stroke",
 		Thickness = borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
 		Color = intent.borderColor,
-	})), React.createElement(Gradient, {
+	}))
+	local _exp_2 = React.createElement(Gradient, {
 		value = intent.backgroundGradient,
-	}), React.createElement(Padding, {
+	})
+	local _exp_3 = React.createElement(Padding, {
 		resolvedPadding = SpacingHelper:GetResolvedPadding(theme, props, theme.components.tabs.button.spacing, theme.components.tabs.button.padding),
-	}), React.createElement(BoxShadow, {
+	})
+	local _exp_4 = React.createElement(BoxShadow, {
 		value = intent.boxShadow,
-	}), fill and (React.createElement("uilistlayout", {
+	})
+	local _exp_5 = (fill or hasIcon) and (React.createElement("uilistlayout", {
 		key = "TitleLayout",
 		FillDirection = Enum.FillDirection.Horizontal,
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		VerticalAlignment = Enum.VerticalAlignment.Center,
 		SortOrder = Enum.SortOrder.LayoutOrder,
-	})), React.createElement(Text, {
-		name = "TabTitleText",
-		TextColor3 = intent.textColor,
-		text = props.text,
-		typography = TypographyHelper:getTypography(theme, nil, intent.typography),
+		Padding = if hasIcon then UDim.new(0, math.ceil(SpacingHelper:GetPadding(theme) / 2)) else nil,
 	}))
+	local _exp_6 = hasIcon and (React.createElement(Icon, {
+		name = "TabTitleIcon",
+		LayoutOrder = 1,
+		icon = props.icon,
+		scale = props.iconScale or theme.default.scale,
+		color = theme.components.tabs.button.iconColor or intent.textColor,
+	}))
+	local _condition_1 = (not hasIcon or hasText)
+	if _condition_1 then
+		local _attributes = {
+			name = "TabTitleText",
+			LayoutOrder = if hasIcon then 2 else nil,
+			TextColor3 = intent.textColor,
+		}
+		local _condition_2 = props.text
+		if _condition_2 == nil then
+			_condition_2 = ""
+		end
+		_attributes.text = _condition_2
+		_attributes.typography = TypographyHelper:getTypography(theme, nil, intent.typography)
+		_condition_1 = (React.createElement(Text, _attributes))
+	end
+	return React.createElement(React.Fragment, nil, _exp, _exp_1, _exp_2, _exp_3, _exp_4, _exp_5, _exp_6, _condition_1)
 end
 local function TabTitle(props)
 	local theme = React.useContext(CleanThemeContext)

@@ -1,16 +1,22 @@
 import React from "@rbxts/react";
-import { Box, Container, Scroller, Tabs as TabsComponent, Text } from "@rbxts/react-clean-ui";
+import { Box, Container, IconName, Scroller, Tabs as TabsComponent, Text } from "@rbxts/react-clean-ui";
 import { ScreenshotFrame } from "../ScreenshotFrame";
 
-function Tabs(props: { screenshot?: boolean; fill?: boolean } = {}) {
+type TabsTitleMode = "text" | "icon-text" | "icon";
+
+function Tabs(props: { screenshot?: boolean; fill?: boolean; titles?: TabsTitleMode } = {}) {
+    const mode = props.titles ?? "text";
+    const text = (value: string) => (mode === "icon" ? undefined : value);
+    const icon = (value: IconName) => (mode === "text" ? undefined : value);
+
     const content = (
         <Container width="75%" height="300">
             <Box>
                 <TabsComponent>
                     <TabsComponent.List fill={props.fill ?? false}>
-                        <TabsComponent.Title value="short-story" text="Short Story" />
-                        <TabsComponent.Title value="scroller" text="Tab with Scroller" />
-                        <TabsComponent.Title value="notes" text="Notes" />
+                        <TabsComponent.Title value="short-story" text={text("Short Story")} icon={icon("book")} />
+                        <TabsComponent.Title value="scroller" text={text("Tab with Scroller")} icon={icon("list")} />
+                        <TabsComponent.Title value="notes" text={text("Notes")} icon={icon("sticky-note")} />
                     </TabsComponent.List>
                     <TabsComponent.Body>
                         <TabsComponent.Content value="short-story">

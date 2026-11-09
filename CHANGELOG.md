@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.0
+
+### Additions
+
+- **`Tabs.Title` icons.** New optional `icon?: IconName` draws an icon before the title text, or on its own when `text` is omitted or empty, for icon-only tab rows. The icon takes the title text colour in every state. `iconScale?: ScaleSize` overrides its size (default `theme.default.scale`, the scale the title typography uses). Titles without an icon render exactly as before.
+- **`theme.components.tabs.button.iconColor`** (optional `Color3`): one fixed colour for tab title icons in every state. Unset, the icon follows the title text colour.
+
 ## 1.6.1
 
 ### Fixes

@@ -21,5 +21,11 @@ declare class TabsMountValidation {
     bodyStrokeGated(): void;
     bodyLayoutOrder(): void;
     bodyLayoutOrderDefault(): void;
+    textOnlyTitle(): void;
+    iconBeforeText(): void;
+    iconOnlyTitle(value: string): void;
+    selectedIconColor(): void;
+    unselectedIconColor(): void;
+    iconColorFollowsSelection(): void;
 }
 export = TabsMountValidation;

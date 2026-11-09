@@ -116,6 +116,44 @@ Set `fill` on `Tabs.List` to make every title share the list's width equally, re
 
 Without `fill`, each title is sized to fit its text.
 
+## Icons
+
+Set `icon` on a `Tabs.Title` to show a Font Awesome icon from the icon library. With `text` as well, the icon comes first and the text follows, vertically centred. `text` is optional, so a title can show just an icon.
+
+<Demo preview="Scenes/Layout/TabsIcons.loom.tsx" previewHeight={260}>
+```tsx
+import React from "@rbxts/react";
+import { Tabs } from "@rbxts/react-clean-ui";
+
+export function IconTabsExample() {
+    return (
+        <Tabs>
+            <Tabs.List>
+                <Tabs.Title value="home" icon="home" />
+                <Tabs.Title value="alerts" icon="bell" />
+                <Tabs.Title value="settings" icon="cog" />
+            </Tabs.List>
+            <Tabs.Body>
+                {/* ... */}
+            </Tabs.Body>
+        </Tabs>
+    );
+}
+```
+</Demo>
+
+An icon-only title gets the same padding as a title with text. To label the icons, pass `text` too:
+
+```tsx
+<Tabs.List>
+    <Tabs.Title value="profile" icon="user" text="Profile" />
+    <Tabs.Title value="settings" icon="cog" text="Settings" />
+    <Tabs.Title value="billing" icon="credit-card" text="Billing" />
+</Tabs.List>
+```
+
+The icon uses the title's text colour in every state (unselected, hovered, and selected), unless the theme sets `button.iconColor`. It uses `theme.default.scale` by default, which is the same scale as the title's typography. Set `iconScale` to use a different scale.
+
 ## Placing tabs in a card header
 
 `Tabs.List` and `Tabs.Body` don't need to be siblings — each reads the current selection from `Tabs` via context wherever it's mounted, so the button bar and the content panel can live in entirely different parts of the layout. This makes it possible to put the buttons in a `Card.Header` while the panel content lives in the `Card.Body`:
@@ -189,7 +227,9 @@ The only rule is that a `Tabs.Title` and the `Tabs.Content` it should reveal sha
 | Prop | Type | Description |
 | --- | --- | --- |
 | `value` | `string` | Identifies this tab. Must match a `Tabs.Content`'s `value` to pair them. |
-| `text` | `string` | Text displayed in the tab button. |
+| `text` | `string` | Optional. Text displayed in the tab button. |
+| `icon` | `IconName` | Optional. Icon displayed in the tab button, before `text` when both are set. |
+| `iconScale` | `ScaleSize` | Optional. Scale of the icon. Defaults to `theme.default.scale`, the scale the title's typography uses. |
 
 ### Shared props
 
@@ -226,7 +266,8 @@ The only rule is that a `Tabs.Title` and the `Tabs.Content` it should reveal sha
 - `onValueChange` fires on every title click, including clicks on the already-selected title. It never fires for the initial selection or for `defaultValue`.
 - If the selected `Tabs.Title` unmounts, the selection is not moved to another tab.
 - Every `Tabs.Content` stays mounted at all times — switching tabs toggles visibility rather than mounting and unmounting, so a panel's local state (such as a `Scroller`'s scroll position) is preserved when switching away and back.
-- Hovering or selecting a `Tabs.Title` switches its background, border, gradient, and text colors to the theme's `hover`/`focus` intent states.
+- Hovering or selecting a `Tabs.Title` switches its background, border, gradient, and text colors to the theme's `hover`/`focus` intent states. A title's icon follows the text colour unless the theme sets `button.iconColor`.
+- A `Tabs.Title` with `icon` and no `text` shows only the icon, with the same padding as a title with text.
 - `fill` only affects titles rendered inside that `Tabs.List`.
 
 ## Theme values
@@ -239,6 +280,7 @@ The only rule is that a `Tabs.Title` and the `Tabs.Content` it should reveal sha
 - `list.gap` — pixel gap between titles. Unset uses the default `HStack` gap. This is separate from `list.spacing`, which only controls the bar's padding.
 - `button.spacing`, `button.padding`, `button.boxShadow`, and `button.typography` — style each title button.
 - `button.cornerRadius` — either a single size or a per-corner object `{ topLeft?, topRight?, bottomLeft?, bottomRight? }`. With the per-corner object, any corner you leave out uses `list.cornerRadius`. A single size is ignored, and every corner uses `list.cornerRadius`. When every corner resolves to `0`, no `UICorner` is added.
+- `button.iconColor` — optional colour for title icons. When set, every state uses this one colour. When unset (the default), the icon follows the state's `textColor`.
 - `button.borderThickness` — thickness of the title button's inner border. `0` (the value in every shipped theme) renders no border.
 - `button.intents.primary.default`, `.hover`, and `.focus` — the unselected, hovered, and selected title states. Each state can set `textColor`, `backgroundColor`, `backgroundTransparency`, `borderColor`, `borderThickness` (overrides `button.borderThickness`), `backgroundImage`, `backgroundGradient`, and `boxShadow`. Titles always use the `primary` intent.
 
