@@ -104,7 +104,7 @@ export function Input(props: InputProps) {
                         BackgroundTransparency={1}
                         AutomaticSize={Enum.AutomaticSize.Y}
                         TextXAlignment={props.TextXAlignment ?? Enum.TextXAlignment.Left}
-                        FontFace={Font.fromName(typography.font.Name, typography.weight ?? Enum.FontWeight.Regular)}
+                        FontFace={TypographyHelper.toFontFace(typography.font, typography.weight ?? Enum.FontWeight.Regular)}
                         FontSize={typography.size}
                         PlaceholderText={props.PlaceholderText ?? props.placeholder}
                         PlaceholderColor3={props.PlaceholderColor3 ?? placeholderTypography.color}

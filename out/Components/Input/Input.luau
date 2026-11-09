@@ -102,7 +102,7 @@ local function Input(props)
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		TextXAlignment = props.TextXAlignment or Enum.TextXAlignment.Left,
-		FontFace = Font.fromName(typography.font.Name, typography.weight or Enum.FontWeight.Regular),
+		FontFace = TypographyHelper:toFontFace(typography.font, typography.weight or Enum.FontWeight.Regular),
 		FontSize = typography.size,
 	}
 	local _condition_2 = props.PlaceholderText

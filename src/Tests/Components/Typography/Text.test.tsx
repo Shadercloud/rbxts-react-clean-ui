@@ -3,6 +3,8 @@ import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/luni
 
 const { Skip } = Decorators;
 import { Text } from "../../../Components/Typography/Text";
+import { ThemeProvider } from "../../../Providers/theme.provider";
+import { DefaultTheme, extendTheme } from "../../../Theme";
 import {
 	STUDIO_SKIP_MESSAGE,
 	assertContained,
@@ -100,6 +102,33 @@ class TextMountValidation {
 			Assert.equal(label.Text, LONG_TEXT, "Expected the label to show the updated text");
 			Assert.true(longWidth > shortWidth, `Expected long text width ${longWidth} to exceed short text width ${shortWidth}`);
 		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A theme body font of Enum.Font.Fantasy renders with the Balthazar family, not a missing Fantasy family")
+	@Test
+	public themeFontFamily() {
+		const theme = extendTheme(DefaultTheme, {
+			typography: { body: { font: Enum.Font.Fantasy } },
+		});
+
+		withMounted(
+			400,
+			300,
+			<ThemeProvider theme={theme}>
+				<Text text={SHORT_TEXT} />
+			</ThemeProvider>,
+			(mounted) => {
+				const label = waitForText(mounted.host);
+				const suffix = "Balthazar.json";
+
+				Assert.equal(
+					label.FontFace.Family.sub(-suffix.size()),
+					suffix,
+					`Expected FontFace.Family to end with ${suffix}, got ${label.FontFace.Family}`,
+				);
+			},
+		);
 	}
 }
 

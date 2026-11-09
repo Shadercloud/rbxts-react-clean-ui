@@ -47,3 +47,7 @@ Per the [Input](./index.md) convention, when rendered inside a `Fieldset`, activ
 - A flat field such as `backgroundColor #295896`, `backgroundTransparency 0`, `borderColor #3D2712`, `borderThickness 3`, `cornerRadius 0`, `typography.color #FFF7CF`, `placeholder.color #8FA6C4`, `iconColor #FFF7CF` is reachable from these keys alone. Because `Select`'s search row renders an `Input`, it picks the same look up.
 
 `TextColor3` resolves as `props.TextColor3 ?? typography.color ?? theme.colors.intents.primary.default.textColor`. `TextTransparency` resolves as `props.TextTransparency ?? typography.transparency` (no further fallback — `undefined` leaves Roblox's own default). `PlaceholderColor3` resolves as `props.PlaceholderColor3 ?? placeholderTypography.color`, with no further fallback beyond that — if neither is set, Roblox's built-in default placeholder color is used.
+
+## Implementation notes
+
+- `FontFace` is built with `TypographyHelper.toFontFace` (see [shared-modules.md](../../../architecture/shared-modules.md#srchelperstypographyhelperts)), not `Font.fromName(font.Name, ...)`, so legacy `Enum.Font` values whose name differs from their family file (e.g. `Fantasy`, `SourceSans`) render their real typeface instead of falling back to Builder Sans.

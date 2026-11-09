@@ -1,5 +1,6 @@
 import React from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
+import { TypographyHelper } from "../../Helpers";
 import { TypographyStyle } from "../../Theme";
 import { TextVariant } from "../../Interfaces/";
 
@@ -67,7 +68,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                         TextColor3={props.TextColor3 ?? theme.colors.intents.primary.default.textColor}
                         Text={character}
                         LineHeight={props.LineHeight ?? style.lineHeight}
-                        FontFace={Font.fromName(style.font.Name, weight)}
+                        FontFace={TypographyHelper.toFontFace(style.font, weight)}
                         FontSize={style.size}
                         RichText={false}
                         TextScaled={props.TextScaled ?? false}
@@ -93,7 +94,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
             Position={props.Position}
             TextWrap={textwrapped}
             TextWrapped={textwrapped}
-            FontFace={Font.fromName(style.font.Name, weight)}
+            FontFace={TypographyHelper.toFontFace(style.font, weight)}
             FontSize={style.size}
             RichText={props.RichText ?? true}
             TextScaled={props.TextScaled ?? false}

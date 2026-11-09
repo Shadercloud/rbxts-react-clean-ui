@@ -3,5 +3,6 @@ declare class TextMountValidation {
     wrapsAtNarrowWidth(): void;
     noWrapStaysSingleLine(): void;
     growsWithContent(): void;
+    themeFontFamily(): void;
 }
 export = TextMountValidation;

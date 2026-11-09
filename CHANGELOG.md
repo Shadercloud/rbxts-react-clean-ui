@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1
+
+### Fixes
+
+- Theme fonts whose enum name differs from their family (Fantasy, Garamond, Bodoni, Antique, ...) now render correctly instead of falling back to Builder Sans.
+
 ## 1.6.0
 
 ### Behaviour changes (check before upgrading)

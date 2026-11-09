@@ -40,6 +40,9 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 ## src/Helpers/typography.helper.ts
 
 - `getClosestTypography`: for a per-scale `ScaledTypographyStyle`, it tries the exact scale, then the nearest smaller scale, then the nearest larger one.
+- `toFontFace` is the only way components should turn a theme `Enum.Font` into a `FontFace`. Don't go back to `Font.fromName(font.Name, weight)`: it loads `rbxasset://fonts/families/<EnumName>.json`, and for legacy enums whose name isn't the family file (`Fantasy` -> `Balthazar`, `Garamond` -> `Guru`, `Bodoni` -> `AccanthisADFStd`, `Antique` -> `RomanAntique`, `SciFi` -> `Zekton`, `Cartoon` -> `ComicNeueAngular`, `Highway` -> `HighwayGothic`, `SourceSans*` -> `SourceSansPro`, ...) that file doesn't exist and Roblox silently renders Builder Sans. `toFontFace` takes only `.Family` from `Font.fromEnum(font)` and builds `new Font(family, weight ?? Regular, style ?? Normal)`.
+- `toFontFace` deliberately ignores the weight/style baked into the enum (`GothamBold`, `SourceSansBold` -> Bold): the caller's weight applies, as it did with `fromName`.
+- `toFontFace` wraps `Font.fromEnum` in `pcall` and falls back to `Font.fromName(font.Name, ...)` when it throws or yields an empty `Family` (`Enum.Font.Unknown`, enums newer than the engine).
 
 ## src/Interfaces/css.types.ts
 

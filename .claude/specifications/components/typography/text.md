@@ -29,3 +29,7 @@
 
 - `theme.typography.<variant>` (`display`, `title`, `heading`, `body`, `label`, `caption`) supplies `font`, `size`, optional `weight`, optional `lineHeight`, and optional `letterSpacing` for each named style.
 - `theme.colors.intents.primary.default.textColor` supplies the default text color.
+
+## Implementation notes
+
+- `FontFace` is built with `TypographyHelper.toFontFace` (see [shared-modules.md](../../../architecture/shared-modules.md#srchelperstypographyhelperts)), not `Font.fromName(font.Name, ...)`, so legacy `Enum.Font` values whose name differs from their family file (e.g. `Fantasy`, `SourceSans`) render their real typeface instead of falling back to Builder Sans.

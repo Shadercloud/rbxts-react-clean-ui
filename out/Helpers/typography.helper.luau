@@ -83,6 +83,17 @@ do
 		end
 		return false
 	end
+	function TypographyHelper:toFontFace(font, weight, style)
+		local resolvedWeight = weight or Enum.FontWeight.Regular
+		local resolvedStyle = style or Enum.FontStyle.Normal
+		local success, family = pcall(function()
+			return Font.fromEnum(font).Family
+		end)
+		if success and type(family) == "string" and family ~= "" then
+			return Font.new(family, resolvedWeight, resolvedStyle)
+		end
+		return Font.fromName(font.Name, resolvedWeight, resolvedStyle)
+	end
 end
 return {
 	TypographyHelper = TypographyHelper,

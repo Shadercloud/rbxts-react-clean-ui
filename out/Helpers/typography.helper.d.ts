@@ -4,4 +4,5 @@ export declare class TypographyHelper {
     static getTypography(theme: ThemeTemplate, scale?: ScaleSize, component?: Partial<TypographyStyle> | ScaledTypographyStyle): TypographyStyle;
     private static getClosestTypography;
     private static isScaledTypographyStyle;
+    static toFontFace(font: Enum.Font, weight?: Enum.FontWeight, style?: Enum.FontStyle): Font;
 }

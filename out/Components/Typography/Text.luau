@@ -2,6 +2,7 @@
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local TypographyHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").TypographyHelper
 local Text = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local style = props.typography or theme.typography[props.variant or "body"]
@@ -63,7 +64,7 @@ local Text = React.forwardRef(function(props, ref)
 				_condition_2 = style.lineHeight
 			end
 			_attributes_1.LineHeight = _condition_2
-			_attributes_1.FontFace = Font.fromName(style.font.Name, weight)
+			_attributes_1.FontFace = TypographyHelper:toFontFace(style.font, weight)
 			_attributes_1.FontSize = style.size
 			_attributes_1.RichText = false
 			local _condition_3 = props.TextScaled
@@ -108,7 +109,7 @@ local Text = React.forwardRef(function(props, ref)
 	_attributes.Position = props.Position
 	_attributes.TextWrap = textwrapped
 	_attributes.TextWrapped = textwrapped
-	_attributes.FontFace = Font.fromName(style.font.Name, weight)
+	_attributes.FontFace = TypographyHelper:toFontFace(style.font, weight)
 	_attributes.FontSize = style.size
 	local _condition_4 = props.RichText
 	if _condition_4 == nil then

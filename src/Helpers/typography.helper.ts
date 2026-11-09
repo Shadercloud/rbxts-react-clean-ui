@@ -68,4 +68,15 @@ export class TypographyHelper {
         return false;
     }
 
+    public static toFontFace(font: Enum.Font, weight?: Enum.FontWeight, style?: Enum.FontStyle): Font {
+        const resolvedWeight = weight ?? Enum.FontWeight.Regular;
+        const resolvedStyle = style ?? Enum.FontStyle.Normal;
+        const [success, family] = pcall(() => Font.fromEnum(font).Family);
+
+        if (success && typeIs(family, "string") && family !== "") {
+            return new Font(family, resolvedWeight, resolvedStyle);
+        }
+
+        return Font.fromName(font.Name, resolvedWeight, resolvedStyle);
+    }
 }

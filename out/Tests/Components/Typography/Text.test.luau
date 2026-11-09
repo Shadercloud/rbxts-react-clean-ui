@@ -11,6 +11,10 @@ local DisplayName = _lunit.DisplayName
 local _binding = Decorators
 local Skip = _binding.Skip
 local Text = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Typography", "Text").Text
+local ThemeProvider = TS.import(script, script.Parent.Parent.Parent.Parent, "Providers", "theme.provider").ThemeProvider
+local _Theme = TS.import(script, script.Parent.Parent.Parent.Parent, "Theme")
+local DefaultTheme = _Theme.DefaultTheme
+local extendTheme = _Theme.extendTheme
 local _layout = TS.import(script, script.Parent.Parent.Parent, "Helpers", "layout")
 local STUDIO_SKIP_MESSAGE = _layout.STUDIO_SKIP_MESSAGE
 local assertContained = _layout.assertContained
@@ -93,6 +97,26 @@ do
 			Assert["true"](Assert, longWidth > shortWidth, `Expected long text width {longWidth} to exceed short text width {shortWidth}`)
 		end)
 	end
+	function TextMountValidation:themeFontFamily()
+		local theme = extendTheme(DefaultTheme, {
+			typography = {
+				body = {
+					font = Enum.Font.Fantasy,
+				},
+			},
+		})
+		withMounted(400, 300, React.createElement(ThemeProvider, {
+			theme = theme,
+		}, React.createElement(Text, {
+			text = SHORT_TEXT,
+		})), function(mounted)
+			local label = waitForText(mounted.host)
+			local suffix = "Balthazar.json"
+			local _family = label.FontFace.Family
+			local _arg0 = -#suffix
+			Assert:equal(string.sub(_family, _arg0), suffix, `Expected FontFace.Family to end with {suffix}, got {label.FontFace.Family}`)
+		end)
+	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	local _decorator_1 = DisplayName("Renders the text prop verbatim in an auto-sized TextLabel that fits its content")
 	local _descriptor = Test(TextMountValidation, "rendersText", {
@@ -172,6 +196,26 @@ do
 	})
 	if _descriptor_11 then
 		TextMountValidation.growsWithContent = _descriptor_11.value
+	end
+	local _decorator_8 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_9 = DisplayName("A theme body font of Enum.Font.Fantasy renders with the Balthazar family, not a missing Fantasy family")
+	local _descriptor_12 = Test(TextMountValidation, "themeFontFamily", {
+		value = TextMountValidation.themeFontFamily,
+	})
+	if _descriptor_12 then
+		TextMountValidation.themeFontFamily = _descriptor_12.value
+	end
+	local _descriptor_13 = _decorator_9(TextMountValidation, "themeFontFamily", {
+		value = TextMountValidation.themeFontFamily,
+	})
+	if _descriptor_13 then
+		TextMountValidation.themeFontFamily = _descriptor_13.value
+	end
+	local _descriptor_14 = _decorator_8(TextMountValidation, "themeFontFamily", {
+		value = TextMountValidation.themeFontFamily,
+	})
+	if _descriptor_14 then
+		TextMountValidation.themeFontFamily = _descriptor_14.value
 	end
 	TextMountValidation = Tag("Studio")(TextMountValidation) or TextMountValidation
 end
