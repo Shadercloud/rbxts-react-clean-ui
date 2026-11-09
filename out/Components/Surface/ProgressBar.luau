@@ -44,7 +44,6 @@ local ProgressBar = React.forwardRef(function(props, ref)
 		end
 	end, { targetProgress, duration, progressTween })
 	local colors = ColorHelper:getIntentColors(theme, props.intent, "default", progressBarTheme.fill.intents)
-	local height = SizeHelper:toUDim(progressBarTheme.height[props.scale or theme.default.scale])
 	local fillSize = progress:map(function(value)
 		return UDim2.fromScale(value, 1)
 	end)
@@ -123,12 +122,27 @@ local ProgressBar = React.forwardRef(function(props, ref)
 	for _k, _v in props do
 		_attributes[_k] = _v
 	end
-	_attributes.Size = SizeHelper:GetSize(props, UDim2.new(UDim.new(1, 0), height))
-	local _condition_5 = props.ClipsDescendants
+	local _object = {
+		Size = props.Size,
+	}
+	local _left = "width"
+	local _condition_5 = props.width
 	if _condition_5 == nil then
-		_condition_5 = true
+		_condition_5 = "100%"
 	end
-	_attributes.ClipsDescendants = _condition_5
+	_object[_left] = _condition_5
+	local _left_1 = "height"
+	local _condition_6 = props.height
+	if _condition_6 == nil then
+		_condition_6 = progressBarTheme.height[props.scale or theme.default.scale]
+	end
+	_object[_left_1] = _condition_6
+	_attributes.Size = SizeHelper:GetSize(_object)
+	local _condition_7 = props.ClipsDescendants
+	if _condition_7 == nil then
+		_condition_7 = true
+	end
+	_attributes.ClipsDescendants = _condition_7
 	_attributes.BackgroundColor3 = progressBarTheme.track.backgroundColor
 	_attributes.BackgroundTransparency = progressBarTheme.track.backgroundTransparency
 	_attributes.backgroundImage = progressBarTheme.track.backgroundImage
@@ -148,11 +162,11 @@ local ProgressBar = React.forwardRef(function(props, ref)
 		Position = fillPosition,
 		BackgroundColor3 = colors.backgroundColor,
 	}
-	local _condition_6 = colors.backgroundTransparency
-	if _condition_6 == nil then
-		_condition_6 = 0
+	local _condition_8 = colors.backgroundTransparency
+	if _condition_8 == nil then
+		_condition_8 = 0
 	end
-	_attributes_1.BackgroundTransparency = _condition_6
+	_attributes_1.BackgroundTransparency = _condition_8
 	_attributes_1.BorderSizePixel = 0
 	_attributes_1.ClipsDescendants = true
 	local _exp_2 = React.createElement(Corners, {
@@ -161,44 +175,54 @@ local ProgressBar = React.forwardRef(function(props, ref)
 	local _exp_3 = React.createElement(Gradient, {
 		value = colors.backgroundGradient,
 	})
-	local _condition_7 = striped
-	if _condition_7 then
+	local _condition_9 = striped
+	if _condition_9 then
 		local _attributes_2 = {
 			key = "Stripe",
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 		}
-		local _condition_8 = resolvedStripeImage.ImageTransparency
-		if _condition_8 == nil then
-			_condition_8 = 0.9
+		local _condition_10 = resolvedStripeImage.ImageTransparency
+		if _condition_10 == nil then
+			_condition_10 = 0.9
 		end
-		_attributes_2.ImageTransparency = _condition_8
+		_attributes_2.ImageTransparency = _condition_10
 		_attributes_2.ImageColor3 = resolvedStripeImage.ImageColor3
 		_attributes_2.Size = UDim2.new(1, stripeTileWidth, 1, 0)
 		_attributes_2.Position = stripePosition
-		local _condition_9 = resolvedStripeImage.Image
-		if _condition_9 == nil then
-			_condition_9 = `rbxassetid://86644568183933`
+		local _condition_11 = resolvedStripeImage.Image
+		if _condition_11 == nil then
+			_condition_11 = `rbxassetid://86644568183933`
 		end
-		_attributes_2.Image = _condition_9
+		_attributes_2.Image = _condition_11
 		_attributes_2.ScaleType = Enum.ScaleType.Tile
 		_attributes_2.TileSize = stripeTileSize
-		_condition_7 = (React.createElement("imagelabel", _attributes_2))
+		_condition_9 = (React.createElement("imagelabel", _attributes_2))
 	end
-	local track = (React.createElement(Container, _attributes, _exp, _exp_1, React.createElement("frame", _attributes_1, _exp_2, _exp_3, _condition_7)))
+	local track = (React.createElement(Container, _attributes, _exp, _exp_1, React.createElement("frame", _attributes_1, _exp_2, _exp_3, _condition_9)))
 	if not showHeader then
 		return track
 	end
 	local headerSizeConstraint = SizeHelper:GetSizeConstraint(props)
 	local _attributes_2 = {}
-	local _condition_8 = props.name
-	if _condition_8 == nil then
-		_condition_8 = "ProgressBar"
+	local _condition_10 = props.name
+	if _condition_10 == nil then
+		_condition_10 = "ProgressBar"
 	end
-	_attributes_2.key = _condition_8
+	_attributes_2.key = _condition_10
 	_attributes_2.BackgroundTransparency = 1
 	_attributes_2.BorderSizePixel = 0
-	_attributes_2.Size = SizeHelper:GetSize(props, UDim2.fromScale(1, 0))
+	local _object_1 = {
+		Size = props.Size,
+	}
+	local _left_2 = "width"
+	local _condition_11 = props.width
+	if _condition_11 == nil then
+		_condition_11 = "100%"
+	end
+	_object_1[_left_2] = _condition_11
+	_object_1.height = props.height
+	_attributes_2.Size = SizeHelper:GetSize(_object_1)
 	_attributes_2.AutomaticSize = Enum.AutomaticSize.Y
 	_attributes_2.Position = SizeHelper:GetPosition(props)
 	_attributes_2.AnchorPoint = SizeHelper:GetAnchor(props)

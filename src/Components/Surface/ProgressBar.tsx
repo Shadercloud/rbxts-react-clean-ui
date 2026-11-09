@@ -64,10 +64,6 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
             progressBarTheme.fill.intents,
         );
 
-        const height = SizeHelper.toUDim(
-            progressBarTheme.height[props.scale ?? theme.default.scale],
-        );
-
         const fillSize = progress.map((value) => UDim2.fromScale(value, 1));
         const fillPosition = UDim2.fromScale(0, 0);
 
@@ -119,7 +115,7 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
                 name={props.name ?? "ProgressBar"}
                 ref={ref}
                 {...props}
-                Size={SizeHelper.GetSize(props, new UDim2(new UDim(1, 0), height))}
+                Size={SizeHelper.GetSize({ Size: props.Size, width: props.width ?? "100%", height: props.height ?? progressBarTheme.height[props.scale ?? theme.default.scale] })}
                 ClipsDescendants={props.ClipsDescendants ?? true}
                 BackgroundColor3={progressBarTheme.track.backgroundColor}
                 BackgroundTransparency={progressBarTheme.track.backgroundTransparency}
@@ -175,7 +171,7 @@ export const ProgressBar = React.forwardRef<ImageLabel, ProgressBarProps>(
                 key={props.name ?? "ProgressBar"}
                 BackgroundTransparency={1}
                 BorderSizePixel={0}
-                Size={SizeHelper.GetSize(props, UDim2.fromScale(1, 0))}
+                Size={SizeHelper.GetSize({ Size: props.Size, width: props.width ?? "100%", height: props.height })}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 Position={SizeHelper.GetPosition(props)}
                 AnchorPoint={SizeHelper.GetAnchor(props)}

@@ -6,6 +6,7 @@
 
 - **Controlled `Input` no longer loses keystrokes.** In controlled mode the box's `Text` was rewritten to `value` on every commit, so a render worked out before the next keystroke could put "2" back after the user had typed "24". While the box has focus, `value` is no longer written into it; `onChange` still fires on every keystroke. A changed `value` is applied when focus is lost, or straight away while the box isn't focused, so a parent that reformats on blur still sees its value appear. Uncontrolled mode gets the same guard.
 - **`Tooltip` works on a bare `HoverButton`.** `HoverButton` ignored a top-level `Event` prop, so the hover handlers `Tooltip` adds were dropped and the tooltip never opened. `HoverButton` now accepts an optional `Event`, which runs after the matching `default.Event` (or state set) handler, and forwards `ref`. Wrapping the button in a `Container` is no longer needed. Buttons that only use `default.Event` behave as before.
+- **`ProgressBar` keeps its height when only `width` is set.** Like `Slider` in 2.0.2, the default size only applied when both `width` and `height` were unset, so `<ProgressBar width="50%" />` had a 0px tall track. Each axis now falls back on its own: width to 100%, height to the theme height for the bar's `scale`. A ProgressBar given only `height` (with or without a `label`/`showValue` header) is now full width instead of 0px wide. Bars with neither set, or with `Size`, render as before.
 
 ## 2.0.2
 

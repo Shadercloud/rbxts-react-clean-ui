@@ -68,6 +68,34 @@ do
 			assertContained(track, mounted.host, "default track")
 		end)
 	end
+	function ProgressBarMountValidation:widthOnlyKeepsHeight()
+		withMounted(400, 100, React.createElement(ProgressBar, {
+			value = 50,
+			width = "50%",
+		}), function(mounted)
+			local track = waitForTrack(mounted.host)
+			assertSizeApprox(track, 200, DEFAULT_TRACK_HEIGHT, 1, "width-only track")
+		end)
+	end
+	function ProgressBarMountValidation:heightOnlyFullWidth()
+		withMounted(400, 100, React.createElement(ProgressBar, {
+			value = 50,
+			height = 24,
+		}), function(mounted)
+			local track = waitForTrack(mounted.host)
+			assertSizeApprox(track, 400, 24, 1, "height-only track")
+		end)
+		withMounted(400, 100, React.createElement(ProgressBar, {
+			value = 50,
+			height = 24,
+			label = "Loading",
+		}), function(mounted)
+			local wrapper = waitForGuiObject(mounted.host, "ProgressBar")
+			local track = waitForGuiObject(wrapper, "ProgressBar")
+			assertSizeApprox(wrapper, 400, nil, 1, "height-only header wrapper")
+			assertSizeApprox(track, 400, 24, 1, "height-only labelled track")
+		end)
+	end
 	function ProgressBarMountValidation:fillContained()
 		withMounted(400, 100, React.createElement(ProgressBar, {
 			value = 75,
@@ -147,44 +175,84 @@ do
 		ProgressBarMountValidation.defaultTrackSize = _descriptor_6.value
 	end
 	local _decorator_5 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_6 = DisplayName("The Fill and everything under it stay inside the clipping track")
-	local _descriptor_7 = Test(ProgressBarMountValidation, "fillContained", {
-		value = ProgressBarMountValidation.fillContained,
+	local _decorator_6 = DisplayName("Setting only width keeps the theme's md track height instead of collapsing to 0px")
+	local _descriptor_7 = Test(ProgressBarMountValidation, "widthOnlyKeepsHeight", {
+		value = ProgressBarMountValidation.widthOnlyKeepsHeight,
 	})
 	if _descriptor_7 then
-		ProgressBarMountValidation.fillContained = _descriptor_7.value
+		ProgressBarMountValidation.widthOnlyKeepsHeight = _descriptor_7.value
 	end
-	local _descriptor_8 = _decorator_6(ProgressBarMountValidation, "fillContained", {
-		value = ProgressBarMountValidation.fillContained,
+	local _descriptor_8 = _decorator_6(ProgressBarMountValidation, "widthOnlyKeepsHeight", {
+		value = ProgressBarMountValidation.widthOnlyKeepsHeight,
 	})
 	if _descriptor_8 then
-		ProgressBarMountValidation.fillContained = _descriptor_8.value
+		ProgressBarMountValidation.widthOnlyKeepsHeight = _descriptor_8.value
 	end
-	local _descriptor_9 = _decorator_5(ProgressBarMountValidation, "fillContained", {
-		value = ProgressBarMountValidation.fillContained,
+	local _descriptor_9 = _decorator_5(ProgressBarMountValidation, "widthOnlyKeepsHeight", {
+		value = ProgressBarMountValidation.widthOnlyKeepsHeight,
 	})
 	if _descriptor_9 then
-		ProgressBarMountValidation.fillContained = _descriptor_9.value
+		ProgressBarMountValidation.widthOnlyKeepsHeight = _descriptor_9.value
 	end
 	local _decorator_7 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_8 = DisplayName("label and showValue render a header with the label text and a rounded percentage above the track")
-	local _descriptor_10 = Test(ProgressBarMountValidation, "headerLabelAndValue", {
-		value = ProgressBarMountValidation.headerLabelAndValue,
+	local _decorator_8 = DisplayName("Setting only height keeps the full host width, with or without a header row")
+	local _descriptor_10 = Test(ProgressBarMountValidation, "heightOnlyFullWidth", {
+		value = ProgressBarMountValidation.heightOnlyFullWidth,
 	})
 	if _descriptor_10 then
-		ProgressBarMountValidation.headerLabelAndValue = _descriptor_10.value
+		ProgressBarMountValidation.heightOnlyFullWidth = _descriptor_10.value
 	end
-	local _descriptor_11 = _decorator_8(ProgressBarMountValidation, "headerLabelAndValue", {
-		value = ProgressBarMountValidation.headerLabelAndValue,
+	local _descriptor_11 = _decorator_8(ProgressBarMountValidation, "heightOnlyFullWidth", {
+		value = ProgressBarMountValidation.heightOnlyFullWidth,
 	})
 	if _descriptor_11 then
-		ProgressBarMountValidation.headerLabelAndValue = _descriptor_11.value
+		ProgressBarMountValidation.heightOnlyFullWidth = _descriptor_11.value
 	end
-	local _descriptor_12 = _decorator_7(ProgressBarMountValidation, "headerLabelAndValue", {
-		value = ProgressBarMountValidation.headerLabelAndValue,
+	local _descriptor_12 = _decorator_7(ProgressBarMountValidation, "heightOnlyFullWidth", {
+		value = ProgressBarMountValidation.heightOnlyFullWidth,
 	})
 	if _descriptor_12 then
-		ProgressBarMountValidation.headerLabelAndValue = _descriptor_12.value
+		ProgressBarMountValidation.heightOnlyFullWidth = _descriptor_12.value
+	end
+	local _decorator_9 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_10 = DisplayName("The Fill and everything under it stay inside the clipping track")
+	local _descriptor_13 = Test(ProgressBarMountValidation, "fillContained", {
+		value = ProgressBarMountValidation.fillContained,
+	})
+	if _descriptor_13 then
+		ProgressBarMountValidation.fillContained = _descriptor_13.value
+	end
+	local _descriptor_14 = _decorator_10(ProgressBarMountValidation, "fillContained", {
+		value = ProgressBarMountValidation.fillContained,
+	})
+	if _descriptor_14 then
+		ProgressBarMountValidation.fillContained = _descriptor_14.value
+	end
+	local _descriptor_15 = _decorator_9(ProgressBarMountValidation, "fillContained", {
+		value = ProgressBarMountValidation.fillContained,
+	})
+	if _descriptor_15 then
+		ProgressBarMountValidation.fillContained = _descriptor_15.value
+	end
+	local _decorator_11 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_12 = DisplayName("label and showValue render a header with the label text and a rounded percentage above the track")
+	local _descriptor_16 = Test(ProgressBarMountValidation, "headerLabelAndValue", {
+		value = ProgressBarMountValidation.headerLabelAndValue,
+	})
+	if _descriptor_16 then
+		ProgressBarMountValidation.headerLabelAndValue = _descriptor_16.value
+	end
+	local _descriptor_17 = _decorator_12(ProgressBarMountValidation, "headerLabelAndValue", {
+		value = ProgressBarMountValidation.headerLabelAndValue,
+	})
+	if _descriptor_17 then
+		ProgressBarMountValidation.headerLabelAndValue = _descriptor_17.value
+	end
+	local _descriptor_18 = _decorator_11(ProgressBarMountValidation, "headerLabelAndValue", {
+		value = ProgressBarMountValidation.headerLabelAndValue,
+	})
+	if _descriptor_18 then
+		ProgressBarMountValidation.headerLabelAndValue = _descriptor_18.value
 	end
 	ProgressBarMountValidation = Tag("Studio")(ProgressBarMountValidation) or ProgressBarMountValidation
 end

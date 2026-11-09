@@ -69,6 +69,36 @@ class ProgressBarMountValidation {
 	}
 
 	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Setting only width keeps the theme's md track height instead of collapsing to 0px")
+	@Test
+	public widthOnlyKeepsHeight() {
+		withMounted(400, 100, <ProgressBar value={50} width="50%" />, (mounted) => {
+			const track = waitForTrack(mounted.host);
+
+			assertSizeApprox(track, 200, DEFAULT_TRACK_HEIGHT, 1, "width-only track");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Setting only height keeps the full host width, with or without a header row")
+	@Test
+	public heightOnlyFullWidth() {
+		withMounted(400, 100, <ProgressBar value={50} height={24} />, (mounted) => {
+			const track = waitForTrack(mounted.host);
+
+			assertSizeApprox(track, 400, 24, 1, "height-only track");
+		});
+
+		withMounted(400, 100, <ProgressBar value={50} height={24} label="Loading" />, (mounted) => {
+			const wrapper = waitForGuiObject<Frame>(mounted.host, "ProgressBar");
+			const track = waitForGuiObject<ImageLabel>(wrapper, "ProgressBar");
+
+			assertSizeApprox(wrapper, 400, undefined, 1, "height-only header wrapper");
+			assertSizeApprox(track, 400, 24, 1, "height-only labelled track");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	@DisplayName("The Fill and everything under it stay inside the clipping track")
 	@Test
 	public fillContained() {
