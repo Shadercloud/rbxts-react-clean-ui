@@ -41,13 +41,15 @@ function isPressInput(input: InputObject): boolean {
 function getTopbarBottom(overlay: Frame): number {
     const surface = overlay.FindFirstAncestorWhichIsA("ScreenGui");
 
-    if (surface === undefined || surface.ScreenInsets === Enum.ScreenInsets.TopbarSafeInsets) {
+    const topbarInset = GuiService.TopbarInset as Rect | undefined;
+
+    if (surface === undefined || !topbarInset || surface.ScreenInsets === Enum.ScreenInsets.TopbarSafeInsets) {
         return 0;
     }
 
     const originY = surface.ScreenInsets === Enum.ScreenInsets.CoreUISafeInsets ? GuiService.GetGuiInset()[0].Y : 0;
 
-    return GuiService.TopbarInset.Max.Y - originY - overlay.AbsolutePosition.Y;
+    return topbarInset.Max.Y - originY - overlay.AbsolutePosition.Y;
 }
 
 function readFrame(overlay: Frame): TooltipFrame {

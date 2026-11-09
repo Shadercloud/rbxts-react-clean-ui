@@ -19,6 +19,14 @@ do
 		local _type = element.type
 		return type(_type) == "string"
 	end
+	function ElementHelper:assignRef(ref, instance)
+		local _ref = ref
+		if type(_ref) == "function" then
+			ref(instance)
+		elseif ref then
+			ref.current = instance
+		end
+	end
 	function ElementHelper:getEventKey(name)
 		return React.Event[name]
 	end

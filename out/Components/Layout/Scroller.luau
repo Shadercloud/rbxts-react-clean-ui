@@ -3,6 +3,7 @@ local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local ElementHelper = _Helpers.ElementHelper
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local Scroller = React.forwardRef(function(props, forwardedRef)
@@ -25,12 +26,7 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 	local decorated = hasTrack or hasCustomThumb or sizeConstraint ~= nil
 	local setFrame = React.useCallback(function(instance)
 		ref.current = instance
-		local _forwardedRef = forwardedRef
-		if type(_forwardedRef) == "function" then
-			forwardedRef(instance)
-		elseif forwardedRef ~= nil then
-			forwardedRef.current = instance
-		end
+		ElementHelper:assignRef(forwardedRef, instance)
 	end, { forwardedRef })
 	React.useEffect(function()
 		local frame = ref.current

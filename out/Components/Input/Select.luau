@@ -257,11 +257,16 @@ local function SelectCaretCap(props)
 	end
 	local borderThickness = _condition
 	local filled = caret.backgroundColor ~= nil or caret.backgroundGradient ~= nil
-	local _exp = React.createElement("uiflexitem", {
-		key = "SelectCaretCapFlex",
-		ItemLineAlignment = Enum.ItemLineAlignment.Center,
-	})
 	local _attributes = {
+		key = "SelectCaretCapFlex",
+	}
+	local _result_1 = Enum.ItemLineAlignment
+	if _result_1 ~= nil then
+		_result_1 = _result_1.Center
+	end
+	_attributes.ItemLineAlignment = _result_1
+	local _exp = React.createElement("uiflexitem", _attributes)
+	local _attributes_1 = {
 		key = "Cap",
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, margin.left, 0.5, (margin.top - margin.bottom) / 2),
@@ -272,14 +277,14 @@ local function SelectCaretCap(props)
 	if _condition_1 == nil then
 		_condition_1 = (if filled then 0 else 1)
 	end
-	_attributes.BackgroundTransparency = _condition_1
-	_attributes.BorderSizePixel = 0
+	_attributes_1.BackgroundTransparency = _condition_1
+	_attributes_1.BorderSizePixel = 0
 	return React.createElement("frame", {
 		key = "SelectCaretCap",
 		Size = UDim2.fromOffset(math.max(0, size + margin.left + margin.right), math.max(0, size + margin.top + margin.bottom - props.inset)),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-	}, _exp, React.createElement("frame", _attributes, borderThickness > 0 and (React.createElement("uistroke", {
+	}, _exp, React.createElement("frame", _attributes_1, borderThickness > 0 and (React.createElement("uistroke", {
 		key = "Stroke",
 		Thickness = borderThickness,
 		BorderStrokePosition = Enum.BorderStrokePosition.Inner,
@@ -574,23 +579,27 @@ local Select = React.forwardRef(function(props, ref)
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	local _exp_7 = React.createElement(Padding, _attributes_1)
-	local _attributes_2 = {
+	local _attributes_2 = {}
+	local _result_4 = Enum.ItemLineAlignment
+	if _result_4 ~= nil then
+		_result_4 = _result_4.Center
+	end
+	_attributes_2.ItemLineAlignment = _result_4
+	local _attributes_3 = {
 		name = "SelectedText",
 	}
-	local _result_4 = selectedOption
-	if _result_4 ~= nil then
-		_result_4 = _result_4.props.text
+	local _result_5 = selectedOption
+	if _result_5 ~= nil then
+		_result_5 = _result_5.props.text
 	end
-	local _condition_9 = _result_4
+	local _condition_9 = _result_5
 	if _condition_9 == nil then
 		_condition_9 = "No Options"
 	end
-	_attributes_2.text = _condition_9
-	_attributes_2.typography = typography
-	_attributes_2.TextColor3 = theme.components.select.textColor
-	local _exp_8 = React.createElement(HStack, nil, React.createElement(FlexItem, {
-		ItemLineAlignment = Enum.ItemLineAlignment.Center,
-	}, React.createElement(Text, _attributes_2)), if selectTheme.caret == nil then React.createElement(Icon, {
+	_attributes_3.text = _condition_9
+	_attributes_3.typography = typography
+	_attributes_3.TextColor3 = theme.components.select.textColor
+	local _exp_8 = React.createElement(HStack, nil, React.createElement(FlexItem, _attributes_2, React.createElement(Text, _attributes_3)), if selectTheme.caret == nil then React.createElement(Icon, {
 		name = "SelectCaret",
 		icon = "caret-down",
 		color = caretColor,
@@ -601,7 +610,7 @@ local Select = React.forwardRef(function(props, ref)
 	}))
 	local _condition_10 = open and overlay.overlay ~= nil
 	if _condition_10 then
-		local _attributes_3 = {
+		local _attributes_4 = {
 			key = "SelectDropdown",
 			BackgroundTransparency = 0,
 			BorderSizePixel = 0,
@@ -609,51 +618,51 @@ local Select = React.forwardRef(function(props, ref)
 			AnchorPoint = Vector2.zero,
 		}
 		local _uDim2 = UDim2.new(0, 0, 0, dropdownSize.Y.Offset + dropDownGap)
-		_attributes_3.Position = dropdownPosition + _uDim2
-		_attributes_3.Size = UDim2.fromOffset(dropdownSize.X.Offset, 0)
-		_attributes_3.AutomaticSize = Enum.AutomaticSize.Y
-		_attributes_3.ClipsDescendants = true
-		local _attributes_4 = {
+		_attributes_4.Position = dropdownPosition + _uDim2
+		_attributes_4.Size = UDim2.fromOffset(dropdownSize.X.Offset, 0)
+		_attributes_4.AutomaticSize = Enum.AutomaticSize.Y
+		_attributes_4.ClipsDescendants = true
+		local _attributes_5 = {
 			key = "Stroke",
 		}
-		local _result_5 = selectTheme.dropDown
-		if _result_5 ~= nil then
-			_result_5 = _result_5.borderThickness
+		local _result_6 = selectTheme.dropDown
+		if _result_6 ~= nil then
+			_result_6 = _result_6.borderThickness
 		end
-		local _condition_11 = _result_5
+		local _condition_11 = _result_6
 		if _condition_11 == nil then
 			_condition_11 = selectTheme.borderThickness
 		end
-		_attributes_4.Thickness = _condition_11
-		_attributes_4.BorderStrokePosition = Enum.BorderStrokePosition.Outer
-		local _result_6 = selectTheme.dropDown
-		if _result_6 ~= nil then
-			_result_6 = _result_6.borderColor
+		_attributes_5.Thickness = _condition_11
+		_attributes_5.BorderStrokePosition = Enum.BorderStrokePosition.Outer
+		local _result_7 = selectTheme.dropDown
+		if _result_7 ~= nil then
+			_result_7 = _result_7.borderColor
 		end
-		local _condition_12 = _result_6
+		local _condition_12 = _result_7
 		if _condition_12 == nil then
 			_condition_12 = selectTheme.borderColor
 		end
-		_attributes_4.Color = _condition_12
-		local _exp_9 = React.createElement("uistroke", _attributes_4)
-		local _attributes_5 = {}
-		local _result_7 = selectTheme.dropDown
-		if _result_7 ~= nil then
-			_result_7 = _result_7.cornerRadius
-		end
-		local _condition_13 = _result_7
-		if _condition_13 == nil then
-			_condition_13 = selectTheme.cornerRadius
-		end
-		_attributes_5.radius = _condition_13
-		local _exp_10 = React.createElement(Corners, _attributes_5)
+		_attributes_5.Color = _condition_12
+		local _exp_9 = React.createElement("uistroke", _attributes_5)
 		local _attributes_6 = {}
 		local _result_8 = selectTheme.dropDown
 		if _result_8 ~= nil then
-			_result_8 = _result_8.boxShadow
+			_result_8 = _result_8.cornerRadius
 		end
-		_attributes_6.value = _result_8
-		_condition_10 = ReactRoblox.createPortal(React.createElement("frame", _attributes_3, _exp_9, _exp_10, React.createElement(FieldBoxShadow, _attributes_6), React.createElement(VStack, {
+		local _condition_13 = _result_8
+		if _condition_13 == nil then
+			_condition_13 = selectTheme.cornerRadius
+		end
+		_attributes_6.radius = _condition_13
+		local _exp_10 = React.createElement(Corners, _attributes_6)
+		local _attributes_7 = {}
+		local _result_9 = selectTheme.dropDown
+		if _result_9 ~= nil then
+			_result_9 = _result_9.boxShadow
+		end
+		_attributes_7.value = _result_9
+		_condition_10 = ReactRoblox.createPortal(React.createElement("frame", _attributes_4, _exp_9, _exp_10, React.createElement(FieldBoxShadow, _attributes_7), React.createElement(VStack, {
 			spacing = "None",
 		}, props.searchable and (React.createElement(SelectSearchInput, {
 			value = query,

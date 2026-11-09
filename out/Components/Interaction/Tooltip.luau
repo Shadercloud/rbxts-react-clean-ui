@@ -34,11 +34,12 @@ local function isPressInput(input)
 end
 local function getTopbarBottom(overlay)
 	local surface = overlay:FindFirstAncestorWhichIsA("ScreenGui")
-	if surface == nil or surface.ScreenInsets == Enum.ScreenInsets.TopbarSafeInsets then
+	local topbarInset = GuiService.TopbarInset
+	if surface == nil or not topbarInset or surface.ScreenInsets == Enum.ScreenInsets.TopbarSafeInsets then
 		return 0
 	end
 	local originY = if surface.ScreenInsets == Enum.ScreenInsets.CoreUISafeInsets then (GuiService:GetGuiInset()).Y else 0
-	return GuiService.TopbarInset.Max.Y - originY - overlay.AbsolutePosition.Y
+	return topbarInset.Max.Y - originY - overlay.AbsolutePosition.Y
 end
 local function readFrame(overlay)
 	return {

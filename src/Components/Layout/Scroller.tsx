@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
 import { PositionElementProps, SizeElementProps, SpacedElementProps } from "../../Interfaces";
-import { SizeHelper, SpacingHelper } from "../../Helpers";
+import { ElementHelper, SizeHelper, SpacingHelper } from "../../Helpers";
 
 export interface ScrollerProps extends SizeElementProps, SpacedElementProps, PositionElementProps {
     children?: React.ReactNode;
@@ -35,11 +35,7 @@ export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, 
         (instance: ScrollingFrame | undefined) => {
             ref.current = instance;
 
-            if (typeIs(forwardedRef, "function")) {
-                forwardedRef(instance);
-            } else if (forwardedRef !== undefined) {
-                (forwardedRef as React.MutableRefObject<ScrollingFrame | undefined>).current = instance;
-            }
+            ElementHelper.assignRef(forwardedRef, instance);
         },
         [forwardedRef],
     );

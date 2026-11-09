@@ -3,6 +3,7 @@ local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local ElementHelper = _Helpers.ElementHelper
 local SizeHelper = _Helpers.SizeHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local SHRINK_SEARCH_STEPS = 24
@@ -10,7 +11,7 @@ local SHRINK_FILL_TOLERANCE = 0.5
 local SHRINK_SCALE_PRECISION = 0.001
 local function getContentWidth(parent)
 	local width = parent.AbsoluteSize.X
-	local padding = parent:FindFirstChildWhichIsA("UIPadding")
+	local padding = parent:FindFirstChildOfClass("UIPadding")
 	if padding == nil then
 		return width
 	end
@@ -31,12 +32,7 @@ local Text = React.forwardRef(function(props, ref)
 	local shrinkScale, setShrinkScale = React.useBinding(1)
 	local setLabel = React.useCallback(function(instance)
 		rootRef.current = instance
-		local _ref = ref
-		if type(_ref) == "function" then
-			ref(instance)
-		elseif ref ~= nil then
-			ref.current = instance
-		end
+		ElementHelper:assignRef(ref, instance)
 	end, { ref })
 	local setFrame = React.useCallback(function(instance)
 		rootRef.current = instance

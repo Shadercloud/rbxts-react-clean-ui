@@ -294,7 +294,7 @@ function SelectCaretCap(props: SelectCaretCapProps) {
             BackgroundTransparency={1}
             BorderSizePixel={0}
         >
-            <uiflexitem key="SelectCaretCapFlex" ItemLineAlignment={Enum.ItemLineAlignment.Center} />
+            <uiflexitem key="SelectCaretCapFlex" ItemLineAlignment={Enum.ItemLineAlignment?.Center} />
             <frame
                 key="Cap"
                 AnchorPoint={new Vector2(0, 0.5)}
@@ -535,7 +535,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
 
                     <Padding {...props} />
                     <HStack>
-                        <FlexItem ItemLineAlignment={Enum.ItemLineAlignment.Center}>
+                        <FlexItem ItemLineAlignment={Enum.ItemLineAlignment?.Center}>
                             <Text
                                 name="SelectedText"
                                 text={selectedOption?.props.text ?? "No Options"}

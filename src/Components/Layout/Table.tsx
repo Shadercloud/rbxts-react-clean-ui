@@ -146,6 +146,14 @@ function TableCellContent(props: TableCellProps & { header: boolean }) {
 		(instance: Frame) => layout?.reportWidth(id, columnIndex, instance.AbsoluteSize.X),
 		[layout?.reportWidth, id, columnIndex],
 	);
+	const reportResizedMeasurement = React.useCallback(
+		(instance: Frame) => {
+			task.defer(() => {
+				if (measurementRef.current === instance) reportMeasurement(instance);
+			});
+		},
+		[reportMeasurement],
+	);
 
 	React.useEffect(() => () => layout?.removeWidth(id), [layout?.removeWidth]);
 	React.useEffect(() => {
@@ -178,7 +186,7 @@ function TableCellContent(props: TableCellProps & { header: boolean }) {
 				BackgroundTransparency={1}
 				BorderSizePixel={0}
 				Change={{
-					AbsoluteSize: reportMeasurement,
+					AbsoluteSize: reportResizedMeasurement,
 				}}
 			>
 				<Padding

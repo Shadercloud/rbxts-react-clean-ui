@@ -31,3 +31,7 @@ Table defaults live under `theme.components.table`:
 - `rowDividerColor` and `rowDividerThickness` style separators between body rows.
 - `header.backgroundColor`, `header.backgroundTransparency`, and `header.typography` style heading rows and text.
 - `cell.spacing`, `cell.padding`, and `cell.typography` configure cell padding and body text. Per-cell padding props override the theme through the shared padding-resolution rules.
+
+## Implementation notes
+
+- The measurement frame's `Change.AbsoluteSize` handler (`reportResizedMeasurement`) defers the report with `task.defer` instead of calling `reportWidth` synchronously. In the Loom docs preview, `AbsoluteSize` fires inside the runtime's layout flush, and the instance writes from a state update made there never reach the DOM. The table then stays collapsed to 0 px wide with nothing visible. The deferred report only runs if `measurementRef.current` is still that instance, so a cell that unmounts before the defer runs can't re-add a width that `removeWidth` already dropped.

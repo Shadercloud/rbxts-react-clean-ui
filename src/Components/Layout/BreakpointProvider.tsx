@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { BreakPointElementProps } from "../../Interfaces/";
 import { BreakpointContext, BreakpointContextValue, CleanThemeContext } from "../../Contexts";
-import { BreakpointHelper } from "../../Helpers/";
+import { BreakpointHelper, ElementHelper } from "../../Helpers/";
 
 export interface BreakpointProviderProps extends BreakPointElementProps {
     name?: string;
@@ -50,11 +50,7 @@ export const BreakpointProvider = React.forwardRef<Frame, BreakpointProviderProp
             (instance: Frame | undefined) => {
                 frameRef.current = instance;
 
-                if (typeIs(ref, "function")) {
-                    ref(instance);
-                } else if (ref !== undefined) {
-                    (ref as React.MutableRefObject<Frame | undefined>).current = instance;
-                }
+                ElementHelper.assignRef(ref, instance);
             },
             [ref],
         );

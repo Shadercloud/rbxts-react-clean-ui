@@ -4,7 +4,9 @@ local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local BreakpointContext = _Contexts.BreakpointContext
 local CleanThemeContext = _Contexts.CleanThemeContext
-local BreakpointHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").BreakpointHelper
+local _ = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local BreakpointHelper = _.BreakpointHelper
+local ElementHelper = _.ElementHelper
 local BreakpointProvider = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local breakpoints = props.breakpoints or theme.breakpoints
@@ -36,12 +38,7 @@ local BreakpointProvider = React.forwardRef(function(props, ref)
 	end, { breakpoints })
 	local setFrame = React.useCallback(function(instance)
 		frameRef.current = instance
-		local _ref = ref
-		if type(_ref) == "function" then
-			ref(instance)
-		elseif ref ~= nil then
-			ref.current = instance
-		end
+		ElementHelper:assignRef(ref, instance)
 	end, { ref })
 	local _attributes = {}
 	local _condition = props.name

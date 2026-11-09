@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.1
+
+### Fixes
+
+- **Components render in the Loom browser preview again.** Browser React passes a missing forwarded ref as `null`, which `Text`, `Scroller` and `BreakpointProvider` didn't guard against, so any scene containing them crashed with "Cannot set properties of null". Refs now go through a null-safe `ElementHelper.assignRef`.
+- **Loom runtime gaps.** `Select` no longer requires `Enum.ItemLineAlignment`, `Text`'s shrink-to-fit uses `FindFirstChildOfClass`, and `Tooltip` treats a missing `GuiService.TopbarInset` as no topbar. Behaviour in Roblox is unchanged.
+- **`Table` sizes to its columns in Loom.** Column-width reports from `AbsoluteSize` changes are now deferred, so an auto-width table no longer collapses to zero width in the preview.
+
+### Known issues
+
+- The Loom preview of `Text`'s `maxWidth` wrapping, `outline` and `shrinkToFit` (the Text page's "Fitting text" demo) doesn't match Roblox, because Loom doesn't yet support those engine features ([astra-void/loom#43](https://github.com/astra-void/loom/issues/43)). They work in Roblox.
+
 ## 2.0.0
 
 ### Behaviour changes (check before upgrading)

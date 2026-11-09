@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
-import { SizeHelper, TypographyHelper } from "../../Helpers";
+import { ElementHelper, SizeHelper, TypographyHelper } from "../../Helpers";
 import { TypographyOutline, TypographyStyle } from "../../Theme";
 import { SizeElementProps, TextVariant } from "../../Interfaces/";
 
@@ -26,7 +26,7 @@ const SHRINK_SCALE_PRECISION = 0.001;
 
 function getContentWidth(parent: GuiBase2d): number {
     const width = parent.AbsoluteSize.X;
-    const padding = parent.FindFirstChildWhichIsA("UIPadding");
+    const padding = parent.FindFirstChildOfClass("UIPadding");
 
     if (padding === undefined)
         return width;
@@ -60,11 +60,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
             (instance: TextLabel | undefined) => {
                 rootRef.current = instance;
 
-                if (typeIs(ref, "function")) {
-                    ref(instance);
-                } else if (ref !== undefined) {
-                    (ref as React.MutableRefObject<TextLabel | undefined>).current = instance;
-                }
+                ElementHelper.assignRef(ref, instance);
             },
             [ref],
         );

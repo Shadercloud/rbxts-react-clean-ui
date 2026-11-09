@@ -11,6 +11,14 @@ export class ElementHelper {
         return typeIs(element.type, "string");
     }
 
+    public static assignRef<T>(ref: React.ForwardedRef<T>, instance: T | undefined): void {
+        if (typeIs(ref, "function")) {
+            ref(instance);
+        } else if (ref) {
+            ref.current = instance;
+        }
+    }
+
     public static getEventKey(name: string): unknown {
         return (React as unknown as ReactEventMarkers).Event[name];
     }

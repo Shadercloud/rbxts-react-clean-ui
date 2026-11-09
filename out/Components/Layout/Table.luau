@@ -156,6 +156,13 @@ local function TableCellContent(props)
 		_result_2 = _result_2.reportWidth
 	end
 	local reportMeasurement = React.useCallback(_exp, { _result_2, id, columnIndex })
+	local reportResizedMeasurement = React.useCallback(function(instance)
+		task.defer(function()
+			if measurementRef.current == instance then
+				reportMeasurement(instance)
+			end
+		end)
+	end, { reportMeasurement })
 	local _exp_1 = function()
 		return function()
 			local _result_3 = layout
@@ -206,7 +213,7 @@ local function TableCellContent(props)
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Change = {
-			AbsoluteSize = reportMeasurement,
+			AbsoluteSize = reportResizedMeasurement,
 		},
 	}, React.createElement(Padding, _attributes), if type(content) == "string" then React.createElement(Text, {
 		text = content,
