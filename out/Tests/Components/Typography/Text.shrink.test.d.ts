@@ -6,5 +6,6 @@ declare class TextShrinkToFit {
     neverScalesUp(): void;
     recoversWhenWidened(): void;
     shrinksIntoMaxWidth(): void;
+    quietUnmount(kind: string): void;
 }
 export = TextShrinkToFit;

@@ -12,8 +12,10 @@ local _binding = Decorators
 local Skip = _binding.Skip
 local Each = _binding.Each
 local Text = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Typography", "Text").Text
+local VStack = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "VStack").VStack
 local _layout = TS.import(script, script.Parent.Parent.Parent, "Helpers", "layout")
 local STUDIO_SKIP_MESSAGE = _layout.STUDIO_SKIP_MESSAGE
+local mountInScreenGui = _layout.mountInScreenGui
 local rect = _layout.rect
 local settleFrames = _layout.settleFrames
 local waitForDescendant = _layout.waitForDescendant
@@ -88,6 +90,18 @@ local function assertLargestFit(host, root, width, label)
 			return if rect(probeRoot).width > width then true else nil
 		end, `{label}: expected the text at scale {probeScale} to overflow {width}px, so {actual}px is the largest fit (is {rect(probeRoot).width})`)
 	end)
+end
+local function stackedShrinkApp(spaced)
+	return React.createElement("frame", {
+		key = "Stack",
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+	}, React.createElement(VStack, nil, React.createElement(Text, {
+		text = string.rep("W", 24),
+		variant = "heading",
+		letterSpacing = if spaced then 2 else nil,
+		shrinkToFit = true,
+	})))
 end
 local function spacedFor(kind)
 	return kind == "spaced"
@@ -202,6 +216,40 @@ do
 			end, `Timed out waiting for the text to shrink into maxWidth {NARROW_SLOT}px`)
 			assertLargestFit(mounted.host, root, NARROW_SLOT, "maxWidth target")
 		end)
+	end
+	function TextShrinkToFit:quietUnmount(kind)
+		local mounted = mountInScreenGui(360, 200, stackedShrinkApp(spacedFor(kind)))
+		local messages = {}
+		local connection
+		TS.try(function()
+			waitForRoot(mounted.host)
+			shrinkScaleOf(mounted.host)
+			settleFrames(5)
+			connection = game:GetService("LogService").MessageOut:Connect(function(message)
+				if (string.find(message, "re-entrancy", 1, true)) ~= nil then
+					local _message = message
+					table.insert(messages, _message)
+				end
+			end)
+			mounted.unmount()
+			settleFrames(2)
+		end, nil, function()
+			local _result = connection
+			if _result ~= nil then
+				_result:Disconnect()
+			end
+			if mounted.host.Parent ~= nil then
+				mounted.unmount()
+			end
+		end)
+		local _exp = #messages
+		local _exp_1 = kind
+		local _exp_2 = #messages
+		local _condition = messages[1]
+		if _condition == nil then
+			_condition = ""
+		end
+		Assert:equal(_exp, 0, `Expected no re-entrancy warnings when unmounting {_exp_1} text, got {_exp_2}: {_condition}`)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	local _decorator_1 = DisplayName("In a slot narrower than the text, the ShrinkScale drops below 1 until the text fits the slot")
@@ -349,6 +397,33 @@ do
 	})
 	if _descriptor_21 then
 		TextShrinkToFit.shrinksIntoMaxWidth = _descriptor_21.value
+	end
+	local _decorator_15 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_16 = DisplayName("Unmounting shrinking text inside a VStack logs no AbsoluteSizeChanged re-entrancy warnings")
+	local _decorator_17 = Each({ { "spaced" }, { "plain" } })
+	local _descriptor_22 = Test(TextShrinkToFit, "quietUnmount", {
+		value = TextShrinkToFit.quietUnmount,
+	})
+	if _descriptor_22 then
+		TextShrinkToFit.quietUnmount = _descriptor_22.value
+	end
+	local _descriptor_23 = _decorator_17(TextShrinkToFit, "quietUnmount", {
+		value = TextShrinkToFit.quietUnmount,
+	})
+	if _descriptor_23 then
+		TextShrinkToFit.quietUnmount = _descriptor_23.value
+	end
+	local _descriptor_24 = _decorator_16(TextShrinkToFit, "quietUnmount", {
+		value = TextShrinkToFit.quietUnmount,
+	})
+	if _descriptor_24 then
+		TextShrinkToFit.quietUnmount = _descriptor_24.value
+	end
+	local _descriptor_25 = _decorator_15(TextShrinkToFit, "quietUnmount", {
+		value = TextShrinkToFit.quietUnmount,
+	})
+	if _descriptor_25 then
+		TextShrinkToFit.quietUnmount = _descriptor_25.value
 	end
 	TextShrinkToFit = Tag("Studio")(TextShrinkToFit) or TextShrinkToFit
 end

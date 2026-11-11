@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.4
+
+### Fixes
+
+- **`Text` with `shrinkToFit` no longer floods the output on unmount.** React detaches a removed tree (`Parent = nil`) before the passive effect cleanup disconnects the shrink listeners. In a detached tree under a `UIListLayout`, each `AbsoluteSize` read flipped the text's size and re-fired `AbsoluteSizeChanged` inside the handler, hitting "Maximum event re-entrancy depth exceeded" (around 130 warnings per text). The shrink handler now does nothing while the text isn't in the DataModel. Plain and letter-spaced text are both fixed.
+- **Letter-spaced `Text` forwards `ref`.** With `letterSpacing` set, a forwarded `ref` was never assigned. It now receives the text's Frame, the same way plain text passes its TextLabel.
+
 ## 2.0.3
 
 ### Fixes

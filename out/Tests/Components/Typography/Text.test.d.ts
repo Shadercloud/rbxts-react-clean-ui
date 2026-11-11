@@ -4,5 +4,7 @@ declare class TextMountValidation {
     noWrapStaysSingleLine(): void;
     growsWithContent(): void;
     themeFontFamily(): void;
+    spacedRefIsFrame(): void;
+    plainRefIsLabel(): void;
 }
 export = TextMountValidation;

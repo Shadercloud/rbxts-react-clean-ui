@@ -3,8 +3,10 @@ import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/luni
 
 const { Skip, Each } = Decorators;
 import { Text } from "../../../Components/Typography/Text";
+import { VStack } from "../../../Components/Layout/VStack";
 import {
 	STUDIO_SKIP_MESSAGE,
+	mountInScreenGui,
 	rect,
 	settleFrames,
 	waitForDescendant,
@@ -88,6 +90,16 @@ function assertLargestFit(host: Instance, root: GuiObject, width: number, label:
 			`${label}: expected the text at scale ${probeScale} to overflow ${width}px, so ${actual}px is the largest fit (is ${rect(probeRoot).width})`,
 		);
 	});
+}
+
+function stackedShrinkApp(spaced: boolean) {
+	return (
+		<frame key="Stack" Size={UDim2.fromScale(1, 1)} BackgroundTransparency={1}>
+			<VStack>
+				<Text text={"W".rep(24)} variant="heading" letterSpacing={spaced ? 2 : undefined} shrinkToFit={true} />
+			</VStack>
+		</frame>
+	);
 }
 
 function spacedFor(kind: string): boolean {
@@ -216,6 +228,38 @@ class TextShrinkToFit {
 
 			assertLargestFit(mounted.host, root, NARROW_SLOT, "maxWidth target");
 		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Unmounting shrinking text inside a VStack logs no AbsoluteSizeChanged re-entrancy warnings")
+	@Each([["spaced"], ["plain"]])
+	@Test
+	public quietUnmount(kind: string) {
+		const mounted = mountInScreenGui(360, 200, stackedShrinkApp(spacedFor(kind)));
+		const messages: string[] = [];
+		let connection: RBXScriptConnection | undefined;
+
+		try {
+			waitForRoot(mounted.host);
+			shrinkScaleOf(mounted.host);
+			settleFrames(5);
+
+			connection = game.GetService("LogService").MessageOut.Connect((message) => {
+				if (message.find("re-entrancy", 1, true)[0] !== undefined) messages.push(message);
+			});
+
+			mounted.unmount();
+			settleFrames(2);
+		} finally {
+			connection?.Disconnect();
+			if (mounted.host.Parent !== undefined) mounted.unmount();
+		}
+
+		Assert.equal(
+			messages.size(),
+			0,
+			`Expected no re-entrancy warnings when unmounting ${kind} text, got ${messages.size()}: ${messages[0] ?? ""}`,
+		);
 	}
 }
 

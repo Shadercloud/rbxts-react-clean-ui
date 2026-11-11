@@ -36,7 +36,8 @@ local Text = React.forwardRef(function(props, ref)
 	end, { ref })
 	local setFrame = React.useCallback(function(instance)
 		rootRef.current = instance
-	end, {})
+		ElementHelper:assignRef(ref, instance)
+	end, { ref })
 	local shrinkToFit = props.shrinkToFit == true
 	local _condition_1 = props.shrinkMinScale
 	if _condition_1 == nil then
@@ -57,6 +58,9 @@ local Text = React.forwardRef(function(props, ref)
 		local settledWidth
 		local update = function()
 			if searching then
+				return nil
+			end
+			if not root:IsDescendantOf(game) then
 				return nil
 			end
 			local parent = root.Parent

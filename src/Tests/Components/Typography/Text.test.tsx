@@ -130,6 +130,38 @@ class TextMountValidation {
 			},
 		);
 	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A forwarded ref on letter-spaced text receives the root Frame that holds the characters")
+	@Test
+	public spacedRefIsFrame() {
+		const ref = React.createRef<TextLabel>();
+
+		withMounted(400, 300, <Text text={SHORT_TEXT} letterSpacing={2} ref={ref} />, (mounted) => {
+			const root = waitForGuiObject<GuiObject>(mounted.host, "Text");
+			const current = ref.current as Instance | undefined;
+
+			Assert.notUndefined(current, "Expected the forwarded ref to be assigned for letter-spaced text");
+			Assert.true(current!.IsA("Frame"), `Expected the ref to hold a Frame, got ${current!.ClassName}`);
+			Assert.true(current === root, "Expected the ref to hold the mounted root instance");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("A forwarded ref on plain text receives the rendered TextLabel")
+	@Test
+	public plainRefIsLabel() {
+		const ref = React.createRef<TextLabel>();
+
+		withMounted(400, 300, <Text text={SHORT_TEXT} ref={ref} />, (mounted) => {
+			const label = waitForText(mounted.host);
+			const current = ref.current as Instance | undefined;
+
+			Assert.notUndefined(current, "Expected the forwarded ref to be assigned for plain text");
+			Assert.true(current!.IsA("TextLabel"), `Expected the ref to hold a TextLabel, got ${current!.ClassName}`);
+			Assert.true(current === label, "Expected the ref to hold the mounted label");
+		});
+	}
 }
 
 export = TextMountValidation;

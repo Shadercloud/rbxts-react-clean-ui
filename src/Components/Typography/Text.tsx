@@ -65,9 +65,14 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
             [ref],
         );
 
-        const setFrame = React.useCallback((instance: Frame | undefined) => {
-            rootRef.current = instance;
-        }, []);
+        const setFrame = React.useCallback(
+            (instance: Frame | undefined) => {
+                rootRef.current = instance;
+
+                ElementHelper.assignRef(ref as React.ForwardedRef<GuiObject>, instance);
+            },
+            [ref],
+        );
 
         const shrinkToFit = props.shrinkToFit === true;
         const shrinkMinScale = math.clamp(props.shrinkMinScale ?? 0, 0, 1);
@@ -89,6 +94,9 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
 
             const update = () => {
                 if (searching)
+                    return;
+
+                if (!root.IsDescendantOf(game))
                     return;
 
                 const parent = root.Parent;

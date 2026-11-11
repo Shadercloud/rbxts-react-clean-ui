@@ -117,6 +117,33 @@ do
 			Assert:equal(string.sub(_family, _arg0), suffix, `Expected FontFace.Family to end with {suffix}, got {label.FontFace.Family}`)
 		end)
 	end
+	function TextMountValidation:spacedRefIsFrame()
+		local ref = React.createRef()
+		withMounted(400, 300, React.createElement(Text, {
+			text = SHORT_TEXT,
+			letterSpacing = 2,
+			ref = ref,
+		}), function(mounted)
+			local root = waitForGuiObject(mounted.host, "Text")
+			local current = ref.current
+			Assert:notUndefined(current, "Expected the forwarded ref to be assigned for letter-spaced text")
+			Assert["true"](Assert, current:IsA("Frame"), `Expected the ref to hold a Frame, got {current.ClassName}`)
+			Assert["true"](Assert, current == root, "Expected the ref to hold the mounted root instance")
+		end)
+	end
+	function TextMountValidation:plainRefIsLabel()
+		local ref = React.createRef()
+		withMounted(400, 300, React.createElement(Text, {
+			text = SHORT_TEXT,
+			ref = ref,
+		}), function(mounted)
+			local label = waitForText(mounted.host)
+			local current = ref.current
+			Assert:notUndefined(current, "Expected the forwarded ref to be assigned for plain text")
+			Assert["true"](Assert, current:IsA("TextLabel"), `Expected the ref to hold a TextLabel, got {current.ClassName}`)
+			Assert["true"](Assert, current == label, "Expected the ref to hold the mounted label")
+		end)
+	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	local _decorator_1 = DisplayName("Renders the text prop verbatim in an auto-sized TextLabel that fits its content")
 	local _descriptor = Test(TextMountValidation, "rendersText", {
@@ -216,6 +243,46 @@ do
 	})
 	if _descriptor_14 then
 		TextMountValidation.themeFontFamily = _descriptor_14.value
+	end
+	local _decorator_10 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_11 = DisplayName("A forwarded ref on letter-spaced text receives the root Frame that holds the characters")
+	local _descriptor_15 = Test(TextMountValidation, "spacedRefIsFrame", {
+		value = TextMountValidation.spacedRefIsFrame,
+	})
+	if _descriptor_15 then
+		TextMountValidation.spacedRefIsFrame = _descriptor_15.value
+	end
+	local _descriptor_16 = _decorator_11(TextMountValidation, "spacedRefIsFrame", {
+		value = TextMountValidation.spacedRefIsFrame,
+	})
+	if _descriptor_16 then
+		TextMountValidation.spacedRefIsFrame = _descriptor_16.value
+	end
+	local _descriptor_17 = _decorator_10(TextMountValidation, "spacedRefIsFrame", {
+		value = TextMountValidation.spacedRefIsFrame,
+	})
+	if _descriptor_17 then
+		TextMountValidation.spacedRefIsFrame = _descriptor_17.value
+	end
+	local _decorator_12 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_13 = DisplayName("A forwarded ref on plain text receives the rendered TextLabel")
+	local _descriptor_18 = Test(TextMountValidation, "plainRefIsLabel", {
+		value = TextMountValidation.plainRefIsLabel,
+	})
+	if _descriptor_18 then
+		TextMountValidation.plainRefIsLabel = _descriptor_18.value
+	end
+	local _descriptor_19 = _decorator_13(TextMountValidation, "plainRefIsLabel", {
+		value = TextMountValidation.plainRefIsLabel,
+	})
+	if _descriptor_19 then
+		TextMountValidation.plainRefIsLabel = _descriptor_19.value
+	end
+	local _descriptor_20 = _decorator_12(TextMountValidation, "plainRefIsLabel", {
+		value = TextMountValidation.plainRefIsLabel,
+	})
+	if _descriptor_20 then
+		TextMountValidation.plainRefIsLabel = _descriptor_20.value
 	end
 	TextMountValidation = Tag("Studio")(TextMountValidation) or TextMountValidation
 end
