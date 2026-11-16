@@ -655,6 +655,52 @@ local SandstoneTheme = createTheme({
 			header = {},
 			body = {},
 		},
+		radialMenu = {
+			size = 280,
+			thickness = "36%",
+			iconScale = "lg",
+			intents = {
+				primary = {
+					default = {
+						textColor = Color3.fromHex("#4A4034"),
+						backgroundColor = Color3.fromHex("#EAE2D4"),
+						backgroundTransparency = 0,
+					},
+					hover = {
+						textColor = Color3.fromHex("#244F4A"),
+						backgroundColor = Color3.fromHex("#DFD5C3"),
+						backgroundTransparency = 0,
+					},
+					focus = {
+						textColor = Color3.fromHex("#FFFFFF"),
+						backgroundColor = Color3.fromHex("#4E8179"),
+						backgroundTransparency = 0,
+					},
+				},
+			},
+			labels = {},
+			center = {
+				backgroundColor = Color3.fromHex("#FFF9ED"),
+				backgroundTransparency = 0,
+				iconSize = 48,
+				iconColor = Color3.fromHex("#244F4A"),
+				gap = 4,
+				title = {
+					typography = {
+						weight = Enum.FontWeight.Bold,
+					},
+				},
+				description = {
+					typography = {
+						weight = Enum.FontWeight.Regular,
+						color = Color3.fromHex("#8A7A61"),
+					},
+				},
+			},
+			animation = {
+				duration = 0.15,
+			},
+		},
 		charts = {
 			colors = { Color3.fromHex("#7A9E7E"), Color3.fromHex("#A66C5D"), Color3.fromHex("#B89A5A"), Color3.fromHex("#6E97A8"), Color3.fromHex("#8A729E"), Color3.fromHex("#6F9A90"), Color3.fromHex("#C97A4A"), Color3.fromHex("#C58A9A"), Color3.fromHex("#8F7B5E"), Color3.fromHex("#8C9B5E") },
 			pie = {

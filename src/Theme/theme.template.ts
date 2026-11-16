@@ -415,6 +415,31 @@ export interface ThemeTemplate {
                 backgroundTransparency: number;
             };
         };
+        radialMenu: {
+            size: CssSize;
+            thickness: CssSize;
+            iconScale?: ScaleSize;
+            intents?: Partial<Record<Intent, InlineIntentColors>>;
+            labels: {
+                typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+            };
+            center: {
+                backgroundColor: Color3;
+                backgroundTransparency: number;
+                iconSize: number;
+                iconColor?: Color3;
+                gap?: number;
+                title: {
+                    typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                };
+                description: {
+                    typography?: Partial<TypographyStyle> | ScaledTypographyStyle;
+                };
+            };
+            animation: {
+                duration: number;
+            };
+        };
         charts: {
             colors: Color3[];
             pie: {

@@ -16,7 +16,7 @@ end
 for _k, _v in TS.import(script, script, "Typography", "Text") or {} do
 	exports[_k] = _v
 end
-for _k, _v in TS.import(script, script, "Navigation", "Menu") or {} do
+for _k, _v in TS.import(script, script, "Navigation") or {} do
 	exports[_k] = _v
 end
 for _k, _v in TS.import(script, script, "Interaction") or {} do

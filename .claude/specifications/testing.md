@@ -327,3 +327,11 @@ Implementation notes for src/Tests — test files carry no comments, so non-obvi
 ## Estimated time per class (this batch)
 
 At about 6 frames per mount plus each `fireHostEvent`/`activateButton`/`settleFrames` frame, at 60fps: `CheckboxMountValidation` ~1.5s, `CheckboxLabelValidation` ~0.8s, `SwitchMountValidation` ~2s, `ButtonPressDownValidation` ~1.5s, `HoverButtonPressDownValidation` ~1s, `ButtonSizingValidation` ~0.6s, `SelectWidthValidation` ~0.3s, `IncrementMountValidation` ~0.5s, `FlexItemMountValidation` ~0.8s, `BadgePropsValidation` ~0.6s, `BadgeClickValidation` ~1.2s. Each wait is frame-bounded (`waitForLayout`'s 30 frames at most).
+
+## `RadialMenu.test.tsx`
+
+- The hit-test runs inside the component's `resolveIndex`, which isn't exported, so there's no Lune-testable angle maths. The tests drive it through the real handlers instead: `fireHostEvent` calls the `HitArea`'s `InputEnded`/`InputChanged` with a plain-table `InputObject` stand-in (`UserInputType`, `Position`). `pointAt` builds `Position` from the `HitArea`'s own `AbsolutePosition`/`AbsoluteSize`, the same space `resolveIndex` reads, so the points don't depend on the ScreenGui inset.
+- Geometry: `size={200}` with the default `thickness` `"36%"` gives an outer radius of 100 and an inner radius of 64. `RING_RADIUS = 82` is mid-band. The `selectsByAngle` rows `[0, 66]` and `[90, 98]` sit just inside the inner and outer edges, and the `missSelectsNothing` rows `[90, 60]` and `[180, 104]` sit just outside them. `[45, 130]` is inside the square `HitArea` but past the ring, so it proves the miss comes from the radius check and not the frame's bounds.
+- With 4 items each wedge spans ±45° around its centre. The boundary rows use 44/46, 224 and 316 rather than exactly 45, so float noise in `atan2` can't flip the result.
+- The centre icon is compared with the ring's `ItemIcon` `Image` for the same item, so the check doesn't depend on the icon set's asset ids. The placeholder uses `cog`, which no item uses.
+- Negative checks (misses, MouseButton2, controlled clicks) wait `settleFrames(3)` before asserting, as described under Engine and framework quirks.

@@ -719,6 +719,52 @@ local DarkTheme = createTheme({
 			header = {},
 			body = {},
 		},
+		radialMenu = {
+			size = 280,
+			thickness = "36%",
+			iconScale = "lg",
+			intents = {
+				primary = {
+					default = {
+						textColor = Color3.fromHex("#D5DAE3"),
+						backgroundColor = Color3.fromHex("#2B3340"),
+						backgroundTransparency = 0,
+					},
+					hover = {
+						textColor = Color3.fromHex("#FFFFFF"),
+						backgroundColor = Color3.fromHex("#353E4D"),
+						backgroundTransparency = 0,
+					},
+					focus = {
+						textColor = Color3.fromHex("#FFFFFF"),
+						backgroundColor = Color3.fromHex("#365FAF"),
+						backgroundTransparency = 0,
+					},
+				},
+			},
+			labels = {},
+			center = {
+				backgroundColor = Color3.fromHex("#1B1F27"),
+				backgroundTransparency = 0,
+				iconSize = 48,
+				iconColor = Color3.fromHex("#E8EDF8"),
+				gap = 4,
+				title = {
+					typography = {
+						weight = Enum.FontWeight.Bold,
+					},
+				},
+				description = {
+					typography = {
+						weight = Enum.FontWeight.Regular,
+						color = Color3.fromHex("#8892A6"),
+					},
+				},
+			},
+			animation = {
+				duration = 0.15,
+			},
+		},
 		charts = {
 			colors = { Color3.fromHex("#4CC47A"), Color3.fromHex("#E35B5B"), Color3.fromHex("#F0B74A"), Color3.fromHex("#4D9EEA"), Color3.fromHex("#A676F0"), Color3.fromHex("#43C2BA"), Color3.fromHex("#F48A52"), Color3.fromHex("#E06AAE"), Color3.fromHex("#6FA8DC"), Color3.fromHex("#9CCC4A") },
 			bar = {

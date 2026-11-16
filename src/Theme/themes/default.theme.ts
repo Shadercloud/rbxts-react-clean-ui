@@ -854,6 +854,52 @@ export const DefaultTheme: ThemeTemplate = {
                 backgroundTransparency: 0.5,
             },
         },
+        radialMenu: {
+            size: 280,
+            thickness: "36%",
+            iconScale: "lg",
+            intents: {
+                primary: {
+                    default: {
+                        textColor: Color3.fromHex("#1D2433"),
+                        backgroundColor: Color3.fromHex("#E4E7EC"),
+                        backgroundTransparency: 0,
+                    },
+                    hover: {
+                        textColor: Color3.fromHex("#1D2433"),
+                        backgroundColor: Color3.fromHex("#D5D9E0"),
+                        backgroundTransparency: 0,
+                    },
+                    focus: {
+                        textColor: Color3.fromHex("#1D2433"),
+                        backgroundColor: Color3.fromHex("#3187C8"),
+                        backgroundTransparency: 0,
+                    },
+                },
+            },
+            labels: {},
+            center: {
+                backgroundColor: Color3.fromHex("#FFFFFF"),
+                backgroundTransparency: 0,
+                iconSize: 48,
+                iconColor: Color3.fromHex("#1D2433"),
+                gap: 4,
+                title: {
+                    typography: {
+                        weight: Enum.FontWeight.Bold,
+                    },
+                },
+                description: {
+                    typography: {
+                        weight: Enum.FontWeight.Regular,
+                        color: Color3.fromHex("#5C6577"),
+                    },
+                },
+            },
+            animation: {
+                duration: 0.15,
+            },
+        },
         charts: {
             colors: [
                 Color3.fromHex("#2E9D63"), // Green

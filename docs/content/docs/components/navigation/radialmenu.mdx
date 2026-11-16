@@ -1,0 +1,244 @@
+---
+title: Radial Menu
+description: A donut-shaped selection ring with icon segments and a centre that describes the selection.
+icon: CircleDot
+---
+
+`RadialMenu` is a donut-shaped selection ring built from native Roblox [`Frame`](https://create.roblox.com/docs/reference/engine/classes/Frame)s and [`CanvasGroup`](https://create.roblox.com/docs/reference/engine/classes/CanvasGroup)s. Its items are spaced evenly around the ring, the selected item's wedge is filled with the accent colour, and the centre of the donut shows the selected item's icon, title and description.
+
+## Import
+
+```tsx
+import { RadialMenu } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Navigation/RadialMenu.loom.tsx" previewHeight={420}>
+```tsx
+import React from "@rbxts/react";
+import { Container, RadialMenu } from "@rbxts/react-clean-ui";
+
+export function RadialMenuExample() {
+    return (
+        <Container width="100%" height="320" center>
+            <RadialMenu
+                placeholder={{ icon: "gear", text: "System Settings", description: "Radial Menu" }}
+                items={[
+                    { value: "airplane", icon: "plane", text: "Airplane", description: "Flight mode" },
+                    { value: "bluetooth", icon: "bluetooth", text: "Bluetooth", description: "Wireless devices" },
+                    { value: "location", icon: "location-arrow", text: "Location", description: "GPS services" },
+                    { value: "volume", icon: "volume-up", text: "Volume", description: "Sound level" },
+                    { value: "brightness", icon: "sun-o", text: "Brightness", description: "Screen light" },
+                    { value: "phone", icon: "phone", text: "Phone", description: "Calls" },
+                    { value: "message", icon: "comment", text: "Message", description: "Texts and chat" },
+                    { value: "wifi", icon: "wifi", text: "Wi-Fi", description: "Network" },
+                ]}
+            />
+        </Container>
+    );
+}
+```
+</Demo>
+
+Items are placed clockwise from 12 o'clock, in array order. Clicking a segment selects it, and the centre switches from the placeholder to the selected item's details.
+
+## Items
+
+Each entry in `items` is a `RadialMenuItem`:
+
+```tsx
+{
+    value: "wifi",          // Required. The stable identifier passed to onValueChange.
+    icon: "wifi",           // Shown on the ring, and in the centre while selected.
+    text: "Wi-Fi",          // The centre title while selected (and the ring label with showLabels).
+    description: "Network", // The centre description while selected.
+}
+```
+
+Only `value` is required. An item without `icon` shows nothing on the ring unless `showLabels` is set and it has `text`.
+
+## Uncontrolled selection
+
+By default the menu keeps its own selection. Use `defaultValue` to choose the item selected on mount. Without it, nothing is selected and the centre shows the `placeholder`.
+
+```tsx
+<RadialMenu
+    defaultValue="volume"
+    onValueChange={(value) => print(`Selected ${value}`)}
+    items={[
+        { value: "volume", icon: "volume-up", text: "Volume" },
+        { value: "brightness", icon: "sun-o", text: "Brightness" },
+        { value: "wifi", icon: "wifi", text: "Wi-Fi" },
+    ]}
+/>
+```
+
+`onValueChange` can be used without `value`, to observe selections while the menu stays uncontrolled.
+
+## Controlled selection
+
+Pass `value` to control the selection from outside, as with `Tabs`. The selected item is then always `value`, and clicking a segment only calls `onValueChange` with that item's `value` and the item itself. Feed the new value back to actually change the selection.
+
+```tsx
+import React from "@rbxts/react";
+import { RadialMenu } from "@rbxts/react-clean-ui";
+
+export function ControlledRadialMenuExample() {
+    const [selected, setSelected] = React.useState("phone");
+
+    return (
+        <RadialMenu
+            value={selected}
+            onValueChange={(value, item) => {
+                print(`Switching to ${item.text}`);
+                setSelected(value);
+            }}
+            items={[
+                { value: "phone", icon: "phone", text: "Phone", description: "Calls" },
+                { value: "message", icon: "comment", text: "Message", description: "Texts and chat" },
+                { value: "location", icon: "map-marker", text: "Location", description: "GPS services" },
+            ]}
+        />
+    );
+}
+```
+
+## Placeholder
+
+`placeholder` is what the centre shows while nothing is selected. It takes the same `icon`, `text` and `description` fields as an item, all optional.
+
+```tsx
+<RadialMenu
+    placeholder={{ icon: "gear", text: "System Settings", description: "Pick a setting" }}
+    items={items}
+/>
+```
+
+Without a `placeholder`, the centre is empty until something is selected.
+
+## Labels
+
+The ring is icon-only by default. Set `showLabels` to show each item's `text` under its icon on the ring.
+
+```tsx
+<RadialMenu showLabels items={items} />
+```
+
+Labels use the next scale down from `scale`. Items with no `text` (or an empty one) show only their icon.
+
+## Size and thickness
+
+`size` sets the menu's diameter. The menu is always square. A `%` size is a fraction of the parent's width.
+
+`thickness` sets how thick the ring is. A `%` value is a fraction of the menu's **radius**, not its diameter, so `"36%"` scales with `size`. A pixel value stays fixed regardless of `size`.
+
+```tsx
+<RadialMenu size={360} thickness="30%" items={items} />
+
+<RadialMenu size={240} thickness={60} items={items} />
+```
+
+The centre disc fills the space inside the ring: its diameter is the menu's diameter minus twice the thickness.
+
+## Scaling
+
+`scale` sets the size of the ring icons and the centre and label typography. The ring icons fall back to `theme.components.radialMenu.iconScale`, then `theme.default.scale`.
+
+```tsx
+<RadialMenu scale="sm" items={items} />
+```
+
+The centre title uses `scale`, and the centre description and ring labels use the next scale down. The centre icon is sized by the theme (`center.iconSize`), not by `scale`.
+
+## Positioning
+
+`Position`, `AnchorPoint`, `ZIndex` and `LayoutOrder` are applied to the menu's root `Frame`, so it can be placed directly or inside a list layout. `name` sets the root instance's name.
+
+```tsx
+<RadialMenu
+    name="QuickSettings"
+    Position={UDim2.fromScale(0.5, 0.5)}
+    AnchorPoint={new Vector2(0.5, 0.5)}
+    ZIndex={10}
+    items={items}
+/>
+```
+
+## Props
+
+### RadialMenu-specific props
+
+| Prop            | Type                                              | Default                                | Description                                                                                         |
+| --------------- | ------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `items`         | `RadialMenuItem[]`                                | Required                               | The segments, placed clockwise from 12 o'clock.                                                     |
+| `value`         | `string`                                          | `undefined`                            | Makes the menu controlled: the selected item is always the one with this `value`.                   |
+| `defaultValue`  | `string`                                          | `undefined`                            | The item selected on mount in uncontrolled mode. Omitted means nothing is selected.                 |
+| `onValueChange` | `(value: string, item: RadialMenuItem) => void`   | `undefined`                            | Called with the clicked item's `value` and the item on every segment click, in both modes.          |
+| `size`          | `CssSize`                                         | `theme.components.radialMenu.size`     | The menu's diameter. A `%` is a fraction of the parent's width.                                     |
+| `thickness`     | `CssSize`                                         | `theme.components.radialMenu.thickness`| The ring's thickness. A `%` is a fraction of the menu's radius.                                     |
+| `showLabels`    | `boolean`                                         | `false`                                | Shows each item's `text` under its icon on the ring.                                                |
+| `placeholder`   | `RadialMenuPlaceholder`                           | `undefined`                            | The `icon`, `text` and `description` the centre shows while nothing is selected.                    |
+| `LayoutOrder`   | `number`                                          | `undefined`                            | Native Roblox layout order of the root frame.                                                       |
+| `name`          | `string`                                          | `"RadialMenu"`                         | The name of the root instance.                                                                      |
+
+### RadialMenuItem
+
+| Field         | Type       | Default     | Description                                                                                  |
+| ------------- | ---------- | ----------- | -------------------------------------------------------------------------------------------- |
+| `value`       | `string`   | Required    | The item's stable identifier, matched against `value`/`defaultValue`.                        |
+| `icon`        | `IconName` | `undefined` | The icon shown on the ring, and in the centre while the item is selected.                    |
+| `text`        | `string`   | `undefined` | The centre title while selected, and the ring label when `showLabels` is set.                |
+| `description` | `string`   | `undefined` | The centre description while selected.                                                       |
+
+### RadialMenuPlaceholder
+
+| Field         | Type       | Default     | Description                                          |
+| ------------- | ---------- | ----------- | ---------------------------------------------------- |
+| `icon`        | `IconName` | `undefined` | The centre icon while nothing is selected.           |
+| `text`        | `string`   | `undefined` | The centre title while nothing is selected.          |
+| `description` | `string`   | `undefined` | The centre description while nothing is selected.    |
+
+### Shared props
+
+The menu also supports props inherited from the following interfaces.
+
+| Interface                                        | Purpose                                                        |
+| ------------------------------------------------ | -------------------------------------------------------------- |
+| `ScalableElementProps`                           | Configures the ring icon scale and the centre/label typography. |
+| `ZIndexElementProps`                             | Configures the root frame's `ZIndex`.                          |
+| `PositionElementProps` (`Position`, `AnchorPoint`) | Positions the root frame.                                     |
+
+`RadialMenu` forwards a ref to its root `Frame`.
+
+## Behaviour
+
+* The centre shows the selected item's `icon`, `text` and `description`. With nothing selected it shows the `placeholder`'s fields instead. A missing field, or empty text, renders nothing, so with no selection and no `placeholder` the centre is empty.
+* Segments are hit-tested by angle and distance from the centre, not by rectangles. A point belongs to a segment when it lies on the ring itself, between the inner and outer radius. Item `i` of `n` is centred at `i * 360 / n` degrees clockwise from 12 o'clock and spans half a step on either side, so the first item's wedge straddles 12 o'clock.
+* Points in the centre hole or outside the ring hit nothing. Moving the pointer there clears the hover, and releasing there selects nothing.
+* The hovered segment is shaded with the theme's `hover` colours, unless it is already selected. Hover follows mouse movement and touch, and clears when the pointer leaves the menu or a touch ends.
+* A segment is activated by releasing the primary mouse button or a touch over it. The segment under the release point is the one selected, not the one under the press point.
+* `onValueChange` fires on every activating click, including a click on the item that is already selected. It never fires on mount.
+* When the selection moves from one item to another, the selected wedge rotates to the new item along the shortest arc, so it never spins the long way round past 12 o'clock. If the selection changes again mid-rotation, the wedge continues from its current angle. Going from no selection to a selection snaps the wedge into place without rotating.
+* Icon colours switch immediately between states, and are not tweened.
+* A `value` or `defaultValue` that matches no item means nothing is selected. When two items share a `value`, the first one matches.
+* Icons on the ring are not rotated, and sit at mid-thickness of the ring at their item's angle.
+* The menu does not auto-size to its content. Very long centre titles wrap, but can overflow the centre disc vertically, and nothing clips them.
+* There is no gamepad or keyboard navigation, and no disabled state for the menu or individual items.
+
+## Theme values
+
+`RadialMenu` reads its appearance from `theme.components.radialMenu`:
+
+* `size` and `thickness` — the default diameter and ring thickness. A `%` thickness is a fraction of the radius.
+* `iconScale` — optional scale of the ring icons when no `scale` prop is set.
+* `intents.primary.default`, `.hover`, and `.focus` — the segment colours. `default` fills the ring and colours idle icons, `hover` shades the hovered wedge and colours its icon, and `focus` fills the selected wedge and colours its icon. Each state's `backgroundColor` and `backgroundTransparency` fill the region, and `textColor` colours the icon and label. The menu always uses the `primary` intent.
+* `labels.typography` — optional ring label typography, layered on the next scale down from `scale`.
+* `center.backgroundColor` and `center.backgroundTransparency` — the centre disc's fill.
+* `center.iconSize` — the centre icon's size in pixels.
+* `center.iconColor` — optional centre icon colour. Unset uses the theme's primary text colour.
+* `center.gap` — optional pixel gap between the centre icon, title and description. Defaults to `0`.
+* `center.title.typography` and `center.description.typography` — optional centre text typography. A typography `color` overrides the text colour.
+* `animation.duration` — how long the selected wedge takes to rotate, in seconds. `0` jumps straight to the new item.
+
+These values can be changed by providing a custom Clean UI theme.

@@ -651,6 +651,52 @@ export const SandstoneTheme = createTheme({
             },
             body: {}
         },
+        radialMenu: {
+            size: 280,
+            thickness: "36%",
+            iconScale: "lg",
+            intents: {
+                primary: {
+                    default: {
+                        textColor: Color3.fromHex("#4A4034"),
+                        backgroundColor: Color3.fromHex("#EAE2D4"),
+                        backgroundTransparency: 0,
+                    },
+                    hover: {
+                        textColor: Color3.fromHex("#244F4A"),
+                        backgroundColor: Color3.fromHex("#DFD5C3"),
+                        backgroundTransparency: 0,
+                    },
+                    focus: {
+                        textColor: Color3.fromHex("#FFFFFF"),
+                        backgroundColor: Color3.fromHex("#4E8179"),
+                        backgroundTransparency: 0,
+                    },
+                },
+            },
+            labels: {},
+            center: {
+                backgroundColor: Color3.fromHex("#FFF9ED"),
+                backgroundTransparency: 0,
+                iconSize: 48,
+                iconColor: Color3.fromHex("#244F4A"),
+                gap: 4,
+                title: {
+                    typography: {
+                        weight: Enum.FontWeight.Bold,
+                    },
+                },
+                description: {
+                    typography: {
+                        weight: Enum.FontWeight.Regular,
+                        color: Color3.fromHex("#8A7A61"),
+                    },
+                },
+            },
+            animation: {
+                duration: 0.15,
+            },
+        },
         charts: {
             colors: [
                 Color3.fromHex("#7A9E7E"), // Sage (Green)

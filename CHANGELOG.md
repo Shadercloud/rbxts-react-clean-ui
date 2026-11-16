@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0
+
+### Additions
+
+- **`RadialMenu` (Navigation).** A donut-shaped selection ring of icon items. The selected item's segment fills with the accent colour, and the centre shows its icon, `text` and `description`, or an optional `placeholder` when nothing is selected. Selection is controlled (`value`) or uncontrolled (`defaultValue`), and both report through `onValueChange`, like `Tabs`. Segments are hit-tested by angle and radius, the hovered segment is shaded, and the selected wedge rotates along the shortest arc. `size`, `thickness` and `showLabels` adjust the ring. New theme key: `theme.components.radialMenu`, set in every shipped theme.
+- **The Navigation folder is exported through its barrel**, so every Navigation component is available from the package root, not only `Menu`.
+
 ## 2.0.4
 
 ### Fixes
