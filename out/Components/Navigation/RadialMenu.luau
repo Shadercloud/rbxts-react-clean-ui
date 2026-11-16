@@ -20,6 +20,10 @@ local SMALLER_SCALE = {
 local function wrapDegrees(angle)
 	return angle - math.floor(angle / 360) * 360
 end
+local function resolveContent(content, state)
+	local _content = content
+	return if type(_content) == "function" then content(state) else content
+end
 local function RadialMenuWedge(props)
 	if props.sweep >= 360 then
 		local _attributes = {
@@ -213,6 +217,27 @@ local RadialMenu = React.forwardRef(function(props, ref)
 		_result_3 = _result_4
 	end
 	local centerDescription = _result_3
+	local ringIconSize = theme.iconSize[props.scale or radialTheme.iconScale or theme.default.scale]
+	local customCenter
+	local hasCustomCenter = false
+	if selectedItem ~= nil then
+		if selectedItem.centerContent ~= nil then
+			hasCustomCenter = true
+			customCenter = resolveContent(selectedItem.centerContent, {
+				selected = true,
+				hovered = selectedIndex == hovered,
+			})
+		end
+	else
+		local _result_4 = props.placeholder
+		if _result_4 ~= nil then
+			_result_4 = _result_4.centerContent
+		end
+		if _result_4 ~= nil then
+			hasCustomCenter = true
+			customCenter = props.placeholder.centerContent
+		end
+	end
 	local _exp_1 = props.items
 	-- ▼ ReadonlyArray.map ▼
 	local _newValue = table.create(#_exp_1)
@@ -236,13 +261,23 @@ local RadialMenu = React.forwardRef(function(props, ref)
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-		}), item.icon ~= nil and (React.createElement(Icon, {
+		}), item.content ~= nil and (React.createElement("frame", {
+			key = "ItemContent",
+			LayoutOrder = 1,
+			Size = UDim2.fromOffset(ringIconSize, ringIconSize),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Interactable = false,
+		}, resolveContent(item.content, {
+			selected = index == selectedIndex,
+			hovered = index == hovered,
+		}))), item.content == nil and item.icon ~= nil and (React.createElement(Icon, {
 			name = "ItemIcon",
 			LayoutOrder = 1,
 			icon = item.icon,
 			scale = props.scale or radialTheme.iconScale,
 			color = scheme.textColor,
-		})), hasLabel and (React.createElement(Text, {
+		})), item.content == nil and hasLabel and (React.createElement(Text, {
 			name = "ItemLabel",
 			LayoutOrder = 2,
 			text = item.text,
@@ -345,13 +380,20 @@ local RadialMenu = React.forwardRef(function(props, ref)
 		Size = UDim2.fromScale(0.75, 0.75),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-	}, React.createElement("uilistlayout", _attributes_2), centerIcon ~= nil and (React.createElement(Icon, {
+	}, React.createElement("uilistlayout", _attributes_2), hasCustomCenter and (React.createElement("frame", {
+		key = "CenterSlot",
+		LayoutOrder = 1,
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Interactable = false,
+	}, customCenter)), not hasCustomCenter and centerIcon ~= nil and (React.createElement(Icon, {
 		name = "CenterIcon",
 		LayoutOrder = 1,
 		icon = centerIcon,
 		Size = UDim2.fromOffset(radialTheme.center.iconSize, radialTheme.center.iconSize),
 		color = radialTheme.center.iconColor or centerTextColor,
-	})), centerText ~= nil and centerText ~= "" and (React.createElement(Text, {
+	})), not hasCustomCenter and centerText ~= nil and centerText ~= "" and (React.createElement(Text, {
 		name = "CenterTitle",
 		LayoutOrder = 2,
 		text = centerText,
@@ -361,7 +403,7 @@ local RadialMenu = React.forwardRef(function(props, ref)
 		AutomaticSize = Enum.AutomaticSize.Y,
 		typography = titleTypography,
 		TextColor3 = titleTypography.color or centerTextColor,
-	})), centerDescription ~= nil and centerDescription ~= "" and (React.createElement(Text, {
+	})), not hasCustomCenter and centerDescription ~= nil and centerDescription ~= "" and (React.createElement(Text, {
 		name = "CenterDescription",
 		LayoutOrder = 3,
 		text = centerDescription,

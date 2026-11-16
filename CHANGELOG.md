@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.1
+
+### Additions
+
+- **`RadialMenu` custom content.** Items take `content` (replaces the ring icon and label) and `centerContent` (replaces the centre icon, title and description while selected), and `placeholder` takes `centerContent`. Item content can be a node or a function of `{ selected, hovered }`, so it can react to hover and selection. Content is display-only: it can't capture input, so angle/radius selection is unaffected. `RadialMenuContent` and `RadialMenuItemState` are exported. Menus that only use `icon`, `text` and `description` render as before.
+
 ## 2.1.0
 
 ### Additions

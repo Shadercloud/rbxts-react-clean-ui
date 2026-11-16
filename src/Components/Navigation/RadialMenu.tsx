@@ -13,15 +13,25 @@ import {
 import { Icon } from "../Surface/Icon";
 import { Text } from "../Typography";
 
+export interface RadialMenuItemState {
+    selected: boolean;
+    hovered: boolean;
+}
+
+export type RadialMenuContent = React.ReactNode | ((state: RadialMenuItemState) => React.ReactNode);
+
 export interface RadialMenuItem extends IconElementProps {
     value: string;
     text?: string;
     description?: string;
+    content?: RadialMenuContent;
+    centerContent?: RadialMenuContent;
 }
 
 export interface RadialMenuPlaceholder extends IconElementProps {
     text?: string;
     description?: string;
+    centerContent?: React.ReactNode;
 }
 
 export interface RadialMenuProps
@@ -66,6 +76,10 @@ const SMALLER_SCALE: Record<ScaleSize, ScaleSize> = {
 
 function wrapDegrees(angle: number): number {
     return angle - math.floor(angle / 360) * 360;
+}
+
+function resolveContent(content: RadialMenuContent, state: RadialMenuItemState): React.ReactNode {
+    return typeIs(content, "function") ? content(state) : content;
 }
 
 function RadialMenuWedge(props: RadialMenuWedgeProps) {
@@ -208,6 +222,22 @@ const RadialMenu = React.forwardRef<Frame, RadialMenuProps>((props, ref) => {
     const centerIcon = selectedItem !== undefined ? selectedItem.icon : props.placeholder?.icon;
     const centerText = selectedItem !== undefined ? selectedItem.text : props.placeholder?.text;
     const centerDescription = selectedItem !== undefined ? selectedItem.description : props.placeholder?.description;
+    const ringIconSize = theme.iconSize[props.scale ?? radialTheme.iconScale ?? theme.default.scale];
+
+    let customCenter: React.ReactNode;
+    let hasCustomCenter = false;
+    if (selectedItem !== undefined) {
+        if (selectedItem.centerContent !== undefined) {
+            hasCustomCenter = true;
+            customCenter = resolveContent(selectedItem.centerContent, {
+                selected: true,
+                hovered: selectedIndex === hovered,
+            });
+        }
+    } else if (props.placeholder?.centerContent !== undefined) {
+        hasCustomCenter = true;
+        customCenter = props.placeholder.centerContent;
+    }
 
     const items = props.items.map((item, index) => {
         const radians = math.rad(index * step);
@@ -238,7 +268,19 @@ const RadialMenu = React.forwardRef<Frame, RadialMenuProps>((props, ref) => {
                     VerticalAlignment={Enum.VerticalAlignment.Center}
                     SortOrder={Enum.SortOrder.LayoutOrder}
                 />
-                {item.icon !== undefined && (
+                {item.content !== undefined && (
+                    <frame
+                        key="ItemContent"
+                        LayoutOrder={1}
+                        Size={UDim2.fromOffset(ringIconSize, ringIconSize)}
+                        BackgroundTransparency={1}
+                        BorderSizePixel={0}
+                        Interactable={false}
+                    >
+                        {resolveContent(item.content, { selected: index === selectedIndex, hovered: index === hovered })}
+                    </frame>
+                )}
+                {item.content === undefined && item.icon !== undefined && (
                     <Icon
                         name="ItemIcon"
                         LayoutOrder={1}
@@ -247,7 +289,7 @@ const RadialMenu = React.forwardRef<Frame, RadialMenuProps>((props, ref) => {
                         color={scheme.textColor}
                     />
                 )}
-                {hasLabel && (
+                {item.content === undefined && hasLabel && (
                     <Text
                         name="ItemLabel"
                         LayoutOrder={2}
@@ -338,7 +380,19 @@ const RadialMenu = React.forwardRef<Frame, RadialMenuProps>((props, ref) => {
                         SortOrder={Enum.SortOrder.LayoutOrder}
                         Padding={new UDim(0, radialTheme.center.gap ?? 0)}
                     />
-                    {centerIcon !== undefined && (
+                    {hasCustomCenter && (
+                        <frame
+                            key="CenterSlot"
+                            LayoutOrder={1}
+                            Size={UDim2.fromScale(1, 1)}
+                            BackgroundTransparency={1}
+                            BorderSizePixel={0}
+                            Interactable={false}
+                        >
+                            {customCenter}
+                        </frame>
+                    )}
+                    {!hasCustomCenter && centerIcon !== undefined && (
                         <Icon
                             name="CenterIcon"
                             LayoutOrder={1}
@@ -347,7 +401,7 @@ const RadialMenu = React.forwardRef<Frame, RadialMenuProps>((props, ref) => {
                             color={radialTheme.center.iconColor ?? centerTextColor}
                         />
                     )}
-                    {centerText !== undefined && centerText !== "" && (
+                    {!hasCustomCenter && centerText !== undefined && centerText !== "" && (
                         <Text
                             name="CenterTitle"
                             LayoutOrder={2}
@@ -360,7 +414,7 @@ const RadialMenu = React.forwardRef<Frame, RadialMenuProps>((props, ref) => {
                             TextColor3={titleTypography.color ?? centerTextColor}
                         />
                     )}
-                    {centerDescription !== undefined && centerDescription !== "" && (
+                    {!hasCustomCenter && centerDescription !== undefined && centerDescription !== "" && (
                         <Text
                             name="CenterDescription"
                             LayoutOrder={3}

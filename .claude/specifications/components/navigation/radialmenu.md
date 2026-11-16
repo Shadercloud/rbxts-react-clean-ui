@@ -15,9 +15,11 @@
   - `placeholder?: RadialMenuPlaceholder`: what the centre shows when nothing is selected.
   - `scale`: sizes the ring icons (falling back to `theme.components.radialMenu.iconScale`, then `theme.default.scale`) and the centre/label typography.
   - `LayoutOrder?`, `ZIndex?`, `Position?`, `AnchorPoint?`: applied to the root frame. `name?` names the root instance (default `"RadialMenu"`).
-- `RadialMenuItem` (extends `IconElementProps`): `value: string` (required, the stable identifier), `icon?: IconName`, `text?: string`, `description?: string`.
-- `RadialMenuPlaceholder` (extends `IconElementProps`): `icon?`, `text?`, `description?`.
-- `RadialMenu`, `RadialMenuProps`, `RadialMenuItem` and `RadialMenuPlaceholder` are exported through the Navigation barrel. `RadialMenu` forwards a ref to its root `Frame`. It has no sub-parts.
+- `RadialMenuItem` (extends `IconElementProps`): `value: string` (required, the stable identifier), `icon?: IconName`, `text?: string`, `description?: string`, `content?: RadialMenuContent` (replaces the ring icon and label, see Custom content), `centerContent?: RadialMenuContent` (replaces the centre's icon, title and description while this item is selected).
+- `RadialMenuPlaceholder` (extends `IconElementProps`): `icon?`, `text?`, `description?`, `centerContent?: React.ReactNode` (replaces the placeholder's centre icon, title and description). It takes no function form, because with nothing selected there's no item state to pass.
+- `RadialMenuItemState`: `{ selected: boolean; hovered: boolean }`.
+- `RadialMenuContent`: `React.ReactNode | ((state: RadialMenuItemState) => React.ReactNode)`.
+- `RadialMenu`, `RadialMenuProps`, `RadialMenuItem`, `RadialMenuPlaceholder`, `RadialMenuItemState` and `RadialMenuContent` are exported through the Navigation barrel. `RadialMenu` forwards a ref to its root `Frame`. It has no sub-parts.
 
 ## Selection
 
@@ -42,6 +44,14 @@
   - `CenterTitle`: the item's `text`, wrapped and centred, at `scale`.
   - `CenterDescription`: the item's `description`, wrapped and centred, one scale down.
 - With nothing selected, the centre shows `placeholder`'s fields the same way. An omitted field (or empty text) renders no instance, so with no selection and no placeholder the centre is empty.
+
+## Custom content
+
+- The new props only take over when they are not `undefined`. Otherwise everything renders exactly as described under Visuals. `text` and `description` still travel with the item to `onValueChange` whether or not custom content is set.
+- **Ring slot.** When an item has `content`, its ring entry renders a single `ItemContent` frame instead of `ItemIcon` and `ItemLabel`, even with `showLabels` set. The slot is a fixed square of the ring icon's size (`theme.iconSize[scale ?? radialMenu.iconScale ?? theme.default.scale]`), centred at the same point as the icon. The content is parented directly to the slot and positions or sizes itself inside it (for example `Size={UDim2.fromScale(1, 1)}` to fill it). The slot doesn't clip, so content larger than the slot overflows it.
+- **Centre slot.** When the selected item has `centerContent` (or, with nothing selected, `placeholder.centerContent` is set), the centre renders a single `CenterSlot` frame filling the centre content box (75% of the centre disc) instead of `CenterIcon`, `CenterTitle` and `CenterDescription`. A selected item without `centerContent` shows its own default centre, never the placeholder's `centerContent`.
+- **Function form.** A function is called on every render with the item's live state. `selected` is true for the selected item. `hovered` is true while the pointer is over that item's segment, including when that item is also selected (the built-in icon shows the selected colour in that case, but the raw hover flag is still passed through). For `centerContent`, the state is the selected item's own state, so `selected` is always `true`.
+- **Input.** Custom content is display-only. Both slots set `Interactable = false`, and the transparent `HitArea` sits above them anyway, so buttons, text boxes or scrolling frames inside the content never receive clicks, hovers or scrolls. Selection and hover keep working by angle and radius exactly as without content. Interactive controls belong outside the menu.
 
 ## Animation
 
@@ -72,6 +82,7 @@ A story should demonstrate:
 - Selection in both uncontrolled (`defaultValue`) and controlled (`value` + `onValueChange`) modes.
 - `showLabels`, and different `size`/`thickness` values.
 - Small item counts (2 and 3) to show the wedge geometry.
+- Custom content: items whose `content` is a function that reacts to `selected`/`hovered` (e.g. a badge or a tinted image), an item with a custom `centerContent`, and a placeholder `centerContent`, alongside plain icon items to show they mix.
 
 A Loom scene can be a single uncontrolled menu with a handful of items and a placeholder.
 
@@ -86,4 +97,7 @@ A Loom scene can be a single uncontrolled menu with a handful of items and a pla
 - **Hit-testing** compares `InputObject.Position` with the `HitArea`'s `AbsolutePosition` directly, the same as `Slider`/`Draggable`. It assumes the usual alignment between those two spaces, so under a `ScreenGui` whose inset handling makes them disagree, hits shift by the inset, as they would in those components. `math.atan2(dx, -dy)` gives the clockwise angle from 12 o'clock in screen space (y grows downward).
 - Hover can't use the shared `HoverButton` primitive, because segments aren't rectangles. Hover comes from the `HitArea`'s `InputChanged` (mouse movement and touch) and is cleared on `MouseLeave` and on touch release.
 - The layers' `ZIndex` values (1 to 6) are sibling-relative. They assume the default `Sibling` `ZIndexBehavior`, as the rest of the library does.
+- **Custom content (`ItemContent`, `CenterSlot`).** The names don't reuse `CenterContent`, which is already the 75% layout box that holds the default centre children. `CenterSlot` is a child of that box, so it inherits the 75% sizing and the box's `UIListLayout` simply centres it. `resolveContent` tells the two forms of `RadialMenuContent` apart with `typeIs(content, "function")`. That's unambiguous because `React.ReactNode` has no function members in `@rbxts/react`'s types.
+- **Content input is blocked on purpose.** Letting content receive input was rejected: a click on an `Active` button inside the content would never reach `HitArea`, so selection would silently break wherever content sits. The `HitArea` (sibling `ZIndex` 6, `Active`) already covers the slots under the default `Sibling` `ZIndexBehavior`. `Interactable = false` on each slot is a backstop for a host using `Global` `ZIndexBehavior`, where a content `ZIndex` above 6 could put it on top of `HitArea`. How far `Interactable` reaches into descendant buttons hasn't been checked in Studio, so don't rely on it alone. `HitArea` staying on top is the real guarantee.
+- `placeholder.centerContent` is `React.ReactNode` only, as agreed for the API. A function form would always get `{ selected: false, hovered: false }`, so it would add nothing.
 - The identifier inside the component is `selectIndex`, not `select`: `select` is reserved by the roblox-ts compiler (`roblox-ts/no-invalid-identifier` lint error).

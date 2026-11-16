@@ -56,7 +56,7 @@ Each entry in `items` is a `RadialMenuItem`:
 }
 ```
 
-Only `value` is required. An item without `icon` shows nothing on the ring unless `showLabels` is set and it has `text`.
+Only `value` is required. An item without `icon` shows nothing on the ring unless `showLabels` is set and it has `text`, or it has custom `content` (see [Custom content](#custom-content)).
 
 ## Uncontrolled selection
 
@@ -127,6 +127,95 @@ The ring is icon-only by default. Set `showLabels` to show each item's `text` un
 
 Labels use the next scale down from `scale`. Items with no `text` (or an empty one) show only their icon.
 
+## Custom content
+
+`icon`, `text` and `description` are the simple default. When you need more, an item can render its own instances on the ring with `content`, and in the centre with `centerContent`. `placeholder` also takes a `centerContent`.
+
+```tsx
+import React from "@rbxts/react";
+import { RadialMenu, RadialMenuItemState } from "@rbxts/react-clean-ui";
+
+function AvatarContent(state: RadialMenuItemState) {
+    return (
+        <imagelabel
+            key="Avatar"
+            Size={UDim2.fromScale(1, 1)}
+            Image="rbxassetid://0000000000"
+            ImageColor3={state.selected ? new Color3(1, 1, 1) : new Color3(0.6, 0.6, 0.6)}
+            ImageTransparency={state.hovered || state.selected ? 0 : 0.3}
+            BackgroundTransparency={1}
+        >
+            <uicorner key="Corners" CornerRadius={new UDim(0.5, 0)} />
+        </imagelabel>
+    );
+}
+
+export function CustomContentRadialMenuExample() {
+    return (
+        <RadialMenu
+            placeholder={{
+                centerContent: (
+                    <textlabel
+                        key="Hint"
+                        Size={UDim2.fromScale(1, 1)}
+                        Text="Pick a friend"
+                        TextScaled
+                        BackgroundTransparency={1}
+                    />
+                ),
+            }}
+            items={[
+                {
+                    value: "friend",
+                    text: "Friend",
+                    description: "Online",
+                    content: AvatarContent,
+                    centerContent: (
+                        <imagelabel
+                            key="Portrait"
+                            Size={UDim2.fromScale(1, 1)}
+                            Image="rbxassetid://0000000000"
+                            ScaleType={Enum.ScaleType.Fit}
+                            BackgroundTransparency={1}
+                        />
+                    ),
+                },
+                { value: "phone", icon: "phone", text: "Phone", description: "Calls" },
+                { value: "message", icon: "comment", text: "Message", description: "Texts and chat" },
+            ]}
+        />
+    );
+}
+```
+
+Custom and plain icon items can be mixed in the same menu.
+
+### Ring content
+
+An item's `content` replaces its ring icon, and its label too, even with `showLabels` set. It renders inside a fixed square slot the size of the ring icons (from `scale`, `theme.components.radialMenu.iconScale` or `theme.default.scale`), centred on the item's segment. The slot doesn't clip, and it doesn't size your content: give it a size yourself, for example `UDim2.fromScale(1, 1)` to fill the slot.
+
+### Centre content
+
+While an item is selected, its `centerContent` replaces the default centre icon, title and description. It renders in a slot filling the centre content area, 75% of the centre disc. A selected item without `centerContent` shows its own default centre, never the placeholder's `centerContent`.
+
+`placeholder.centerContent` does the same while nothing is selected. It takes a plain node only, not a function.
+
+### Reacting to state
+
+`content` and an item's `centerContent` accept either a node or a function of type `RadialMenuContent`. A function is called on every render with a `RadialMenuItemState`, `{ selected, hovered }`:
+
+* `selected` is `true` while the item is selected.
+* `hovered` is the raw pointer hover over the item's segment, so both flags can be `true` at once. (The built-in icon shows the selected colour in that case, but the hover flag is still passed through.)
+* For `centerContent`, the state is the selected item's own, so `selected` is always `true`.
+
+### Display-only
+
+Custom content can't receive clicks, hovers or scrolls. Selection and hover keep working by angle and distance from the centre, exactly as without custom content, so don't put buttons, text boxes or scrolling frames inside it. Interactive controls belong outside the menu.
+
+`text` and `description` are still worth setting on items with custom content: they travel with the item to `onValueChange`.
+
+`RadialMenuItemState` and `RadialMenuContent` are exported from `@rbxts/react-clean-ui` alongside `RadialMenuItem` and `RadialMenuPlaceholder`.
+
 ## Size and thickness
 
 `size` sets the menu's diameter. The menu is always square. A `%` size is a fraction of the parent's width.
@@ -178,26 +267,42 @@ The centre title uses `scale`, and the centre description and ring labels use th
 | `size`          | `CssSize`                                         | `theme.components.radialMenu.size`     | The menu's diameter. A `%` is a fraction of the parent's width.                                     |
 | `thickness`     | `CssSize`                                         | `theme.components.radialMenu.thickness`| The ring's thickness. A `%` is a fraction of the menu's radius.                                     |
 | `showLabels`    | `boolean`                                         | `false`                                | Shows each item's `text` under its icon on the ring.                                                |
-| `placeholder`   | `RadialMenuPlaceholder`                           | `undefined`                            | The `icon`, `text` and `description` the centre shows while nothing is selected.                    |
+| `placeholder`   | `RadialMenuPlaceholder`                           | `undefined`                            | What the centre shows while nothing is selected: `icon`, `text` and `description`, or `centerContent`. |
 | `LayoutOrder`   | `number`                                          | `undefined`                            | Native Roblox layout order of the root frame.                                                       |
 | `name`          | `string`                                          | `"RadialMenu"`                         | The name of the root instance.                                                                      |
 
 ### RadialMenuItem
 
-| Field         | Type       | Default     | Description                                                                                  |
-| ------------- | ---------- | ----------- | -------------------------------------------------------------------------------------------- |
-| `value`       | `string`   | Required    | The item's stable identifier, matched against `value`/`defaultValue`.                        |
-| `icon`        | `IconName` | `undefined` | The icon shown on the ring, and in the centre while the item is selected.                    |
-| `text`        | `string`   | `undefined` | The centre title while selected, and the ring label when `showLabels` is set.                |
-| `description` | `string`   | `undefined` | The centre description while selected.                                                       |
+| Field           | Type                | Default     | Description                                                                                                  |
+| --------------- | ------------------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
+| `value`         | `string`            | Required    | The item's stable identifier, matched against `value`/`defaultValue`.                                        |
+| `icon`          | `IconName`          | `undefined` | The icon shown on the ring, and in the centre while the item is selected.                                    |
+| `text`          | `string`            | `undefined` | The centre title while selected, and the ring label when `showLabels` is set.                                |
+| `description`   | `string`            | `undefined` | The centre description while selected.                                                                       |
+| `content`       | `RadialMenuContent` | `undefined` | Custom ring content, replacing the ring icon and label. Rendered in a square slot at the ring icon size.     |
+| `centerContent` | `RadialMenuContent` | `undefined` | Custom centre content while the item is selected, replacing the centre icon, title and description.          |
 
 ### RadialMenuPlaceholder
 
-| Field         | Type       | Default     | Description                                          |
-| ------------- | ---------- | ----------- | ---------------------------------------------------- |
-| `icon`        | `IconName` | `undefined` | The centre icon while nothing is selected.           |
-| `text`        | `string`   | `undefined` | The centre title while nothing is selected.          |
-| `description` | `string`   | `undefined` | The centre description while nothing is selected.    |
+| Field           | Type              | Default     | Description                                                                                 |
+| --------------- | ----------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| `icon`          | `IconName`        | `undefined` | The centre icon while nothing is selected.                                                  |
+| `text`          | `string`          | `undefined` | The centre title while nothing is selected.                                                 |
+| `description`   | `string`          | `undefined` | The centre description while nothing is selected.                                           |
+| `centerContent` | `React.ReactNode` | `undefined` | Custom centre content while nothing is selected, replacing the icon, title and description. |
+
+### RadialMenuContent and RadialMenuItemState
+
+```ts
+interface RadialMenuItemState {
+    selected: boolean;
+    hovered: boolean;
+}
+
+type RadialMenuContent = React.ReactNode | ((state: RadialMenuItemState) => React.ReactNode);
+```
+
+A function is called on every render with the item's current state. Both types are exported from `@rbxts/react-clean-ui`.
 
 ### Shared props
 
@@ -214,6 +319,8 @@ The menu also supports props inherited from the following interfaces.
 ## Behaviour
 
 * The centre shows the selected item's `icon`, `text` and `description`. With nothing selected it shows the `placeholder`'s fields instead. A missing field, or empty text, renders nothing, so with no selection and no `placeholder` the centre is empty.
+* A `centerContent` replaces the centre's default icon, title and description, and a ring `content` replaces the item's ring icon and label. A selected item without `centerContent` shows its own default centre, not the placeholder's `centerContent`.
+* Custom content is display-only and never receives input. Function-form content is re-run on every render, with `hovered` reflecting the raw pointer hover even on the selected item.
 * Segments are hit-tested by angle and distance from the centre, not by rectangles. A point belongs to a segment when it lies on the ring itself, between the inner and outer radius. Item `i` of `n` is centred at `i * 360 / n` degrees clockwise from 12 o'clock and spans half a step on either side, so the first item's wedge straddles 12 o'clock.
 * Points in the centre hole or outside the ring hit nothing. Moving the pointer there clears the hover, and releasing there selects nothing.
 * The hovered segment is shaded with the theme's `hover` colours, unless it is already selected. Hover follows mouse movement and touch, and clears when the pointer leaves the menu or a touch ends.
