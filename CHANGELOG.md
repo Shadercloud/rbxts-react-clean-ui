@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.2
+
+### Fixes
+
+- **Letter-spaced `Text` no longer draws non-English letters as "?".** With `letterSpacing` set, the text was split into one label per byte, so accented Latin, Cyrillic, CJK and emoji characters (two to four bytes each in UTF-8) were cut into invalid pieces. Text is now split by grapheme cluster, so a letter stays with its combining marks and an emoji or flag sequence stays whole. ASCII text renders exactly as before.
+- **Letter-spaced `Text` leaves right-to-left and joined scripts unspaced.** Text containing Hebrew, Arabic, Indic or other right-to-left or joined-script characters (or invalid UTF-8) is drawn as a single label with no letter spacing, because one label per character would reverse the reading order and break letter joining.
+- **`Select` search matches accented, Greek and Cyrillic letters regardless of case.** The search only lowercased ASCII, so "é" did not find "École". Latin-1, Latin Extended-A, Greek and basic Cyrillic capitals are now folded too. Other scripts, Turkish dotted/dotless i, German sharp s and composed versus decomposed forms are still compared as written.
+
+### Additions
+
+- **`TextHelper` is exported.** `splitGraphemes`, `lowercase`, `isComplexScript` and `isValidUtf8` are the helpers behind the fixes above.
+
 ## 2.1.1
 
 ### Additions

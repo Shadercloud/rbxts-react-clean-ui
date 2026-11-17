@@ -10,6 +10,7 @@ local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
+local TextHelper = _Helpers.TextHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
@@ -183,7 +184,7 @@ local function optionMatchesQuery(option, normalizedQuery)
 	if option.text == nil then
 		return true
 	end
-	local _exp = string.lower(option.text)
+	local _exp = TextHelper:lowercase(option.text)
 	local _normalizedQuery = normalizedQuery
 	return (string.find(_exp, _normalizedQuery, 1, true)) ~= nil
 end
@@ -386,7 +387,7 @@ local Select = React.forwardRef(function(props, ref)
 			setQuery("")
 		end
 	end, { open })
-	local normalizedQuery = if props.searchable then string.lower(query) else ""
+	local normalizedQuery = if props.searchable then TextHelper:lowercase(query) else ""
 	local renderOption = function(option)
 		return React.cloneElement(option.element, {
 			index = option.index,

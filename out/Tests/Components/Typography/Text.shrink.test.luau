@@ -27,6 +27,8 @@ local NARROW_SLOT = 60
 local WIDE_SLOT = 600
 local SCALE_EPSILON = 0.01
 local PROBE_STEP = 0.005
+local PROBE_SWEEP_STEPS = 12
+local WIDTH_EPSILON = 0.5
 local function shrinkApp(options)
 	local padding = options.padding
 	return React.createElement("frame", {
@@ -60,12 +62,10 @@ local function waitForScale(host, predicate, message)
 		return if predicate(scale.Scale) then scale.Scale else nil
 	end, `{message} (Scale is {scale.Scale})`)
 end
-local function assertWidthNear(root, width, label)
-	local actual = rect(root).width
-	Assert["true"](Assert, actual <= width + 1, `{label}: expected the visual width {actual} to fit within {width}px`)
-	Assert["true"](Assert, actual >= width - 2, `{label}: expected the visual width {actual} to fill about {width}px`)
-end
-local function probeApp(scale)
+local function probeApp(scale, spaced)
+	if spaced == nil then
+		spaced = true
+	end
 	return React.createElement("frame", {
 		key = "Probe",
 		Size = UDim2.fromOffset(WIDE_SLOT, 40),
@@ -76,8 +76,30 @@ local function probeApp(scale)
 	}), React.createElement(Text, {
 		text = TITLE,
 		TextWrap = false,
-		letterSpacing = 2,
+		letterSpacing = if spaced then 2 else nil,
 	}))
+end
+local function assertWidestFit(host, root, width, label)
+	settleFrames(3)
+	local actual = rect(root).width
+	Assert["true"](Assert, actual <= width + WIDTH_EPSILON, `{label}: expected the visual width {actual} to fit within {width}px`)
+	local baseScale = shrinkScaleOf(host).Scale
+	local overflowed = false
+	withMounted(800, 200, probeApp(baseScale, false), function(probe)
+		local probeRoot = waitForRoot(probe.host)
+		for step = 1, PROBE_SWEEP_STEPS do
+			local probeScale = baseScale + step * PROBE_STEP
+			probe.update(probeApp(probeScale, false))
+			settleFrames(2)
+			local probeWidth = rect(probeRoot).width
+			if probeWidth > width + WIDTH_EPSILON then
+				overflowed = true
+			else
+				Assert["true"](Assert, probeWidth <= actual + WIDTH_EPSILON, `{label}: the text renders {probeWidth}px at scale {probeScale}, which still fits {width}px, so {actual}px is not the widest fit`)
+			end
+		end
+	end)
+	Assert["true"](Assert, overflowed, `{label}: expected a scale within {PROBE_SWEEP_STEPS * PROBE_STEP} above {baseScale} to overflow {width}px, so {actual}px is one render step short of it`)
 end
 local function assertLargestFit(host, root, width, label)
 	settleFrames(3)
@@ -133,7 +155,7 @@ do
 			if spacedFor(kind) then
 				assertLargestFit(mounted.host, root, NARROW_SLOT, `{kind} text`)
 			else
-				assertWidthNear(root, NARROW_SLOT, `{kind} text`)
+				assertWidestFit(mounted.host, root, NARROW_SLOT, `{kind} text`)
 			end
 		end)
 	end

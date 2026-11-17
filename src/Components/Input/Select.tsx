@@ -4,7 +4,7 @@ import {
     CleanThemeContext,
     OverlayContext,
 } from "../../Contexts";
-import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TextHelper, TypographyHelper } from "../../Helpers";
 import {
     CssBackgroundGradient,
     CssSize,
@@ -215,7 +215,7 @@ function optionMatchesQuery(option: ParsedOption, normalizedQuery: string): bool
     if (normalizedQuery === "") return true;
     if (option.text === undefined) return true;
 
-    return option.text.lower().find(normalizedQuery, 1, true)[0] !== undefined;
+    return TextHelper.lowercase(option.text).find(normalizedQuery, 1, true)[0] !== undefined;
 }
 
 interface SelectSearchInputProps {
@@ -394,7 +394,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         if (!open) setQuery("");
     }, [open]);
 
-    const normalizedQuery = props.searchable ? query.lower() : "";
+    const normalizedQuery = props.searchable ? TextHelper.lowercase(query) : "";
 
     const renderOption = (option: ParsedOption) =>
         React.cloneElement(option.element, { index: option.index, key: `option-${option.index}` });

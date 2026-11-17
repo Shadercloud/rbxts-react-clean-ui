@@ -148,7 +148,7 @@ Use `Alphanumeric` to allow only letters and digits:
 />
 ```
 
-Spaces, punctuation, and other symbols are rejected.
+Spaces, punctuation, and other symbols are rejected. Only ASCII letters and digits are accepted, so accented and non-Latin letters are rejected too; see [Non-English text](/non_english_text#input-validation).
 
 ### Email
 
@@ -162,7 +162,7 @@ Use `Email` to allow only characters valid within an email address, letters, dig
 />
 ```
 
-This only restricts which characters can be typed; it does not verify that the resulting text is a well-formed email address.
+This only restricts which characters can be typed; it does not verify that the resulting text is a well-formed email address. The letters and digits are ASCII only; see [Non-English text](/non_english_text#input-validation).
 
 ### String
 

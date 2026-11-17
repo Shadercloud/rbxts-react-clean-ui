@@ -216,6 +216,8 @@ Set `searchable` to render a filter textbox above the option list. The search bo
 </Select>
 ```
 
+Case is ignored for ASCII, Latin-1, Latin Extended-A, Greek, and basic Cyrillic letters. Other scripts match only when the case is the same, and text isn't normalised; see [Non-English text](/non_english_text#select-search) for the details.
+
 Options that only use `children`, without a `text` property, can't be matched against the search text and are always shown.
 
 Use `searchPlaceholder` to customize the search box's placeholder text, which defaults to `"Search"`.

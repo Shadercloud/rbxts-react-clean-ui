@@ -5,6 +5,7 @@ local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contex
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ElementHelper = _Helpers.ElementHelper
 local SizeHelper = _Helpers.SizeHelper
+local TextHelper = _Helpers.TextHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local SHRINK_SEARCH_STEPS = 24
 local SHRINK_FILL_TOLERANCE = 0.5
@@ -27,7 +28,8 @@ local Text = React.forwardRef(function(props, ref)
 		_condition = style.letterSpacing
 	end
 	local letterSpacing = _condition
-	local letterSpaced = letterSpacing ~= nil and letterSpacing ~= 0 and props.text ~= ""
+	local characters = if letterSpacing ~= nil and letterSpacing ~= 0 and props.text ~= "" then TextHelper:splitGraphemes(props.text) else nil
+	local letterSpaced = characters ~= nil
 	local rootRef = React.useRef()
 	local shrinkScale, setShrinkScale = React.useBinding(1)
 	local setLabel = React.useCallback(function(instance)
@@ -244,15 +246,7 @@ local Text = React.forwardRef(function(props, ref)
 			Scale = shrinkScale,
 		})))
 	end
-	if letterSpacing ~= nil and letterSpaced then
-		local characters = {}
-		for index = 0, #props.text - 1 do
-			local _text = props.text
-			local _arg0 = index + 1
-			local _arg1 = index + 1
-			local _arg0_1 = string.sub(_text, _arg0, _arg1)
-			table.insert(characters, _arg0_1)
-		end
+	if letterSpacing ~= nil and characters ~= nil then
 		local _attributes = {}
 		local _condition_4 = props.name
 		if _condition_4 == nil then

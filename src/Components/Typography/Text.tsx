@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
 import { CleanThemeContext } from "../../Contexts";
-import { ElementHelper, SizeHelper, TypographyHelper } from "../../Helpers";
+import { ElementHelper, SizeHelper, TextHelper, TypographyHelper } from "../../Helpers";
 import { TypographyOutline, TypographyStyle } from "../../Theme";
 import { SizeElementProps, TextVariant } from "../../Interfaces/";
 
@@ -51,7 +51,10 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
         const textwrapped = props.TextWrap !== false && props.TextWrapped !== false;
 
         const letterSpacing = props.letterSpacing ?? style.letterSpacing;
-        const letterSpaced = letterSpacing !== undefined && letterSpacing !== 0 && props.text !== "";
+        const characters = letterSpacing !== undefined && letterSpacing !== 0 && props.text !== ""
+            ? TextHelper.splitGraphemes(props.text)
+            : undefined;
+        const letterSpaced = characters !== undefined;
 
         const rootRef = React.useRef<GuiObject>();
         const [shrinkScale, setShrinkScale] = React.useBinding(1);
@@ -236,12 +239,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
             </>
         );
 
-        if (letterSpacing !== undefined && letterSpaced) {
-            const characters: string[] = [];
-            for (let index = 0; index < props.text.size(); index++) {
-                characters.push(props.text.sub(index + 1, index + 1));
-            }
-
+        if (letterSpacing !== undefined && characters !== undefined) {
             return <frame
                 key={props.name ?? "Text"}
                 ref={setFrame}

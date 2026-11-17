@@ -1,0 +1,99 @@
+---
+title: Non-English Text
+description: What to expect when displaying translated and non-Latin text with React Clean UI.
+icon: Languages
+---
+
+Every component draws its text through [`Text`](/components/typography/text) or [`Input`](/components/form/input), and both hand your strings to Roblox's `TextLabel` and `TextBox` unchanged. Accented Latin, Cyrillic, CJK, emoji, and other UTF-8 text therefore display as long as the font has the glyphs. Truncation (`TextTruncate`) is Roblox's own.
+
+A few features look at the characters in a string, and they have limits that are listed below.
+
+## Letter spacing
+
+Roblox has no letter-spacing property, so a `Text` with a nonzero `letterSpacing` draws one label per character. The text is split by grapheme cluster: a letter stays with its combining marks, and a whole emoji or flag sequence stays together.
+
+```tsx
+<Text text="ПРИВЕТ" letterSpacing={4} />
+<Text text="Crème brûlée" letterSpacing={2} />
+```
+
+Before this release the text was split by byte, which drew non-ASCII letters as "?".
+
+Some text can't be split without breaking it. When the text contains any character from a right-to-left or joined script, it is drawn as a single label with **no letter spacing**, because splitting would break letter joining and reverse the reading order. This applies to:
+
+* Hebrew, Arabic, Syriac, Thaana, and N'Ko
+* The Indic scripts, Tibetan, Myanmar, Khmer, and Mongolian
+* Bidirectional control characters
+
+Text that isn't valid UTF-8 is treated the same way. In both cases the label behaves like a `Text` without `letterSpacing`.
+
+Thai and Lao are split by grapheme and do get letter spacing.
+
+## Select search
+
+A [searchable `Select`](/components/form/select#searchable-options) matches options without regard to case for:
+
+* ASCII
+* Latin-1 and Latin Extended-A (accented Western and Central European letters)
+* Greek
+* Basic Cyrillic
+
+Case is not folded for other scripts, so those match only when the case is the same. These cases are also not handled:
+
+* Turkish dotted and dotless i (`İ` and `ı`) don't match `i` or `I`.
+* German sharp s (`ß`) doesn't match `SS`.
+* Greek final sigma (`ς`) doesn't match `σ` or `Σ`.
+* Text isn't normalised, so a composed letter (`é` as one code point) doesn't match its decomposed form (`e` followed by a combining accent).
+
+## Input validation
+
+The built-in character checks of `Input`'s [`validation`](/components/form/input#validation) prop are ASCII-only:
+
+* `"Alphanumeric"` accepts only `A`–`Z`, `a`–`z`, and `0`–`9`.
+* `"Email"` accepts the same letters and digits plus `@`, `.`, `_`, `-`, and `+`.
+
+Both reject accented and non-Latin letters. For names or other free text in any language, use `"String"` or `"None"` (or omit `validation`), which don't restrict the text.
+
+## Changing font per language
+
+The theme's `typography.<variant>.font` values (`display`, `title`, `heading`, `body`, `label`, and `caption`) set the font of every `Text` and `Input`. Passing a new theme object to the provider re-renders them with the new fonts.
+
+```tsx
+import React from "@rbxts/react";
+import { CleanUiProvider, DefaultTheme, extendTheme } from "@rbxts/react-clean-ui";
+
+const FONT_BY_LOCALE: Record<string, Enum.Font> = {
+    en: Enum.Font.Roboto,
+    ru: Enum.Font.SourceSans,
+    ja: Enum.Font.BuilderSans,
+};
+
+function themeForLocale(locale: string) {
+    const font = FONT_BY_LOCALE[locale] ?? Enum.Font.Roboto;
+
+    return extendTheme(DefaultTheme, {
+        typography: {
+            display: { font },
+            title: { font },
+            heading: { font },
+            body: { font },
+            label: { font },
+            caption: { font },
+        },
+    });
+}
+
+export function App(props: { locale: string; children?: React.ReactNode }) {
+    const theme = React.useMemo(() => themeForLocale(props.locale), [props.locale]);
+
+    return <CleanUiProvider theme={theme}>{props.children}</CleanUiProvider>;
+}
+```
+
+* Memoise the theme, as above, or build it outside render. A new theme object on every render re-renders every themed component.
+* The fonts in the example are placeholders. Choose fonts that cover the languages your game ships, and check glyph coverage in Studio.
+* Theme fonts are `Enum.Font` values only. A `Font` object, such as one from `Font.fromId`, isn't accepted by the theme today.
+* A component whose own theme typography sets `font` (`theme.components.<name>.typography`) keeps that font. Of the built-in themes, only `WoodenTheme` does this, for `badge`.
+* A single `Text` can use a different font with its [`typography`](/components/typography/text#custom-typography) prop.
+
+See [Customize / Extend](/theme/customize) for more on `extendTheme()`.

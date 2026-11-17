@@ -20,6 +20,8 @@ const NARROW_SLOT = 60;
 const WIDE_SLOT = 600;
 const SCALE_EPSILON = 0.01;
 const PROBE_STEP = 0.005;
+const PROBE_SWEEP_STEPS = 12;
+const WIDTH_EPSILON = 0.5;
 
 interface ShrinkCase {
 	slot: number;
@@ -62,18 +64,46 @@ function waitForScale(host: Instance, predicate: (scale: number) => boolean, mes
 	return waitForLayout(() => (predicate(scale.Scale) ? scale.Scale : undefined), `${message} (Scale is ${scale.Scale})`);
 }
 
-function assertWidthNear(root: GuiObject, width: number, label: string) {
-	const actual = rect(root).width;
-	Assert.true(actual <= width + 1, `${label}: expected the visual width ${actual} to fit within ${width}px`);
-	Assert.true(actual >= width - 2, `${label}: expected the visual width ${actual} to fill about ${width}px`);
-}
-
-function probeApp(scale: number) {
+function probeApp(scale: number, spaced = true) {
 	return (
 		<frame key="Probe" Size={UDim2.fromOffset(WIDE_SLOT, 40)} BackgroundTransparency={1}>
 			<uiscale key="ProbeScale" Scale={scale} />
-			<Text text={TITLE} TextWrap={false} letterSpacing={2} />
+			<Text text={TITLE} TextWrap={false} letterSpacing={spaced ? 2 : undefined} />
 		</frame>
+	);
+}
+
+function assertWidestFit(host: Instance, root: GuiObject, width: number, label: string) {
+	settleFrames(3);
+	const actual = rect(root).width;
+	Assert.true(actual <= width + WIDTH_EPSILON, `${label}: expected the visual width ${actual} to fit within ${width}px`);
+
+	const baseScale = shrinkScaleOf(host).Scale;
+	let overflowed = false;
+
+	withMounted(800, 200, probeApp(baseScale, false), (probe) => {
+		const probeRoot = waitForRoot(probe.host);
+
+		for (let step = 1; step <= PROBE_SWEEP_STEPS; step++) {
+			const probeScale = baseScale + step * PROBE_STEP;
+			probe.update(probeApp(probeScale, false));
+			settleFrames(2);
+
+			const probeWidth = rect(probeRoot).width;
+			if (probeWidth > width + WIDTH_EPSILON) {
+				overflowed = true;
+			} else {
+				Assert.true(
+					probeWidth <= actual + WIDTH_EPSILON,
+					`${label}: the text renders ${probeWidth}px at scale ${probeScale}, which still fits ${width}px, so ${actual}px is not the widest fit`,
+				);
+			}
+		}
+	});
+
+	Assert.true(
+		overflowed,
+		`${label}: expected a scale within ${PROBE_SWEEP_STEPS * PROBE_STEP} above ${baseScale} to overflow ${width}px, so ${actual}px is one render step short of it`,
 	);
 }
 
@@ -125,7 +155,7 @@ class TextShrinkToFit {
 			if (spacedFor(kind)) {
 				assertLargestFit(mounted.host, root, NARROW_SLOT, `${kind} text`);
 			} else {
-				assertWidthNear(root, NARROW_SLOT, `${kind} text`);
+				assertWidestFit(mounted.host, root, NARROW_SLOT, `${kind} text`);
 			}
 		});
 	}

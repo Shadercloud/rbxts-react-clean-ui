@@ -7,4 +7,5 @@ export * from './gui.helper';
 export * from './input.helper';
 export * from './size.helper';
 export * from './spacing.helper';
+export * from './text.helper';
 export * from './typography.helper';
