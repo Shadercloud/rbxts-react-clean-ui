@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { CleanThemeContext } from "../../Contexts";
+import { CleanThemeContext, TableSectionContext } from "../../Contexts";
 import { SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
 import { PaddingProps, ScalableElementProps, ScaleSize, SizeElementProps } from "../../Interfaces";
 import { Corners, Padding } from "../Decorator";
@@ -35,7 +35,6 @@ interface TableLayoutContextValue {
 	removeWidth: (id: number) => void;
 }
 
-const TableSectionContext = React.createContext<"header" | "body" | undefined>(undefined);
 const TableScaleContext = React.createContext<ScaleSize | undefined>(undefined);
 const TableLayoutContext = React.createContext<TableLayoutContextValue | undefined>(undefined);
 const TableColumnContext = React.createContext(0);
