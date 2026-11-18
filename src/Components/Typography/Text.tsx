@@ -1,5 +1,5 @@
 import React from "@rbxts/react";
-import { CleanThemeContext } from "../../Contexts";
+import { CleanThemeContext, TableSectionContext } from "../../Contexts";
 import { ElementHelper, SizeHelper, TextHelper, TypographyHelper } from "../../Helpers";
 import { TypographyOutline, TypographyStyle } from "../../Theme";
 import { SizeElementProps, TextVariant } from "../../Interfaces/";
@@ -39,6 +39,7 @@ function getContentWidth(parent: GuiBase2d): number {
 export const Text = React.forwardRef<TextLabel, TextProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
+        const tableSection = React.useContext(TableSectionContext);
 
 
         const style = props.typography ?? theme.typography[props.variant ?? "body"]
@@ -48,7 +49,8 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                 ? Enum.FontWeight.Bold
                 : props.weight ?? style.weight ?? Enum.FontWeight.Regular;
 
-        const textwrapped = props.TextWrap !== false && props.TextWrapped !== false;
+        const wrapByDefault = tableSection === undefined;
+        const textwrapped = (props.TextWrap ?? wrapByDefault) && (props.TextWrapped ?? wrapByDefault);
 
         const letterSpacing = props.letterSpacing ?? style.letterSpacing;
         const characters = letterSpacing !== undefined && letterSpacing !== 0 && props.text !== ""
