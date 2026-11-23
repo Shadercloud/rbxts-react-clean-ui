@@ -2,7 +2,9 @@ declare class ScrollerMountValidation {
     fillsHostByDefault(): void;
     shortContentContained(): void;
     canvasGrowsWithContent(): void;
-    defaultInset(): void;
+    insetNone(stable: boolean): void;
+    contentWidth(stable: boolean, childHeight: number, reserves: boolean): void;
+    gutterCountedOnce(): void;
     stableGutterNarrows(): void;
     stableGutterSteady(): void;
     plainRef(): void;

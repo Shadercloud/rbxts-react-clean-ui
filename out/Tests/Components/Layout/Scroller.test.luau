@@ -10,6 +10,7 @@ local Tag = _lunit.Tag
 local DisplayName = _lunit.DisplayName
 local _binding = Decorators
 local Skip = _binding.Skip
+local Each = _binding.Each
 local Scroller = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "Scroller").Scroller
 local SpacingHelper = TS.import(script, script.Parent.Parent.Parent.Parent, "Helpers", "spacing.helper").SpacingHelper
 local DefaultTheme = TS.import(script, script.Parent.Parent.Parent.Parent, "Theme").DefaultTheme
@@ -19,6 +20,7 @@ local assertAllDescendantsContained = _layout.assertAllDescendantsContained
 local assertContained = _layout.assertContained
 local assertSizeApprox = _layout.assertSizeApprox
 local findDescendant = _layout.findDescendant
+local settleFrames = _layout.settleFrames
 local sizeConstraintsOf = _layout.sizeConstraintsOf
 local soleSizeConstraint = _layout.soleSizeConstraint
 local waitForGuiObject = _layout.waitForGuiObject
@@ -28,6 +30,7 @@ local withMounted = _layout.withMounted
 local HOST_WIDTH = 300
 local HOST_HEIGHT = 150
 local SCROLLBAR_THICKNESS = 12
+local DEFAULT_GUTTER = SCROLLBAR_THICKNESS + SpacingHelper:GetPadding(DefaultTheme, nil)
 local function scrollerWithChild(childHeight)
 	return React.createElement(Scroller, nil, React.createElement("frame", {
 		key = "Content",
@@ -43,9 +46,6 @@ local function stableScroller(childHeight)
 		Size = UDim2.new(1, 0, 0, childHeight),
 		BackgroundTransparency = 1,
 	}))
-end
-local function gutterWidth(scroller)
-	return scroller.AbsoluteWindowSize.X - SCROLLBAR_THICKNESS - SpacingHelper:GetPadding(DefaultTheme, nil)
 end
 local function waitForScroller(host)
 	return waitForGuiObject(host, "Scroller")
@@ -95,20 +95,50 @@ do
 			assertContained(child, content, "tall child vs content frame")
 		end)
 	end
-	function ScrollerMountValidation:defaultInset()
-		withMounted(HOST_WIDTH, HOST_HEIGHT, scrollerWithChild(50), function(mounted)
+	function ScrollerMountValidation:insetNone(stable)
+		local element = if stable then stableScroller(50) else scrollerWithChild(50)
+		withMounted(HOST_WIDTH, HOST_HEIGHT, element, function(mounted)
 			local scroller = waitForScroller(mounted.host)
-			Assert:equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.ScrollBar)
+			Assert:equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.None)
+			Assert:equal(scroller.AbsoluteCanvasSize.X, scroller.AbsoluteSize.X)
+		end)
+	end
+	function ScrollerMountValidation:contentWidth(stable, childHeight, reserves)
+		local element = if stable then stableScroller(childHeight) else scrollerWithChild(childHeight)
+		withMounted(HOST_WIDTH, HOST_HEIGHT, element, function(mounted)
+			local scroller = waitForScroller(mounted.host)
+			local content = waitForGuiObject(scroller, "ScrollerContent")
+			local overflows = childHeight > HOST_HEIGHT
+			waitForLayout(function()
+				return if (scroller.AbsoluteCanvasSize.Y > scroller.AbsoluteWindowSize.Y) == overflows then true else nil
+			end, `Expected the {childHeight}px child {if overflows then "to" else "not to"} overflow`)
+			local expected = scroller.AbsoluteSize.X - (if reserves then DEFAULT_GUTTER else 0)
+			waitForWidth(content, expected, 0.5)
+			settleFrames(3)
+			assertSizeApprox(content, expected, nil, 0.5, "content width")
+		end)
+	end
+	function ScrollerMountValidation:gutterCountedOnce()
+		withMounted(HOST_WIDTH, HOST_HEIGHT, scrollerWithChild(400), function(mounted)
+			local scroller = waitForGuiObject(mounted.host, "Scroller", function(gui)
+				return gui.AbsoluteCanvasSize.Y > gui.AbsoluteWindowSize.Y and gui.AbsoluteWindowSize.Y > 0
+			end, "Timed out waiting for the Scroller to overflow")
+			local content = waitForGuiObject(scroller, "ScrollerContent")
+			waitForWidth(content, scroller.AbsoluteSize.X - DEFAULT_GUTTER, 0.5)
+			settleFrames(3)
+			Assert:equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.None)
+			Assert:equal(scroller.AbsoluteCanvasSize.X, scroller.AbsoluteSize.X)
+			assertSizeApprox(content, scroller.AbsoluteSize.X - DEFAULT_GUTTER, nil, 0.5, "single gutter")
 		end)
 	end
 	function ScrollerMountValidation:stableGutterNarrows()
 		withMounted(HOST_WIDTH, HOST_HEIGHT, stableScroller(50), function(mounted)
 			local scroller = waitForScroller(mounted.host)
 			local content = waitForGuiObject(scroller, "ScrollerContent")
-			Assert:equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.Always)
+			Assert:equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.None)
 			Assert["true"](Assert, scroller.AbsoluteCanvasSize.Y <= scroller.AbsoluteWindowSize.Y, `Expected 50px of content not to overflow (canvas {scroller.AbsoluteCanvasSize.Y}, window {scroller.AbsoluteWindowSize.Y})`)
-			waitForWidth(content, gutterWidth(scroller))
-			Assert["true"](Assert, content.AbsoluteSize.X < HOST_WIDTH - SCROLLBAR_THICKNESS, `Expected the content ({content.AbsoluteSize.X}) to leave the gutter free`)
+			waitForWidth(content, scroller.AbsoluteSize.X - DEFAULT_GUTTER, 0.5)
+			assertSizeApprox(content, HOST_WIDTH - DEFAULT_GUTTER, nil, 0.5, "stable gutter width")
 		end)
 	end
 	function ScrollerMountValidation:stableGutterSteady()
@@ -235,124 +265,178 @@ do
 		ScrollerMountValidation.canvasGrowsWithContent = _descriptor_8.value
 	end
 	local _decorator_6 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_7 = DisplayName("Without stableGutter the scrollbar inset only applies while the bar is shown")
-	local _descriptor_9 = Test(ScrollerMountValidation, "defaultInset", {
-		value = ScrollerMountValidation.defaultInset,
+	local _decorator_7 = Each({ { false }, { true } })
+	local _decorator_8 = DisplayName("The native inset is always None, so the canvas is as wide as the ScrollingFrame")
+	local _descriptor_9 = Test(ScrollerMountValidation, "insetNone", {
+		value = ScrollerMountValidation.insetNone,
 	})
 	if _descriptor_9 then
-		ScrollerMountValidation.defaultInset = _descriptor_9.value
+		ScrollerMountValidation.insetNone = _descriptor_9.value
 	end
-	local _descriptor_10 = _decorator_7(ScrollerMountValidation, "defaultInset", {
-		value = ScrollerMountValidation.defaultInset,
+	local _descriptor_10 = _decorator_8(ScrollerMountValidation, "insetNone", {
+		value = ScrollerMountValidation.insetNone,
 	})
 	if _descriptor_10 then
-		ScrollerMountValidation.defaultInset = _descriptor_10.value
+		ScrollerMountValidation.insetNone = _descriptor_10.value
 	end
-	local _descriptor_11 = _decorator_6(ScrollerMountValidation, "defaultInset", {
-		value = ScrollerMountValidation.defaultInset,
+	local _descriptor_11 = _decorator_7(ScrollerMountValidation, "insetNone", {
+		value = ScrollerMountValidation.insetNone,
 	})
 	if _descriptor_11 then
-		ScrollerMountValidation.defaultInset = _descriptor_11.value
+		ScrollerMountValidation.insetNone = _descriptor_11.value
 	end
-	local _decorator_8 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_9 = DisplayName("stableGutter always insets the bar and narrows short content as if it overflowed")
-	local _descriptor_12 = Test(ScrollerMountValidation, "stableGutterNarrows", {
-		value = ScrollerMountValidation.stableGutterNarrows,
+	local _descriptor_12 = _decorator_6(ScrollerMountValidation, "insetNone", {
+		value = ScrollerMountValidation.insetNone,
 	})
 	if _descriptor_12 then
-		ScrollerMountValidation.stableGutterNarrows = _descriptor_12.value
+		ScrollerMountValidation.insetNone = _descriptor_12.value
 	end
-	local _descriptor_13 = _decorator_9(ScrollerMountValidation, "stableGutterNarrows", {
-		value = ScrollerMountValidation.stableGutterNarrows,
+	local _decorator_9 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_10 = Each({ { false, 50, false }, { false, 400, true }, { true, 50, true }, { true, 400, true } })
+	local _decorator_11 = DisplayName("Content reserves the default gutter with stableGutter or while overflowing, and is full width otherwise")
+	local _descriptor_13 = Test(ScrollerMountValidation, "contentWidth", {
+		value = ScrollerMountValidation.contentWidth,
 	})
 	if _descriptor_13 then
-		ScrollerMountValidation.stableGutterNarrows = _descriptor_13.value
+		ScrollerMountValidation.contentWidth = _descriptor_13.value
 	end
-	local _descriptor_14 = _decorator_8(ScrollerMountValidation, "stableGutterNarrows", {
-		value = ScrollerMountValidation.stableGutterNarrows,
+	local _descriptor_14 = _decorator_11(ScrollerMountValidation, "contentWidth", {
+		value = ScrollerMountValidation.contentWidth,
 	})
 	if _descriptor_14 then
-		ScrollerMountValidation.stableGutterNarrows = _descriptor_14.value
+		ScrollerMountValidation.contentWidth = _descriptor_14.value
 	end
-	local _decorator_10 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_11 = DisplayName("With stableGutter the content width does not change when the content starts to overflow")
-	local _descriptor_15 = Test(ScrollerMountValidation, "stableGutterSteady", {
-		value = ScrollerMountValidation.stableGutterSteady,
+	local _descriptor_15 = _decorator_10(ScrollerMountValidation, "contentWidth", {
+		value = ScrollerMountValidation.contentWidth,
 	})
 	if _descriptor_15 then
-		ScrollerMountValidation.stableGutterSteady = _descriptor_15.value
+		ScrollerMountValidation.contentWidth = _descriptor_15.value
 	end
-	local _descriptor_16 = _decorator_11(ScrollerMountValidation, "stableGutterSteady", {
-		value = ScrollerMountValidation.stableGutterSteady,
+	local _descriptor_16 = _decorator_9(ScrollerMountValidation, "contentWidth", {
+		value = ScrollerMountValidation.contentWidth,
 	})
 	if _descriptor_16 then
-		ScrollerMountValidation.stableGutterSteady = _descriptor_16.value
-	end
-	local _descriptor_17 = _decorator_10(ScrollerMountValidation, "stableGutterSteady", {
-		value = ScrollerMountValidation.stableGutterSteady,
-	})
-	if _descriptor_17 then
-		ScrollerMountValidation.stableGutterSteady = _descriptor_17.value
+		ScrollerMountValidation.contentWidth = _descriptor_16.value
 	end
 	local _decorator_12 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_13 = DisplayName("An object ref and a callback ref both receive the root ScrollingFrame of the plain tree")
-	local _descriptor_18 = Test(ScrollerMountValidation, "plainRef", {
-		value = ScrollerMountValidation.plainRef,
+	local _decorator_13 = DisplayName("While overflowing, the gap is taken once from the full canvas width rather than twice")
+	local _descriptor_17 = Test(ScrollerMountValidation, "gutterCountedOnce", {
+		value = ScrollerMountValidation.gutterCountedOnce,
+	})
+	if _descriptor_17 then
+		ScrollerMountValidation.gutterCountedOnce = _descriptor_17.value
+	end
+	local _descriptor_18 = _decorator_13(ScrollerMountValidation, "gutterCountedOnce", {
+		value = ScrollerMountValidation.gutterCountedOnce,
 	})
 	if _descriptor_18 then
-		ScrollerMountValidation.plainRef = _descriptor_18.value
+		ScrollerMountValidation.gutterCountedOnce = _descriptor_18.value
 	end
-	local _descriptor_19 = _decorator_13(ScrollerMountValidation, "plainRef", {
-		value = ScrollerMountValidation.plainRef,
+	local _descriptor_19 = _decorator_12(ScrollerMountValidation, "gutterCountedOnce", {
+		value = ScrollerMountValidation.gutterCountedOnce,
 	})
 	if _descriptor_19 then
-		ScrollerMountValidation.plainRef = _descriptor_19.value
-	end
-	local _descriptor_20 = _decorator_12(ScrollerMountValidation, "plainRef", {
-		value = ScrollerMountValidation.plainRef,
-	})
-	if _descriptor_20 then
-		ScrollerMountValidation.plainRef = _descriptor_20.value
+		ScrollerMountValidation.gutterCountedOnce = _descriptor_19.value
 	end
 	local _decorator_14 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_15 = DisplayName("Without min or max props the plain ScrollingFrame has no UISizeConstraint")
-	local _descriptor_21 = Test(ScrollerMountValidation, "noConstraintWhenUnset", {
-		value = ScrollerMountValidation.noConstraintWhenUnset,
+	local _decorator_15 = DisplayName("stableGutter narrows short content by exactly one gutter even though the bar is hidden")
+	local _descriptor_20 = Test(ScrollerMountValidation, "stableGutterNarrows", {
+		value = ScrollerMountValidation.stableGutterNarrows,
+	})
+	if _descriptor_20 then
+		ScrollerMountValidation.stableGutterNarrows = _descriptor_20.value
+	end
+	local _descriptor_21 = _decorator_15(ScrollerMountValidation, "stableGutterNarrows", {
+		value = ScrollerMountValidation.stableGutterNarrows,
 	})
 	if _descriptor_21 then
-		ScrollerMountValidation.noConstraintWhenUnset = _descriptor_21.value
+		ScrollerMountValidation.stableGutterNarrows = _descriptor_21.value
 	end
-	local _descriptor_22 = _decorator_15(ScrollerMountValidation, "noConstraintWhenUnset", {
-		value = ScrollerMountValidation.noConstraintWhenUnset,
+	local _descriptor_22 = _decorator_14(ScrollerMountValidation, "stableGutterNarrows", {
+		value = ScrollerMountValidation.stableGutterNarrows,
 	})
 	if _descriptor_22 then
-		ScrollerMountValidation.noConstraintWhenUnset = _descriptor_22.value
-	end
-	local _descriptor_23 = _decorator_14(ScrollerMountValidation, "noConstraintWhenUnset", {
-		value = ScrollerMountValidation.noConstraintWhenUnset,
-	})
-	if _descriptor_23 then
-		ScrollerMountValidation.noConstraintWhenUnset = _descriptor_23.value
+		ScrollerMountValidation.stableGutterNarrows = _descriptor_22.value
 	end
 	local _decorator_16 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_17 = DisplayName("A maxWidth wraps the ScrollingFrame in a Frame that holds the only SizeConstraint and caps the inner window")
-	local _descriptor_24 = Test(ScrollerMountValidation, "wrapperClamped", {
-		value = ScrollerMountValidation.wrapperClamped,
+	local _decorator_17 = DisplayName("With stableGutter the content width does not change when the content starts to overflow")
+	local _descriptor_23 = Test(ScrollerMountValidation, "stableGutterSteady", {
+		value = ScrollerMountValidation.stableGutterSteady,
+	})
+	if _descriptor_23 then
+		ScrollerMountValidation.stableGutterSteady = _descriptor_23.value
+	end
+	local _descriptor_24 = _decorator_17(ScrollerMountValidation, "stableGutterSteady", {
+		value = ScrollerMountValidation.stableGutterSteady,
 	})
 	if _descriptor_24 then
-		ScrollerMountValidation.wrapperClamped = _descriptor_24.value
+		ScrollerMountValidation.stableGutterSteady = _descriptor_24.value
 	end
-	local _descriptor_25 = _decorator_17(ScrollerMountValidation, "wrapperClamped", {
-		value = ScrollerMountValidation.wrapperClamped,
+	local _descriptor_25 = _decorator_16(ScrollerMountValidation, "stableGutterSteady", {
+		value = ScrollerMountValidation.stableGutterSteady,
 	})
 	if _descriptor_25 then
-		ScrollerMountValidation.wrapperClamped = _descriptor_25.value
+		ScrollerMountValidation.stableGutterSteady = _descriptor_25.value
 	end
-	local _descriptor_26 = _decorator_16(ScrollerMountValidation, "wrapperClamped", {
-		value = ScrollerMountValidation.wrapperClamped,
+	local _decorator_18 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_19 = DisplayName("An object ref and a callback ref both receive the root ScrollingFrame of the plain tree")
+	local _descriptor_26 = Test(ScrollerMountValidation, "plainRef", {
+		value = ScrollerMountValidation.plainRef,
 	})
 	if _descriptor_26 then
-		ScrollerMountValidation.wrapperClamped = _descriptor_26.value
+		ScrollerMountValidation.plainRef = _descriptor_26.value
+	end
+	local _descriptor_27 = _decorator_19(ScrollerMountValidation, "plainRef", {
+		value = ScrollerMountValidation.plainRef,
+	})
+	if _descriptor_27 then
+		ScrollerMountValidation.plainRef = _descriptor_27.value
+	end
+	local _descriptor_28 = _decorator_18(ScrollerMountValidation, "plainRef", {
+		value = ScrollerMountValidation.plainRef,
+	})
+	if _descriptor_28 then
+		ScrollerMountValidation.plainRef = _descriptor_28.value
+	end
+	local _decorator_20 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_21 = DisplayName("Without min or max props the plain ScrollingFrame has no UISizeConstraint")
+	local _descriptor_29 = Test(ScrollerMountValidation, "noConstraintWhenUnset", {
+		value = ScrollerMountValidation.noConstraintWhenUnset,
+	})
+	if _descriptor_29 then
+		ScrollerMountValidation.noConstraintWhenUnset = _descriptor_29.value
+	end
+	local _descriptor_30 = _decorator_21(ScrollerMountValidation, "noConstraintWhenUnset", {
+		value = ScrollerMountValidation.noConstraintWhenUnset,
+	})
+	if _descriptor_30 then
+		ScrollerMountValidation.noConstraintWhenUnset = _descriptor_30.value
+	end
+	local _descriptor_31 = _decorator_20(ScrollerMountValidation, "noConstraintWhenUnset", {
+		value = ScrollerMountValidation.noConstraintWhenUnset,
+	})
+	if _descriptor_31 then
+		ScrollerMountValidation.noConstraintWhenUnset = _descriptor_31.value
+	end
+	local _decorator_22 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_23 = DisplayName("A maxWidth wraps the ScrollingFrame in a Frame that holds the only SizeConstraint and caps the inner window")
+	local _descriptor_32 = Test(ScrollerMountValidation, "wrapperClamped", {
+		value = ScrollerMountValidation.wrapperClamped,
+	})
+	if _descriptor_32 then
+		ScrollerMountValidation.wrapperClamped = _descriptor_32.value
+	end
+	local _descriptor_33 = _decorator_23(ScrollerMountValidation, "wrapperClamped", {
+		value = ScrollerMountValidation.wrapperClamped,
+	})
+	if _descriptor_33 then
+		ScrollerMountValidation.wrapperClamped = _descriptor_33.value
+	end
+	local _descriptor_34 = _decorator_22(ScrollerMountValidation, "wrapperClamped", {
+		value = ScrollerMountValidation.wrapperClamped,
+	})
+	if _descriptor_34 then
+		ScrollerMountValidation.wrapperClamped = _descriptor_34.value
 	end
 	ScrollerMountValidation = Tag("Studio")(ScrollerMountValidation) or ScrollerMountValidation
 end

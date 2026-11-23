@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.0
+
+### Additions
+
+- **`Scroller` bar sizing is themeable.** Two new optional keys under `theme.components.scroller`: `thickness` (the bar's width in px, default 12) and `gutter` (the gap kept to the right of the content for the bar, default `thickness` plus the `spacing` padding). The native bar, the custom thumb and the track all use `thickness`. When `gutter` is set, the `spacing` prop no longer changes the gap. A theme that sets only `barColor`, `thickness` and `gutter` gets a plain native bar with no track and no custom thumb. Shipped themes don't set either key, so they look the same as before.
+
+### Fixes
+
+- **`Scroller` reserves the bar gap once.** With `stableGutter`, the canvas was inset by the bar (`VerticalScrollBarInset = Always`) and `ScrollerContent` was narrowed by `thickness + spacing` as well, so content came out about 24px narrower than the window. The same thing happened without `stableGutter` while the bar was shown. The inset is now always `None` and only `ScrollerContent` reserves the gap. With `stableGutter`, content width is the window width minus `gutter`, whether or not the bar is shown, and never changes. Without it, the gap is reserved only while the bar is shown. With the default keys and the bar shown, content is now 12px wider than before (frame width minus 24 instead of minus 36), which matches the gap the old code meant to keep.
+
 ## 2.1.2
 
 ### Fixes

@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
-const { Skip } = Decorators;
+const { Skip, Each } = Decorators;
 import { Scroller } from "../../../Components/Layout/Scroller";
 import { SpacingHelper } from "../../../Helpers/spacing.helper";
 import { DefaultTheme } from "../../../Theme";
@@ -11,6 +11,7 @@ import {
 	assertContained,
 	assertSizeApprox,
 	findDescendant,
+	settleFrames,
 	sizeConstraintsOf,
 	soleSizeConstraint,
 	waitForGuiObject,
@@ -22,6 +23,7 @@ import {
 const HOST_WIDTH = 300;
 const HOST_HEIGHT = 150;
 const SCROLLBAR_THICKNESS = 12;
+const DEFAULT_GUTTER = SCROLLBAR_THICKNESS + SpacingHelper.GetPadding(DefaultTheme, undefined);
 
 function scrollerWithChild(childHeight: number) {
 	return (
@@ -37,10 +39,6 @@ function stableScroller(childHeight: number) {
 			<frame key="Content" Size={new UDim2(1, 0, 0, childHeight)} BackgroundTransparency={1} />
 		</Scroller>
 	);
-}
-
-function gutterWidth(scroller: ScrollingFrame) {
-	return scroller.AbsoluteWindowSize.X - SCROLLBAR_THICKNESS - SpacingHelper.GetPadding(DefaultTheme, undefined);
 }
 
 function waitForScroller(host: Instance): ScrollingFrame {
@@ -111,34 +109,86 @@ class ScrollerMountValidation {
 	}
 
 	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	@DisplayName("Without stableGutter the scrollbar inset only applies while the bar is shown")
+	@Each([[false], [true]])
+	@DisplayName("The native inset is always None, so the canvas is as wide as the ScrollingFrame")
 	@Test
-	public defaultInset() {
-		withMounted(HOST_WIDTH, HOST_HEIGHT, scrollerWithChild(50), (mounted) => {
+	public insetNone(stable: boolean) {
+		const element = stable ? stableScroller(50) : scrollerWithChild(50);
+
+		withMounted(HOST_WIDTH, HOST_HEIGHT, element, (mounted) => {
 			const scroller = waitForScroller(mounted.host);
 
-			Assert.equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.ScrollBar);
+			Assert.equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.None);
+			Assert.equal(scroller.AbsoluteCanvasSize.X, scroller.AbsoluteSize.X);
 		});
 	}
 
 	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	@DisplayName("stableGutter always insets the bar and narrows short content as if it overflowed")
+	@Each([
+		[false, 50, false],
+		[false, 400, true],
+		[true, 50, true],
+		[true, 400, true],
+	])
+	@DisplayName("Content reserves the default gutter with stableGutter or while overflowing, and is full width otherwise")
+	@Test
+	public contentWidth(stable: boolean, childHeight: number, reserves: boolean) {
+		const element = stable ? stableScroller(childHeight) : scrollerWithChild(childHeight);
+
+		withMounted(HOST_WIDTH, HOST_HEIGHT, element, (mounted) => {
+			const scroller = waitForScroller(mounted.host);
+			const content = waitForGuiObject<Frame>(scroller, "ScrollerContent");
+			const overflows = childHeight > HOST_HEIGHT;
+
+			waitForLayout(
+				() => ((scroller.AbsoluteCanvasSize.Y > scroller.AbsoluteWindowSize.Y) === overflows ? true : undefined),
+				`Expected the ${childHeight}px child ${overflows ? "to" : "not to"} overflow`,
+			);
+
+			const expected = scroller.AbsoluteSize.X - (reserves ? DEFAULT_GUTTER : 0);
+			waitForWidth(content, expected, 0.5);
+			settleFrames(3);
+			assertSizeApprox(content, expected, undefined, 0.5, "content width");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("While overflowing, the gap is taken once from the full canvas width rather than twice")
+	@Test
+	public gutterCountedOnce() {
+		withMounted(HOST_WIDTH, HOST_HEIGHT, scrollerWithChild(400), (mounted) => {
+			const scroller = waitForGuiObject<ScrollingFrame>(
+				mounted.host,
+				"Scroller",
+				(gui) => gui.AbsoluteCanvasSize.Y > gui.AbsoluteWindowSize.Y && gui.AbsoluteWindowSize.Y > 0,
+				"Timed out waiting for the Scroller to overflow",
+			);
+			const content = waitForGuiObject<Frame>(scroller, "ScrollerContent");
+
+			waitForWidth(content, scroller.AbsoluteSize.X - DEFAULT_GUTTER, 0.5);
+			settleFrames(3);
+
+			Assert.equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.None);
+			Assert.equal(scroller.AbsoluteCanvasSize.X, scroller.AbsoluteSize.X);
+			assertSizeApprox(content, scroller.AbsoluteSize.X - DEFAULT_GUTTER, undefined, 0.5, "single gutter");
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("stableGutter narrows short content by exactly one gutter even though the bar is hidden")
 	@Test
 	public stableGutterNarrows() {
 		withMounted(HOST_WIDTH, HOST_HEIGHT, stableScroller(50), (mounted) => {
 			const scroller = waitForScroller(mounted.host);
 			const content = waitForGuiObject<Frame>(scroller, "ScrollerContent");
 
-			Assert.equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.Always);
+			Assert.equal(scroller.VerticalScrollBarInset, Enum.ScrollBarInset.None);
 			Assert.true(
 				scroller.AbsoluteCanvasSize.Y <= scroller.AbsoluteWindowSize.Y,
 				`Expected 50px of content not to overflow (canvas ${scroller.AbsoluteCanvasSize.Y}, window ${scroller.AbsoluteWindowSize.Y})`,
 			);
-			waitForWidth(content, gutterWidth(scroller));
-			Assert.true(
-				content.AbsoluteSize.X < HOST_WIDTH - SCROLLBAR_THICKNESS,
-				`Expected the content (${content.AbsoluteSize.X}) to leave the gutter free`,
-			);
+			waitForWidth(content, scroller.AbsoluteSize.X - DEFAULT_GUTTER, 0.5);
+			assertSizeApprox(content, HOST_WIDTH - DEFAULT_GUTTER, undefined, 0.5, "stable gutter width");
 		});
 	}
 

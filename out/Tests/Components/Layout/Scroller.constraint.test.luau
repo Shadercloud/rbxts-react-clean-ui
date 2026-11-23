@@ -40,7 +40,8 @@ end
 local function assertScrolls(wrapper)
 	local scroller = waitForOverflow(wrapper)
 	assertNoConstraintUnder(scroller)
-	assertSizeApprox(scroller, nil, WINDOW_HEIGHT, 1, "ScrollingFrame window")
+	assertSizeApprox(wrapper, HOST_WIDTH, WINDOW_HEIGHT, 1, "Scroller wrapper")
+	assertSizeApprox(scroller, HOST_WIDTH, WINDOW_HEIGHT, 1, "ScrollingFrame window")
 	Assert["true"](Assert, scroller.AbsoluteCanvasSize.Y > scroller.AbsoluteWindowSize.Y, `Expected the canvas ({scroller.AbsoluteCanvasSize.Y}) to exceed the window ({scroller.AbsoluteWindowSize.Y})`)
 	waitForGuiObject(scroller, "ScrollerContent", function(gui)
 		return gui.AbsoluteSize.X <= scroller.AbsoluteSize.X - SCROLLBAR_THICKNESS
@@ -48,6 +49,7 @@ local function assertScrolls(wrapper)
 end
 local function tallScroller(props)
 	return React.createElement(Scroller, {
+		width = "100%",
 		height = props.height,
 		minHeight = props.minHeight,
 		maxHeight = props.maxHeight,

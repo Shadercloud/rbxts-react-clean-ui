@@ -1,12 +1,14 @@
 import React from "@rbxts/react";
 import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/lunit";
 
-const { Skip } = Decorators;
+const { Skip, Each } = Decorators;
 import { Scroller } from "../../../Components/Layout/Scroller";
+import { SpacingHelper } from "../../../Helpers/spacing.helper";
 import { ThemeProvider } from "../../../Providers/theme.provider";
 import { DefaultTheme, extendTheme } from "../../../Theme";
 import {
 	STUDIO_SKIP_MESSAGE,
+	assertSizeApprox,
 	settleFrames,
 	sizeConstraintsOf,
 	soleSizeConstraint,
@@ -20,6 +22,7 @@ const HOST_WIDTH = 300;
 const HOST_HEIGHT = 150;
 const TRACK_COLOR = Color3.fromRGB(255, 0, 0);
 const BORDER_COLOR = Color3.fromRGB(0, 0, 255);
+const BAR_COLOR = Color3.fromRGB(0, 255, 0);
 
 type ScrollerTheme = Partial<typeof DefaultTheme.components.scroller>;
 
@@ -33,6 +36,30 @@ function themed(scroller: ScrollerTheme, childHeight: number, extra?: React.Reac
 			)}
 		</ThemeProvider>
 	);
+}
+
+function stableChild(childHeight: number, spacing?: "xl" | "None") {
+	return (
+		<Scroller stableGutter={true} spacing={spacing}>
+			<frame key="Content" Size={new UDim2(1, 0, 0, childHeight)} BackgroundTransparency={1} />
+		</Scroller>
+	);
+}
+
+function waitForPlain(host: Instance): ScrollingFrame {
+	const scroller = waitForGuiObject<GuiObject>(host, "Scroller");
+	Assert.true(scroller.IsA("ScrollingFrame"), `Expected a plain ScrollingFrame root, got ${scroller.ClassName}`);
+	return scroller as ScrollingFrame;
+}
+
+function assertContentWidth(scroller: ScrollingFrame, gutter: number) {
+	const content = waitForGuiObject<Frame>(scroller, "ScrollerContent");
+	const expected = scroller.AbsoluteSize.X - gutter;
+
+	waitForWidth(content, expected, 0.5);
+	settleFrames(3);
+	Assert.equal(scroller.AbsoluteCanvasSize.X, scroller.AbsoluteSize.X);
+	assertSizeApprox(content, expected, undefined, 0.5, `content width with a ${gutter}px gutter`);
 }
 
 function waitForWrapper(host: Instance): Frame {
@@ -194,6 +221,126 @@ class ScrollerThemeDecoration {
 				waitForWidth(scroller, 180);
 			},
 		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Theme thickness sizes the native bar and theme gutter sets the reserved gap on its own")
+	@Test
+	public themeThicknessGutter() {
+		withMounted(
+			HOST_WIDTH,
+			HOST_HEIGHT,
+			themed({ barColor: BAR_COLOR, thickness: 8, gutter: 12 }, 0, stableChild(50)),
+			(mounted) => {
+				const scroller = waitForPlain(mounted.host);
+
+				Assert.equal(scroller.ScrollBarThickness, 8);
+				Assert.equal(scroller.ScrollBarImageColor3, BAR_COLOR);
+				assertContentWidth(scroller, 12);
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@Each([["xl"], ["None"]])
+	@DisplayName("Once the theme sets a gutter, the spacing prop no longer changes the reserved gap")
+	@Test
+	public gutterIgnoresSpacing(spacing: "xl" | "None") {
+		withMounted(
+			HOST_WIDTH,
+			HOST_HEIGHT,
+			themed({ thickness: 8, gutter: 12 }, 0, stableChild(50, spacing)),
+			(mounted) => {
+				assertContentWidth(waitForPlain(mounted.host), 12);
+			},
+		);
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Without thickness or gutter keys the bar is 12px and the gap is 12px plus the default spacing padding")
+	@Test
+	public defaultFallback() {
+		withMounted(HOST_WIDTH, HOST_HEIGHT, themed({}, 0, stableChild(50)), (mounted) => {
+			const scroller = waitForPlain(mounted.host);
+
+			Assert.equal(scroller.ScrollBarThickness, 12);
+			assertContentWidth(scroller, 12 + SpacingHelper.GetPadding(DefaultTheme, undefined));
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@Each([["xl"], ["None"]])
+	@DisplayName("Without a theme gutter the spacing prop widens or removes the padding part of the gap")
+	@Test
+	public spacingDrivesGutter(spacing: "xl" | "None") {
+		withMounted(HOST_WIDTH, HOST_HEIGHT, themed({ thickness: 8 }, 0, stableChild(50, spacing)), (mounted) => {
+			assertContentWidth(waitForPlain(mounted.host), 8 + SpacingHelper.GetPadding(DefaultTheme, spacing));
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("Negative thickness and gutter are treated as zero, leaving no bar and full-width content")
+	@Test
+	public negativeClamped() {
+		withMounted(HOST_WIDTH, HOST_HEIGHT, themed({ thickness: -4, gutter: -6 }, 0, stableChild(50)), (mounted) => {
+			const scroller = waitForPlain(mounted.host);
+
+			Assert.equal(scroller.ScrollBarThickness, 0);
+			assertContentWidth(scroller, 0);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("barColor, thickness and gutter alone keep the plain ScrollingFrame tree with no track or thumb")
+	@Test
+	public sizingKeysPlain() {
+		withMounted(HOST_WIDTH, HOST_HEIGHT, themed({ barColor: BAR_COLOR, thickness: 8, gutter: 12 }, 400), (mounted) => {
+			const scroller = waitForPlain(mounted.host);
+
+			Assert.equal(scroller.Parent, mounted.host);
+			Assert.undefined(mounted.host.FindFirstChild("ScrollerTrack", true));
+			Assert.undefined(mounted.host.FindFirstChild("ScrollerThumb", true));
+			Assert.undefined(mounted.host.FindFirstChild("ScrollingFrame", true));
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@Each([["theme"], ["default"]])
+	@DisplayName("The decorated ScrollerTrack and native bar are as wide as the theme thickness, or 12px by default")
+	@Test
+	public trackThickness(source: "theme" | "default") {
+		const expected = source === "theme" ? 8 : 12;
+		const theme: ScrollerTheme = source === "theme" ? { trackColor: TRACK_COLOR, thickness: 8 } : { trackColor: TRACK_COLOR };
+
+		withMounted(HOST_WIDTH, HOST_HEIGHT, themed(theme, 400), (mounted) => {
+			const wrapper = waitForWrapper(mounted.host);
+			const scroller = waitForOverflow(wrapper);
+			const track = waitForDescendant<Frame>(wrapper, "ScrollerTrack", () => true);
+
+			Assert.equal(track.Size.X.Offset, expected);
+			Assert.equal(track.Size.X.Scale, 0);
+			Assert.equal(scroller.ScrollBarThickness, expected);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("The custom ScrollerThumb is as wide as the theme thickness and sits flush with the right edge")
+	@Test
+	public thumbThickness() {
+		withMounted(HOST_WIDTH, HOST_HEIGHT, themed({ thumbBorderThickness: 2, thickness: 8 }, 400), (mounted) => {
+			const wrapper = waitForWrapper(mounted.host);
+			waitForOverflow(wrapper);
+			const thumb = waitForDescendant<Frame>(
+				wrapper,
+				"ScrollerThumb",
+				(gui) => gui.Visible,
+				"Timed out waiting for the custom thumb to show while overflowing",
+			);
+
+			Assert.equal(thumb.Size.X.Offset, 8);
+			Assert.equal(thumb.Position.X.Scale, 1);
+			Assert.equal(thumb.Position.X.Offset, -8);
+		});
 	}
 }
 

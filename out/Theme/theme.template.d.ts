@@ -37,6 +37,8 @@ export interface ThemeTemplate {
         };
         scroller: {
             barColor: Color3;
+            thickness?: number;
+            gutter?: number;
             trackColor?: Color3;
             trackTransparency?: number;
             thumbBorderColor?: Color3;

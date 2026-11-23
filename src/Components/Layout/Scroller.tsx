@@ -17,7 +17,7 @@ export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, 
     const theme = React.useContext(CleanThemeContext);
     const scrollerTheme = theme.components.scroller;
 
-    const thickness = 12;
+    const thickness = math.max(0, scrollerTheme.thickness ?? 12);
     const [isScrolling, setIsScrolling] = React.useState(false);
 
     const ref = React.useRef<ScrollingFrame>();
@@ -122,9 +122,9 @@ export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, 
             windowConn.Disconnect();
             positionConn.Disconnect();
         };
-    }, [decorated, hasCustomThumb]);
+    }, [decorated, hasCustomThumb, thickness]);
 
-    const spacing = SpacingHelper.GetPadding(theme, props.spacing)
+    const gutter = math.max(0, scrollerTheme.gutter ?? thickness + SpacingHelper.GetPadding(theme, props.spacing));
     const reserveGutter = props.stableGutter === true || isScrolling;
 
     const scrollingFrame = (
@@ -143,7 +143,7 @@ export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, 
             CanvasSize={UDim2.fromScale(1, 0)}
             BackgroundTransparency={1}
             ScrollBarThickness={thickness}
-            VerticalScrollBarInset={props.stableGutter === true ? Enum.ScrollBarInset.Always : Enum.ScrollBarInset.ScrollBar}
+            VerticalScrollBarInset={Enum.ScrollBarInset.None}
             AutomaticCanvasSize={Enum.AutomaticSize.Y}
         >
             {props.AutomaticSizeParent && <uilistlayout
@@ -152,7 +152,7 @@ export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, 
             />}
             <frame
                 key="ScrollerContent"
-                Size={new UDim2(1, reserveGutter ? -thickness - (spacing) : 0, 0, 0)}
+                Size={new UDim2(1, reserveGutter ? -gutter : 0, 0, 0)}
                 AutomaticSize={Enum.AutomaticSize.Y}
                 BackgroundTransparency={1}
                 BorderSizePixel={0}

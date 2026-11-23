@@ -45,7 +45,8 @@ function assertScrolls(wrapper: Frame) {
 	const scroller = waitForOverflow(wrapper);
 
 	assertNoConstraintUnder(scroller);
-	assertSizeApprox(scroller, undefined, WINDOW_HEIGHT, 1, "ScrollingFrame window");
+	assertSizeApprox(wrapper, HOST_WIDTH, WINDOW_HEIGHT, 1, "Scroller wrapper");
+	assertSizeApprox(scroller, HOST_WIDTH, WINDOW_HEIGHT, 1, "ScrollingFrame window");
 	Assert.true(
 		scroller.AbsoluteCanvasSize.Y > scroller.AbsoluteWindowSize.Y,
 		`Expected the canvas (${scroller.AbsoluteCanvasSize.Y}) to exceed the window (${scroller.AbsoluteWindowSize.Y})`,
@@ -60,7 +61,7 @@ function assertScrolls(wrapper: Frame) {
 
 function tallScroller(props: { height: number; minHeight?: number; maxHeight?: number }) {
 	return (
-		<Scroller height={props.height} minHeight={props.minHeight} maxHeight={props.maxHeight}>
+		<Scroller width="100%" height={props.height} minHeight={props.minHeight} maxHeight={props.maxHeight}>
 			<frame key="Content" Size={new UDim2(1, 0, 0, CONTENT_HEIGHT)} BackgroundTransparency={1} />
 		</Scroller>
 	);

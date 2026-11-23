@@ -66,7 +66,7 @@ Setting any of these props wraps the scroller in a transparent `Frame` (named `S
 
 ## Spacing
 
-The `spacing` prop reserves room for the scrollbar so it doesn't overlap the content. When the scrollbar is visible, the content area is inset by the scrollbar's thickness plus this spacing value.
+The `spacing` prop sets the gap between the content and the scrollbar. Together with the scrollbar's thickness it makes up the scroller's gutter: the space kept free on the right of the content for the bar. By default the gutter is the theme's `thickness` (12 pixels unless the theme changes it) plus the pixel value of `spacing`, looked up in `theme.spacing`. When `spacing` is omitted it falls back to `theme.default.spacing` (`md`, 12 pixels, in every shipped theme), and `spacing="None"` adds nothing. A theme can set the gutter directly with `gutter` (see [Theme values](#theme-values)).
 
 ```tsx
 <Scroller height="200" spacing="sm">
@@ -86,7 +86,9 @@ Roblox doesn't recalculate a parent's `AutomaticSize` correctly when its only ch
 
 ## Stable gutter
 
-By default the content area only narrows to make room for the scrollbar once content actually overflows, so content shifts sideways the moment the scrollbar appears. Set `stableGutter` to always reserve the scrollbar's gutter (like CSS `scrollbar-gutter: stable`), so the content has the same width whether or not it overflows. The third scroller in the [Theme values](#theme-values) demo shows this.
+By default `stableGutter` is off and the gutter is reserved only while the scrollbar is shown. The content uses the scroller's full width until it overflows, then narrows by the gutter when the scrollbar appears, and widens again when it disappears. Content that lays itself out by width, such as a grid of tiles, reflows each time.
+
+Set `stableGutter` to reserve the gutter all the time, whether or not the scrollbar is visible (like CSS `scrollbar-gutter: stable`). The gutter is reserved once, so the content's width is always the window's width minus the gutter and never changes when the scrollbar appears or disappears. The third scroller in the [Theme values](#theme-values) demo shows this.
 
 ```tsx
 <Scroller height="200" spacing="sm" stableGutter>
@@ -190,7 +192,7 @@ The ref always points at the `ScrollingFrame`, including when the scroller is wr
 | --- | --- | --- | --- |
 | `children` | `React.ReactNode` | `undefined` | Content rendered inside the scrolling area. |
 | `AutomaticSizeParent` | `boolean` | `false` | Adds an internal `UIListLayout` so an ancestor using `AutomaticSize` can size around the scroller. |
-| `stableGutter` | `boolean` | `false` | Always reserves the scrollbar's gutter, so content doesn't shift sideways when the scrollbar appears. |
+| `stableGutter` | `boolean` | `false` | Reserves the gutter once, all the time, so the content's width is always the window's width minus the gutter. When `false`, the gutter is only reserved while the scrollbar is shown. |
 | `onScroll` | `(canvasPosition: Vector2, scroller: ScrollingFrame) => void` | `undefined` | Called every time `CanvasPosition` changes, from user input or from code. |
 | `onNearEnd` | `() => void` | `undefined` | Called once each time the end of the content comes within `nearEndThreshold` pixels of the window's bottom edge. |
 | `nearEndThreshold` | `number` | `0` | Distance in pixels from the end of the content at which `onNearEnd` fires. Negative values are treated as `0`. |
@@ -203,7 +205,7 @@ The scroller also supports props inherited from the following interfaces.
 | Interface             | Purpose                                                              |
 | ---------------------- | --------------------------------------------------------------------- |
 | `SizeElementProps`     | Configures the scroller's `width`, `height`, and native `Size`, plus `minWidth`/`maxWidth`/`minHeight`/`maxHeight` to clamp its window (on a wrapper `Frame`, see [Sizing](#sizing)). |
-| `SpacedElementProps`   | Reserves space between the content and the scrollbar.                |
+| `SpacedElementProps`   | Sets the gap between the content and the scrollbar, part of the default gutter (see [Spacing](#spacing)). |
 | `PositionElementProps` | Configures the scroller's position, anchor point, and centering.     |
 
 ## Behaviour
@@ -213,10 +215,10 @@ The scroller also supports props inherited from the following interfaces.
 * Without an explicit `width`/`height`, the scroller fills 100% of its parent's size.
 * With none of `minWidth`, `maxWidth`, `minHeight`, or `maxHeight` set and a plain theme, the root is the `ScrollingFrame` itself. Setting any of them, or a decorated theme, makes the root a transparent `Frame` (named `Scroller` unless you pass `name`) that wraps a `ScrollingFrame` named `ScrollingFrame`, and the size constraint goes on that wrapper, never on the `ScrollingFrame`.
 * The scrollbar is only rendered when the content's height exceeds the scroller's visible window; it disappears automatically once content shrinks below that threshold.
-* While the scrollbar is visible, the content area is narrowed by the scrollbar's thickness plus `spacing`. With `stableGutter`, it is always narrowed, whether or not content overflows.
+* While the scrollbar is visible, the content area is narrowed by the gutter (the theme's `gutter`, or `thickness` plus `spacing` when it is unset). With `stableGutter`, it is always narrowed by the gutter, once, whether or not content overflows.
 * `onScroll`, `onNearEnd`, and `nearEndThreshold` can change between renders without reconnecting any signals.
 * An empty or non-overflowing list fires `onNearEnd` on mount, because its end is already in view.
-* The scrollbar is 12 pixels thick and inset within the scrolling frame.
+* The scrollbar is `thickness` pixels thick (12 by default) and inset within the scrolling frame.
 * The scroller's own background is fully transparent and has no border.
 
 ## Theme values
@@ -224,7 +226,9 @@ The scroller also supports props inherited from the following interfaces.
 The scroller uses values from `theme.components.scroller` for:
 
 * `barColor` — the scrollbar's colour (`ScrollBarImageColor3`), and the fill of the custom thumb when one is drawn
-* `trackColor` (optional) — draws a 12-pixel track behind the scrollbar while content overflows
+* `thickness` (optional, default `12`) — the scrollbar's width in pixels. The native scrollbar, the custom thumb, and the track all use it.
+* `gutter` (optional) — the space in pixels kept free on the right of the content for the scrollbar. When unset, it is `thickness` plus the scroller's `spacing` (see [Spacing](#spacing)).
+* `trackColor` (optional) — draws a `thickness`-wide track behind the scrollbar while content overflows. No track is drawn unless it is set.
 * `trackTransparency` (optional, default `0`) — the track's transparency. It has no effect unless `trackColor` is set.
 * `thumbBorderThickness` (optional) — when greater than `0`, outlines the scrollbar thumb with a border of this thickness
 * `thumbBorderColor` (optional) — the thumb border's colour. When unset, the border is black.
@@ -271,6 +275,20 @@ export function DecoratedScroller() {
 </Demo>
 
 No shipped theme sets the optional keys, so by default the scroller renders Roblox's plain native scrollbar.
+
+`thickness` and `gutter` don't decorate the scroller. A theme that sets only `barColor`, `thickness`, and `gutter` still gets a plain native scrollbar, with no track and no custom thumb, just thinner and with a different gap:
+
+```tsx
+const SlimTheme = extendTheme(DefaultTheme, {
+    components: {
+        scroller: {
+            barColor: Color3.fromHex("#697386"),
+            thickness: 8,
+            gutter: 12,
+        },
+    },
+});
+```
 
 Roblox's native scrollbar has no track, and its thumb can't take a border. Setting `trackColor` or a positive `thumbBorderThickness` therefore changes how the scroller is built: it is wrapped in a transparent `Frame` that draws the track and thumb as overlays, and the native thumb is hidden underneath (it still handles dragging). Setting a min or max size prop uses the same wrapper (see [Sizing](#sizing)), but only draws the track and thumb when the theme asks for them. This has a few consequences:
 

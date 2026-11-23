@@ -9,18 +9,22 @@ local SpacingHelper = _Helpers.SpacingHelper
 local Scroller = React.forwardRef(function(props, forwardedRef)
 	local theme = React.useContext(CleanThemeContext)
 	local scrollerTheme = theme.components.scroller
-	local thickness = 12
+	local _condition = scrollerTheme.thickness
+	if _condition == nil then
+		_condition = 12
+	end
+	local thickness = math.max(0, _condition)
 	local isScrolling, setIsScrolling = React.useState(false)
 	local ref = React.useRef()
 	local thumbRef = React.useRef()
 	local propsRef = React.useRef(props)
 	propsRef.current = props
 	local hasTrack = scrollerTheme.trackColor ~= nil
-	local _condition = scrollerTheme.thumbBorderThickness
-	if _condition == nil then
-		_condition = 0
+	local _condition_1 = scrollerTheme.thumbBorderThickness
+	if _condition_1 == nil then
+		_condition_1 = 0
 	end
-	local thumbBorderThickness = _condition
+	local thumbBorderThickness = _condition_1
 	local hasCustomThumb = thumbBorderThickness > 0
 	local sizeConstraint = SizeHelper:GetSizeConstraint(props)
 	local decorated = hasTrack or hasCustomThumb or sizeConstraint ~= nil
@@ -64,11 +68,11 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 			end
 			lastCanvasHeight = canvasHeight
 			local distance = canvasHeight - frame.AbsoluteWindowSize.Y - frame.CanvasPosition.Y
-			local _condition_1 = propsRef.current.nearEndThreshold
-			if _condition_1 == nil then
-				_condition_1 = 0
+			local _condition_2 = propsRef.current.nearEndThreshold
+			if _condition_2 == nil then
+				_condition_2 = 0
 			end
-			local threshold = math.max(0, _condition_1)
+			local threshold = math.max(0, _condition_2)
 			if distance <= threshold then
 				if nearEndArmed then
 					nearEndArmed = false
@@ -100,19 +104,23 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 			windowConn:Disconnect()
 			positionConn:Disconnect()
 		end
-	end, { decorated, hasCustomThumb })
-	local spacing = SpacingHelper:GetPadding(theme, props.spacing)
+	end, { decorated, hasCustomThumb, thickness })
+	local _condition_2 = scrollerTheme.gutter
+	if _condition_2 == nil then
+		_condition_2 = thickness + SpacingHelper:GetPadding(theme, props.spacing)
+	end
+	local gutter = math.max(0, _condition_2)
 	local reserveGutter = props.stableGutter == true or isScrolling
 	local _attributes = {}
 	local _result
 	if decorated then
 		_result = "ScrollingFrame"
 	else
-		local _condition_1 = props.name
-		if _condition_1 == nil then
-			_condition_1 = "Scroller"
+		local _condition_3 = props.name
+		if _condition_3 == nil then
+			_condition_3 = "Scroller"
 		end
-		_result = _condition_1
+		_result = _condition_3
 	end
 	_attributes.key = _result
 	_attributes.ref = setFrame
@@ -128,14 +136,14 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 	_attributes.CanvasSize = UDim2.fromScale(1, 0)
 	_attributes.BackgroundTransparency = 1
 	_attributes.ScrollBarThickness = thickness
-	_attributes.VerticalScrollBarInset = if props.stableGutter == true then Enum.ScrollBarInset.Always else Enum.ScrollBarInset.ScrollBar
+	_attributes.VerticalScrollBarInset = Enum.ScrollBarInset.None
 	_attributes.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	local scrollingFrame = (React.createElement("scrollingframe", _attributes, props.AutomaticSizeParent and React.createElement("uilistlayout", {
 		key = "AutomaticSizeLayout",
 		FillDirection = Enum.FillDirection.Horizontal,
 	}), React.createElement("frame", {
 		key = "ScrollerContent",
-		Size = UDim2.new(1, if reserveGutter then -thickness - spacing else 0, 0, 0),
+		Size = UDim2.new(1, if reserveGutter then -gutter else 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
@@ -144,11 +152,11 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 		return scrollingFrame
 	end
 	local _attributes_1 = {}
-	local _condition_1 = props.name
-	if _condition_1 == nil then
-		_condition_1 = "Scroller"
+	local _condition_3 = props.name
+	if _condition_3 == nil then
+		_condition_3 = "Scroller"
 	end
-	_attributes_1.key = _condition_1
+	_attributes_1.key = _condition_3
 	_attributes_1.AnchorPoint = SizeHelper:GetAnchor(props)
 	_attributes_1.AutomaticSize = SizeHelper:GetAutoSize(props, Enum.AutomaticSize.None)
 	_attributes_1.Position = SizeHelper:GetPosition(props)
@@ -160,8 +168,8 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 		MinSize = sizeConstraint.MinSize,
 		MaxSize = sizeConstraint.MaxSize,
 	}))
-	local _condition_2 = hasTrack
-	if _condition_2 then
+	local _condition_4 = hasTrack
+	if _condition_4 then
 		local _attributes_2 = {
 			key = "ScrollerTrack",
 			AnchorPoint = Vector2.new(1, 0),
@@ -172,15 +180,15 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 			Active = false,
 			BackgroundColor3 = scrollerTheme.trackColor,
 		}
-		local _condition_3 = scrollerTheme.trackTransparency
-		if _condition_3 == nil then
-			_condition_3 = 0
+		local _condition_5 = scrollerTheme.trackTransparency
+		if _condition_5 == nil then
+			_condition_5 = 0
 		end
-		_attributes_2.BackgroundTransparency = _condition_3
+		_attributes_2.BackgroundTransparency = _condition_5
 		_attributes_2.BorderSizePixel = 0
-		_condition_2 = (React.createElement("frame", _attributes_2))
+		_condition_4 = (React.createElement("frame", _attributes_2))
 	end
-	return React.createElement("frame", _attributes_1, _exp, _condition_2, scrollingFrame, hasCustomThumb and (React.createElement("frame", {
+	return React.createElement("frame", _attributes_1, _exp, _condition_4, scrollingFrame, hasCustomThumb and (React.createElement("frame", {
 		key = "ScrollerThumb",
 		ref = thumbRef,
 		ZIndex = 3,
