@@ -37,7 +37,7 @@ class PieMountValidation {
 	@Test
 	public slicePerDataPoint() {
 		withMounted(300, 300, <Pie values={VALUES} />, (mounted) => {
-			const pie = waitForGuiObject<CanvasGroup>(mounted.host, "Pie");
+			const pie = waitForGuiObject<Frame>(mounted.host, "Pie");
 			assertNonZeroSize(pie, "mounted pie");
 
 			const wedges = getWedges(waitForHitArea(pie));
@@ -50,11 +50,21 @@ class PieMountValidation {
 	}
 
 	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	@DisplayName("The Pie root renders as a plain Frame rather than an off-screen CanvasGroup")
+	@Test
+	public rootIsFrame() {
+		withMounted(300, 300, <Pie values={VALUES} />, (mounted) => {
+			const pie = waitForGuiObject<GuiObject>(mounted.host, "Pie");
+			Assert.equal(pie.ClassName, "Frame", `Expected the Pie root to be a Frame, got ${pie.ClassName}`);
+		});
+	}
+
+	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
 	@DisplayName("The HitArea stays inside the Pie root and every SegmentWedge stays inside the HitArea")
 	@Test
 	public slicesContained() {
 		withMounted(300, 300, <Pie values={VALUES} />, (mounted) => {
-			const pie = waitForGuiObject<CanvasGroup>(mounted.host, "Pie");
+			const pie = waitForGuiObject<Frame>(mounted.host, "Pie");
 			const hitArea = waitForHitArea(pie);
 
 			assertContained(hitArea, pie, "hit area");
@@ -71,7 +81,7 @@ class PieMountValidation {
 	@Test
 	public labelPerValue() {
 		withMounted(300, 300, <Pie values={VALUES} />, (mounted) => {
-			const pie = waitForGuiObject<CanvasGroup>(mounted.host, "Pie");
+			const pie = waitForGuiObject<Frame>(mounted.host, "Pie");
 
 			for (let index = 0; index < VALUES.size(); index++) {
 				const label = waitForGuiObject<Frame>(pie, `PieLabel-${index}`);

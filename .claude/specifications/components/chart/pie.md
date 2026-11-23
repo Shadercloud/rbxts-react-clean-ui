@@ -38,7 +38,7 @@
 
 Pie defaults live under `theme.components.charts.pie`:
 
-- `boxShadow` (`CssBoxShadow`, not the general `CssShadow` most other components use) — an optional shadow around the entire disc. When present, extra padding is reserved around the whole chart so the shadow is not clipped.
+- `boxShadow` (`CssBoxShadow`, not the general `CssShadow` most other components use) — an optional shadow around the entire disc. When present, extra padding is reserved around the whole chart (spread plus blur, shifted by the shadow offset) so the shadow fits inside the Pie's own bounds.
 - `hoverDarken` — declared but currently unused; see above.
 - `labels.spacing`, `labels.backgroundColor`, `labels.backgroundTransparency`, `labels.typography`, `labels.borderColor`, `labels.borderThickness`, `labels.cornerRadius` — each falls back to the equivalent `theme.components.box.*` value when undefined (except `spacing` and `typography`, which have no such box fallback and instead fall back to the shared spacing/typography helpers' own defaults).
 
@@ -53,4 +53,7 @@ A story should demonstrate: string labels, a custom-styled `PieLabel` (backgroun
 
 ## Implementation notes
 
+- **The root is a plain `Frame`, not a `CanvasGroup`.** A `CanvasGroup` draws its subtree to an off-screen texture and only re-captures when something inside changes, so a bad first capture (seen on PS5 when the Pie mounted while the GPU was busy: segments cut wrong, colours overlapping) stayed on screen permanently. Each `CanvasGroup` also costs texture memory, which is tight on consoles. It did nothing else useful: the disc shape comes from each `SegmentFill`'s own `UICorner` (0.5) clipped to half by its `ClipsDescendants` `SegmentWedge`, the `UICorner` (1) sits on `HitArea`, nothing sets `GroupTransparency`/`GroupColor3`, and segment colours are opaque. Don't put it back.
+- **The `boxShadow` `UIShadow` now draws unclipped.** Under the old `CanvasGroup` it was clipped to the root's bounds. The `shadowPadding` inset (spread + blur, shifted by the shadow offset) is kept unchanged so the disc's drawn size stays the same for existing users; it now simply leaves room for the shadow inside the Pie's bounds. Labels near the edge (large `label-distance`) are likewise no longer clipped at the root's bounds.
+- **Rotated ancestors.** Roblox `ClipsDescendants` stops working under a rotated ancestor, and `SegmentWedge` relies on it to halve each disc. The old `CanvasGroup` root happened to shield that; a Pie placed inside a rotated container will now show unclipped full discs. `Pie` has no rotation of its own, so this only matters for consumers rotating a parent.
 - The hover hit-test stays in screen pixels under a `UiScaleRoot`: `MouseMoved` coordinates, `GuiService:GetGuiInset()`, `AbsolutePosition` and `AbsoluteSize` are all screen pixels and nothing is written back as an offset.

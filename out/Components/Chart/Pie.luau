@@ -226,7 +226,7 @@ local function Pie(props)
 	_attributes.BackgroundTransparency = 1
 	_attributes.BorderSizePixel = 0
 	_attributes.Size = UDim2.fromScale(1, 1)
-	return React.createElement("canvasgroup", _attributes, shadowPadding, React.createElement("frame", {
+	return React.createElement("frame", _attributes, shadowPadding, React.createElement("frame", {
 		key = "HitArea",
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,

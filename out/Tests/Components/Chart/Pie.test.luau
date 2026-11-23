@@ -67,6 +67,14 @@ do
 			end
 		end)
 	end
+	function PieMountValidation:rootIsFrame()
+		withMounted(300, 300, React.createElement(Pie, {
+			values = VALUES,
+		}), function(mounted)
+			local pie = waitForGuiObject(mounted.host, "Pie")
+			Assert:equal(pie.ClassName, "Frame", `Expected the Pie root to be a Frame, got {pie.ClassName}`)
+		end)
+	end
 	function PieMountValidation:slicesContained()
 		withMounted(300, 300, React.createElement(Pie, {
 			values = VALUES,
@@ -114,44 +122,64 @@ do
 		PieMountValidation.slicePerDataPoint = _descriptor_2.value
 	end
 	local _decorator_2 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_3 = DisplayName("The HitArea stays inside the Pie root and every SegmentWedge stays inside the HitArea")
-	local _descriptor_3 = Test(PieMountValidation, "slicesContained", {
-		value = PieMountValidation.slicesContained,
+	local _decorator_3 = DisplayName("The Pie root renders as a plain Frame rather than an off-screen CanvasGroup")
+	local _descriptor_3 = Test(PieMountValidation, "rootIsFrame", {
+		value = PieMountValidation.rootIsFrame,
 	})
 	if _descriptor_3 then
-		PieMountValidation.slicesContained = _descriptor_3.value
+		PieMountValidation.rootIsFrame = _descriptor_3.value
 	end
-	local _descriptor_4 = _decorator_3(PieMountValidation, "slicesContained", {
-		value = PieMountValidation.slicesContained,
+	local _descriptor_4 = _decorator_3(PieMountValidation, "rootIsFrame", {
+		value = PieMountValidation.rootIsFrame,
 	})
 	if _descriptor_4 then
-		PieMountValidation.slicesContained = _descriptor_4.value
+		PieMountValidation.rootIsFrame = _descriptor_4.value
 	end
-	local _descriptor_5 = _decorator_2(PieMountValidation, "slicesContained", {
-		value = PieMountValidation.slicesContained,
+	local _descriptor_5 = _decorator_2(PieMountValidation, "rootIsFrame", {
+		value = PieMountValidation.rootIsFrame,
 	})
 	if _descriptor_5 then
-		PieMountValidation.slicesContained = _descriptor_5.value
+		PieMountValidation.rootIsFrame = _descriptor_5.value
 	end
 	local _decorator_4 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_5 = DisplayName("String labels render one PieLabel-N frame per value, each with text and inside the Pie root")
-	local _descriptor_6 = Test(PieMountValidation, "labelPerValue", {
-		value = PieMountValidation.labelPerValue,
+	local _decorator_5 = DisplayName("The HitArea stays inside the Pie root and every SegmentWedge stays inside the HitArea")
+	local _descriptor_6 = Test(PieMountValidation, "slicesContained", {
+		value = PieMountValidation.slicesContained,
 	})
 	if _descriptor_6 then
-		PieMountValidation.labelPerValue = _descriptor_6.value
+		PieMountValidation.slicesContained = _descriptor_6.value
 	end
-	local _descriptor_7 = _decorator_5(PieMountValidation, "labelPerValue", {
-		value = PieMountValidation.labelPerValue,
+	local _descriptor_7 = _decorator_5(PieMountValidation, "slicesContained", {
+		value = PieMountValidation.slicesContained,
 	})
 	if _descriptor_7 then
-		PieMountValidation.labelPerValue = _descriptor_7.value
+		PieMountValidation.slicesContained = _descriptor_7.value
 	end
-	local _descriptor_8 = _decorator_4(PieMountValidation, "labelPerValue", {
-		value = PieMountValidation.labelPerValue,
+	local _descriptor_8 = _decorator_4(PieMountValidation, "slicesContained", {
+		value = PieMountValidation.slicesContained,
 	})
 	if _descriptor_8 then
-		PieMountValidation.labelPerValue = _descriptor_8.value
+		PieMountValidation.slicesContained = _descriptor_8.value
+	end
+	local _decorator_6 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
+	local _decorator_7 = DisplayName("String labels render one PieLabel-N frame per value, each with text and inside the Pie root")
+	local _descriptor_9 = Test(PieMountValidation, "labelPerValue", {
+		value = PieMountValidation.labelPerValue,
+	})
+	if _descriptor_9 then
+		PieMountValidation.labelPerValue = _descriptor_9.value
+	end
+	local _descriptor_10 = _decorator_7(PieMountValidation, "labelPerValue", {
+		value = PieMountValidation.labelPerValue,
+	})
+	if _descriptor_10 then
+		PieMountValidation.labelPerValue = _descriptor_10.value
+	end
+	local _descriptor_11 = _decorator_6(PieMountValidation, "labelPerValue", {
+		value = PieMountValidation.labelPerValue,
+	})
+	if _descriptor_11 then
+		PieMountValidation.labelPerValue = _descriptor_11.value
 	end
 	PieMountValidation = Tag("Studio")(PieMountValidation) or PieMountValidation
 end

@@ -249,7 +249,7 @@ export function Pie(props: PieProps) {
     }
 
     return (
-        <canvasgroup
+        <frame
             key={props.name ?? "Pie"}
             BackgroundTransparency={1}
             BorderSizePixel={0}
@@ -329,6 +329,6 @@ export function Pie(props: PieProps) {
                 }
                 <uicorner key="Corners" CornerRadius={new UDim(1, 0)} />
             </frame>
-        </canvasgroup>
+        </frame>
     );
 }
