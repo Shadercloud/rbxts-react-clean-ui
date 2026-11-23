@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.1
+
+### Fixes
+
+- **Pie: root is a plain Frame instead of a CanvasGroup, so it never shows a stale capture and uses no off-screen texture.** A Pie mounted under GPU load (seen on PS5) could keep a bad first capture, with wrong wedge cuts and overlapping colours. The BoxShadow and labels now draw unclipped at the edge; `shadowPadding` is unchanged, so the pie keeps its size. A Pie under a rotated parent now draws whole, uncut discs, because Roblox ignores `ClipsDescendants` under rotation.
+
 ## 2.3.0
 
 ### Additions
