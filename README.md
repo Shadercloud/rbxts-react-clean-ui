@@ -104,6 +104,24 @@ root.render(
 
 See the [Quick Start docs](https://shadercloud.github.io/rbxts-react-clean-ui/quickstart) for the full walkthrough (including `default.project.json` setup), and the [`Stories`](./Stories) directory for live UI Labs examples you can open directly in Roblox Studio.
 
+## Scaling the UI
+
+Wrap your interface in one `UiScaleRoot` to make all of it larger or smaller, for example `1.5` on consoles and TVs:
+
+```tsx
+import { UiScaleRoot } from "@rbxts/react-clean-ui";
+
+const scale = game.GetService("GuiService").IsTenFootInterface() ? 1.5 : 1;
+
+root.render(
+  <UiScaleRoot scale={scale}>
+    <CleanUiProvider theme={DefaultTheme}>{/* your UI */}</CleanUiProvider>
+  </UiScaleRoot>
+);
+```
+
+Layouts, breakpoints, popups, and drag-and-drop keep working at any scale. See the [Scaling the UI guide](https://shadercloud.github.io/rbxts-react-clean-ui/scaling) for design pixels, the `useUiScale` and `useDesignViewportSize` hooks, and the conversion helpers.
+
 ## Project status
 
 React Clean UI is under active development and being built in public. APIs, component props, and installation details may still change before a first stable release. Feedback, issues, and contributions are welcome.

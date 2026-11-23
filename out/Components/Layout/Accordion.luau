@@ -2,13 +2,16 @@
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local useTween = TS.import(script, TS.getModule(script, "@rbxts", "react-ripple").src).useTween
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
+local toDesignPixels = _Helpers.toDesignPixels
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
@@ -128,6 +131,7 @@ local function toValues(value)
 end
 local function RenderedAccordionItem(props)
 	local theme = React.useContext(CleanThemeContext)
+	local uiScale = useUiScale()
 	local mounted, setMounted = React.useState(props.open)
 	local height, heightTween = useTween(0, {
 		duration = props.duration,
@@ -138,11 +142,12 @@ local function RenderedAccordionItem(props)
 			setMounted(true)
 			local content = contentRef.current
 			if content ~= nil then
-				heightTween:setGoal(content.AbsoluteSize.Y, {
+				local contentHeight = toDesignPixels(content.AbsoluteSize.Y, uiScale)
+				heightTween:setGoal(contentHeight, {
 					duration = props.duration,
 				})
 				if props.duration == 0 then
-					heightTween:setPosition(content.AbsoluteSize.Y)
+					heightTween:setPosition(contentHeight)
 				end
 				heightTween:start()
 			end
@@ -292,11 +297,12 @@ local function RenderedAccordionItem(props)
 		Change = {
 			AbsoluteSize = function(instance)
 				if props.open then
-					heightTween:setGoal(instance.AbsoluteSize.Y, {
+					local contentHeight = toDesignPixels(instance.AbsoluteSize.Y, uiScale)
+					heightTween:setGoal(contentHeight, {
 						duration = props.duration,
 					})
 					if props.duration == 0 then
-						heightTween:setPosition(instance.AbsoluteSize.Y)
+						heightTween:setPosition(contentHeight)
 					end
 					heightTween:start()
 				end

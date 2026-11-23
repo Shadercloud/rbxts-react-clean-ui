@@ -1,6 +1,8 @@
 import React from "@rbxts/react";
 import { ResolvedPadding } from "../../Interfaces";
 import { RegistryContext } from "../../Providers";
+import { useUiScale } from "../../Contexts";
+import { toDesignPixels } from "../../Helpers";
 
 interface GroupContextValue {
     size: Vector2;
@@ -25,6 +27,7 @@ let nextFallbackElementId = 0;
 function GroupElement(props: GroupElementProps) {
     const registry = React.useContext(RegistryContext);
     const context = React.useContext(GroupContext);
+    const uiScale = useUiScale();
     const idRef = React.useRef<string>();
 
     if (idRef.current === undefined) {
@@ -68,11 +71,13 @@ function GroupElement(props: GroupElementProps) {
             AutomaticSize={Enum.AutomaticSize.XY}
             Change={{
                 AbsoluteSize: (instance) => {
+                    const size = toDesignPixels(instance.AbsoluteSize, uiScale);
+
                     context.reportSize(
                         id,
                         new Vector2(
-                            instance.AbsoluteSize.X + horizontalPadding,
-                            instance.AbsoluteSize.Y + verticalPadding,
+                            size.X + horizontalPadding,
+                            size.Y + verticalPadding,
                         ),
                     );
                 },

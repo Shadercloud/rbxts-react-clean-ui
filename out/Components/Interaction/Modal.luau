@@ -13,6 +13,7 @@ local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local SizeHelper = _Helpers.SizeHelper
 local useGamepadSelection = _Helpers.useGamepadSelection
 local Draggable = TS.import(script, script.Parent.Parent, "Layout").Draggable
+local OverlayScaleFrame = TS.import(script, script.Parent.Parent, "Layout", "UiScaleRoot.frame").OverlayScaleFrame
 local Card = TS.import(script, script.Parent.Parent, "Surface").Card
 local nextModalId = 0
 local function generateModalId()
@@ -234,7 +235,9 @@ local function Modal(props)
 					Activated = function() end,
 				},
 			}, _exp, React.createElement(Card, _attributes, panelChildren)))
-			return ReactRoblox.createPortal(React.createElement("imagebutton", {
+			return ReactRoblox.createPortal(React.createElement(OverlayScaleFrame, {
+				ZIndex = backdropZIndex,
+			}, React.createElement("imagebutton", {
 				key = "ModalBackdrop",
 				ref = backdropRef,
 				Size = UDim2.fromScale(1, 1),
@@ -268,7 +271,7 @@ local function Modal(props)
 			}, if props.draggable then (React.createElement(Draggable, {
 				placeholder = false,
 				retainPosition = true,
-			}, panel)) else panel))), overlay)
+			}, panel)) else panel)))), overlay)
 		end,
 	})
 end

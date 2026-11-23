@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { CleanThemeContext } from "../../Contexts";
-import { ElementHelper, SizeHelper, TextHelper, TypographyHelper } from "../../Helpers";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
+import { ElementHelper, SizeHelper, TextHelper, TypographyHelper, toDesignPixels } from "../../Helpers";
 import { TypographyOutline, TypographyStyle } from "../../Theme";
 import { SizeElementProps, TextVariant } from "../../Interfaces/";
 
@@ -24,8 +24,8 @@ const SHRINK_SEARCH_STEPS = 24;
 const SHRINK_FILL_TOLERANCE = 0.5;
 const SHRINK_SCALE_PRECISION = 0.001;
 
-function getContentWidth(parent: GuiBase2d): number {
-    const width = parent.AbsoluteSize.X;
+function getContentWidth(parent: GuiBase2d, uiScale: number): number {
+    const width = toDesignPixels(parent.AbsoluteSize.X, uiScale);
     const padding = parent.FindFirstChildOfClass("UIPadding");
 
     if (padding === undefined)
@@ -39,6 +39,7 @@ function getContentWidth(parent: GuiBase2d): number {
 export const Text = React.forwardRef<TextLabel, TextProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
+        const uiScale = useUiScale();
 
 
         const style = props.typography ?? theme.typography[props.variant ?? "body"]
@@ -103,9 +104,9 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                     return;
 
                 const parent = root.Parent;
-                const available = shrinkWidth ?? (parent !== undefined && parent.IsA("GuiBase2d") ? getContentWidth(parent) : undefined);
+                const available = shrinkWidth ?? (parent !== undefined && parent.IsA("GuiBase2d") ? getContentWidth(parent, uiScale) : undefined);
                 let scale = shrinkScale.getValue();
-                let width = root.AbsoluteSize.X;
+                let width = toDesignPixels(root.AbsoluteSize.X, uiScale);
 
                 if (width <= 0 || available === undefined || available <= 0)
                     return;
@@ -148,13 +149,13 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
 
                     scale = nextScale;
                     setShrinkScale(scale);
-                    width = root.AbsoluteSize.X;
+                    width = toDesignPixels(root.AbsoluteSize.X, uiScale);
                 }
 
                 if (width > available && fitScale !== undefined && fitScale !== scale) {
                     scale = fitScale;
                     setShrinkScale(scale);
-                    width = root.AbsoluteSize.X;
+                    width = toDesignPixels(root.AbsoluteSize.X, uiScale);
                 }
 
                 settledAvailable = available;
@@ -184,7 +185,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                 ancestryConnection.Disconnect();
                 parentConnection?.Disconnect();
             };
-        }, [shrinkToFit, letterSpaced, shrinkWidth, shrinkMinScale]);
+        }, [shrinkToFit, letterSpaced, shrinkWidth, shrinkMinScale, uiScale]);
 
         const sizeConstraint = SizeHelper.GetSizeConstraint({
             minWidth: props.minWidth,

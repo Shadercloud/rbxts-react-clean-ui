@@ -1,8 +1,8 @@
 import React from "@rbxts/react";
 import { Column } from "./Column";
 import { BreakPointElementProps, SpacedElementProps } from "../../Interfaces/";
-import { CleanThemeContext, RowContext } from "../../Contexts";
-import { BreakpointHelper, SpacingHelper } from "../../Helpers/";
+import { CleanThemeContext, RowContext, useUiScale } from "../../Contexts";
+import { BreakpointHelper, SpacingHelper, toDesignPixels } from "../../Helpers/";
 
 interface RowProps extends SpacedElementProps, BreakPointElementProps {
     name?: string;
@@ -13,8 +13,10 @@ export const Row = React.forwardRef<Frame, RowProps>(
     (props, ref) => {
 
         const theme = React.useContext(CleanThemeContext);
+        const uiScale = useUiScale();
 
-        const [width, setWidth] = React.useState<number>(0);
+        const [screenWidth, setScreenWidth] = React.useState<number>(0);
+        const width = toDesignPixels(screenWidth, uiScale);
 
         const breakpoints = props.breakpoints ?? theme.breakpoints;
         const padding = new UDim(0, SpacingHelper.GetPadding(theme, props.spacing))
@@ -31,7 +33,7 @@ export const Row = React.forwardRef<Frame, RowProps>(
                     AbsoluteSize: (instance) => {
                         const nextWidth = instance.AbsoluteSize.X;
 
-                        setWidth((currentWidth) =>
+                        setScreenWidth((currentWidth) =>
                             currentWidth === nextWidth ? currentWidth : nextWidth
                         );
                     },

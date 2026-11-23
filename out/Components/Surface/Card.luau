@@ -11,7 +11,10 @@ local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local toDesignPixels = _Helpers.toDesignPixels
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local Padding = TS.import(script, script.Parent.Parent, "Decorator").Padding
 local CardContext = React.createContext({})
 local function resolveCssPositionOffset(position)
@@ -306,6 +309,7 @@ local CardFooter = React.forwardRef(function(props, ref)
 end)
 local Card = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
+	local uiScale = useUiScale()
 	local headerRect, setHeaderRect = React.useState()
 	local footerRect, setFooterRect = React.useState()
 	local wrapperAbsoluteY, setWrapperAbsoluteY = React.useState()
@@ -385,9 +389,9 @@ local Card = React.forwardRef(function(props, ref)
 	local overlayHeader = _binding.overlayHeader
 	local overlayFooter = _binding.overlayFooter
 	local hasOverlay = overlayHeader ~= nil or overlayFooter ~= nil
-	local headerClearance = if overlayHeader ~= nil and headerRect ~= nil and wrapperAbsoluteY ~= nil then math.max(0, (headerRect.position.Y + headerRect.size.Y) - wrapperAbsoluteY) else 0
+	local headerClearance = if overlayHeader ~= nil and headerRect ~= nil and wrapperAbsoluteY ~= nil then math.max(0, toDesignPixels((headerRect.position.Y + headerRect.size.Y) - wrapperAbsoluteY, uiScale)) else 0
 	local wrapperBottomY = if wrapperAbsoluteY ~= nil and wrapperAbsoluteSize ~= nil then wrapperAbsoluteY + wrapperAbsoluteSize.Y else nil
-	local footerClearance = if overlayFooter ~= nil and footerRect ~= nil and wrapperBottomY ~= nil then math.max(0, wrapperBottomY - footerRect.position.Y) else 0
+	local footerClearance = if overlayFooter ~= nil and footerRect ~= nil and wrapperBottomY ~= nil then math.max(0, toDesignPixels(wrapperBottomY - footerRect.position.Y, uiScale)) else 0
 	local _result
 	if hasOverlay then
 		local _object = table.clone(props)

@@ -37,6 +37,7 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 - `getGuiRoot` returns the parent of the element's outermost `LayerCollector` (PlayerGui, CoreGui, PluginGuiService, StarterGui, ...). It used to return PlayerGui whenever the game was running and otherwise require a PluginGuiService ancestor, throwing `"No root"` for anything under CoreGui (where the Studio tests mount).
 - `isGuiObjectHitAtPoint`: rect contains the point, the object and every `GuiObject` ancestor are `Visible`, no ancestor with `ClipsDescendants` (or a `CanvasGroup`) clips the point away, and the nearest `LayerCollector` is `Enabled` and not a `SurfaceGuiBase` (3D GUIs' absolute rects are in surface space, not screen space). Rotation is ignored. An object with no `LayerCollector` ancestor isn't drawn, so it never hits.
 - `isRenderedAbove(a, b)` compares two objects' draw order without walking the whole GUI tree. `getGuiRenderOrder` would be too slow to run on every mouse move. Different surfaces: `ScreenGui.DisplayOrder` (0 for other `LayerCollector`s), then tree order. Same surface, `Global`: own `ZIndex`, then descendants above ancestors, then tree order. Same surface, `Sibling`: descendants above ancestors, then the `ZIndex` of the two diverging sibling branches, then child index. Tree order means the child index of the diverging branches under the lowest common ancestor, with the later child on top. Non-`GuiObject` branches (e.g. a `Folder`) fall back to child index. Callers should scan with it rather than sort, because Luau's `table.sort` isn't stable.
+- Every point and rect `GuiHelper` compares is in screen pixels (input positions, `AbsolutePosition`, `AbsoluteSize`), so hit-testing is already correct under a `UiScaleRoot` and must not be converted with `toDesignPixels`.
 - `getGuiObjectsAtPosition` is kept for API compatibility, but Draggable no longer uses it. It only searches under the highest `Frame` ancestor and sorts by `ZIndex` alone.
 - `getGuiRenderOrder`: both sorts tie-break on child index (`rootIndex` for surfaces, `siblingIndex` for siblings) because Luau's `table.sort` is not stable. Without that, siblings with equal `DisplayOrder`/`ZIndex` come out in arbitrary order. A nested `LayerCollector` becomes its own render surface and is not recursed into from its parent surface.
 
@@ -69,6 +70,12 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 - `toFontFace` deliberately ignores the weight/style baked into the enum (`GothamBold`, `SourceSansBold` -> Bold): the caller's weight applies, as it did with `fromName`.
 - `toFontFace` wraps `Font.fromEnum` in `pcall` and falls back to `Font.fromName(font.Name, ...)` when it throws or yields an empty `Family` (`Enum.Font.Unknown`, enums newer than the engine).
 
+## src/Helpers/uiscale.helper.ts
+
+- `toDesignPixels(value, scale)` is `value / scale` and `toScreenPixels(value, scale)` is `value * scale`, overloaded so a `number` stays a `number` and a `Vector2` stays a `Vector2`. They are the only place a screen/design conversion is written: components call them with `useUiScale()` instead of an inline `/ scale`. Use behaviour and the list of converted components are in [layout/uiscaleroot.md](../specifications/components/layout/uiscaleroot.md).
+- The file has no imports and touches no Roblox service, so it can be required under Lune. Only the `number` overload can actually run there; Lune has no `Vector2` global without `@lune/roblox`.
+- At scale `1` both are exact identities (IEEE `x / 1 === x`), which is what keeps existing trees unchanged with no `UiScaleRoot`.
+
 ## src/Interfaces/css.types.ts
 
 - `CssRadius` (`CssSize | CssRadiusToken`) is likewise kept separate from `CssSize` and used only for radius values, so a token can't leak into a width/position/padding value, where nothing resolves it.
@@ -84,6 +91,16 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 ## src/Contexts/breakpoint.context.ts
 
 - `BreakpointContext`, `useBreakpoint` and `useBreakpointValue` are specified with their provider in [layout/breakpointprovider.md](../specifications/components/layout/breakpointprovider.md), including the implementation notes on hook ordering and the camera/viewport fallback.
+
+## src/Contexts/uiscale.context.ts
+
+- `UiScaleContext` holds the **effective** scale (default `1`); `UiScaleRoot` provides `parent * own`, so nested roots multiply. `useUiScale` and `useDesignViewportSize` live here next to the context, the same way `useBreakpoint` lives in `breakpoint.context.ts`. Specified with the component in [layout/uiscaleroot.md](../specifications/components/layout/uiscaleroot.md).
+- `useDesignViewportSize` keeps the raw `ViewportSize` in state and divides at render, so a scale change re-renders through the context without reconnecting anything. The camera binding (`bindCamera` on `Workspace.CurrentCamera` changes, a `ViewportSize` connection per camera) mirrors `useBreakpoint`'s viewport fallback.
+- `useBreakpoint`'s viewport fallback divides `ViewportSize.X` by `useUiScale()` and lists the scale in its effect's dependencies, so the camera signals reconnect with the new scale. `useUiScale` is called unconditionally, after the two existing `useContext` calls, so the hook order doesn't depend on whether a provider is present.
+
+## src/Contexts/overlay.context.ts
+
+- `OverlayContextValue.scale` is optional and is the effective `UiScaleContext` scale at the `OverlayProvider`. A hand-built context value without it is treated as `1`. Portalling components compare it against their own `useUiScale()` through `OverlayScaleFrame`; see the portal notes in [layout/uiscaleroot.md](../specifications/components/layout/uiscaleroot.md#implementation-notes).
 
 ## src/Contexts/modal.context.ts
 

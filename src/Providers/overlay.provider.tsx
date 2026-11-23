@@ -1,13 +1,15 @@
 import React, { useState } from "@rbxts/react";
-import { OverlayProviderProps, OverlayContext } from "../Contexts";
+import { OverlayProviderProps, OverlayContext, useUiScale } from "../Contexts";
 
 export function OverlayProvider(props: OverlayProviderProps) {
     const [overlay, setOverlay] = useState<Frame>();
+    const scale = useUiScale();
 
     return (
         <OverlayContext.Provider
             value={{
                 overlay,
+                scale,
             }}
         >
             {props.children}

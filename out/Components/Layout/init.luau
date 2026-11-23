@@ -52,6 +52,9 @@ end
 for _k, _v in TS.import(script, script, "Table") or {} do
 	exports[_k] = _v
 end
+for _k, _v in TS.import(script, script, "UiScaleRoot") or {} do
+	exports[_k] = _v
+end
 for _k, _v in TS.import(script, script, "VStack") or {} do
 	exports[_k] = _v
 end

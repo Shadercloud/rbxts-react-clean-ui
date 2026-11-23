@@ -20,7 +20,7 @@ This is `src/Components/Layout/Fieldset.tsx`, exported from the package root.
 
 ## Layout
 
-- `Fieldset` renders a `Container` (tracking its own `AbsoluteSize.X` for breakpoint calculation) wrapping an `HStack` with vertical-centered alignment and `HorizontalFlex={Enum.UIFlexAlignment.Fill}`, containing the `Fieldset.Label`/`Fieldset.Control` children directly.
+- `Fieldset` renders a `Container` (tracking its own `AbsoluteSize.X`, in design pixels under a [UiScaleRoot](./uiscaleroot.md), for breakpoint calculation) wrapping an `HStack` with vertical-centered alignment and `HorizontalFlex={Enum.UIFlexAlignment.Fill}`, containing the `Fieldset.Label`/`Fieldset.Control` children directly.
 - `Fieldset.Label` is a fixed-size flex item (`GrowRatio`/`ShrinkRatio` both `0`) — it never grows or shrinks to fill space.
 - `Fieldset.Control` grows and shrinks to fill remaining space (`GrowRatio`/`ShrinkRatio` both `1`) in the default (non-`checkbox`) mode. In `checkbox` mode, it behaves like the label — fixed-size (`GrowRatio`/`ShrinkRatio` both `0`) — since a checkbox control should size to its own content rather than stretch.
 - Whether the row wraps to a vertical stack is computed from the `Fieldset`'s own measured width against `breakpoints` (`props.breakpoints` or the theme default) and the `wrap` prop: the row wraps at breakpoints at-or-below `wrap` (default `"lg"`) and stays on one line above it. In practice this means the label/control stack vertically at narrow widths and sit side-by-side once the `Fieldset` is wide enough to cross past the `wrap` breakpoint.
@@ -40,3 +40,7 @@ The story should demonstrate:
 ## Loom
 
 - A short form-like scene with two or three `Fieldset` rows (a text input, a select, and a checkbox) at a width that keeps them inline, since this is the common usage shown in the existing `dragdrop`/`Fieldset` example scenes elsewhere in the package.
+
+## Implementation notes
+
+- The `Change.AbsoluteSize` handler stores the raw screen width. The breakpoint resolves against `toDesignPixels(width, useUiScale())` at render, so a [UiScaleRoot](./uiscaleroot.md) can't push the fieldset into a roomier (non-wrapping) layout.

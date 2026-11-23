@@ -95,3 +95,4 @@
 - The fallback for complex scripts is a plain label with no spacing rather than per-word or per-run labels: there is no way to letter-space joined text in Roblox without breaking shaping, and mixed-direction runs would need a bidi algorithm to order the labels.
 - Each character label is shaped on its own, so kerning and ligatures between clusters are lost on the letter-spaced path. That was already true for ASCII.
 - `renderTextDecorations`/`renderBoxDecorations` return Fragments whose unset parts are `false`, so they add no instances when nothing is set.
+- Shrink measurement is done in design pixels: `root.AbsoluteSize.X` and the parent's width in `getContentWidth` go through `toDesignPixels(..., useUiScale())` before the parent's `UIPadding` offsets are subtracted and before comparing with `maxWidth`. Under a [UiScaleRoot](../layout/uiscaleroot.md), unconverted screen widths would be compared with design-pixel `maxWidth`/padding. The effect depends on the scale.

@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { CssHelper, SizeHelper } from "../../Helpers";
-import { CleanThemeContext } from "../../Contexts";
+import { CssHelper, SizeHelper, toDesignPixels } from "../../Helpers";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
 import { ButtonFlag, CssBoxShadow, CssRadius, CssShadow } from "../../Interfaces";
 import { FieldStateStyle, FieldStateStyles, InnerShadowStyle } from "../../Theme";
 import { BoxShadow } from "../Decorator";
@@ -52,14 +52,16 @@ interface FieldInnerShadowProps {
 
 export function FieldInnerShadow(props: FieldInnerShadowProps) {
     const theme = React.useContext(CleanThemeContext);
+    const uiScale = useUiScale();
     const ref = React.useRef<Frame>();
-    const [height, setHeight] = React.useState(0);
+    const [screenHeight, setScreenHeight] = React.useState(0);
+    const height = toDesignPixels(screenHeight, uiScale);
 
     React.useEffect(() => {
         const frame = ref.current;
 
         if (frame !== undefined) {
-            setHeight(frame.AbsoluteSize.Y);
+            setScreenHeight(frame.AbsoluteSize.Y);
         }
     }, []);
 
@@ -87,7 +89,7 @@ export function FieldInnerShadow(props: FieldInnerShadowProps) {
             BorderSizePixel={0}
             Visible={fade > 0}
             Change={{
-                AbsoluteSize: (rbx) => setHeight(rbx.AbsoluteSize.Y),
+                AbsoluteSize: (rbx) => setScreenHeight(rbx.AbsoluteSize.Y),
             }}
         >
             {(innerRadius.Scale !== 0 || innerRadius.Offset !== 0) && <uicorner key="Corners" CornerRadius={innerRadius} />}

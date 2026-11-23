@@ -6,6 +6,7 @@ import { ModalCloseContext, useModalStack } from "../../Contexts/modal.context";
 import { GamepadSelectionMode, SizeHelper, useGamepadSelection } from "../../Helpers";
 import { IntentElementProps } from "../../Interfaces";
 import { Draggable } from "../Layout";
+import { OverlayScaleFrame } from "../Layout/UiScaleRoot.frame";
 import { BoxProps, Card } from "../Surface";
 
 export interface ModalProps extends BoxProps, IntentElementProps {
@@ -244,49 +245,51 @@ export function Modal(props: ModalProps) {
                 );
 
                 return ReactRoblox.createPortal(
-                    <imagebutton
-                        key="ModalBackdrop"
-                        ref={backdropRef}
-                        Size={UDim2.fromScale(1, 1)}
-                        AutoButtonColor={false}
-                        Active={true}
-                        BackgroundColor3={theme.components.modal.backdrop.backgroundColor}
-                        BackgroundTransparency={backdropTransparency}
-                        BorderSizePixel={0}
-                        ZIndex={backdropZIndex}
-                        Event={{
-                            Activated: () => {
-                                if (closeOnBackdropClick) {
-                                    requestClose();
-                                }
-                            },
-                        }}
-                    >
-                        <canvasgroup
-                            key="ModalPanel"
+                    <OverlayScaleFrame ZIndex={backdropZIndex}>
+                        <imagebutton
+                            key="ModalBackdrop"
+                            ref={backdropRef}
                             Size={UDim2.fromScale(1, 1)}
-                            BackgroundTransparency={1}
+                            AutoButtonColor={false}
+                            Active={true}
+                            BackgroundColor3={theme.components.modal.backdrop.backgroundColor}
+                            BackgroundTransparency={backdropTransparency}
                             BorderSizePixel={0}
-                            GroupTransparency={panelTransparency}
-                            ZIndex={2}
+                            ZIndex={backdropZIndex}
+                            Event={{
+                                Activated: () => {
+                                    if (closeOnBackdropClick) {
+                                        requestClose();
+                                    }
+                                },
+                            }}
                         >
-                            {!props.draggable && (
-                                <uilistlayout
-                                    key="CenterLayout"
-                                    FillDirection={Enum.FillDirection.Horizontal}
-                                    HorizontalAlignment={Enum.HorizontalAlignment.Center}
-                                    VerticalAlignment={Enum.VerticalAlignment.Center}
-                                />
-                            )}
-                            <ModalCloseContext.Provider value={requestClose}>
-                                {props.draggable ? (
-                                    <Draggable placeholder={false} retainPosition>
-                                        {panel}
-                                    </Draggable>
-                                ) : panel}
-                            </ModalCloseContext.Provider>
-                        </canvasgroup>
-                    </imagebutton>,
+                            <canvasgroup
+                                key="ModalPanel"
+                                Size={UDim2.fromScale(1, 1)}
+                                BackgroundTransparency={1}
+                                BorderSizePixel={0}
+                                GroupTransparency={panelTransparency}
+                                ZIndex={2}
+                            >
+                                {!props.draggable && (
+                                    <uilistlayout
+                                        key="CenterLayout"
+                                        FillDirection={Enum.FillDirection.Horizontal}
+                                        HorizontalAlignment={Enum.HorizontalAlignment.Center}
+                                        VerticalAlignment={Enum.VerticalAlignment.Center}
+                                    />
+                                )}
+                                <ModalCloseContext.Provider value={requestClose}>
+                                    {props.draggable ? (
+                                        <Draggable placeholder={false} retainPosition>
+                                            {panel}
+                                        </Draggable>
+                                    ) : panel}
+                                </ModalCloseContext.Provider>
+                            </canvasgroup>
+                        </imagebutton>
+                    </OverlayScaleFrame>,
                     overlay,
                 );
             }}

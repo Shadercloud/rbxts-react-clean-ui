@@ -4,8 +4,12 @@ local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local FlexItem = TS.import(script, script.Parent, "FlexItem").FlexItem
 local Container = TS.import(script, script.Parent, "Container").Container
 local HStack = TS.import(script, script.Parent, "HStack").HStack
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
-local BreakpointHelper = TS.import(script, script.Parent.Parent.Parent, "Helpers").BreakpointHelper
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
+local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local BreakpointHelper = _Helpers.BreakpointHelper
+local toDesignPixels = _Helpers.toDesignPixels
 local FieldsetContext = React.createContext(nil)
 local function FieldsetLabel(props)
 	local context = React.useContext(FieldsetContext)
@@ -40,7 +44,9 @@ local function FieldsetControl(props)
 end
 local Fieldset = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
-	local width, setWidth = React.useState(0)
+	local uiScale = useUiScale()
+	local screenWidth, setScreenWidth = React.useState(0)
+	local width = toDesignPixels(screenWidth, uiScale)
 	local labelActivated = React.useRef(Instance.new("BindableEvent")).current
 	React.useEffect(function()
 		return function()
@@ -76,7 +82,7 @@ local Fieldset = React.forwardRef(function(props, ref)
 	_attributes.ref = ref
 	_attributes.Change = {
 		AbsoluteSize = function(instance)
-			setWidth(instance.AbsoluteSize.X)
+			setScreenWidth(instance.AbsoluteSize.X)
 		end,
 	}
 	return React.createElement(FieldsetContext.Provider, {

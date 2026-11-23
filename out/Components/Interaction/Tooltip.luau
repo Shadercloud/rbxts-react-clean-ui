@@ -8,6 +8,7 @@ local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local CleanThemeContext = _Contexts.CleanThemeContext
 local DragStateContext = _Contexts.DragStateContext
 local OverlayConsumer = _Contexts.OverlayConsumer
+local useUiScale = _Contexts.useUiScale
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local ReactRoblox = TS.import(script, TS.getModule(script, "@rbxts", "react-roblox"))
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
@@ -20,6 +21,8 @@ local CssHelper = _Helpers.CssHelper
 local ElementHelper = _Helpers.ElementHelper
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
+local toDesignPixels = _Helpers.toDesignPixels
+local OverlayScaleFrame = TS.import(script, script.Parent.Parent, "Layout", "UiScaleRoot.frame").OverlayScaleFrame
 local useTween = TS.import(script, TS.getModule(script, "@rbxts", "react-ripple").src).useTween
 local _Tooltip_placement = TS.import(script, script.Parent, "Tooltip.placement")
 local computeTooltipLayout = _Tooltip_placement.computeTooltipLayout
@@ -50,6 +53,7 @@ local function readFrame(overlay)
 end
 local function TooltipPopup(props)
 	local theme = React.useContext(CleanThemeContext)
+	local uiScale = useUiScale()
 	local contentRef = React.useRef()
 	local contentSize, setContentSize = React.useState()
 	local frame, setFrame = React.useState(function()
@@ -117,7 +121,7 @@ local function TooltipPopup(props)
 	if _condition == nil then
 		_condition = 0
 	end
-	local contentWidth = _condition
+	local contentWidth = toDesignPixels(_condition, uiScale)
 	local _result_1 = contentSize
 	if _result_1 ~= nil then
 		_result_1 = _result_1.Y
@@ -126,26 +130,28 @@ local function TooltipPopup(props)
 	if _condition_1 == nil then
 		_condition_1 = 0
 	end
-	local contentHeight = _condition_1
+	local contentHeight = toDesignPixels(_condition_1, uiScale)
 	local cornerRadius = SizeHelper:toRadius(theme, theme.components.button.cornerRadius)
 	local _position = props.target.position
 	local _position_1 = frame.position
-	local targetPosition = _position - _position_1
+	local targetPosition = toDesignPixels(_position - _position_1, uiScale)
+	local targetSize = toDesignPixels(props.target.size, uiScale)
+	local frameSize = toDesignPixels(frame.size, uiScale)
 	local layout = computeTooltipLayout({
 		target = {
 			left = targetPosition.X,
 			top = targetPosition.Y,
-			right = targetPosition.X + props.target.size.X,
-			bottom = targetPosition.Y + props.target.size.Y,
+			right = targetPosition.X + targetSize.X,
+			bottom = targetPosition.Y + targetSize.Y,
 		},
 		content = {
 			width = contentWidth,
 			height = contentHeight,
 		},
 		bounds = getTooltipSafeArea({
-			width = frame.size.X,
-			height = frame.size.Y,
-		}, theme.components.tooltip.edgeMargin, frame.topbarBottom),
+			width = frameSize.X,
+			height = frameSize.Y,
+		}, theme.components.tooltip.edgeMargin, toDesignPixels(frame.topbarBottom, uiScale)),
 		placement = props.placement,
 		pointerSize = theme.components.tooltip.pointerSize,
 		shadow = shadowPadding,
@@ -574,7 +580,7 @@ local function Tooltip(props)
 			_attributes.layer = childLayer
 			_attributes.onHover = if interactive then setPopupHovered else nil
 			_attributes.onPress = if pinOnPress then unpin else nil
-			return ReactRoblox.createPortal(React.createElement(TooltipPopup, _attributes), overlay)
+			return ReactRoblox.createPortal(React.createElement(OverlayScaleFrame, nil, React.createElement(TooltipPopup, _attributes)), overlay)
 		end,
 	})))
 end

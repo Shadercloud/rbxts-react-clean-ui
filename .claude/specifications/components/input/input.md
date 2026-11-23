@@ -85,3 +85,4 @@ input: {
 - The `Focused` handler is added on top of `props.Event` and forwards to `props.Event.Focused`, just as `FocusLost` does; dropping that forwarding would silently swallow a consumer's handler.
 - `disabled` does not read `FieldsetContext.disabled` (see ISSUES.md): wiring it would change how existing disabled fieldsets look.
 - Multi-line input was considered and skipped: scrolling at a fixed height needs a `ScrollingFrame` around an auto-sized `TextBox` plus caret-follow scrolling (`CursorPosition` → text bounds), which the current `HStack`/`FlexItem` row doesn't support cleanly. The native `MultiLine` prop still passes through.
+- `FieldInnerShadow` keeps its measured height in screen pixels in state and divides by `useUiScale()` at render, because `size` (the fade band) is in design pixels. Under a [UiScaleRoot](../layout/uiscaleroot.md) the band would otherwise shrink by the scale.

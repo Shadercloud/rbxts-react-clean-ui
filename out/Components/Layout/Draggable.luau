@@ -14,9 +14,13 @@ local CleanThemeContext = _Contexts.CleanThemeContext
 local DragStateContext = _Contexts.DragStateContext
 local DraggableContext = _Contexts.DraggableContext
 local OverlayConsumer = _Contexts.OverlayConsumer
+local useUiScale = _Contexts.useUiScale
 local createPortal = TS.import(script, TS.getModule(script, "@rbxts", "react-roblox")).createPortal
 local Corners = TS.import(script, script.Parent.Parent, "Decorator").Corners
-local CustomInputService = TS.import(script, script.Parent.Parent.Parent, "Helpers").CustomInputService
+local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
+local CustomInputService = _Helpers.CustomInputService
+local toDesignPixels = _Helpers.toDesignPixels
+local OverlayScaleFrame = TS.import(script, script.Parent, "UiScaleRoot.frame").OverlayScaleFrame
 local DEFAULT_INPUT_TYPES = { Enum.UserInputType.MouseButton1, Enum.UserInputType.Touch }
 local PREVIEW_DRAG_STATE = {
 	preview = true,
@@ -121,6 +125,7 @@ local Draggable = React.forwardRef(function(props, _ref)
 	})
 	local registry = React.useContext(RegistryContext)
 	local parentDragState = React.useContext(DragStateContext)
+	local uiScale = useUiScale()
 	local rootRef = React.useRef()
 	local placeholderRef = React.useRef()
 	local dragInformationRef = React.useRef()
@@ -288,15 +293,15 @@ local Draggable = React.forwardRef(function(props, _ref)
 				local delta = inputPosition - _inputStart
 				local finalOverlayPosition = dragInformation.absolutePositionStart + delta
 				local _absolutePosition = parent.AbsolutePosition
-				local localTopLeft = finalOverlayPosition - _absolutePosition
+				local localTopLeft = toDesignPixels(finalOverlayPosition - _absolutePosition, uiScale)
 				local _absoluteSize = root.AbsoluteSize
 				local _anchorPoint = root.AnchorPoint
-				local anchorOffset = _absoluteSize * _anchorPoint
+				local anchorOffset = toDesignPixels(_absoluteSize * _anchorPoint, uiScale)
 				root.Position = UDim2.fromOffset(localTopLeft.X + anchorOffset.X, localTopLeft.Y + anchorOffset.Y)
 			end
 		end
 		setDragging(false)
-	end, { findDroppable, props.onDropped, props.retainPosition, props.id })
+	end, { findDroppable, props.onDropped, props.retainPosition, props.id, uiScale })
 	local contextValue = React.useMemo(function()
 		return {
 			isDragging = dragInformationRef.current ~= nil,
@@ -357,11 +362,12 @@ local Draggable = React.forwardRef(function(props, _ref)
 		ref = rootRef,
 		Visible = not dragging,
 	})
+	local designOverlaySize = toDesignPixels(overlaySize, uiScale)
 	local placeholder = (React.createElement(Placeholder, {
 		ref = placeholderRef,
 		Position = placeholderPosition.Position,
 		AnchorPoint = placeholderPosition.AnchorPoint,
-		Size = UDim2.fromOffset(overlaySize.X, overlaySize.Y),
+		Size = UDim2.fromOffset(designOverlaySize.X, designOverlaySize.Y),
 		AutomaticSize = Enum.AutomaticSize.None,
 		BackgroundTransparency = 0.3,
 		LayoutOrder = placeholderPosition.LayoutOrder,
@@ -377,9 +383,9 @@ local Draggable = React.forwardRef(function(props, _ref)
 				return nil
 			end
 			local _absolutePosition = overlay.AbsolutePosition
-			local localPosition = overlayPosition - _absolutePosition
+			local localPosition = toDesignPixels(overlayPosition - _absolutePosition, uiScale)
 			local position = UDim2.fromOffset(localPosition.X, localPosition.Y)
-			local size = UDim2.fromOffset(overlaySize.X, overlaySize.Y)
+			local size = UDim2.fromOffset(designOverlaySize.X, designOverlaySize.Y)
 			local preview = if props.renderOverlay ~= nil then (React.createElement("frame", {
 				key = "DragOverlay",
 				Position = position,
@@ -395,9 +401,11 @@ local Draggable = React.forwardRef(function(props, _ref)
 				Visible = true,
 				ZIndex = 100001,
 			})
-			return createPortal(React.createElement(DragStateContext.Provider, {
+			return createPortal(React.createElement(OverlayScaleFrame, {
+				ZIndex = 100001,
+			}, React.createElement(DragStateContext.Provider, {
 				value = PREVIEW_DRAG_STATE,
-			}, preview), overlay)
+			}, preview)), overlay)
 		end,
 	}))
 end)

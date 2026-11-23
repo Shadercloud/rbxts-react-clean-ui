@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useTween } from "@rbxts/react-ripple";
-import { CleanThemeContext } from "../../Contexts";
-import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TypographyHelper, toDesignPixels } from "../../Helpers";
 import { IconName, PaddingProps, ScalableElementProps } from "../../Interfaces";
 import { Corners, Padding } from "../Decorator";
 import { HoverButton, HoverButtonContext } from "../Input/HoverButton";
@@ -128,6 +128,7 @@ function toValues(value: string | string[] | undefined): string[] {
 
 function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boolean; duration: number; keepMounted: boolean; onActivate: () => void }) {
     const theme = React.useContext(CleanThemeContext);
+    const uiScale = useUiScale();
     const [mounted, setMounted] = React.useState(props.open);
     const [height, heightTween] = useTween(0, { duration: props.duration });
     const contentRef = React.useRef<Frame>();
@@ -137,8 +138,9 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
             setMounted(true);
             const content = contentRef.current;
             if (content !== undefined) {
-                heightTween.setGoal(content.AbsoluteSize.Y, { duration: props.duration });
-                if (props.duration === 0) heightTween.setPosition(content.AbsoluteSize.Y);
+                const contentHeight = toDesignPixels(content.AbsoluteSize.Y, uiScale);
+                heightTween.setGoal(contentHeight, { duration: props.duration });
+                if (props.duration === 0) heightTween.setPosition(contentHeight);
                 heightTween.start();
             }
         } else {
@@ -253,8 +255,9 @@ function RenderedAccordionItem(props: ParsedItem & { first: boolean; open: boole
                             Change={{
                                 AbsoluteSize: (instance) => {
                                     if (props.open) {
-                                        heightTween.setGoal(instance.AbsoluteSize.Y, { duration: props.duration });
-                                        if (props.duration === 0) heightTween.setPosition(instance.AbsoluteSize.Y);
+                                        const contentHeight = toDesignPixels(instance.AbsoluteSize.Y, uiScale);
+                                        heightTween.setGoal(contentHeight, { duration: props.duration });
+                                        if (props.duration === 0) heightTween.setPosition(contentHeight);
                                         heightTween.start();
                                     }
                                 }

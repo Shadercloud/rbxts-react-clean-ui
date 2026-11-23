@@ -5,6 +5,7 @@ local ReactRoblox = TS.import(script, TS.getModule(script, "@rbxts", "react-robl
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local CleanThemeContext = _Contexts.CleanThemeContext
 local OverlayContext = _Contexts.OverlayContext
+local useUiScale = _Contexts.useUiScale
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local CssHelper = _Helpers.CssHelper
@@ -12,6 +13,7 @@ local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TextHelper = _Helpers.TextHelper
 local TypographyHelper = _Helpers.TypographyHelper
+local toDesignPixels = _Helpers.toDesignPixels
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Gradient = _Decorator.Gradient
@@ -23,6 +25,7 @@ local FlexItem = _Layout.FlexItem
 local HStack = _Layout.HStack
 local Scroller = _Layout.Scroller
 local VStack = _Layout.VStack
+local OverlayScaleFrame = TS.import(script, script.Parent.Parent, "Layout", "UiScaleRoot.frame").OverlayScaleFrame
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
 local Input = TS.import(script, script.Parent, "Input").Input
@@ -306,6 +309,7 @@ local Select = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local overlay = React.useContext(OverlayContext)
 	local fieldset = React.useContext(FieldsetContext)
+	local uiScale = useUiScale()
 	local _condition = props.selected
 	if _condition == nil then
 		_condition = 0
@@ -471,7 +475,7 @@ local Select = React.forwardRef(function(props, ref)
 		_condition_4 = _result_2
 	end
 	local hasVisibleOptions = _condition_4
-	local dropdownHeight = math.min(contentHeight, if props["max-height"] ~= nil then SizeHelper:toUDim(props["max-height"]).Offset else theme.components.select.maxDropDownHeight)
+	local dropdownHeight = math.min(toDesignPixels(contentHeight, uiScale), if props["max-height"] ~= nil then SizeHelper:toUDim(props["max-height"]).Offset else theme.components.select.maxDropDownHeight)
 	local activateSelect = React.useCallback(function()
 		local button = buttonRef.current
 		local overlayInstance = overlay.overlay
@@ -484,11 +488,12 @@ local Select = React.forwardRef(function(props, ref)
 		end
 		local _absolutePosition = button.AbsolutePosition
 		local _absolutePosition_1 = overlayInstance.AbsolutePosition
-		local localPosition = _absolutePosition - _absolutePosition_1
+		local localPosition = toDesignPixels(_absolutePosition - _absolutePosition_1, uiScale)
+		local buttonSize = toDesignPixels(button.AbsoluteSize, uiScale)
 		setDropdownPosition(UDim2.fromOffset(localPosition.X, localPosition.Y))
-		setDropdownSize(UDim2.fromOffset(button.AbsoluteSize.X, button.AbsoluteSize.Y))
+		setDropdownSize(UDim2.fromOffset(buttonSize.X, buttonSize.Y))
 		setOpen(true)
-	end, { open, overlay.overlay, props.disabled })
+	end, { open, overlay.overlay, props.disabled, uiScale })
 	React.useEffect(function()
 		if props.disabled then
 			setOpen(false)
@@ -663,7 +668,7 @@ local Select = React.forwardRef(function(props, ref)
 			_result_9 = _result_9.boxShadow
 		end
 		_attributes_7.value = _result_9
-		_condition_10 = ReactRoblox.createPortal(React.createElement("frame", _attributes_4, _exp_9, _exp_10, React.createElement(FieldBoxShadow, _attributes_7), React.createElement(VStack, {
+		_condition_10 = ReactRoblox.createPortal(React.createElement(OverlayScaleFrame, nil, React.createElement("frame", _attributes_4, _exp_9, _exp_10, React.createElement(FieldBoxShadow, _attributes_7), React.createElement(VStack, {
 			spacing = "None",
 		}, props.searchable and (React.createElement(SelectSearchInput, {
 			value = query,
@@ -684,7 +689,7 @@ local Select = React.forwardRef(function(props, ref)
 			name = "NoResultsText",
 			text = "No Results",
 			typography = typography,
-		}))))), overlay.overlay)
+		})))))), overlay.overlay)
 	end
 	return React.createElement(Container, _attributes, _exp_1, _exp_2, _exp_3, _exp_4, React.createElement(SelectContext.Provider, {
 		value = context,

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.3.0
+
+### Additions
+
+- **Global UI scaling with `UiScaleRoot` (Layout).** `<UiScaleRoot scale={1.25}>` renders a transparent frame sized `UDim2.fromScale(1/scale, 1/scale)` with a `UIScale` inside it, so after scaling it exactly fills its parent and its children lay out in design pixels (screen pixels / scale). `ZIndex` and `name` are forwarded and the ref points to the frame. Nested roots multiply. With scale 1, or with no root, the instance tree is the same as before.
+- **`useUiScale()`** returns the effective scale from the nearest root(s), or 1 with none. **`useDesignViewportSize()`** returns `CurrentCamera.ViewportSize / scale` and updates on viewport resize, scale change and camera change. **`UiScaleContext`** is exported too.
+- **`toDesignPixels` / `toScreenPixels`** are pure helpers for a `number` or a `Vector2`. They return the same type they're given.
+
+### Fixes
+
+- **Breakpoints resolve in design pixels.** `BreakpointProvider`, `useBreakpoint`'s viewport fallback, `Row`, `Grid` and `Fieldset` divide the measured `AbsoluteSize` by the effective scale, so a panel no longer picks a roomier layout at a larger scale.
+- **Components are scale-correct under a root.** Measured screen-pixel sizes and positions that are written back into offsets are now converted to design pixels. This covers `Accordion`, `Group`, `Table`, `Card`, `Input`/`Select` fields, the `Select` dropdown, `Text` `shrinkToFit`, `Scroller`, `Draggable` and `Tooltip` placement. The `RadialMenu` hit test converts its ring thickness to screen pixels.
+- **Portalled overlays keep the right size and place.** When the `OverlayProvider` sits at a different scale from the component, the `Tooltip`, `Select` dropdown, `Modal` and `Draggable` preview are wrapped in a relative-scale frame (`UiScaleOverlay`). `Modal` and `Draggable` keep their stacking order.
+
 ## 2.2.0
 
 ### Additions

@@ -9,3 +9,4 @@ export * from './size.helper';
 export * from './spacing.helper';
 export * from './text.helper';
 export * from './typography.helper';
+export * from './uiscale.helper';

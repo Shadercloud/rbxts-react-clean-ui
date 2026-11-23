@@ -1,14 +1,18 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ElementHelper = _Helpers.ElementHelper
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
+local toDesignPixels = _Helpers.toDesignPixels
 local Scroller = React.forwardRef(function(props, forwardedRef)
 	local theme = React.useContext(CleanThemeContext)
 	local scrollerTheme = theme.components.scroller
+	local uiScale = useUiScale()
 	local _condition = scrollerTheme.thickness
 	if _condition == nil then
 		_condition = 12
@@ -44,8 +48,8 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 			if not thumb then
 				return nil
 			end
-			local windowHeight = frame.AbsoluteWindowSize.Y
-			local canvasHeight = frame.AbsoluteCanvasSize.Y
+			local windowHeight = toDesignPixels(frame.AbsoluteWindowSize.Y, uiScale)
+			local canvasHeight = toDesignPixels(frame.AbsoluteCanvasSize.Y, uiScale)
 			local maxScroll = canvasHeight - windowHeight
 			if maxScroll <= 0 or windowHeight <= 0 then
 				thumb.Visible = false
@@ -62,12 +66,12 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 			if onNearEnd == nil then
 				return nil
 			end
-			local canvasHeight = frame.AbsoluteCanvasSize.Y
+			local canvasHeight = toDesignPixels(frame.AbsoluteCanvasSize.Y, uiScale)
 			if canvasHeight > lastCanvasHeight then
 				nearEndArmed = true
 			end
 			lastCanvasHeight = canvasHeight
-			local distance = canvasHeight - frame.AbsoluteWindowSize.Y - frame.CanvasPosition.Y
+			local distance = canvasHeight - toDesignPixels(frame.AbsoluteWindowSize.Y, uiScale) - frame.CanvasPosition.Y
 			local _condition_2 = propsRef.current.nearEndThreshold
 			if _condition_2 == nil then
 				_condition_2 = 0
@@ -104,7 +108,7 @@ local Scroller = React.forwardRef(function(props, forwardedRef)
 			windowConn:Disconnect()
 			positionConn:Disconnect()
 		end
-	end, { decorated, hasCustomThumb, thickness })
+	end, { decorated, hasCustomThumb, thickness, uiScale })
 	local _condition_2 = scrollerTheme.gutter
 	if _condition_2 == nil then
 		_condition_2 = thickness + SpacingHelper:GetPadding(theme, props.spacing)

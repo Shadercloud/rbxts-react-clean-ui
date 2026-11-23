@@ -1,11 +1,14 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local _ = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local BreakpointHelper = _.BreakpointHelper
 local SizeHelper = _.SizeHelper
 local SpacingHelper = _.SpacingHelper
+local toDesignPixels = _.toDesignPixels
 local SETTLE_POLL_FRAMES = 10
 local function GridCell(props)
 	local measurementRef = React.useRef()
@@ -50,12 +53,14 @@ local function GridCell(props)
 end
 local Grid = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
-	local width, setWidth = React.useState(0)
+	local uiScale = useUiScale()
+	local screenWidth, setScreenWidth = React.useState(0)
 	local heights, setHeights = React.useState({
 		key = "",
 		values = {},
 	})
 	local lock, setLock = React.useState(nil)
+	local width = toDesignPixels(screenWidth, uiScale)
 	local breakpoints = props.breakpoints or theme.breakpoints
 	local breakpoint = BreakpointHelper:getBreakpoint(width, breakpoints)
 	local _condition = SizeHelper:resolveResponsiveValue(props.cols, breakpoint)
@@ -68,9 +73,9 @@ local Grid = React.forwardRef(function(props, ref)
 	local cellWidthOffset = math.floor(-gap * (cols - 1) / cols)
 	local cellWidth = UDim.new(cellWidthScale, cellWidthOffset)
 	local childCount = React.Children.count(props.children)
-	local measureKey = `{width}:{cols}:{gap}:{childCount}`
+	local measureKey = `{width}:{cols}:{gap}:{childCount}:{uiScale}`
 	local locked = lock ~= nil and lock.key == measureKey
-	local lockedHeight = if locked then lock.height else 0
+	local lockedHeight = if locked then toDesignPixels(lock.height, uiScale) else 0
 	React.useEffect(function()
 		local _condition_1 = locked or heights.key ~= measureKey
 		if not _condition_1 then
@@ -136,7 +141,7 @@ local Grid = React.forwardRef(function(props, ref)
 	_attributes.Change = {
 		AbsoluteSize = function(instance)
 			local nextWidth = instance.AbsoluteSize.X
-			setWidth(function(currentWidth)
+			setScreenWidth(function(currentWidth)
 				return if currentWidth == nextWidth then currentWidth else nextWidth
 			end)
 		end,

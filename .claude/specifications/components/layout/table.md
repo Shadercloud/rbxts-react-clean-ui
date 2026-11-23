@@ -35,3 +35,4 @@ Table defaults live under `theme.components.table`:
 ## Implementation notes
 
 - The measurement frame's `Change.AbsoluteSize` handler (`reportResizedMeasurement`) defers the report with `task.defer` instead of calling `reportWidth` synchronously. In the Loom docs preview, `AbsoluteSize` fires inside the runtime's layout flush, and the instance writes from a state update made there never reach the DOM. The table then stays collapsed to 0 px wide with nothing visible. The deferred report only runs if `measurementRef.current` is still that instance, so a cell that unmounts before the defer runs can't re-add a width that `removeWidth` already dropped.
+- Measured cell widths are reported in design pixels (`toDesignPixels(AbsoluteSize.X, useUiScale())`), since column widths are written back as offsets. `reportMeasurement` depends on the scale, so a [UiScaleRoot](./uiscaleroot.md) scale change re-reports from the mount effect.

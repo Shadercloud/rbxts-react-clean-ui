@@ -2,6 +2,7 @@ import React from "@rbxts/react";
 
 export interface OverlayContextValue {
     overlay?: Frame;
+    scale?: number;
 }
 
 export const OverlayContext = React.createContext<OverlayContextValue>({});

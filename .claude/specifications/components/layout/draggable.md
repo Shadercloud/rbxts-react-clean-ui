@@ -89,3 +89,6 @@ The story should demonstrate:
 - `contextValue.isDragging` is initialised from `dragInformationRef` so a mid-drag re-render (new inline callback props → new context value → new registration) doesn't reset it and let a second drag start.
 - The unmount cleanup sends the pending `dragLeave` with `DragInformation.root`, captured in `beginDrag`, not `rootRef.current`. The Luau reconciler detaches a deleted host component's object ref in the mutation phase, before passive effect cleanups run, so `rootRef.current` is already `nil` there.
 - `isInteractiveDescendantAtInput` scans only the handle's own descendants; the old version searched the whole highest `Frame` ancestor.
+- Under a [UiScaleRoot](./uiscaleroot.md), the drag's `overlaySize` and `overlayPosition` stay in screen pixels in state and are converted with `toDesignPixels(..., useUiScale())` at render for the placeholder size and the preview's overlay-relative position and size. `retainPosition` converts the final top-left and anchor offset the same way before writing `root.Position`.
+- The preview portal is wrapped in `OverlayScaleFrame` with `ZIndex={100001}` (the preview's own `ZIndex`), see the portal notes in `layout/uiscaleroot.md`.
+- Drop-target hit-testing and `DragEventInfo.position` stay in screen pixels: they compare input positions with `AbsolutePosition`s only.

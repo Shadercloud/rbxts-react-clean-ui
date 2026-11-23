@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
-import { CleanThemeContext } from "../../Contexts";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
 import { PositionElementProps, SizeElementProps, SpacedElementProps } from "../../Interfaces";
-import { ElementHelper, SizeHelper, SpacingHelper } from "../../Helpers";
+import { ElementHelper, SizeHelper, SpacingHelper, toDesignPixels } from "../../Helpers";
 
 export interface ScrollerProps extends SizeElementProps, SpacedElementProps, PositionElementProps {
     children?: React.ReactNode;
@@ -16,6 +16,7 @@ export interface ScrollerProps extends SizeElementProps, SpacedElementProps, Pos
 export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, forwardedRef) => {
     const theme = React.useContext(CleanThemeContext);
     const scrollerTheme = theme.components.scroller;
+    const uiScale = useUiScale();
 
     const thickness = math.max(0, scrollerTheme.thickness ?? 12);
     const [isScrolling, setIsScrolling] = React.useState(false);
@@ -51,8 +52,8 @@ export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, 
             const thumb = thumbRef.current;
             if (!thumb) return;
 
-            const windowHeight = frame.AbsoluteWindowSize.Y;
-            const canvasHeight = frame.AbsoluteCanvasSize.Y;
+            const windowHeight = toDesignPixels(frame.AbsoluteWindowSize.Y, uiScale);
+            const canvasHeight = toDesignPixels(frame.AbsoluteCanvasSize.Y, uiScale);
             const maxScroll = canvasHeight - windowHeight;
 
             if (maxScroll <= 0 || windowHeight <= 0) {
@@ -72,11 +73,11 @@ export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, 
             const onNearEnd = propsRef.current.onNearEnd;
             if (onNearEnd === undefined) return;
 
-            const canvasHeight = frame.AbsoluteCanvasSize.Y;
+            const canvasHeight = toDesignPixels(frame.AbsoluteCanvasSize.Y, uiScale);
             if (canvasHeight > lastCanvasHeight) nearEndArmed = true;
             lastCanvasHeight = canvasHeight;
 
-            const distance = canvasHeight - frame.AbsoluteWindowSize.Y - frame.CanvasPosition.Y;
+            const distance = canvasHeight - toDesignPixels(frame.AbsoluteWindowSize.Y, uiScale) - frame.CanvasPosition.Y;
             const threshold = math.max(0, propsRef.current.nearEndThreshold ?? 0);
 
             if (distance <= threshold) {
@@ -122,7 +123,7 @@ export const Scroller = React.forwardRef<ScrollingFrame, ScrollerProps>((props, 
             windowConn.Disconnect();
             positionConn.Disconnect();
         };
-    }, [decorated, hasCustomThumb, thickness]);
+    }, [decorated, hasCustomThumb, thickness, uiScale]);
 
     const gutter = math.max(0, scrollerTheme.gutter ?? thickness + SpacingHelper.GetPadding(theme, props.spacing));
     const reserveGutter = props.stableGutter === true || isScrolling;

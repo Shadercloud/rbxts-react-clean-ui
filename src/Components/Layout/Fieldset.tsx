@@ -2,9 +2,9 @@ import React from "@rbxts/react";
 import { FlexItem } from "./FlexItem";
 import { Container } from "./Container";
 import { HStack } from "./HStack";
-import { CleanThemeContext } from "../../Contexts";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
 import { Breakpoint, BreakPointElementProps } from "../../Interfaces";
-import { BreakpointHelper } from "../../Helpers";
+import { BreakpointHelper, toDesignPixels } from "../../Helpers";
 
 
 export interface FieldsetContextValue {
@@ -85,8 +85,10 @@ const Fieldset = React.forwardRef<ImageLabel, FieldsetProps>(
     (props, ref) => {
 
         const theme = React.useContext(CleanThemeContext);
+        const uiScale = useUiScale();
 
-        const [width, setWidth] = React.useState<number>(0);
+        const [screenWidth, setScreenWidth] = React.useState<number>(0);
+        const width = toDesignPixels(screenWidth, uiScale);
 
         const labelActivated = React.useRef(new Instance("BindableEvent")).current;
 
@@ -115,7 +117,7 @@ const Fieldset = React.forwardRef<ImageLabel, FieldsetProps>(
                     ref={ref}
                     Change={{
                         AbsoluteSize: (instance) => {
-                            setWidth(instance.AbsoluteSize.X);
+                            setScreenWidth(instance.AbsoluteSize.X);
                         },
                     }}>
                     <HStack

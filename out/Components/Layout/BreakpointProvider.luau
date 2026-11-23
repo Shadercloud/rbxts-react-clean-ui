@@ -4,11 +4,14 @@ local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local BreakpointContext = _Contexts.BreakpointContext
 local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local _ = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local BreakpointHelper = _.BreakpointHelper
 local ElementHelper = _.ElementHelper
+local toDesignPixels = _.toDesignPixels
 local BreakpointProvider = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
+	local uiScale = useUiScale()
 	local breakpoints = props.breakpoints or theme.breakpoints
 	local frameRef = React.useRef()
 	local widthRef = React.useRef(0)
@@ -19,8 +22,9 @@ local BreakpointProvider = React.forwardRef(function(props, ref)
 		}
 	end)
 	local valueRef = React.useRef(value)
-	local resolve = function(width)
-		widthRef.current = width
+	local resolve = function(screenWidth)
+		widthRef.current = screenWidth
+		local width = toDesignPixels(screenWidth, uiScale)
 		local breakpoint = BreakpointHelper:getBreakpoint(width, breakpoints)
 		if breakpoint == valueRef.current.breakpoint then
 			return nil
@@ -35,7 +39,7 @@ local BreakpointProvider = React.forwardRef(function(props, ref)
 	React.useEffect(function()
 		local instance = frameRef.current
 		resolve(if instance ~= nil then instance.AbsoluteSize.X else widthRef.current)
-	end, { breakpoints })
+	end, { breakpoints, uiScale })
 	local setFrame = React.useCallback(function(instance)
 		frameRef.current = instance
 		ElementHelper:assignRef(ref, instance)

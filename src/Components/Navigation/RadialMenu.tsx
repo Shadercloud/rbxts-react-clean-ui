@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { useTween } from "@rbxts/react-ripple";
-import { CleanThemeContext } from "../../Contexts";
-import { ColorHelper, SizeHelper, TypographyHelper } from "../../Helpers";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
+import { ColorHelper, SizeHelper, TypographyHelper, toScreenPixels } from "../../Helpers";
 import {
     CssSize,
     IconElementProps,
@@ -135,6 +135,7 @@ function RadialMenuWedge(props: RadialMenuWedgeProps) {
 const RadialMenu = React.forwardRef<Frame, RadialMenuProps>((props, ref) => {
     const theme = React.useContext(CleanThemeContext);
     const radialTheme = theme.components.radialMenu;
+    const uiScale = useUiScale();
 
     const controlled = props.value !== undefined;
     const [internalValue, setInternalValue] = React.useState(props.defaultValue);
@@ -189,7 +190,7 @@ const RadialMenu = React.forwardRef<Frame, RadialMenuProps>((props, ref) => {
         const outer = math.min(size.X, size.Y) / 2;
         if (outer <= 0) return -1;
 
-        const inner = math.max(0, outer - (thickness.Scale * outer + thickness.Offset));
+        const inner = math.max(0, outer - (thickness.Scale * outer + toScreenPixels(thickness.Offset, uiScale)));
         const dx = position.X - (rbx.AbsolutePosition.X + size.X / 2);
         const dy = position.Y - (rbx.AbsolutePosition.Y + size.Y / 2);
         const distance = math.sqrt(dx * dx + dy * dy);

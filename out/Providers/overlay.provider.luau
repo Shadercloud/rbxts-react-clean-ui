@@ -3,12 +3,16 @@ local TS = _G[script]
 local _react = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local React = _react
 local useState = _react.useState
-local OverlayContext = TS.import(script, script.Parent.Parent, "Contexts").OverlayContext
+local _Contexts = TS.import(script, script.Parent.Parent, "Contexts")
+local OverlayContext = _Contexts.OverlayContext
+local useUiScale = _Contexts.useUiScale
 local function OverlayProvider(props)
 	local overlay, setOverlay = useState()
+	local scale = useUiScale()
 	return React.createElement(OverlayContext.Provider, {
 		value = {
 			overlay = overlay,
+			scale = scale,
 		},
 	}, props.children, React.createElement("frame", {
 		key = "OverlayProvider",

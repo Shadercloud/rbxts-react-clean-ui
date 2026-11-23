@@ -6,14 +6,14 @@
 
 - `BreakpointProvider` props: `breakpoints` (`BreakPointElementProps`, overriding `theme.breakpoints`), `name` (instance name, default `"BreakpointProvider"`), `LayoutOrder`, `children`. It forwards a ref to its root `Frame`.
 - `BreakpointContext` (exported): `BreakpointContextValue | undefined`, where the value is `{ width: number, breakpoint: Breakpoint }`. `undefined` means no provider is mounted above.
-- `useBreakpoint(): Breakpoint` — the nearest provider's `breakpoint`. With no provider, the breakpoint of `Workspace.CurrentCamera.ViewportSize.X` against `theme.breakpoints`.
+- `useBreakpoint(): Breakpoint` — the nearest provider's `breakpoint`. With no provider, the breakpoint of `Workspace.CurrentCamera.ViewportSize.X / useUiScale()` (the design viewport width, see [UiScaleRoot](./uiscaleroot.md)) against `theme.breakpoints`.
 - `useBreakpointValue<T>(value: ResponsiveValue<T> | undefined): T | undefined` — resolves `value` for `useBreakpoint()`'s result. A plain `T` is returned as-is; a `{ xs?, sm?, md?, lg?, xl? }` object returns the current breakpoint's entry, falling back down the scale (`xl` → `lg` → … → `xs`), and `undefined` when nothing at or below the current breakpoint is set.
 - No `theme.components` entry: layout-only, like `Row`/`Grid`.
 
 ## Layout
 
 - Renders a transparent frame (`BackgroundTransparency` 1) sized `UDim2.fromScale(1, 1)` with no `AutomaticSize`, wrapping `children`. It therefore measures whatever container it is placed in (e.g. a fixed 390x844 story frame), not the viewport.
-- The breakpoint is `BreakpointHelper.getBreakpoint(AbsoluteSize.X, breakpoints ?? theme.breakpoints)`.
+- The breakpoint is `BreakpointHelper.getBreakpoint(AbsoluteSize.X / useUiScale(), breakpoints ?? theme.breakpoints)`: widths, including the published `width`, are design pixels under a [UiScaleRoot](./uiscaleroot.md), and the provider re-resolves when the scale changes.
 
 ## Update behaviour
 
@@ -36,3 +36,5 @@
 - `useBreakpoint` always calls its hooks (context, theme, state, effect) and gates the viewport subscription inside the effect on `context === undefined`, so a provider mounting/unmounting above it doesn't break the hook order. The effect depends on the boolean `context === undefined`, not the context object, so provider breakpoint changes don't reconnect the camera signals.
 - `useBreakpointValue` resolves via `SizeHelper.resolveResponsiveValue` rather than `BreakpointHelper.getValue` directly: the same fallback-down-the-scale order, but it also accepts the plain-`T` arm of the existing `ResponsiveValue<T>` type.
 - The hooks live in `src/Contexts/breakpoint.context.ts` next to `BreakpointContext` (like `useToast`/`useModalStack`); only the provider component is in `src/Components/Layout/`.
+- Under a [UiScaleRoot](./uiscaleroot.md), `resolve` keeps the raw screen width in `widthRef` and resolves (and publishes `width`) in design pixels, `toDesignPixels(AbsoluteSize.X, useUiScale())`. The mount effect also depends on the scale: a full-size frame's screen width doesn't change when only the scale does, so no `Change.AbsoluteSize` would fire.
+- `useBreakpoint`'s viewport fallback uses the design viewport width the same way (see `shared-modules.md` -> `src/Contexts/uiscale.context.ts`).

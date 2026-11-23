@@ -48,3 +48,4 @@ Worth demonstrating: a single-value slider with `onDragged`/`onChanged` wired to
 
 - On drag end, `isDraggingRef` is cleared synchronously before `setDragging(false)`, so `InputChanged` events that arrive before React re-renders stop moving the handle straight away. Gate movement on the ref, not on the `dragging` state.
 - The root `Size` passes `width ?? "100%"` and `height ?? theme.height` to `SizeHelper.GetSize` rather than using its `defaultSize` argument. `GetSize` only uses `defaultSize` when *both* `width` and `height` are unset, so `<Slider width="100%" />` used to get a 0 px tall root: the track and handles collapsed (seen in the docs' Loom preview, and the same in Roblox).
+- Pointer-to-value maths stays in screen pixels under a `UiScaleRoot`: it only takes the ratio of `InputObject.Position` against the container's `AbsolutePosition`/`AbsoluteSize`, so there is nothing to convert.

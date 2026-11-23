@@ -1,6 +1,6 @@
 import React from "@rbxts/react";
-import { CleanThemeContext } from "../../Contexts";
-import { SizeHelper, SpacingHelper, TypographyHelper } from "../../Helpers";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
+import { SizeHelper, SpacingHelper, TypographyHelper, toDesignPixels } from "../../Helpers";
 import { PaddingProps, ScalableElementProps, ScaleSize, SizeElementProps } from "../../Interfaces";
 import { Corners, Padding } from "../Decorator";
 import { Text } from "../Typography";
@@ -131,6 +131,7 @@ function TableCellContent(props: TableCellProps & { header: boolean }) {
 	const theme = React.useContext(CleanThemeContext);
 	const tableScale = React.useContext(TableScaleContext);
 	const layout = React.useContext(TableLayoutContext);
+	const uiScale = useUiScale();
 	const id = React.useRef(nextTableCellId++).current;
 	const measurementRef = React.useRef<Frame>();
 	const typography = props.header
@@ -143,8 +144,8 @@ function TableCellContent(props: TableCellProps & { header: boolean }) {
 		? new UDim(columnWidth / layout.totalWidth, 0)
 		: new UDim(0, columnWidth);
 	const reportMeasurement = React.useCallback(
-		(instance: Frame) => layout?.reportWidth(id, columnIndex, instance.AbsoluteSize.X),
-		[layout?.reportWidth, id, columnIndex],
+		(instance: Frame) => layout?.reportWidth(id, columnIndex, toDesignPixels(instance.AbsoluteSize.X, uiScale)),
+		[layout?.reportWidth, id, columnIndex, uiScale],
 	);
 	const reportResizedMeasurement = React.useCallback(
 		(instance: Frame) => {

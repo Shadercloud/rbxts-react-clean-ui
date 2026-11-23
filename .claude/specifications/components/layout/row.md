@@ -15,6 +15,10 @@
 
 ## Composition with Column
 
-- `Row` measures its own `AbsoluteSize.X` and exposes it, along with the resolved spacing `UDim` and current `breakpoint`, to descendants through `RowContext`.
+- `Row` measures its own `AbsoluteSize.X`, converts it to design pixels (divided by the [UiScaleRoot](./uiscaleroot.md) scale, `1` without one) and exposes it, along with the resolved spacing `UDim` and current `breakpoint`, to descendants through `RowContext`.
 - `breakpoint` is derived from the row's own measured width (not the screen/viewport) via `BreakpointHelper.getBreakpoint`, using `breakpoints` (or the theme default).
 - `RowContext.children` is the count of direct children of `Row` whose element type is `Column`; `Column` uses this count to divide `12` evenly across columns that don't specify a `span`. Other content passed as a child of `Row` still renders and participates in the list layout, but does not affect this count.
+
+## Implementation notes
+
+- The `Change.AbsoluteSize` handler stores the raw screen width. The design width (`toDesignPixels(width, useUiScale())`) is computed at render and is what `RowContext.width` and the breakpoint use, so under a [UiScaleRoot](./uiscaleroot.md) a scale change alone re-resolves without a size event.

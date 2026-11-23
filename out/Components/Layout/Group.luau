@@ -2,11 +2,14 @@
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local RegistryContext = TS.import(script, script.Parent.Parent.Parent, "Providers").RegistryContext
+local useUiScale = TS.import(script, script.Parent.Parent.Parent, "Contexts").useUiScale
+local toDesignPixels = TS.import(script, script.Parent.Parent.Parent, "Helpers").toDesignPixels
 local GroupContext = React.createContext(nil)
 local nextFallbackElementId = 0
 local function GroupElement(props)
 	local registry = React.useContext(RegistryContext)
 	local context = React.useContext(GroupContext)
+	local uiScale = useUiScale()
 	local idRef = React.useRef()
 	if idRef.current == nil then
 		nextFallbackElementId += 1
@@ -87,7 +90,8 @@ local function GroupElement(props)
 	_attributes.AutomaticSize = Enum.AutomaticSize.XY
 	_attributes.Change = {
 		AbsoluteSize = function(instance)
-			context.reportSize(id, Vector2.new(instance.AbsoluteSize.X + horizontalPadding, instance.AbsoluteSize.Y + verticalPadding))
+			local size = toDesignPixels(instance.AbsoluteSize, uiScale)
+			context.reportSize(id, Vector2.new(size.X + horizontalPadding, size.Y + verticalPadding))
 		end,
 	}
 	return React.createElement("frame", _attributes, props.children)

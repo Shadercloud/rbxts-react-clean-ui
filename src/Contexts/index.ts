@@ -7,3 +7,4 @@ export * from './overlay.context';
 export * from './row.context';
 export * from './theme.context';
 export * from './toast.context';
+export * from './uiscale.context';

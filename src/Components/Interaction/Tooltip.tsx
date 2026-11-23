@@ -1,12 +1,13 @@
 import React from "@rbxts/react";
 import { GuiService, UserInputService } from "@rbxts/services";
-import { CleanThemeContext, DragStateContext, OverlayConsumer } from "../../Contexts";
+import { CleanThemeContext, DragStateContext, OverlayConsumer, useUiScale } from "../../Contexts";
 import { Text } from "../Typography";
 import ReactRoblox from "@rbxts/react-roblox";
 import { BoxShadow, Corners, Padding } from "../Decorator";
-import { ColorHelper, CssHelper, ElementHelper, SizeHelper, SpacingHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, ElementHelper, SizeHelper, SpacingHelper, toDesignPixels } from "../../Helpers";
 import { IntentElementProps, PaddingProps } from "../../Interfaces";
 import { BoxProps } from "../Surface";
+import { OverlayScaleFrame } from "../Layout/UiScaleRoot.frame";
 import { useTween } from "@rbxts/react-ripple";
 import { TooltipPlacement, computeTooltipLayout, getTooltipSafeArea } from "./Tooltip.placement";
 import { TooltipLayer, TooltipLayerContext, isTooltipCovered, setTooltipHovered, subscribeTooltipHover } from "./Tooltip.layer";
@@ -62,6 +63,7 @@ function readFrame(overlay: Frame): TooltipFrame {
 
 function TooltipPopup(props: TooltipPopup) {
     const theme = React.useContext(CleanThemeContext);
+    const uiScale = useUiScale();
 
     const contentRef = React.useRef<Frame>();
     const [contentSize, setContentSize] = React.useState<Vector2>();
@@ -143,23 +145,25 @@ function TooltipPopup(props: TooltipPopup) {
         shadowPadding.right += shadow.blurRadius.Offset + shadow.spread.X.Offset + shadow.offset.X.Offset;
     }
 
-    const contentWidth = contentSize?.X ?? 0;
-    const contentHeight = contentSize?.Y ?? 0;
+    const contentWidth = toDesignPixels(contentSize?.X ?? 0, uiScale);
+    const contentHeight = toDesignPixels(contentSize?.Y ?? 0, uiScale);
     const cornerRadius = SizeHelper.toRadius(theme, theme.components.button.cornerRadius);
-    const targetPosition = props.target.position.sub(frame.position);
+    const targetPosition = toDesignPixels(props.target.position.sub(frame.position), uiScale);
+    const targetSize = toDesignPixels(props.target.size, uiScale);
+    const frameSize = toDesignPixels(frame.size, uiScale);
 
     const layout = computeTooltipLayout({
         target: {
             left: targetPosition.X,
             top: targetPosition.Y,
-            right: targetPosition.X + props.target.size.X,
-            bottom: targetPosition.Y + props.target.size.Y,
+            right: targetPosition.X + targetSize.X,
+            bottom: targetPosition.Y + targetSize.Y,
         },
         content: { width: contentWidth, height: contentHeight },
         bounds: getTooltipSafeArea(
-            { width: frame.size.X, height: frame.size.Y },
+            { width: frameSize.X, height: frameSize.Y },
             theme.components.tooltip.edgeMargin,
-            frame.topbarBottom,
+            toDesignPixels(frame.topbarBottom, uiScale),
         ),
         placement: props.placement,
         pointerSize: theme.components.tooltip.pointerSize,
@@ -588,16 +592,18 @@ export function Tooltip(props: TooltipProps) {
                             return undefined;
                         }
                         return ReactRoblox.createPortal(
-                            <TooltipPopup
-                                fadeDuration={fadeDuration}
-                                {...props}
-                                overlay={overlay}
-                                target={target}
-                                visible={visible}
-                                layer={childLayer}
-                                onHover={interactive ? setPopupHovered : undefined}
-                                onPress={pinOnPress ? unpin : undefined}
-                            />,
+                            <OverlayScaleFrame>
+                                <TooltipPopup
+                                    fadeDuration={fadeDuration}
+                                    {...props}
+                                    overlay={overlay}
+                                    target={target}
+                                    visible={visible}
+                                    layer={childLayer}
+                                    onHover={interactive ? setPopupHovered : undefined}
+                                    onPress={pinOnPress ? unpin : undefined}
+                                />
+                            </OverlayScaleFrame>,
                             overlay,
                         );
                     }}

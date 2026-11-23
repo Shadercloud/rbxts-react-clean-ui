@@ -1,11 +1,14 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local SizeHelper = _Helpers.SizeHelper
 local SpacingHelper = _Helpers.SpacingHelper
 local TypographyHelper = _Helpers.TypographyHelper
+local toDesignPixels = _Helpers.toDesignPixels
 local _Decorator = TS.import(script, script.Parent.Parent, "Decorator")
 local Corners = _Decorator.Corners
 local Padding = _Decorator.Padding
@@ -115,6 +118,7 @@ local function TableCellContent(props)
 	local theme = React.useContext(CleanThemeContext)
 	local tableScale = React.useContext(TableScaleContext)
 	local layout = React.useContext(TableLayoutContext)
+	local uiScale = useUiScale()
 	local _original = nextTableCellId
 	nextTableCellId += 1
 	local id = React.useRef(_original).current
@@ -147,7 +151,7 @@ local function TableCellContent(props)
 	local _exp = function(instance)
 		local _result_2 = layout
 		if _result_2 ~= nil then
-			_result_2 = _result_2.reportWidth(id, columnIndex, instance.AbsoluteSize.X)
+			_result_2 = _result_2.reportWidth(id, columnIndex, toDesignPixels(instance.AbsoluteSize.X, uiScale))
 		end
 		return _result_2
 	end
@@ -155,7 +159,7 @@ local function TableCellContent(props)
 	if _result_2 ~= nil then
 		_result_2 = _result_2.reportWidth
 	end
-	local reportMeasurement = React.useCallback(_exp, { _result_2, id, columnIndex })
+	local reportMeasurement = React.useCallback(_exp, { _result_2, id, columnIndex, uiScale })
 	local reportResizedMeasurement = React.useCallback(function(instance)
 		task.defer(function()
 			if measurementRef.current == instance then

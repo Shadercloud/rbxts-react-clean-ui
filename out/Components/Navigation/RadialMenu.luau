@@ -2,11 +2,14 @@
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local useTween = TS.import(script, TS.getModule(script, "@rbxts", "react-ripple").src).useTween
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ColorHelper = _Helpers.ColorHelper
 local SizeHelper = _Helpers.SizeHelper
 local TypographyHelper = _Helpers.TypographyHelper
+local toScreenPixels = _Helpers.toScreenPixels
 local Icon = TS.import(script, script.Parent.Parent, "Surface", "Icon").Icon
 local Text = TS.import(script, script.Parent.Parent, "Typography").Text
 local HALF_MASK = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.4999, 1), NumberSequenceKeypoint.new(0.5, 0), NumberSequenceKeypoint.new(1, 0) })
@@ -82,6 +85,7 @@ end
 local RadialMenu = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local radialTheme = theme.components.radialMenu
+	local uiScale = useUiScale()
 	local controlled = props.value ~= nil
 	local internalValue, setInternalValue = React.useState(props.defaultValue)
 	local hoverIndex, setHoverIndex = React.useState(-1)
@@ -162,7 +166,7 @@ local RadialMenu = React.forwardRef(function(props, ref)
 		if outer <= 0 then
 			return -1
 		end
-		local inner = math.max(0, outer - (thickness.Scale * outer + thickness.Offset))
+		local inner = math.max(0, outer - (thickness.Scale * outer + toScreenPixels(thickness.Offset, uiScale)))
 		local dx = position.X - (rbx.AbsolutePosition.X + size.X / 2)
 		local dy = position.Y - (rbx.AbsolutePosition.Y + size.Y / 2)
 		local distance = math.sqrt(dx * dx + dy * dy)

@@ -3,8 +3,9 @@ import ReactRoblox from "@rbxts/react-roblox";
 import {
     CleanThemeContext,
     OverlayContext,
+    useUiScale,
 } from "../../Contexts";
-import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TextHelper, TypographyHelper } from "../../Helpers";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, TextHelper, TypographyHelper, toDesignPixels } from "../../Helpers";
 import {
     CssBackgroundGradient,
     CssSize,
@@ -16,6 +17,7 @@ import {
 import { CssBackgroundImage, ThemeTemplate } from "../../Theme";
 import { Corners, Gradient, Padding } from "../Decorator";
 import { Container, FieldsetContext, FlexItem, HStack, Scroller, VStack } from "../Layout";
+import { OverlayScaleFrame } from "../Layout/UiScaleRoot.frame";
 import { Text } from "../Typography";
 import { Icon } from "../Surface";
 import { Input } from "./Input";
@@ -327,6 +329,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
     const theme = React.useContext(CleanThemeContext);
     const overlay = React.useContext(OverlayContext);
     const fieldset = React.useContext(FieldsetContext);
+    const uiScale = useUiScale();
 
     const [selected, setSelected] = React.useState(props.selected ?? 0);
     const [open, setOpen] = React.useState(false);
@@ -435,7 +438,7 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
     const hasVisibleOptions = !props.searchable || query === "" || flatOptions.some((option) => optionMatchesQuery(option, normalizedQuery));
 
     const dropdownHeight = math.min(
-        contentHeight,
+        toDesignPixels(contentHeight, uiScale),
         props["max-height"] !== undefined
             ? SizeHelper.toUDim(props["max-height"]).Offset
             : theme.components.select.maxDropDownHeight,
@@ -454,9 +457,11 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
             return;
         }
 
-        const localPosition = button.AbsolutePosition.sub(
-            overlayInstance.AbsolutePosition,
+        const localPosition = toDesignPixels(
+            button.AbsolutePosition.sub(overlayInstance.AbsolutePosition),
+            uiScale,
         );
+        const buttonSize = toDesignPixels(button.AbsoluteSize, uiScale);
 
         setDropdownPosition(UDim2.fromOffset(
             localPosition.X,
@@ -464,12 +469,12 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
         ));
 
         setDropdownSize(UDim2.fromOffset(
-            button.AbsoluteSize.X,
-            button.AbsoluteSize.Y,
+            buttonSize.X,
+            buttonSize.Y,
         ));
 
         setOpen(true);
-    }, [open, overlay.overlay, props.disabled]);
+    }, [open, overlay.overlay, props.disabled, uiScale]);
 
     React.useEffect(() => {
         if (props.disabled) setOpen(false);
@@ -551,48 +556,50 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                     {open &&
                         overlay.overlay !== undefined &&
                         ReactRoblox.createPortal(
-                            <frame
-                                key="SelectDropdown"
-                                BackgroundTransparency={0}
-                                BorderSizePixel={0}
-                                BackgroundColor3={
-                                    theme.components.select.dropDownBackgroundColor
-                                }
-                                AnchorPoint={Vector2.zero}
-                                Position={dropdownPosition.add(new UDim2(0, 0, 0, dropdownSize.Y.Offset + dropDownGap))}
-                                Size={UDim2.fromOffset(dropdownSize.X.Offset, 0)}
-                                AutomaticSize={Enum.AutomaticSize.Y}
-                                ClipsDescendants={true}
-                            >
-                                <uistroke key="Stroke" Thickness={selectTheme.dropDown?.borderThickness ?? selectTheme.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={selectTheme.dropDown?.borderColor ?? selectTheme.borderColor} />
+                            <OverlayScaleFrame>
+                                <frame
+                                    key="SelectDropdown"
+                                    BackgroundTransparency={0}
+                                    BorderSizePixel={0}
+                                    BackgroundColor3={
+                                        theme.components.select.dropDownBackgroundColor
+                                    }
+                                    AnchorPoint={Vector2.zero}
+                                    Position={dropdownPosition.add(new UDim2(0, 0, 0, dropdownSize.Y.Offset + dropDownGap))}
+                                    Size={UDim2.fromOffset(dropdownSize.X.Offset, 0)}
+                                    AutomaticSize={Enum.AutomaticSize.Y}
+                                    ClipsDescendants={true}
+                                >
+                                    <uistroke key="Stroke" Thickness={selectTheme.dropDown?.borderThickness ?? selectTheme.borderThickness} BorderStrokePosition={Enum.BorderStrokePosition.Outer} Color={selectTheme.dropDown?.borderColor ?? selectTheme.borderColor} />
 
-                                <Corners radius={selectTheme.dropDown?.cornerRadius ?? selectTheme.cornerRadius} />
-                                <FieldBoxShadow value={selectTheme.dropDown?.boxShadow} />
+                                    <Corners radius={selectTheme.dropDown?.cornerRadius ?? selectTheme.cornerRadius} />
+                                    <FieldBoxShadow value={selectTheme.dropDown?.boxShadow} />
 
-                                <VStack spacing="None">
-                                    {props.searchable && (
-                                        <SelectSearchInput
-                                            value={query}
-                                            onChange={setQuery}
-                                            placeholder={props.searchPlaceholder}
-                                            scale={props.scale}
-                                        />
-                                    )}
-                                    <Scroller Size={new UDim2(1, 0, 0, dropdownHeight)} spacing="None">
-                                        <VStack
-                                            spacing="None"
-                                            Change={{
-                                                AbsoluteContentSize: (layout) => {
-                                                    setContentHeight(layout.AbsoluteContentSize.Y);
-                                                },
-                                            }}>
-                                            {hasVisibleOptions
-                                                ? renderSections()
-                                                : <Text name="NoResultsText" text="No Results" typography={typography} />}
-                                        </VStack>
-                                    </Scroller>
-                                </VStack>
-                            </frame>,
+                                    <VStack spacing="None">
+                                        {props.searchable && (
+                                            <SelectSearchInput
+                                                value={query}
+                                                onChange={setQuery}
+                                                placeholder={props.searchPlaceholder}
+                                                scale={props.scale}
+                                            />
+                                        )}
+                                        <Scroller Size={new UDim2(1, 0, 0, dropdownHeight)} spacing="None">
+                                            <VStack
+                                                spacing="None"
+                                                Change={{
+                                                    AbsoluteContentSize: (layout) => {
+                                                        setContentHeight(layout.AbsoluteContentSize.Y);
+                                                    },
+                                                }}>
+                                                {hasVisibleOptions
+                                                    ? renderSections()
+                                                    : <Text name="NoResultsText" text="No Results" typography={typography} />}
+                                            </VStack>
+                                        </Scroller>
+                                    </VStack>
+                                </frame>
+                            </OverlayScaleFrame>,
                             overlay.overlay,
                         )}
                 </imagebutton>

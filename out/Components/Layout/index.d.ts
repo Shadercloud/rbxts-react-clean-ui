@@ -15,4 +15,5 @@ export * from './Row';
 export * from './Scroller';
 export * from './Tabs';
 export * from './Table';
+export * from './UiScaleRoot';
 export * from './VStack';

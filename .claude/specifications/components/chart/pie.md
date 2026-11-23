@@ -50,3 +50,7 @@ Pie defaults live under `theme.components.charts.pie`:
 ## Story
 
 A story should demonstrate: string labels, a custom-styled `PieLabel` (background/border override), a `PieLabel` using `content` for fully custom React content, `label-hover` (labels appearing only on hover), and the `onChangeSelected`/`onClick` callbacks. Do not rely on the documented `label-hidden` prop name — use `Label-hidden` to match the actual implementation.
+
+## Implementation notes
+
+- The hover hit-test stays in screen pixels under a `UiScaleRoot`: `MouseMoved` coordinates, `GuiService:GetGuiInset()`, `AbsolutePosition` and `AbsoluteSize` are all screen pixels and nothing is written back as an offset.

@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { BreakPointElementProps, ResponsiveCssSize, ResponsiveValue, ScaleSize } from "../../Interfaces/";
-import { CleanThemeContext } from "../../Contexts";
-import { BreakpointHelper, SizeHelper, SpacingHelper } from "../../Helpers/";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
+import { BreakpointHelper, SizeHelper, SpacingHelper, toDesignPixels } from "../../Helpers/";
 
 export interface GridProps extends BreakPointElementProps {
     cols?: ResponsiveValue<number>;
@@ -80,11 +80,13 @@ interface GridLock {
 
 export const Grid = React.forwardRef<Frame, GridProps>((props, ref) => {
     const theme = React.useContext(CleanThemeContext);
+    const uiScale = useUiScale();
 
-    const [width, setWidth] = React.useState<number>(0);
+    const [screenWidth, setScreenWidth] = React.useState<number>(0);
     const [heights, setHeights] = React.useState<MeasuredHeights>({ key: "", values: new Map() });
     const [lock, setLock] = React.useState<GridLock | undefined>(undefined);
 
+    const width = toDesignPixels(screenWidth, uiScale);
     const breakpoints = props.breakpoints ?? theme.breakpoints;
     const breakpoint = BreakpointHelper.getBreakpoint(width, breakpoints);
     const cols = math.max(SizeHelper.resolveResponsiveValue(props.cols, breakpoint) ?? 1, 1);
@@ -96,10 +98,10 @@ export const Grid = React.forwardRef<Frame, GridProps>((props, ref) => {
 
     const childCount = React.Children.count(props.children);
 
-    const measureKey = `${width}:${cols}:${gap}:${childCount}`;
+    const measureKey = `${width}:${cols}:${gap}:${childCount}:${uiScale}`;
 
     const locked = lock !== undefined && lock.key === measureKey;
-    const lockedHeight = locked ? lock!.height : 0;
+    const lockedHeight = locked ? toDesignPixels(lock!.height, uiScale) : 0;
 
     React.useEffect(() => {
         if (locked || heights.key !== measureKey || heights.values.size() < childCount) return;
@@ -147,7 +149,7 @@ export const Grid = React.forwardRef<Frame, GridProps>((props, ref) => {
                 AbsoluteSize: (instance) => {
                     const nextWidth = instance.AbsoluteSize.X;
 
-                    setWidth((currentWidth) =>
+                    setScreenWidth((currentWidth) =>
                         currentWidth === nextWidth ? currentWidth : nextWidth
                     );
                 },

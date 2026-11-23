@@ -1,0 +1,162 @@
+---
+title: UiScaleRoot
+description: Scale a whole UI tree by one factor while keeping layouts, breakpoints, and overlays correct.
+icon: Scaling
+---
+
+`UiScaleRoot` is a transparent Roblox [`Frame`](https://create.roblox.com/docs/reference/engine/classes/Frame) containing a [`UIScale`](https://create.roblox.com/docs/reference/engine/classes/UIScale). It scales everything inside it by one factor and tells the library's components what that factor is, so their measurements and breakpoints stay in design pixels (screen pixels divided by the scale). For setup, design pixels, and pitfalls, see the [Scaling the UI](/scaling) guide.
+
+## Import
+
+```tsx
+import { UiScaleRoot, UiScaleContext, useUiScale, useDesignViewportSize, toDesignPixels, toScreenPixels } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Layout/UiScaleRoot.loom.tsx" previewHeight={300}>
+```tsx
+import React from "@rbxts/react";
+import { Box, Button, Container, HStack, Text, UiScaleRoot, VStack, useUiScale } from "@rbxts/react-clean-ui";
+
+function ScalePanel() {
+    const scale = useUiScale();
+
+    return (
+        <Box>
+            <VStack>
+                <Text text={`useUiScale(): ${scale}`} />
+                <Button text="Button" />
+            </VStack>
+        </Box>
+    );
+}
+
+export function UiScaleRootExample() {
+    return (
+        <Container width="100%" height="200">
+            <HStack HorizontalFlex={Enum.UIFlexAlignment.Fill}>
+                <Container height="200">
+                    <UiScaleRoot scale={1}>
+                        <ScalePanel />
+                    </UiScaleRoot>
+                </Container>
+                <Container height="200">
+                    <UiScaleRoot scale={1.5}>
+                        <ScalePanel />
+                    </UiScaleRoot>
+                </Container>
+            </HStack>
+        </Container>
+    );
+}
+```
+</Demo>
+
+## Placement
+
+In a game, place one `UiScaleRoot` directly under the `ScreenGui`, wrapping `CleanUiProvider`. The overlay and the `ToastContainer` that `CleanUiProvider` renders are then inside the root and scaled along with everything else.
+
+```tsx
+const GuiService = game.GetService("GuiService");
+const scale = GuiService.IsTenFootInterface() ? 1.5 : 1;
+
+ReactRoblox.createRoot(screenGui).render(
+    <UiScaleRoot scale={scale}>
+        <CleanUiProvider theme={DefaultTheme}>
+            <App />
+        </CleanUiProvider>
+    </UiScaleRoot>,
+);
+```
+
+Anything rendered outside the root is not scaled.
+
+## Nesting
+
+Nested roots multiply. An inner `UiScaleRoot scale={1.2}` inside an outer `scale={1.25}` gives its children an effective scale of `1.5`.
+
+```tsx
+<UiScaleRoot scale={1.25}>
+    <Hud />
+    <UiScaleRoot scale={1.2}>
+        <Inventory />
+    </UiScaleRoot>
+</UiScaleRoot>
+```
+
+## useUiScale
+
+`useUiScale()` returns the effective scale: the product of every `UiScaleRoot` above the caller, or `1` with none.
+
+```tsx
+const scale = useUiScale();
+```
+
+## useDesignViewportSize
+
+`useDesignViewportSize()` returns `Workspace.CurrentCamera.ViewportSize` divided by the effective scale.
+
+```tsx
+const viewport = useDesignViewportSize();
+
+<Container width={math.min(400, viewport.X - 32)} height="100%" />
+```
+
+## Converting pixels
+
+`toDesignPixels(value, scale)` divides by the scale and `toScreenPixels(value, scale)` multiplies by it. A `number` returns a `number` and a `Vector2` returns a `Vector2`. Use `toDesignPixels` on `AbsoluteSize`, `AbsolutePosition`, and input positions before writing them into an offset.
+
+```tsx
+const scale = useUiScale();
+const size = toDesignPixels(other.AbsoluteSize, scale);
+
+<frame Size={UDim2.fromOffset(size.X, size.Y)} />
+```
+
+## UiScaleContext
+
+`UiScaleContext` is exported. It is a `React.Context<number>` with a default of `1`, and holds the effective scale rather than the nearest root's own `scale` prop. `useUiScale()` reads it.
+
+## Props
+
+### UiScaleRoot-specific props
+
+| Prop       | Type              | Default         | Description                                                      |
+| ---------- | ----------------- | --------------- | ---------------------------------------------------------------- |
+| `scale`    | `number`          | Required        | Scale factor applied to the children. Must be greater than `0`.  |
+| `name`     | `string`          | `"UiScaleRoot"` | Name assigned to the root `Frame`.                               |
+| `children` | `React.ReactNode` | `undefined`     | Content to scale. It lays out in design pixels.                  |
+
+### Shared props
+
+| Interface            | Purpose                                                           |
+| -------------------- | ----------------------------------------------------------------- |
+| `ZIndexElementProps` | Configures the root frame's render order among its siblings via `ZIndex`. |
+
+### Hooks and helpers
+
+| Export                           | Returns              | Description                                                                 |
+| -------------------------------- | -------------------- | --------------------------------------------------------------------------- |
+| `useUiScale()`                   | `number`             | The effective scale of every `UiScaleRoot` above the caller, or `1`.        |
+| `useDesignViewportSize()`        | `Vector2`            | The camera viewport size in design pixels.                                  |
+| `toDesignPixels(value, scale)`   | `number \| Vector2`  | `value / scale`, keeping the input type.                                    |
+| `toScreenPixels(value, scale)`   | `number \| Vector2`  | `value * scale`, keeping the input type.                                    |
+
+## Behaviour
+
+* The root is a transparent frame (`BackgroundTransparency` 1, `BorderSizePixel` 0) sized `UDim2.fromScale(1 / scale, 1 / scale)`, containing a `UIScale` named `UiScale` with `Scale = scale`. After scaling it exactly fills its parent.
+* It renders nothing else. Children keep their relative `ZIndex` order inside the frame, and the frame takes part in sibling ordering through its `ZIndex` prop.
+* With no root, or `scale={1}`, every library component behaves exactly as before.
+* `BreakpointProvider`, `Row`, `Grid`, and `Fieldset` resolve breakpoints against design-pixel widths, so a panel doesn't pick a roomier layout at a larger scale.
+* `Tooltip`, `Select`'s dropdown, `Modal`, and the `Draggable` drag preview render at the portalling component's scale. If the `OverlayProvider` sits outside the root, or under a different scale, the portalled content is wrapped in a frame named `UiScaleOverlay` that applies the difference.
+* A `ToastContainer` placed outside the root renders in place and is not scaled.
+* `Slider`, `Pie` hover, and drag-and-drop hit-testing work in screen pixels, and `DragEventInfo.position` is in screen pixels.
+* `useDesignViewportSize()` updates when the viewport is resized, when the scale changes, and when `Workspace.CurrentCamera` is replaced. It returns `Vector2.zero` until there is a camera, and keeps the last size while `CurrentCamera` is `nil`.
+* A `UIScale` of your own outside `UiScaleRoot` is invisible to the library. Use `UiScaleRoot`, nesting roots where needed.
+* A `scale` of `0` or below is not guarded and produces an infinite or negative frame size.
+* The ref forwards to the root `Frame`.
+
+## Theme values
+
+`UiScaleRoot` has no `theme.components` entry and is not themeable.

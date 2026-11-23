@@ -1,7 +1,7 @@
 import React from "@rbxts/react";
 import { BreakPointElementProps } from "../../Interfaces/";
-import { BreakpointContext, BreakpointContextValue, CleanThemeContext } from "../../Contexts";
-import { BreakpointHelper, ElementHelper } from "../../Helpers/";
+import { BreakpointContext, BreakpointContextValue, CleanThemeContext, useUiScale } from "../../Contexts";
+import { BreakpointHelper, ElementHelper, toDesignPixels } from "../../Helpers/";
 
 export interface BreakpointProviderProps extends BreakPointElementProps {
     name?: string;
@@ -12,6 +12,7 @@ export interface BreakpointProviderProps extends BreakPointElementProps {
 export const BreakpointProvider = React.forwardRef<Frame, BreakpointProviderProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
+        const uiScale = useUiScale();
 
         const breakpoints = props.breakpoints ?? theme.breakpoints;
 
@@ -25,9 +26,10 @@ export const BreakpointProvider = React.forwardRef<Frame, BreakpointProviderProp
 
         const valueRef = React.useRef<BreakpointContextValue>(value);
 
-        const resolve = (width: number) => {
-            widthRef.current = width;
+        const resolve = (screenWidth: number) => {
+            widthRef.current = screenWidth;
 
+            const width = toDesignPixels(screenWidth, uiScale);
             const breakpoint = BreakpointHelper.getBreakpoint(width, breakpoints);
 
             if (breakpoint === valueRef.current.breakpoint) {
@@ -44,7 +46,7 @@ export const BreakpointProvider = React.forwardRef<Frame, BreakpointProviderProp
             const instance = frameRef.current;
 
             resolve(instance !== undefined ? instance.AbsoluteSize.X : widthRef.current);
-        }, [breakpoints]);
+        }, [breakpoints, uiScale]);
 
         const setFrame = React.useCallback(
             (instance: Frame | undefined) => {

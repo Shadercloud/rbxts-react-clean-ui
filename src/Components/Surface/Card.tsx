@@ -1,8 +1,8 @@
 import React from "@rbxts/react";
 import { Box, BoxProps } from "./Box";
 import { Container, FlexItem, VStack } from "../Layout";
-import { ColorHelper, CssHelper, SizeHelper, SpacingHelper } from "../../Helpers";
-import { CleanThemeContext } from "../../Contexts";
+import { ColorHelper, CssHelper, SizeHelper, SpacingHelper, toDesignPixels } from "../../Helpers";
+import { CleanThemeContext, useUiScale } from "../../Contexts";
 import { Padding } from "../Decorator";
 import { CssPadding, Intent, IntentElementProps, PaddingProps, PositionElementProps, ResolvedPadding, SizeElementProps, SpacedElementProps, ZIndexElementProps } from "../../Interfaces";
 import { CssPosition } from "../../Theme";
@@ -243,6 +243,7 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
     (props, ref) => {
 
         const theme = React.useContext(CleanThemeContext);
+        const uiScale = useUiScale();
 
         const [headerRect, setHeaderRect] = React.useState<{ position: Vector2; size: Vector2 } | undefined>();
         const [footerRect, setFooterRect] = React.useState<{ position: Vector2; size: Vector2 } | undefined>();
@@ -307,7 +308,7 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
         const hasOverlay = overlayHeader !== undefined || overlayFooter !== undefined;
 
         const headerClearance = overlayHeader !== undefined && headerRect !== undefined && wrapperAbsoluteY !== undefined
-            ? math.max(0, (headerRect.position.Y + headerRect.size.Y) - wrapperAbsoluteY)
+            ? math.max(0, toDesignPixels((headerRect.position.Y + headerRect.size.Y) - wrapperAbsoluteY, uiScale))
             : 0;
 
         const wrapperBottomY = wrapperAbsoluteY !== undefined && wrapperAbsoluteSize !== undefined
@@ -315,7 +316,7 @@ const Card = React.forwardRef<ImageLabel, CardProps>(
             : undefined;
 
         const footerClearance = overlayFooter !== undefined && footerRect !== undefined && wrapperBottomY !== undefined
-            ? math.max(0, wrapperBottomY - footerRect.position.Y)
+            ? math.max(0, toDesignPixels(wrapperBottomY - footerRect.position.Y, uiScale))
             : 0;
 
         const boxProps: CardProps = hasOverlay

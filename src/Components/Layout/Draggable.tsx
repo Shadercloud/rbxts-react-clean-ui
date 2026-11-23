@@ -1,10 +1,11 @@
 import React from "@rbxts/react";
 import { ElementHelper, GuiHelper } from "../../Helpers/";
 import { DraggableRegistration, DraggableRegistryKey, DroppableRegistration, DroppableRegistryKey, GlobalRegistry, RegistryContext } from "../../Providers";
-import { CleanThemeContext, DragEventInfo, DragStateContext, DragStateContextValue, DraggableContext, DraggableContextValue, OverlayConsumer } from "../../Contexts";
+import { CleanThemeContext, DragEventInfo, DragStateContext, DragStateContextValue, DraggableContext, DraggableContextValue, OverlayConsumer, useUiScale } from "../../Contexts";
 import { createPortal } from "@rbxts/react-roblox";
 import { Corners } from "../Decorator";
-import { CustomInputService } from "../../Helpers";
+import { CustomInputService, toDesignPixels } from "../../Helpers";
+import { OverlayScaleFrame } from "./UiScaleRoot.frame";
 
 
 type GuiObjectProps = React.InstanceProps<GuiObject>;
@@ -169,6 +170,8 @@ const Draggable = React.forwardRef<Frame, DraggableProps>(
 
         const parentDragState = React.useContext(DragStateContext);
 
+        const uiScale = useUiScale();
+
         const rootRef = React.useRef<GuiObject>();
 
         const placeholderRef = React.useRef<Frame>();
@@ -321,12 +324,14 @@ const Draggable = React.forwardRef<Frame, DraggableProps>(
                     const finalOverlayPosition =
                         dragInformation.absolutePositionStart.add(delta);
 
-                    const localTopLeft = finalOverlayPosition.sub(
-                        parent.AbsolutePosition,
+                    const localTopLeft = toDesignPixels(
+                        finalOverlayPosition.sub(parent.AbsolutePosition),
+                        uiScale,
                     );
 
-                    const anchorOffset = root.AbsoluteSize.mul(
-                        root.AnchorPoint,
+                    const anchorOffset = toDesignPixels(
+                        root.AbsoluteSize.mul(root.AnchorPoint),
+                        uiScale,
                     );
 
                     root.Position = UDim2.fromOffset(
@@ -338,7 +343,7 @@ const Draggable = React.forwardRef<Frame, DraggableProps>(
 
             setDragging(false);
 
-        }, [findDroppable, props.onDropped, props.retainPosition, props.id]);
+        }, [findDroppable, props.onDropped, props.retainPosition, props.id, uiScale]);
 
         const contextValue = React.useMemo<DraggableContextValue>(() => ({
             isDragging: dragInformationRef.current !== undefined,
@@ -422,14 +427,16 @@ const Draggable = React.forwardRef<Frame, DraggableProps>(
             Visible: !dragging
         })
 
+        const designOverlaySize = toDesignPixels(overlaySize, uiScale);
+
         const placeholder = (
             <Placeholder
                 ref={placeholderRef}
                 Position={placeholderPosition.Position}
                 AnchorPoint={placeholderPosition.AnchorPoint}
                 Size={UDim2.fromOffset(
-                    overlaySize.X,
-                    overlaySize.Y,
+                    designOverlaySize.X,
+                    designOverlaySize.Y,
                 )}
                 AutomaticSize={Enum.AutomaticSize.None}
                 BackgroundTransparency={0.3}
@@ -452,10 +459,12 @@ const Draggable = React.forwardRef<Frame, DraggableProps>(
                         ) {
                             return undefined;
                         }
-                        const localPosition =
+                        const localPosition = toDesignPixels(
                             overlayPosition.sub(
                                 overlay.AbsolutePosition,
-                            );
+                            ),
+                            uiScale,
+                        );
 
                         const position = UDim2.fromOffset(
                             localPosition.X,
@@ -463,8 +472,8 @@ const Draggable = React.forwardRef<Frame, DraggableProps>(
                         );
 
                         const size = UDim2.fromOffset(
-                            overlaySize.X,
-                            overlaySize.Y,
+                            designOverlaySize.X,
+                            designOverlaySize.Y,
                         );
 
                         const preview = props.renderOverlay !== undefined
@@ -490,9 +499,11 @@ const Draggable = React.forwardRef<Frame, DraggableProps>(
                             });
 
                         return createPortal(
-                            <DragStateContext.Provider value={PREVIEW_DRAG_STATE}>
-                                {preview}
-                            </DragStateContext.Provider>,
+                            <OverlayScaleFrame ZIndex={100001}>
+                                <DragStateContext.Provider value={PREVIEW_DRAG_STATE}>
+                                    {preview}
+                                </DragStateContext.Provider>
+                            </OverlayScaleFrame>,
                             overlay,
                         );
 

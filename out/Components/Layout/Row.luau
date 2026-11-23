@@ -5,12 +5,16 @@ local Column = TS.import(script, script.Parent, "Column").Column
 local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
 local CleanThemeContext = _Contexts.CleanThemeContext
 local RowContext = _Contexts.RowContext
+local useUiScale = _Contexts.useUiScale
 local _ = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local BreakpointHelper = _.BreakpointHelper
 local SpacingHelper = _.SpacingHelper
+local toDesignPixels = _.toDesignPixels
 local Row = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
-	local width, setWidth = React.useState(0)
+	local uiScale = useUiScale()
+	local screenWidth, setScreenWidth = React.useState(0)
+	local width = toDesignPixels(screenWidth, uiScale)
 	local breakpoints = props.breakpoints or theme.breakpoints
 	local padding = UDim.new(0, SpacingHelper:GetPadding(theme, props.spacing))
 	local _attributes = {}
@@ -27,7 +31,7 @@ local Row = React.forwardRef(function(props, ref)
 	_attributes.Change = {
 		AbsoluteSize = function(instance)
 			local nextWidth = instance.AbsoluteSize.X
-			setWidth(function(currentWidth)
+			setScreenWidth(function(currentWidth)
 				return if currentWidth == nextWidth then currentWidth else nextWidth
 			end)
 		end,

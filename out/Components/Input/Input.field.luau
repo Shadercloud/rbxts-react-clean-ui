@@ -4,7 +4,10 @@ local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local CssHelper = _Helpers.CssHelper
 local SizeHelper = _Helpers.SizeHelper
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local toDesignPixels = _Helpers.toDesignPixels
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local BoxShadow = TS.import(script, script.Parent.Parent, "Decorator").BoxShadow
 local function resolveFieldState(disabled, focused, hovered)
 	if disabled then
@@ -46,12 +49,14 @@ local function FieldBoxShadow(props)
 end
 local function FieldInnerShadow(props)
 	local theme = React.useContext(CleanThemeContext)
+	local uiScale = useUiScale()
 	local ref = React.useRef()
-	local height, setHeight = React.useState(0)
+	local screenHeight, setScreenHeight = React.useState(0)
+	local height = toDesignPixels(screenHeight, uiScale)
 	React.useEffect(function()
 		local frame = ref.current
 		if frame ~= nil then
-			setHeight(frame.AbsoluteSize.Y)
+			setScreenHeight(frame.AbsoluteSize.Y)
 		end
 	end, {})
 	local inset = math.max(0, props.inset)
@@ -70,7 +75,7 @@ local function FieldInnerShadow(props)
 		Visible = fade > 0,
 		Change = {
 			AbsoluteSize = function(rbx)
-				return setHeight(rbx.AbsoluteSize.Y)
+				return setScreenHeight(rbx.AbsoluteSize.Y)
 			end,
 		},
 	}, (innerRadius.Scale ~= 0 or innerRadius.Offset ~= 0) and React.createElement("uicorner", {

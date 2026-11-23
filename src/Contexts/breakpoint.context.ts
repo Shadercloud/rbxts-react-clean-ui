@@ -3,7 +3,9 @@ import { Workspace } from "@rbxts/services";
 import { Breakpoint, BreakpointValue, ResponsiveValue } from "../Interfaces/responsive.types";
 import { BreakpointHelper } from "../Helpers/breakpoint.helper";
 import { SizeHelper } from "../Helpers/size.helper";
+import { toDesignPixels } from "../Helpers/uiscale.helper";
 import { CleanThemeContext } from "./theme.context";
+import { useUiScale } from "./uiscale.context";
 
 export interface BreakpointContextValue {
     width: number;
@@ -14,22 +16,23 @@ export const BreakpointContext = React.createContext<BreakpointContextValue | un
     undefined,
 );
 
-function getViewportBreakpoint(breakpoints: BreakpointValue<number>): Breakpoint | undefined {
+function getViewportBreakpoint(breakpoints: BreakpointValue<number>, scale: number): Breakpoint | undefined {
     const camera = Workspace.CurrentCamera;
 
     if (camera === undefined) {
         return undefined;
     }
 
-    return BreakpointHelper.getBreakpoint(camera.ViewportSize.X, breakpoints);
+    return BreakpointHelper.getBreakpoint(toDesignPixels(camera.ViewportSize.X, scale), breakpoints);
 }
 
 export function useBreakpoint(): Breakpoint {
     const context = React.useContext(BreakpointContext);
     const theme = React.useContext(CleanThemeContext);
+    const scale = useUiScale();
 
     const [viewportBreakpoint, setViewportBreakpoint] = React.useState<Breakpoint>(
-        () => (context === undefined ? getViewportBreakpoint(theme.breakpoints) : undefined) ?? "xs",
+        () => (context === undefined ? getViewportBreakpoint(theme.breakpoints, scale) : undefined) ?? "xs",
     );
 
     React.useEffect(() => {
@@ -40,7 +43,7 @@ export function useBreakpoint(): Breakpoint {
         let viewportConnection: RBXScriptConnection | undefined;
 
         const update = () => {
-            const resolved = getViewportBreakpoint(theme.breakpoints);
+            const resolved = getViewportBreakpoint(theme.breakpoints, scale);
 
             if (resolved !== undefined) {
                 setViewportBreakpoint(resolved);
@@ -68,7 +71,7 @@ export function useBreakpoint(): Breakpoint {
             cameraConnection.Disconnect();
             viewportConnection?.Disconnect();
         };
-    }, [context === undefined, theme.breakpoints]);
+    }, [context === undefined, theme.breakpoints, scale]);
 
     return context !== undefined ? context.breakpoint : viewportBreakpoint;
 }

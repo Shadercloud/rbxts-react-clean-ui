@@ -1,0 +1,213 @@
+---
+title: Scaling the UI
+description: Make your whole interface bigger or smaller with one UiScaleRoot, without breaking layouts, overlays, or positioning.
+icon: Scaling
+---
+
+[`UiScaleRoot`](/components/layout/uiscaleroot) scales everything inside it by one factor. It uses a Roblox [`UIScale`](https://create.roblox.com/docs/reference/engine/classes/UIScale) internally and corrects the parts of the library that a plain `UIScale` would break, such as breakpoints, popups, and drag positions.
+
+## Why scale the UI
+
+A layout that looks right on a desktop monitor is often too small on a TV, where players sit several metres from the screen. Players on any device may also want larger text and controls. With `UiScaleRoot` you keep one set of sizes and change a single number:
+
+* `1`: the sizes you designed with
+* `1.25`: a little larger, for a "large UI" setting
+* `1.5`: much larger, for consoles and TVs
+
+A scale of `1`, or no `UiScaleRoot` at all, changes nothing.
+
+## Import
+
+```tsx
+import { UiScaleRoot, UiScaleContext, useUiScale, useDesignViewportSize, toDesignPixels, toScreenPixels } from "@rbxts/react-clean-ui";
+```
+
+## Setup
+
+Place one `UiScaleRoot` directly under your `ScreenGui`, wrapping `CleanUiProvider`, so the overlay and toasts that `CleanUiProvider` renders are scaled too. This example uses `1.5` on a ten-foot (console/TV) interface and `1` everywhere else:
+
+```tsx
+// src/client/app.client.tsx
+import React from "@rbxts/react";
+import ReactRoblox from "@rbxts/react-roblox";
+import { CleanUiProvider, DefaultTheme, UiScaleRoot } from "@rbxts/react-clean-ui";
+import { App } from "./App";
+
+const GuiService = game.GetService("GuiService");
+const playerGui = game.GetService("Players").LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
+
+const screenGui = new Instance("ScreenGui");
+screenGui.ResetOnSpawn = false;
+screenGui.IgnoreGuiInset = true;
+screenGui.Parent = playerGui;
+
+const scale = GuiService.IsTenFootInterface() ? 1.5 : 1;
+
+ReactRoblox.createRoot(screenGui).render(
+    <UiScaleRoot scale={scale}>
+        <CleanUiProvider theme={DefaultTheme}>
+            <App />
+        </CleanUiProvider>
+    </UiScaleRoot>,
+);
+```
+
+`scale` is an ordinary prop, so you can drive it from state, for example from a settings menu:
+
+```tsx
+import React, { useState } from "@rbxts/react";
+import { UiScaleRoot } from "@rbxts/react-clean-ui";
+
+const UI_SIZES = { small: 1, medium: 1.25, large: 1.5 };
+
+export function ScaledApp() {
+    const [uiSize, setUiSize] = useState<keyof typeof UI_SIZES>("medium");
+
+    return (
+        <UiScaleRoot scale={UI_SIZES[uiSize]}>
+            <App uiSize={uiSize} onUiSizeChange={setUiSize} />
+        </UiScaleRoot>
+    );
+}
+```
+
+`UiScaleRoot` renders a transparent, full-screen frame with no visual of its own. Its children keep their relative `ZIndex` order inside it, and its own `ZIndex` prop sets where the frame sits among the other children of the `ScreenGui`.
+
+### Nesting
+
+Nested `UiScaleRoot`s multiply. A `UiScaleRoot scale={1.2}` inside a `UiScaleRoot scale={1.5}` gives its children an effective scale of `1.8`. Most games only need the one at the root.
+
+## Design pixels and screen pixels
+
+Inside a `UiScaleRoot` there are two kinds of pixel:
+
+* **Screen pixels** are real pixels on the display.
+* **Design pixels** are the pixels you write in your layout: screen pixels divided by the scale.
+
+`UiScaleRoot` sizes its frame `UDim2.fromScale(1 / scale, 1 / scale)` and puts a `UIScale` with `Scale = scale` inside it, so after scaling the frame fills the `ScreenGui` exactly. On a 1920x1080 screen at a scale of `1.5`, children lay out in a 1280x720 design-pixel space. A `Container width={200}` is 200 design pixels wide and 300 screen pixels wide, and `width="50%"` is still half the screen.
+
+Sizes, offsets, padding, and spacing that you pass to components are all in design pixels. Roblox reports some values in screen pixels, however:
+
+* `AbsoluteSize` and `AbsolutePosition`
+* Mouse and touch positions from `UserInputService`, `Mouse`, and `InputObject.Position`
+* `Camera.ViewportSize`
+
+Convert these before mixing them with your own offsets. See [Converting between pixels](#converting-between-pixels).
+
+## useUiScale
+
+`useUiScale()` returns the effective scale of the nearest `UiScaleRoot`, multiplied through any nested roots. With no `UiScaleRoot` above the component it returns `1`.
+
+The value comes from `UiScaleContext`, which is also exported. It holds the effective scale (default `1`), not the nearest root's own `scale` prop.
+
+```tsx
+import React from "@rbxts/react";
+import { Text, useUiScale } from "@rbxts/react-clean-ui";
+
+function ScaleLabel() {
+    const scale = useUiScale();
+
+    return <Text text={`UI scale: ${scale}x`} />;
+}
+```
+
+## useDesignViewportSize
+
+`useDesignViewportSize()` returns the size of the screen in design pixels: `Camera.ViewportSize` divided by the effective scale. It updates when the viewport is resized, when the scale changes, and when `Workspace.CurrentCamera` is replaced. It returns `Vector2.zero` until there is a camera.
+
+```tsx
+import React from "@rbxts/react";
+import { Container, useDesignViewportSize } from "@rbxts/react-clean-ui";
+
+function SidePanel() {
+    const viewport = useDesignViewportSize();
+    const width = math.min(400, viewport.X - 32);
+
+    return <Container width={width} height="100%" />;
+}
+```
+
+Use this instead of reading `Camera.ViewportSize` yourself. The camera's value is in screen pixels and is too large by the scale factor.
+
+## Converting between pixels
+
+`toDesignPixels(value, scale)` and `toScreenPixels(value, scale)` convert a `Vector2` or a `number` between the two spaces. They are plain functions, so pass in the scale from `useUiScale()`.
+
+* `toDesignPixels` divides by the scale. Use it on `AbsoluteSize`, `AbsolutePosition`, and input positions before using them as offsets.
+* `toScreenPixels` multiplies by the scale. Use it when you need to compare a design-pixel value with a screen-pixel one.
+
+This example positions a marker under the mouse:
+
+```tsx
+import React, { useEffect, useRef, useState } from "@rbxts/react";
+import { toDesignPixels, useUiScale } from "@rbxts/react-clean-ui";
+
+const UserInputService = game.GetService("UserInputService");
+
+function CursorMarker() {
+    const scale = useUiScale();
+    const ref = useRef<Frame>();
+    const [position, setPosition] = useState(new Vector2());
+
+    useEffect(() => {
+        const connection = UserInputService.InputChanged.Connect((input) => {
+            const parent = ref.current?.Parent as GuiObject | undefined;
+            if (input.UserInputType !== Enum.UserInputType.MouseMovement || !parent) return;
+
+            const offset = new Vector2(input.Position.X, input.Position.Y).sub(parent.AbsolutePosition);
+            setPosition(toDesignPixels(offset, scale));
+        });
+
+        return () => connection.Disconnect();
+    }, [scale]);
+
+    return (
+        <frame
+            ref={ref}
+            Size={UDim2.fromOffset(8, 8)}
+            Position={UDim2.fromOffset(position.X, position.Y)}
+            AnchorPoint={new Vector2(0.5, 0.5)}
+        />
+    );
+}
+```
+
+`toDesignPixels(300, 1.5)` returns `200`, and `toScreenPixels(200, 1.5)` returns `300`.
+
+## Breakpoints
+
+[`BreakpointProvider`](/components/layout/breakpointprovider), [`Row`](/components/layout/row), [`Grid`](/components/layout/grid), and [`Fieldset`](/components/form/fieldset) measure their width in design pixels. A panel that is 600 design pixels wide resolves to the same breakpoint at every scale, even though it covers more screen pixels at `1.5`.
+
+This is intended. At a larger scale the text and controls are larger too, so a panel should not switch to a roomier layout just because it covers more of the screen. Scaling up can make the design viewport smaller, though: a 1920x1080 screen at `1.5` is 1280 design pixels wide. A screen-level `BreakpointProvider` can therefore resolve to a smaller breakpoint at a larger scale, which gives the larger UI the space it needs.
+
+## Library behaviour under a root
+
+You don't need to do anything extra for the library's own components. Under a `UiScaleRoot`:
+
+* [`Tooltip`](/components/interaction/tooltip), [`Select`](/components/form/select)'s dropdown, [`Modal`](/components/interaction/modal), and the [`Draggable`](/components/layout/dragdrop) drag preview are portalled into the overlay at the right size and position.
+* With the recommended setup the overlay is already inside the root. If the `OverlayProvider` (rendered by `CleanUiProvider`) sits outside the root, or under a different scale, portalled content is wrapped in a frame named `UiScaleOverlay` that applies the difference, so it still comes out the right size.
+* A `ToastContainer` is rendered in place, not portalled. One placed outside the root is **not** scaled, so keep it inside, for example by keeping `CleanUiProvider` inside the root.
+* [`Slider`](/components/form/slider), [`Pie`](/components/chart/pie) hover, and drag-and-drop hit-testing compare pointer positions with `AbsolutePosition`/`AbsoluteSize`, so they work in screen pixels and need no conversion. The `position` in a `DragEventInfo` is in screen pixels too; convert it with `toDesignPixels` before using it as an offset.
+
+## Pitfalls
+
+### Don't add your own UIScale
+
+A `UIScale` of your own outside `UiScaleRoot` is invisible to the library: `useUiScale()` doesn't include it, so the library's conversions don't account for it. Use `UiScaleRoot` instead, and nest a second `UiScaleRoot` if one region needs a different scale, since nested roots multiply.
+
+### Convert Absolute* reads
+
+`AbsoluteSize`, `AbsolutePosition`, `Camera.ViewportSize`, and input positions are in screen pixels. Writing them straight into an offset makes the element too large or too far away by the scale factor. Convert them with `toDesignPixels` first, or use `useDesignViewportSize()` for the viewport.
+
+```tsx
+// Wrong at any scale other than 1
+const size = UDim2.fromOffset(other.AbsoluteSize.X, other.AbsoluteSize.Y);
+
+// Right
+const designSize = toDesignPixels(other.AbsoluteSize, scale);
+const size = UDim2.fromOffset(designSize.X, designSize.Y);
+```
+
+### Read the scale from the hook
+
+Read the scale with `useUiScale()` rather than reusing the value you passed to `UiScaleRoot`. The hook includes any nested roots and stays correct if the scale later changes.

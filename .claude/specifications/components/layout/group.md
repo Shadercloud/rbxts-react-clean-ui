@@ -19,3 +19,7 @@
 ## Theme
 
 Not themeable.
+
+## Implementation notes
+
+- `Group.Element` converts its measured `AbsoluteSize` to design pixels (`useUiScale()`) before adding `padding` (already design pixels) and reporting it, because the shared size is written back into offset sizes. The element is content-sized, so its screen size changes whenever a [UiScaleRoot](./uiscaleroot.md)'s scale does and the handler re-reports.

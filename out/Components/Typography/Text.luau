@@ -1,17 +1,20 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = _G[script]
 local React = TS.import(script, TS.getModule(script, "@rbxts", "react"))
-local CleanThemeContext = TS.import(script, script.Parent.Parent.Parent, "Contexts").CleanThemeContext
+local _Contexts = TS.import(script, script.Parent.Parent.Parent, "Contexts")
+local CleanThemeContext = _Contexts.CleanThemeContext
+local useUiScale = _Contexts.useUiScale
 local _Helpers = TS.import(script, script.Parent.Parent.Parent, "Helpers")
 local ElementHelper = _Helpers.ElementHelper
 local SizeHelper = _Helpers.SizeHelper
 local TextHelper = _Helpers.TextHelper
 local TypographyHelper = _Helpers.TypographyHelper
+local toDesignPixels = _Helpers.toDesignPixels
 local SHRINK_SEARCH_STEPS = 24
 local SHRINK_FILL_TOLERANCE = 0.5
 local SHRINK_SCALE_PRECISION = 0.001
-local function getContentWidth(parent)
-	local width = parent.AbsoluteSize.X
+local function getContentWidth(parent, uiScale)
+	local width = toDesignPixels(parent.AbsoluteSize.X, uiScale)
 	local padding = parent:FindFirstChildOfClass("UIPadding")
 	if padding == nil then
 		return width
@@ -20,6 +23,7 @@ local function getContentWidth(parent)
 end
 local Text = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
+	local uiScale = useUiScale()
 	local style = props.typography or theme.typography[props.variant or "body"]
 	local weight = if props.weight == "bold" then Enum.FontWeight.Bold else props.weight or style.weight or Enum.FontWeight.Regular
 	local textwrapped = props.TextWrap ~= false and props.TextWrapped ~= false
@@ -68,11 +72,11 @@ local Text = React.forwardRef(function(props, ref)
 			local parent = root.Parent
 			local _condition_2 = shrinkWidth
 			if _condition_2 == nil then
-				_condition_2 = (if parent ~= nil and parent:IsA("GuiBase2d") then getContentWidth(parent) else nil)
+				_condition_2 = (if parent ~= nil and parent:IsA("GuiBase2d") then getContentWidth(parent, uiScale) else nil)
 			end
 			local available = _condition_2
 			local scale = shrinkScale:getValue()
-			local width = root.AbsoluteSize.X
+			local width = toDesignPixels(root.AbsoluteSize.X, uiScale)
 			if width <= 0 or available == nil or available <= 0 then
 				return nil
 			end
@@ -117,12 +121,12 @@ local Text = React.forwardRef(function(props, ref)
 				end
 				scale = nextScale
 				setShrinkScale(scale)
-				width = root.AbsoluteSize.X
+				width = toDesignPixels(root.AbsoluteSize.X, uiScale)
 			end
 			if width > available and fitScale ~= nil and fitScale ~= scale then
 				scale = fitScale
 				setShrinkScale(scale)
-				width = root.AbsoluteSize.X
+				width = toDesignPixels(root.AbsoluteSize.X, uiScale)
 			end
 			settledAvailable = available
 			settledScale = scale
@@ -152,7 +156,7 @@ local Text = React.forwardRef(function(props, ref)
 				_result:Disconnect()
 			end
 		end
-	end, { shrinkToFit, letterSpaced, shrinkWidth, shrinkMinScale })
+	end, { shrinkToFit, letterSpaced, shrinkWidth, shrinkMinScale, uiScale })
 	local sizeConstraint = SizeHelper:GetSizeConstraint({
 		minWidth = props.minWidth,
 		maxWidth = if shrinkToFit then nil else props.maxWidth,
