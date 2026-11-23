@@ -10,6 +10,9 @@ local SizeHelper = _Helpers.SizeHelper
 local TextHelper = _Helpers.TextHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local toDesignPixels = _Helpers.toDesignPixels
+local _PinTextSize_preferred = TS.import(script, script.Parent, "PinTextSize.preferred")
+local PreferredTextSizePin = _PinTextSize_preferred.PreferredTextSizePin
+local usePinsPreferredTextSize = _PinTextSize_preferred.usePinsPreferredTextSize
 local SHRINK_SEARCH_STEPS = 24
 local SHRINK_FILL_TOLERANCE = 0.5
 local SHRINK_SCALE_PRECISION = 0.001
@@ -24,6 +27,7 @@ end
 local Text = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local uiScale = useUiScale()
+	local pinsTextSize = usePinsPreferredTextSize(props.TextScaled)
 	local style = props.typography or theme.typography[props.variant or "body"]
 	local weight = if props.weight == "bold" then Enum.FontWeight.Bold else props.weight or style.weight or Enum.FontWeight.Regular
 	local textwrapped = props.TextWrap ~= false and props.TextWrapped ~= false
@@ -234,11 +238,16 @@ local Text = React.forwardRef(function(props, ref)
 			_attributes.Transparency = _condition_7
 			_condition_4 = (React.createElement("uistroke", _attributes))
 		end
-		return React.createElement(React.Fragment, nil, _condition_4, hasTextSizeConstraint and (React.createElement("uitextsizeconstraint", {
+		return React.createElement(React.Fragment, nil, _condition_4, hasTextSizeConstraint and not pinsTextSize and (React.createElement("uitextsizeconstraint", {
 			key = "TextSizeConstraint",
 			MinTextSize = minTextSize,
 			MaxTextSize = maxTextSize,
-		})))
+		})), React.createElement(PreferredTextSizePin, {
+			size = style.size,
+			scaled = props.TextScaled,
+			minTextSize = if hasTextSizeConstraint then minTextSize else nil,
+			maxTextSize = if hasTextSizeConstraint then maxTextSize else nil,
+		}))
 	end
 	local renderBoxDecorations = function()
 		return React.createElement(React.Fragment, nil, sizeConstraint ~= nil and (React.createElement("uisizeconstraint", {

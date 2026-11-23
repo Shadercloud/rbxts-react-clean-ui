@@ -48,6 +48,12 @@
 - `minTextSize`/`maxTextSize` add a `UITextSizeConstraint` named `TextSizeConstraint` to the text (each character label when letter-spaced). Use them to bound `TextScaled` text. Unset is `1` for the minimum and `100` for the maximum. Both are clamped to Roblox's `1`–`100`, and a maximum below the minimum is raised to it.
 - No constraint is rendered when both are unset.
 
+### Player text size
+
+- Under `CleanUiProvider ignorePreferredTextSize`, the label (each character label when letter-spaced) gets a `UITextSizeConstraint` named `PinTextSize` with `MinTextSize = MaxTextSize =` the resolved style's `size` in pixels, so the player's Text Size setting doesn't enlarge it (see [Player text size](../index.md#player-text-size-preferredtextsize)). With the switch off, or `TextScaled={true}`, none is rendered.
+- When `minTextSize`/`maxTextSize` are also set, the pin replaces the `TextSizeConstraint` and pins to the style size clamped into that range.
+- `shrinkToFit` doesn't change the pinned size: it shrinks with a `UIScale`, not `TextSize`.
+
 ### Letter spacing
 
 - `letterSpacing` resolves as `props.letterSpacing ?? style.letterSpacing` (the resolved typography style, per above).
@@ -95,4 +101,6 @@
 - The fallback for complex scripts is a plain label with no spacing rather than per-word or per-run labels: there is no way to letter-space joined text in Roblox without breaking shaping, and mixed-direction runs would need a bidi algorithm to order the labels.
 - Each character label is shaped on its own, so kerning and ligatures between clusters are lost on the letter-spaced path. That was already true for ASCII.
 - `renderTextDecorations`/`renderBoxDecorations` return Fragments whose unset parts are `false`, so they add no instances when nothing is set.
+- `PinTextSize` is rendered through the internal `PreferredTextSizePin` (`src/Components/Typography/PinTextSize.preferred.tsx`, not exported from the package), which reads `useIgnorePreferredTextSize()` and converts the `Enum.FontSize` with `TypographyHelper.toTextSize`. `Text` calls `usePinsPreferredTextSize(props.TextScaled)` itself only to drop `TextSizeConstraint` while pinned: two `UITextSizeConstraint`s on one label have no defined winner. A `TextScaled` binding is pinned with `MinTextSize`/`MaxTextSize` bindings that open to the `minTextSize`/`maxTextSize` range (default `1`-`100`) while the binding is `true`.
+- RichText stays on by default on the plain label, and the pin overrides any `<font size="...">` in caller text while it is on. `Text` itself never emits size markup (the letter-spaced path forces `RichText` off), so nothing in the library depends on sized runs.
 - Shrink measurement is done in design pixels: `root.AbsoluteSize.X` and the parent's width in `getContentWidth` go through `toDesignPixels(..., useUiScale())` before the parent's `UIPadding` offsets are subtracted and before comparing with `maxWidth`. Under a [UiScaleRoot](../layout/uiscaleroot.md), unconverted screen widths would be compared with design-pixel `maxWidth`/padding. The effect depends on the scale.

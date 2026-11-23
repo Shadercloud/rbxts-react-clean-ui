@@ -69,6 +69,7 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 - `toFontFace` is the only way components should turn a theme `Enum.Font` into a `FontFace`. Don't go back to `Font.fromName(font.Name, weight)`: it loads `rbxasset://fonts/families/<EnumName>.json`, and for legacy enums whose name isn't the family file (`Fantasy` -> `Balthazar`, `Garamond` -> `Guru`, `Bodoni` -> `AccanthisADFStd`, `Antique` -> `RomanAntique`, `SciFi` -> `Zekton`, `Cartoon` -> `ComicNeueAngular`, `Highway` -> `HighwayGothic`, `SourceSans*` -> `SourceSansPro`, ...) that file doesn't exist and Roblox silently renders Builder Sans. `toFontFace` takes only `.Family` from `Font.fromEnum(font)` and builds `new Font(family, weight ?? Regular, style ?? Normal)`.
 - `toFontFace` deliberately ignores the weight/style baked into the enum (`GothamBold`, `SourceSansBold` -> Bold): the caller's weight applies, as it did with `fromName`.
 - `toFontFace` wraps `Font.fromEnum` in `pcall` and falls back to `Font.fromName(font.Name, ...)` when it throws or yields an empty `Family` (`Enum.Font.Unknown`, enums newer than the engine).
+- `toTextSize(size)` turns an `Enum.FontSize` into its pixel `TextSize` by parsing the item name (`Size18` -> `18`); it returns `undefined` for any name not shaped `Size<n>`. Parsing avoids a table of `Enum.FontSize` members built at require time, which would throw on a runtime missing one. Only `PreferredTextSizePin` calls it, and only while the pin is on.
 
 ## src/Helpers/uiscale.helper.ts
 
@@ -98,6 +99,11 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 - `useDesignViewportSize` keeps the raw `ViewportSize` in state and divides at render, so a scale change re-renders through the context without reconnecting anything. The camera binding (`bindCamera` on `Workspace.CurrentCamera` changes, a `ViewportSize` connection per camera) mirrors `useBreakpoint`'s viewport fallback.
 - `useBreakpoint`'s viewport fallback divides `ViewportSize.X` by `useUiScale()` and lists the scale in its effect's dependencies, so the camera signals reconnect with the new scale. `useUiScale` is called unconditionally, after the two existing `useContext` calls, so the hook order doesn't depend on whether a provider is present.
 
+## src/Contexts/textsize.context.ts
+
+- `IgnorePreferredTextSizeContext` (`boolean`, default `false`) carries `CleanUiProvider`'s `ignorePreferredTextSize`; `useIgnorePreferredTextSize` reads it, next to the context like `useUiScale`. Behaviour is specified in [components/index.md](../specifications/components/index.md#player-text-size-preferredtextsize) and [typography/pintextsize.md](../specifications/components/typography/pintextsize.md). Context survives portals, so overlay content (Tooltip, Select, Modal, Toast) follows the provider's value.
+- The opt-out is a child `UITextSizeConstraint` with equal min and max on each text instance, because Roblox has no global switch. It overrides RichText `<font size="...">` markup on that instance, so a caller's sized runs render at the label's size while the switch is on. The library emits no size markup itself.
+
 ## src/Contexts/overlay.context.ts
 
 - `OverlayContextValue.scale` is optional and is the effective `UiScaleContext` scale at the `OverlayProvider`. A hand-built context value without it is treated as `1`. Portalling components compare it against their own `useUiScale()` through `OverlayScaleFrame`; see the portal notes in [layout/uiscaleroot.md](../specifications/components/layout/uiscaleroot.md#implementation-notes).
@@ -116,3 +122,7 @@ Implementation notes for src/Helpers, src/Interfaces, src/Contexts and src/Provi
 - `createRegistry()` builds a standalone registry. `RegistryProvider` creates one per provider instance (kept in state, so the context value is stable across renders; it used to be rebuilt every render, which re-ran every registration effect). `GlobalRegistry` is a module-level instance shared by every React root in the Luau VM.
 - Draggable and Droppable register in both `GlobalRegistry` and the context registry (when present), and Draggable looks up droppables and active drags in `GlobalRegistry` only. That keeps drag/drop working with no provider and across separate React roots, while `registry.get(instance, DroppableRegistryKey)` on a provider's registry still works.
 - `DroppableRegistration.dragEnter`/`dragLeave` are optional and `drop`'s `info` is optional, so registrations built by hand against the old shape still type-check.
+
+## src/Providers/app.provider.tsx
+
+- `CleanUiProvider`'s `ignorePreferredTextSize` (default `false`) is provided outermost, around `RegistryProvider`, so `ToastContainer` and everything portalled through `OverlayProvider` read it. A provider renders no instance, so the tree is unchanged.

@@ -83,6 +83,10 @@ do
 		end
 		return false
 	end
+	function TypographyHelper:toTextSize(size)
+		local digits = string.match(size.Name, "^Size(%d+)$")
+		return if digits ~= nil then tonumber(digits) else nil
+	end
 	function TypographyHelper:toFontFace(font, weight, style)
 		local resolvedWeight = weight or Enum.FontWeight.Regular
 		local resolvedStyle = style or Enum.FontStyle.Normal

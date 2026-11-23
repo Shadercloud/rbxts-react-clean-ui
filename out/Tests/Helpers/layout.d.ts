@@ -45,4 +45,7 @@ export declare function assertAlignedRight(child: GuiObject, parent: GuiObject, 
 export declare function assertAlignedTop(child: GuiObject, parent: GuiObject, tolerance?: number, label?: string): void;
 export declare function sizeConstraintsOf(instance: Instance): UISizeConstraint[];
 export declare function soleSizeConstraint(instance: Instance): UISizeConstraint;
+export declare function textSizeConstraintsOf(instance: Instance): UITextSizeConstraint[];
+export declare function assertTextSizePinned(instance: Instance, size: number): void;
+export declare function assertTextSizeNotPinned(instance: Instance): void;
 export declare function waitForWidth(gui: GuiObject, width: number, tolerance?: number): void;

@@ -16,6 +16,8 @@
 - Several native `TextBox` properties are managed internally and cannot be meaningfully overridden: `Text`, `FontFace`, `FontSize`, `BackgroundTransparency` (theme-driven, see Theme), `ClearTextOnFocus` (defaults to `false` unless overridden), and `AutomaticSize`.
 - Internally, the icon and the `TextBox` sit in a single non-wrapping `HStack` (`Wraps={false}`, matching the convention used by `Button`/`Increment`/`Accordion` for icon+content rows) with the `TextBox` wrapped in a `FlexItem` so it fills the remaining width; when `icon` is omitted, the `HStack` renders with only the `FlexItem`+`TextBox` child, unchanged from the pre-`icon` layout.
 
+- Under `CleanUiProvider ignorePreferredTextSize`, the `TextBox` gets a `UITextSizeConstraint` named `PinTextSize` pinned to the resolved input typography size (text and placeholder share it), unless `TextScaled` is set. See [Player text size](../index.md#player-text-size-preferredtextsize). A caller's `RichText` size markup is overridden while pinned.
+
 ## Controlled vs. uncontrolled
 
 - Without `controlled`, `value` seeds internal state (`React.useState(props.value)`) once; the rendered `Text` afterward comes from that internal state, updated as the user types.

@@ -362,3 +362,10 @@ At about 6 frames per mount plus each `fireHostEvent`/`activateButton`/`settleFr
 - `viewportDesignWidth` builds thresholds relative to the camera width `vw` (`sm = vw/1.5 - 1`, `md = vw/1.25 - 1`, `lg = vw - 1`), because `ViewportSize` can't be set from a test. The same approach is used in the BreakpointProvider viewport-fallback test.
 - `UiScaleRoot.frame.test.tsx` uses a 600x450 host, so the 1.5x design area (400x300) leaves room for a `Bottom` tooltip under the trigger and the placement doesn't flip.
 - **No double quotes in `@DisplayName`.** The Lunit CLI escapes `"` in the runner output (`\"`) and then can't match the result back to the test item, so the test reports "No matching result found" even when every row passed.
+
+## Player text size pin (`PinTextSize.test.tsx`, `Text.textsize.test.tsx`, `Input.textsize.test.tsx`, `Button.textsize.test.tsx`, `typography.helper.toTextSize.test.ts`)
+
+- `textSizeConstraintsOf`, `assertTextSizePinned` and `assertTextSizeNotPinned` in `src/Tests/Helpers/layout.ts` check the direct children of one text instance. `assertTextSizePinned` requires exactly one `UITextSizeConstraint`, named `PinTextSize`, with `MinTextSize == MaxTextSize == size`, so it also catches a leftover `TextSizeConstraint` next to the pin.
+- The switch is driven through a real `CleanUiProvider` (`toasts={false}`) inside `withMounted`'s outer `ThemeProvider`, so the tests cover the provider prop and not just the context.
+- `Input`/`Button` expected sizes come from `TypographyHelper.getTypography(DefaultTheme, scale, <component typography>)` plus `toTextSize`, the same resolution the components use. The tests also assert the pin equals the instance's own `TextSize`, which is the observable contract.
+- `typography.helper.toTextSize.test.ts` is `@Tag("Lune")` and passes name-only stand-ins (`{ Name: "Size18" } as unknown as Enum.FontSize`), because `Enum` is nil under Lune and `toTextSize` reads only `.Name`. The real enum round trip is covered by the Studio `pinsVariant` rows (`label.TextSize` equals the pin).

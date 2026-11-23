@@ -251,6 +251,17 @@ Use `minTextSize` and `maxTextSize` to add a `UITextSizeConstraint`. They mainly
 
 Both are clamped to Roblox's `1`–`100` range. An unset minimum is `1` and an unset maximum is `100`; a maximum below the minimum is raised to it. No constraint is rendered when both are unset.
 
+## Player text size
+
+Under `<CleanUiProvider ignorePreferredTextSize>`, `Text` pins its size so the player's Text Size setting can't enlarge it. The label, or every character label when letter-spaced, gets a `UITextSizeConstraint` named `PinTextSize` with both limits set to the resolved typography size. See [Player text size](/scaling#player-text-size) for the full picture.
+
+* With the switch off, or with `TextScaled`, no pin is rendered.
+* With `minTextSize` or `maxTextSize` set, the pin replaces that constraint and uses the typography size clamped into the range.
+* `shrinkToFit` is unaffected, since it shrinks with a `UIScale` rather than `TextSize`.
+* A pinned label ignores RichText `<font size="...">` markup in `text`.
+
+For your own native text elements, use [`PinTextSize`](/components/typography/pintextsize).
+
 ## Native properties
 
 `Text` extends `React.InstanceProps<TextLabel>`, so native Roblox `TextLabel` properties can be passed directly to it.
@@ -322,7 +333,7 @@ All other compatible native `TextLabel` properties, such as `AnchorPoint`, `Visi
 * The background is fully transparent by default (`BackgroundTransparency={1}`).
 * When a nonzero `letterSpacing` is set (directly or via the typography style), Roblox has no native letter-spacing property, so the text is instead split into one `TextLabel` per character laid out in a `UIListLayout` row. A character is a grapheme cluster: a letter stays with its combining marks, and an emoji or flag sequence stays whole. In this mode, `RichText` is forced off (markup can't survive being split apart), wrapping/truncation don't apply since each character auto-sizes to itself, and native properties other than `TextColor3`, `TextStrokeColor3`, `TextStrokeTransparency`, and `TextTransparency` — including `Change` and `Event` — are not forwarded to the underlying instances.
 * Text containing right-to-left or joined scripts (such as Hebrew, Arabic, or the Indic scripts), bidirectional control characters, or invalid UTF-8 is not split. It is drawn as a single label with no letter spacing, and behaves like a `Text` without `letterSpacing`. See [Non-English text](/non_english_text#letter-spacing) for the full list.
-* With none of `minWidth`, `maxWidth`, `minHeight`, `maxHeight`, `outline`, `shrinkToFit`, `minTextSize`, or `maxTextSize` set, and no `outline` in the typography style, no extra UI objects are added to the label.
+* With none of `minWidth`, `maxWidth`, `minHeight`, `maxHeight`, `outline`, `shrinkToFit`, `minTextSize`, or `maxTextSize` set, no `outline` in the typography style, and `ignorePreferredTextSize` off, no extra UI objects are added to the label.
 * The `UISizeConstraint` and the shrink `UIScale` go on the label, or on the letter-spaced row. The outline `UIStroke` and the `UITextSizeConstraint` go on the label, or on every character label when letter-spaced.
 * `UIScale` also shrinks the layout footprint, so siblings in a list layout close up around shrunk text.
 * With `shrinkToFit`, the scale stays where it is until the available width is known (no GUI parent, or a width of `0`).

@@ -68,6 +68,12 @@ export class TypographyHelper {
         return false;
     }
 
+    public static toTextSize(size: Enum.FontSize): number | undefined {
+        const [digits] = size.Name.match("^Size(%d+)$");
+
+        return digits !== undefined ? tonumber(digits) : undefined;
+    }
+
     public static toFontFace(font: Enum.Font, weight?: Enum.FontWeight, style?: Enum.FontStyle): Font {
         const resolvedWeight = weight ?? Enum.FontWeight.Regular;
         const resolvedStyle = style ?? Enum.FontStyle.Normal;

@@ -1,0 +1,133 @@
+---
+title: PinTextSize
+description: Pin a native text element's size so the player's Text Size setting can't enlarge it.
+icon: Type
+---
+
+`PinTextSize` renders a Roblox [`UITextSizeConstraint`](https://create.roblox.com/docs/reference/engine/classes/UITextSizeConstraint) with `MinTextSize` and `MaxTextSize` both set to one size. Placed inside your own `textlabel`, `textbox`, or `textbutton`, it stops Roblox's player Text Size setting ([`GuiService.PreferredTextSize`](https://create.roblox.com/docs/reference/engine/classes/GuiService#PreferredTextSize)) from enlarging that element's text. Library components pin their own text through `CleanUiProvider`'s `ignorePreferredTextSize` switch (see [Player text size](/scaling#player-text-size)); `PinTextSize` is for the native text elements your game renders itself.
+
+## Import
+
+```tsx
+import { PinTextSize, useIgnorePreferredTextSize, TypographyHelper } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Typography/PinTextSize.loom.tsx" previewHeight={260}>
+```tsx
+import React from "@rbxts/react";
+import { Box, CleanUiProvider, DefaultTheme, PinTextSize, Text, VStack } from "@rbxts/react-clean-ui";
+
+export function PinTextSizeExample() {
+    return (
+        <CleanUiProvider theme={DefaultTheme} ignorePreferredTextSize>
+            <Box>
+                <VStack spacing="sm">
+                    <textlabel
+                        Text="Native textlabel pinned to 18px"
+                        TextSize={18}
+                        Size={new UDim2()}
+                        AutomaticSize={Enum.AutomaticSize.XY}
+                        BackgroundTransparency={1}
+                    >
+                        <PinTextSize size={18} />
+                    </textlabel>
+                    <Text text="Library Text pins its own size" />
+                </VStack>
+            </Box>
+        </CleanUiProvider>
+    );
+}
+```
+</Demo>
+
+Pass `size` the same value as the element's `TextSize`. The native label then renders at that size whatever the player's Text Size setting is. The `Text` next to it needs no `PinTextSize`: with `ignorePreferredTextSize` on, library text pins itself.
+
+## Why pin text size
+
+Roblox's Text Size accessibility setting enlarges text on its own, without enlarging the frames around it. A layout with fixed sizes can then clip or overflow, and under a [`UiScaleRoot`](/components/layout/uiscaleroot) the text grows on top of the scale you already chose. Roblox has no global opt-out; a `UITextSizeConstraint` whose minimum and maximum are equal is the per-element one.
+
+Text with `TextScaled` set is not affected by the setting, so it doesn't need a pin. Don't add `PinTextSize` to scaled text: it would fix the scaled size too.
+
+## Following the provider switch
+
+`PinTextSize` always pins when it is rendered. It does not read `CleanUiProvider`'s `ignorePreferredTextSize` itself. To pin your own labels only while the switch is on, pass `enabled={useIgnorePreferredTextSize()}`:
+
+```tsx
+import React from "@rbxts/react";
+import { PinTextSize, useIgnorePreferredTextSize } from "@rbxts/react-clean-ui";
+
+function ScoreLabel(props: { score: number }) {
+    const ignorePreferredTextSize = useIgnorePreferredTextSize();
+
+    return (
+        <textlabel
+            Text={`Score: ${props.score}`}
+            TextSize={20}
+            AutomaticSize={Enum.AutomaticSize.XY}
+            BackgroundTransparency={1}
+        >
+            <PinTextSize size={20} enabled={ignorePreferredTextSize} />
+        </textlabel>
+    );
+}
+```
+
+`useIgnorePreferredTextSize()` returns the provider's `ignorePreferredTextSize`, or `false` with no `CleanUiProvider` above the caller.
+
+## Sizes from Enum.FontSize
+
+If your size comes from a typography style or another `Enum.FontSize` value, convert it with `TypographyHelper.toTextSize`, which returns the size in pixels.
+
+```tsx
+const size = TypographyHelper.toTextSize(Enum.FontSize.Size24); // 24
+
+<textlabel Text="Heading" TextSize={size} AutomaticSize={Enum.AutomaticSize.XY} BackgroundTransparency={1}>
+    <PinTextSize size={size} />
+</textlabel>
+```
+
+`toTextSize` returns `undefined` for a value that isn't a `Size<n>` member, and `PinTextSize` renders nothing for an `undefined` size.
+
+## Inside library components
+
+Components that only render children you pass in, such as [`HoverButton`](/components/form/hoverbutton), [`Switch`](/components/form/switch), [`Modal`](/components/interaction/modal), [`Fieldset`](/components/form/fieldset), and [`Card`](/components/surface/card), draw no text of their own. A [`Text`](/components/typography/text) inside them is pinned by the provider switch, but a native text element of yours is not. Add `PinTextSize` to it:
+
+```tsx
+<Card>
+    <Card.Body>
+        <textlabel Text="Native label" TextSize={18} AutomaticSize={Enum.AutomaticSize.XY} BackgroundTransparency={1}>
+            <PinTextSize size={18} enabled={useIgnorePreferredTextSize()} />
+        </textlabel>
+    </Card.Body>
+</Card>
+```
+
+## Props
+
+### PinTextSize-specific props
+
+| Prop      | Type      | Default     | Description                                                                                   |
+| --------- | --------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `size`    | `number`  | `undefined` | The text size to pin, in pixels. Pass the element's `TextSize`. Clamped to `1`–`100`. Nothing is rendered when unset. |
+| `enabled` | `boolean` | `true`      | Renders nothing when `false`. Pass `useIgnorePreferredTextSize()` to follow the provider switch. |
+
+### Hooks and helpers
+
+| Export                              | Returns               | Description                                                                 |
+| ----------------------------------- | --------------------- | --------------------------------------------------------------------------- |
+| `useIgnorePreferredTextSize()`      | `boolean`             | `CleanUiProvider`'s `ignorePreferredTextSize`, or `false` with no provider. |
+| `TypographyHelper.toTextSize(size)` | `number \| undefined` | Converts an `Enum.FontSize` such as `Size24` to its size in pixels.         |
+
+## Behaviour
+
+* Renders one `UITextSizeConstraint` named `PinTextSize`, with `MinTextSize` and `MaxTextSize` both set to `size`, clamped to Roblox's `1`–`100` range. Place it as a child of the text element.
+* Renders nothing when `size` is `undefined` or `enabled` is `false`.
+* The constraint is in the same pixels as `TextSize`. Under a `UiScaleRoot` the pinned value is the design size, and the `UIScale` still scales it, so pinned text follows the UI scale but not the player's Text Size setting.
+* Roblox honours one `UITextSizeConstraint` per element. Don't add another constraint of your own alongside it.
+* A pinned element ignores RichText `<font size="...">` markup: every run renders at the pinned size.
+
+## Theme values
+
+`PinTextSize` has no `theme.components` entry and is not themeable.

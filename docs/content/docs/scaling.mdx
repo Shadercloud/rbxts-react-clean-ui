@@ -189,6 +189,48 @@ You don't need to do anything extra for the library's own components. Under a `U
 * A `ToastContainer` is rendered in place, not portalled. One placed outside the root is **not** scaled, so keep it inside, for example by keeping `CleanUiProvider` inside the root.
 * [`Slider`](/components/form/slider), [`Pie`](/components/chart/pie) hover, and drag-and-drop hit-testing compare pointer positions with `AbsolutePosition`/`AbsoluteSize`, so they work in screen pixels and need no conversion. The `position` in a `DragEventInfo` is in screen pixels too; convert it with `toDesignPixels` before using it as an offset.
 
+## Player text size
+
+Roblox's Text Size accessibility setting ([`GuiService.PreferredTextSize`](https://create.roblox.com/docs/reference/engine/classes/GuiService#PreferredTextSize)) enlarges text on its own, without enlarging the frames around it. Under a `UiScaleRoot` the text then grows on top of your scale, and fixed-size layouts can clip or overflow. Roblox has no global opt-out, so `CleanUiProvider` provides one for the library's text with `ignorePreferredTextSize`:
+
+```tsx
+<UiScaleRoot scale={scale}>
+    <CleanUiProvider theme={DefaultTheme} ignorePreferredTextSize>
+        <App />
+    </CleanUiProvider>
+</UiScaleRoot>
+```
+
+`ignorePreferredTextSize` defaults to `false`, which changes nothing. When it is on:
+
+* Every text element the library renders gets a `UITextSizeConstraint` named `PinTextSize` whose minimum and maximum are both the text's resolved size. That size comes from the theme's typography, after `scale`, breakpoints, and per-component typography, and the pin follows it when it changes.
+* All library text is drawn by [`Text`](/components/typography/text) or [`Input`](/components/form/input)'s text box, so this covers every component built on them, such as `Button`, `Select`, `Badge`, `Tabs`, `Tooltip`, `Toast`, `Menu`, `Table`, and the charts.
+* Text still scales with `UiScaleRoot`. The pin is in design pixels, and the `UIScale` scales it like everything else.
+* Text with `TextScaled` gets no pin, because the player setting doesn't affect scaled text.
+* `Text`'s `shrinkToFit` still works: it shrinks with a `UIScale`, not `TextSize`.
+* On a `Text` with `minTextSize` or `maxTextSize`, the pin replaces that constraint and uses the resolved size clamped into the range.
+
+Components that only render children you pass in, such as `HoverButton`, `Switch`, `Modal`, `Fieldset`, and `Card`, draw no text of their own. A `Text` inside them is pinned, but your own native `textlabel`, `textbox`, or `textbutton` is not. Add [`PinTextSize`](/components/typography/pintextsize) to those, and read the switch with `useIgnorePreferredTextSize()` to follow it:
+
+```tsx
+import React from "@rbxts/react";
+import { PinTextSize, useIgnorePreferredTextSize } from "@rbxts/react-clean-ui";
+
+function NativeLabel() {
+    const ignorePreferredTextSize = useIgnorePreferredTextSize();
+
+    return (
+        <textlabel Text="Native label" TextSize={18} AutomaticSize={Enum.AutomaticSize.XY} BackgroundTransparency={1}>
+            <PinTextSize size={18} enabled={ignorePreferredTextSize} />
+        </textlabel>
+    );
+}
+```
+
+A pinned label ignores RichText `<font size="...">` markup: every run renders at the label's size. The library emits no size markup itself, so this only affects RichText you supply.
+
+Turning the switch on removes an accessibility setting players may rely on. Consider exposing your own UI size option, for example through `UiScaleRoot`'s `scale`, so players can still make text larger.
+
 ## Pitfalls
 
 ### Don't add your own UIScale

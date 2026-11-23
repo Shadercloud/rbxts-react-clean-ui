@@ -51,6 +51,13 @@ Every component whose props include `SizeElementProps` accepts `minWidth`, `maxW
 - Roblox honours only one `UISizeConstraint` per instance. Don't also pass a `<uisizeconstraint>` child to a component when using these props.
 - A component that takes `SizeElementProps` but ignores its size props entirely (its spec says so) also ignores these.
 
+## Player text size (PreferredTextSize)
+
+- `CleanUiProvider`'s `ignorePreferredTextSize` (default `false`) opts every library-drawn text out of Roblox's player Text Size setting (`GuiService.PreferredTextSize`), so text scales only with the UI (`UiScaleRoot`). With it off, nothing changes.
+- With it on, every `TextLabel`/`TextBox` the library renders gets a `UITextSizeConstraint` named `PinTextSize` with `MinTextSize = MaxTextSize =` the label's resolved text size (the theme/typography size actually applied, after `scale`, breakpoints and per-component typography). It follows the size when that changes. Labels with `TextScaled` get no pin. See [Text](typography/text.md#player-text-size) and [PinTextSize](typography/pintextsize.md).
+- All library text is drawn by `Text` or `Input`'s `TextBox`, so components built on them (Button, Select, Badge, Tabs, Tooltip, Toast, Menu, RadialMenu, Table, BarChart, Pie, Pagination, Increment, Checkbox, ProgressBar, Accordion) need no wiring of their own. Components that only render caller-supplied children (HoverButton, Switch, Modal, Fieldset, Card, ...) draw no text of their own: a `Text` inside them is pinned, a caller's own native text instance needs `PinTextSize`. A new component that draws its own native text instance must add the pin the same way.
+- The pin overrides RichText `<font size="...">` markup on the pinned label: with the switch on, sized runs inside user-supplied RichText render at the label's size. The library itself emits no size markup.
+
 ## Interaction
 
 - Pointer/gamepad activation on a clickable surface goes through the shared hover-aware button primitive so default/hover (and selected/focus) states stay consistent across components, rather than each component wiring its own `MouseEnter`/`MouseLeave` handling.

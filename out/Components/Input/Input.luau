@@ -17,6 +17,7 @@ local FieldsetContext = _Layout.FieldsetContext
 local FlexItem = _Layout.FlexItem
 local HStack = _Layout.HStack
 local Icon = TS.import(script, script.Parent.Parent, "Surface").Icon
+local PreferredTextSizePin = TS.import(script, script.Parent.Parent, "Typography", "PinTextSize.preferred").PreferredTextSizePin
 local _Input_field = TS.import(script, script.Parent, "Input.field")
 local FieldBoxShadow = _Input_field.FieldBoxShadow
 local FieldInnerShadow = _Input_field.FieldInnerShadow
@@ -237,7 +238,10 @@ local function Input(props)
 	local content = (React.createElement(React.Fragment, nil, _exp, React.createElement(HStack, {
 		valign = "Center",
 		Wraps = false,
-	}, _exp_1, React.createElement(FlexItem, nil, React.createElement("textbox", _attributes_1)))))
+	}, _exp_1, React.createElement(FlexItem, nil, React.createElement("textbox", _attributes_1, React.createElement(PreferredTextSizePin, {
+		size = typography.size,
+		scaled = props.TextScaled,
+	}))))))
 	local _attributes_2 = {}
 	local _condition_5 = props.name
 	if _condition_5 == nil then

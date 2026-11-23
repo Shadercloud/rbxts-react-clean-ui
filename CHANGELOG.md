@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.4.0
+
+### Additions
+
+- **Opt out of the player's Text Size setting with `<CleanUiProvider ignorePreferredTextSize>`.** Roblox's accessibility Text Size setting (`GuiService.PreferredTextSize`) enlarges text alone and can break layouts, including those scaled with `UiScaleRoot`. With the prop on, every text label and text box the library renders (all of them go through `Text` or `Input`) gets a `UITextSizeConstraint` named `PinTextSize`, with `MinTextSize = MaxTextSize` set to its resolved text size. The pin follows theme, `scale` and breakpoint sizes and works under `UiScaleRoot`. `shrinkToFit` is unaffected because it shrinks with a `UIScale`. `TextScaled` labels are skipped. When `Text` has `minTextSize`/`maxTextSize`, the pin replaces that constraint and uses the style size clamped into the range. The default is `false`, which leaves the instance tree unchanged.
+- **`useIgnorePreferredTextSize()`** returns the provider switch. **`IgnorePreferredTextSizeContext`** is exported too.
+- **`<PinTextSize size={n} enabled? />` (Typography)** pins your own native `textlabel`/`textbox`/`textbutton`. It always pins when rendered and does not read the switch, so use `enabled={useIgnorePreferredTextSize()}` to follow it. It renders nothing when `size` is undefined.
+- **`TypographyHelper.toTextSize(fontSize)`** converts an `Enum.FontSize` to its pixel size (`Size18` gives `18`).
+
+### Notes
+
+- A pinned label ignores RichText `<font size=...>` markup. The library itself emits no size markup. Components that only render children you pass in (`HoverButton`, `Switch`, `Modal`, `Fieldset`, `Card`) don't pin your own native labels, so use `PinTextSize` there.
+
 ## 2.3.1
 
 ### Fixes

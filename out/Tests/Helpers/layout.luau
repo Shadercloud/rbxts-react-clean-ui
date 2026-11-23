@@ -346,6 +346,25 @@ local function soleSizeConstraint(instance)
 	Assert:equal(found[1].Name, "SizeConstraint", `Expected the UISizeConstraint on {instance.Name} to be named SizeConstraint`)
 	return found[1]
 end
+local function textSizeConstraintsOf(instance)
+	local found = {}
+	for _, child in instance:GetChildren() do
+		if child:IsA("UITextSizeConstraint") then
+			table.insert(found, child)
+		end
+	end
+	return found
+end
+local function assertTextSizePinned(instance, size)
+	local found = textSizeConstraintsOf(instance)
+	Assert:equal(#found, 1, `Expected exactly one UITextSizeConstraint directly on {instance:GetFullName()}, found {#found}`)
+	Assert:equal(found[1].Name, "PinTextSize", `Expected the UITextSizeConstraint on {instance.Name} to be named PinTextSize, got {found[1].Name}`)
+	Assert:equal(found[1].MinTextSize, size, `Unexpected MinTextSize on {instance.Name}`)
+	Assert:equal(found[1].MaxTextSize, size, `Unexpected MaxTextSize on {instance.Name}`)
+end
+local function assertTextSizeNotPinned(instance)
+	Assert:undefined(instance:FindFirstChild("PinTextSize"), `Expected no PinTextSize constraint on {instance:GetFullName()}`)
+end
 local function waitForWidth(gui, width, tolerance)
 	if tolerance == nil then
 		tolerance = 1
@@ -382,6 +401,9 @@ return {
 	assertAlignedTop = assertAlignedTop,
 	sizeConstraintsOf = sizeConstraintsOf,
 	soleSizeConstraint = soleSizeConstraint,
+	textSizeConstraintsOf = textSizeConstraintsOf,
+	assertTextSizePinned = assertTextSizePinned,
+	assertTextSizeNotPinned = assertTextSizeNotPinned,
 	waitForWidth = waitForWidth,
 	STUDIO_SKIP_MESSAGE = STUDIO_SKIP_MESSAGE,
 }

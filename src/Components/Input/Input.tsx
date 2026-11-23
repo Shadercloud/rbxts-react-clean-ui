@@ -6,6 +6,7 @@ import { TypographyStyle } from "../../Theme";
 import { Corners, Gradient, Padding } from "../Decorator";
 import { FieldsetContext, FlexItem, HStack } from "../Layout";
 import { Icon } from "../Surface";
+import { PreferredTextSizePin } from "../Typography/PinTextSize.preferred";
 import { FieldBoxShadow, FieldInnerShadow, resolveFieldState, resolveFieldStateStyle } from "./Input.field";
 import { resolveClampedText, resolveValidatedText } from "./Input.validation";
 
@@ -204,7 +205,7 @@ export function Input(props: InputProps) {
                             },
                         }}
                     >
-
+                        <PreferredTextSizePin size={typography.size} scaled={props.TextScaled} />
                     </textbox>
                 </FlexItem>
             </HStack>

@@ -5,6 +5,7 @@ export * from './modal.context';
 export * from './navigation.context';
 export * from './overlay.context';
 export * from './row.context';
+export * from './textsize.context';
 export * from './theme.context';
 export * from './toast.context';
 export * from './uiscale.context';

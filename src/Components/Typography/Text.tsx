@@ -3,6 +3,7 @@ import { CleanThemeContext, useUiScale } from "../../Contexts";
 import { ElementHelper, SizeHelper, TextHelper, TypographyHelper, toDesignPixels } from "../../Helpers";
 import { TypographyOutline, TypographyStyle } from "../../Theme";
 import { SizeElementProps, TextVariant } from "../../Interfaces/";
+import { PreferredTextSizePin, usePinsPreferredTextSize } from "./PinTextSize.preferred";
 
 interface TextProps extends React.InstanceProps<TextLabel>, Pick<SizeElementProps, "minWidth" | "maxWidth" | "minHeight" | "maxHeight"> {
     text: string;
@@ -40,6 +41,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
         const uiScale = useUiScale();
+        const pinsTextSize = usePinsPreferredTextSize(props.TextScaled);
 
 
         const style = props.typography ?? theme.typography[props.variant ?? "body"]
@@ -212,13 +214,19 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                         Transparency={outlineProp?.transparency ?? style.outline?.transparency ?? 0}
                     />
                 )}
-                {hasTextSizeConstraint && (
+                {hasTextSizeConstraint && !pinsTextSize && (
                     <uitextsizeconstraint
                         key="TextSizeConstraint"
                         MinTextSize={minTextSize}
                         MaxTextSize={maxTextSize}
                     />
                 )}
+                <PreferredTextSizePin
+                    size={style.size}
+                    scaled={props.TextScaled}
+                    minTextSize={hasTextSizeConstraint ? minTextSize : undefined}
+                    maxTextSize={hasTextSizeConstraint ? maxTextSize : undefined}
+                />
             </>
         );
 

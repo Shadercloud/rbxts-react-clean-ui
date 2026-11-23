@@ -435,6 +435,26 @@ export function soleSizeConstraint(instance: Instance): UISizeConstraint {
 	return found[0];
 }
 
+export function textSizeConstraintsOf(instance: Instance): UITextSizeConstraint[] {
+	const found: UITextSizeConstraint[] = [];
+	for (const child of instance.GetChildren()) {
+		if (child.IsA("UITextSizeConstraint")) found.push(child);
+	}
+	return found;
+}
+
+export function assertTextSizePinned(instance: Instance, size: number) {
+	const found = textSizeConstraintsOf(instance);
+	Assert.equal(found.size(), 1, `Expected exactly one UITextSizeConstraint directly on ${instance.GetFullName()}, found ${found.size()}`);
+	Assert.equal(found[0].Name, "PinTextSize", `Expected the UITextSizeConstraint on ${instance.Name} to be named PinTextSize, got ${found[0].Name}`);
+	Assert.equal(found[0].MinTextSize, size, `Unexpected MinTextSize on ${instance.Name}`);
+	Assert.equal(found[0].MaxTextSize, size, `Unexpected MaxTextSize on ${instance.Name}`);
+}
+
+export function assertTextSizeNotPinned(instance: Instance) {
+	Assert.undefined(instance.FindFirstChild("PinTextSize"), `Expected no PinTextSize constraint on ${instance.GetFullName()}`);
+}
+
 export function waitForWidth(gui: GuiObject, width: number, tolerance = 1) {
 	waitForLayout(
 		() => (math.abs(gui.AbsoluteSize.X - width) <= tolerance ? true : undefined),

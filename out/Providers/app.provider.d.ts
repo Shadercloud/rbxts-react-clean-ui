@@ -4,6 +4,7 @@ interface CleanUiProviderProps {
     children?: React.ReactNode;
     theme: ThemeTemplate;
     toasts?: boolean;
+    ignorePreferredTextSize?: boolean;
 }
-export declare function CleanUiProvider({ children, theme, toasts }: CleanUiProviderProps): React.JSX.Element;
+export declare function CleanUiProvider({ children, theme, toasts, ignorePreferredTextSize }: CleanUiProviderProps): React.JSX.Element;
 export {};
