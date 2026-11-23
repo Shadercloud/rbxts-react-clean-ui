@@ -98,6 +98,14 @@ function Select(props: { screenshot?: boolean; searchable?: boolean; grouped?: b
                 <Container>
                     <CountrySelect searchable={searchable} grouped={grouped} disabled={disabled} width={200} />
                 </Container>
+                <Text text="Select with width={150} and a long selected option" />
+                <Container>
+                    <SelectComponent max-height="200px" searchable={searchable} disabled={disabled} width={150} selected={1}>
+                        <SelectComponent.Option text="Short" />
+                        <SelectComponent.Option text="An extremely long option label that cannot possibly fit" />
+                        <SelectComponent.Option text="Medium length option" />
+                    </SelectComponent>
+                </Container>
             </VStack>
         </Container>
     );

@@ -539,13 +539,22 @@ const Select = React.forwardRef<ImageLabel, SelectProps>((props, ref) => {
                     <Corners radius={theme.components.select.cornerRadius} />
 
                     <Padding {...props} />
-                    <HStack>
-                        <FlexItem ItemLineAlignment={Enum.ItemLineAlignment?.Center}>
+                    <HStack Wraps={false}>
+                        <FlexItem
+                            mode="Fill"
+                            Size={UDim2.fromScale(0, 0)}
+                            AutomaticSize={Enum.AutomaticSize.Y}
+                            ItemLineAlignment={Enum.ItemLineAlignment?.Center}
+                        >
                             <Text
                                 name="SelectedText"
                                 text={selectedOption?.props.text ?? "No Options"}
                                 typography={typography}
                                 TextColor3={theme.components.select.textColor}
+                                Size={UDim2.fromScale(1, 0)}
+                                AutomaticSize={Enum.AutomaticSize.Y}
+                                TextWrapped={false}
+                                TextTruncate={Enum.TextTruncate.AtEnd}
                             />
                         </FlexItem>
                         {selectTheme.caret === undefined

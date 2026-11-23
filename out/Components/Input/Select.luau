@@ -585,7 +585,11 @@ local Select = React.forwardRef(function(props, ref)
 	local _attributes_1 = table.clone(props)
 	setmetatable(_attributes_1, nil)
 	local _exp_7 = React.createElement(Padding, _attributes_1)
-	local _attributes_2 = {}
+	local _attributes_2 = {
+		mode = "Fill",
+		Size = UDim2.fromScale(0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+	}
 	local _result_4 = Enum.ItemLineAlignment
 	if _result_4 ~= nil then
 		_result_4 = _result_4.Center
@@ -605,7 +609,13 @@ local Select = React.forwardRef(function(props, ref)
 	_attributes_3.text = _condition_9
 	_attributes_3.typography = typography
 	_attributes_3.TextColor3 = theme.components.select.textColor
-	local _exp_8 = React.createElement(HStack, nil, React.createElement(FlexItem, _attributes_2, React.createElement(Text, _attributes_3)), if selectTheme.caret == nil then React.createElement(Icon, {
+	_attributes_3.Size = UDim2.fromScale(1, 0)
+	_attributes_3.AutomaticSize = Enum.AutomaticSize.Y
+	_attributes_3.TextWrapped = false
+	_attributes_3.TextTruncate = Enum.TextTruncate.AtEnd
+	local _exp_8 = React.createElement(HStack, {
+		Wraps = false,
+	}, React.createElement(FlexItem, _attributes_2, React.createElement(Text, _attributes_3)), if selectTheme.caret == nil then React.createElement(Icon, {
 		name = "SelectCaret",
 		icon = "caret-down",
 		color = caretColor,

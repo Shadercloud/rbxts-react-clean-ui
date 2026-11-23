@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.1
+
+### Fixes
+
+- **Select: a long selected label stays on one line with the caret and ends in an ellipsis.** The field row wrapped, so a label wider than the field pushed the caret onto a second line and doubled the field's height. The row no longer wraps, the label fills the room left beside the caret, and it truncates with `TextTruncate.AtEnd`. Short labels look the same as before. A letter-spaced `typography` still can't truncate, because it draws one label per character.
+
 ## 2.4.0
 
 ### Additions
