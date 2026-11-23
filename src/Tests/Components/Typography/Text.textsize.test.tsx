@@ -17,6 +17,7 @@ import {
 } from "../../Helpers/layout";
 
 const SPACED_TEXT = "Hey";
+const SHRINK_EPSILON = 0.01;
 
 function app(ignore: boolean, child: React.ReactElement) {
 	return (
@@ -286,14 +287,26 @@ class TextPreferredTextSize {
 	}
 
 	@Skip(!Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	@DisplayName("shrinkToFit leaves the pin at the style size since it shrinks through UIScale")
+	@DisplayName("shrinkToFit pins at the style size times the ShrinkScale so the pin follows the shrink")
 	@Test
-	public shrinkKeepsPin() {
+	public shrinkScalesPin() {
 		withMounted(400, 300, app(true, <Text text="A long title" shrinkToFit={true} maxWidth={40} />), (mounted) => {
 			const label = waitForText<TextLabel>(mounted.host);
+			const shrink = waitForDescendant<UIScale>(mounted.host, "ShrinkScale", () => true);
 			settleFrames(3);
 
-			assertTextSizePinned(label, 18);
+			Assert.true(shrink.Scale < 1 - SHRINK_EPSILON, `Expected the text to shrink (ShrinkScale is ${shrink.Scale})`);
+
+			const found = textSizeConstraintsOf(label);
+			Assert.equal(found.size(), 1, "Expected exactly one UITextSizeConstraint");
+			Assert.equal(found[0].Name, "PinTextSize", "Expected the pin constraint");
+			Assert.equal(found[0].MinTextSize, found[0].MaxTextSize, "Expected MinTextSize to equal MaxTextSize");
+
+			const expected = 18 * shrink.Scale;
+			Assert.true(
+				math.abs(found[0].MinTextSize - expected) <= 1,
+				`Expected the pin to be about ${expected}, got ${found[0].MinTextSize}`,
+			);
 		});
 	}
 }

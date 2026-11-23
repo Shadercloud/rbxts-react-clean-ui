@@ -1,9 +1,9 @@
 import React from "@rbxts/react";
 import { CleanThemeContext, useUiScale } from "../../Contexts";
-import { ElementHelper, SizeHelper, TextHelper, TypographyHelper, toDesignPixels } from "../../Helpers";
+import { ElementHelper, SizeHelper, TextHelper, TypographyHelper, toDesignPixels, toScreenTextSizeRange } from "../../Helpers";
 import { TypographyOutline, TypographyStyle } from "../../Theme";
 import { SizeElementProps, TextVariant } from "../../Interfaces/";
-import { PreferredTextSizePin, usePinsPreferredTextSize } from "./PinTextSize.preferred";
+import { PreferredTextSizePin, usePreferredTextSizePin } from "./PinTextSize.preferred";
 
 interface TextProps extends React.InstanceProps<TextLabel>, Pick<SizeElementProps, "minWidth" | "maxWidth" | "minHeight" | "maxHeight"> {
     text: string;
@@ -41,7 +41,6 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
     (props, ref) => {
         const theme = React.useContext(CleanThemeContext);
         const uiScale = useUiScale();
-        const pinsTextSize = usePinsPreferredTextSize(props.TextScaled);
 
 
         const style = props.typography ?? theme.typography[props.variant ?? "body"]
@@ -202,6 +201,16 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
         const hasTextSizeConstraint = props.minTextSize !== undefined || props.maxTextSize !== undefined;
         const minTextSize = math.clamp(props.minTextSize ?? 1, 1, 100);
         const maxTextSize = math.clamp(props.maxTextSize ?? 100, minTextSize, 100);
+        const pinsTextSize = usePreferredTextSizePin(
+            style.size,
+            props.TextScaled,
+            hasTextSizeConstraint ? minTextSize : undefined,
+            hasTextSizeConstraint ? maxTextSize : undefined,
+        ) !== undefined;
+        const textSizeRange = toScreenTextSizeRange(minTextSize, maxTextSize, uiScale);
+        const shrunkTextSizeRange = shrinkToFit
+            ? shrinkScale.map((scale) => toScreenTextSizeRange(minTextSize, maxTextSize, uiScale * scale))
+            : undefined;
 
         const renderTextDecorations = () => (
             <>
@@ -217,8 +226,8 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                 {hasTextSizeConstraint && !pinsTextSize && (
                     <uitextsizeconstraint
                         key="TextSizeConstraint"
-                        MinTextSize={minTextSize}
-                        MaxTextSize={maxTextSize}
+                        MinTextSize={shrunkTextSizeRange?.map((range) => range[0]) ?? textSizeRange[0]}
+                        MaxTextSize={shrunkTextSizeRange?.map((range) => range[1]) ?? textSizeRange[1]}
                     />
                 )}
                 <PreferredTextSizePin
@@ -226,6 +235,7 @@ export const Text = React.forwardRef<TextLabel, TextProps>(
                     scaled={props.TextScaled}
                     minTextSize={hasTextSizeConstraint ? minTextSize : undefined}
                     maxTextSize={hasTextSizeConstraint ? maxTextSize : undefined}
+                    shrinkScale={shrinkToFit ? shrinkScale : undefined}
                 />
             </>
         );

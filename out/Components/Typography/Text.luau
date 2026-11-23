@@ -10,9 +10,10 @@ local SizeHelper = _Helpers.SizeHelper
 local TextHelper = _Helpers.TextHelper
 local TypographyHelper = _Helpers.TypographyHelper
 local toDesignPixels = _Helpers.toDesignPixels
+local toScreenTextSizeRange = _Helpers.toScreenTextSizeRange
 local _PinTextSize_preferred = TS.import(script, script.Parent, "PinTextSize.preferred")
 local PreferredTextSizePin = _PinTextSize_preferred.PreferredTextSizePin
-local usePinsPreferredTextSize = _PinTextSize_preferred.usePinsPreferredTextSize
+local usePreferredTextSizePin = _PinTextSize_preferred.usePreferredTextSizePin
 local SHRINK_SEARCH_STEPS = 24
 local SHRINK_FILL_TOLERANCE = 0.5
 local SHRINK_SCALE_PRECISION = 0.001
@@ -27,7 +28,6 @@ end
 local Text = React.forwardRef(function(props, ref)
 	local theme = React.useContext(CleanThemeContext)
 	local uiScale = useUiScale()
-	local pinsTextSize = usePinsPreferredTextSize(props.TextScaled)
 	local style = props.typography or theme.typography[props.variant or "body"]
 	local weight = if props.weight == "bold" then Enum.FontWeight.Bold else props.weight or style.weight or Enum.FontWeight.Regular
 	local textwrapped = props.TextWrap ~= false and props.TextWrapped ~= false
@@ -181,6 +181,11 @@ local Text = React.forwardRef(function(props, ref)
 		_condition_3 = 100
 	end
 	local maxTextSize = math.clamp(_condition_3, minTextSize, 100)
+	local pinsTextSize = usePreferredTextSizePin(style.size, props.TextScaled, if hasTextSizeConstraint then minTextSize else nil, if hasTextSizeConstraint then maxTextSize else nil) ~= nil
+	local textSizeRange = toScreenTextSizeRange(minTextSize, maxTextSize, uiScale)
+	local shrunkTextSizeRange = if shrinkToFit then shrinkScale:map(function(scale)
+		return toScreenTextSizeRange(minTextSize, maxTextSize, uiScale * scale)
+	end) else nil
 	local renderTextDecorations = function()
 		local _condition_4 = hasOutline
 		if _condition_4 then
@@ -238,15 +243,41 @@ local Text = React.forwardRef(function(props, ref)
 			_attributes.Transparency = _condition_7
 			_condition_4 = (React.createElement("uistroke", _attributes))
 		end
-		return React.createElement(React.Fragment, nil, _condition_4, hasTextSizeConstraint and not pinsTextSize and (React.createElement("uitextsizeconstraint", {
-			key = "TextSizeConstraint",
-			MinTextSize = minTextSize,
-			MaxTextSize = maxTextSize,
-		})), React.createElement(PreferredTextSizePin, {
+		local _condition_5 = hasTextSizeConstraint and not pinsTextSize
+		if _condition_5 then
+			local _attributes = {
+				key = "TextSizeConstraint",
+			}
+			local _result = shrunkTextSizeRange
+			if _result ~= nil then
+				_result = _result:map(function(range)
+					return range[1]
+				end)
+			end
+			local _condition_6 = _result
+			if _condition_6 == nil then
+				_condition_6 = textSizeRange[1]
+			end
+			_attributes.MinTextSize = _condition_6
+			local _result_1 = shrunkTextSizeRange
+			if _result_1 ~= nil then
+				_result_1 = _result_1:map(function(range)
+					return range[2]
+				end)
+			end
+			local _condition_7 = _result_1
+			if _condition_7 == nil then
+				_condition_7 = textSizeRange[2]
+			end
+			_attributes.MaxTextSize = _condition_7
+			_condition_5 = (React.createElement("uitextsizeconstraint", _attributes))
+		end
+		return React.createElement(React.Fragment, nil, _condition_4, _condition_5, React.createElement(PreferredTextSizePin, {
 			size = style.size,
 			scaled = props.TextScaled,
 			minTextSize = if hasTextSizeConstraint then minTextSize else nil,
 			maxTextSize = if hasTextSizeConstraint then maxTextSize else nil,
+			shrinkScale = if shrinkToFit then shrinkScale else nil,
 		}))
 	end
 	local renderBoxDecorations = function()

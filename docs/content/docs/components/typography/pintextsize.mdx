@@ -4,7 +4,7 @@ description: Pin a native text element's size so the player's Text Size setting 
 icon: Type
 ---
 
-`PinTextSize` renders a Roblox [`UITextSizeConstraint`](https://create.roblox.com/docs/reference/engine/classes/UITextSizeConstraint) with `MinTextSize` and `MaxTextSize` both set to one size. Placed inside your own `textlabel`, `textbox`, or `textbutton`, it stops Roblox's player Text Size setting ([`GuiService.PreferredTextSize`](https://create.roblox.com/docs/reference/engine/classes/GuiService#PreferredTextSize)) from enlarging that element's text. Library components pin their own text through `CleanUiProvider`'s `ignorePreferredTextSize` switch (see [Player text size](/scaling#player-text-size)); `PinTextSize` is for the native text elements your game renders itself.
+`PinTextSize` renders a Roblox [`UITextSizeConstraint`](https://create.roblox.com/docs/reference/engine/classes/UITextSizeConstraint) with `MinTextSize` and `MaxTextSize` both set to one size, the given size times the effective [`UiScaleRoot`](/components/layout/uiscaleroot) scale. Placed inside your own `textlabel`, `textbox`, or `textbutton`, it stops Roblox's player Text Size setting ([`GuiService.PreferredTextSize`](https://create.roblox.com/docs/reference/engine/classes/GuiService#PreferredTextSize)) from enlarging that element's text. Library components pin their own text through `CleanUiProvider`'s `ignorePreferredTextSize` switch (see [Player text size](/scaling#player-text-size)); `PinTextSize` is for the native text elements your game renders itself.
 
 ## Import
 
@@ -42,7 +42,7 @@ export function PinTextSizeExample() {
 ```
 </Demo>
 
-Pass `size` the same value as the element's `TextSize`. The native label then renders at that size whatever the player's Text Size setting is. The `Text` next to it needs no `PinTextSize`: with `ignorePreferredTextSize` on, library text pins itself.
+Pass `size` the same value as the element's `TextSize`. The native label then renders at that size, scaled by any `UiScaleRoot` above it, whatever the player's Text Size setting is. The `Text` next to it needs no `PinTextSize`: with `ignorePreferredTextSize` on, library text pins itself.
 
 ## Why pin text size
 
@@ -110,7 +110,7 @@ Components that only render children you pass in, such as [`HoverButton`](/compo
 
 | Prop      | Type      | Default     | Description                                                                                   |
 | --------- | --------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `size`    | `number`  | `undefined` | The text size to pin, in pixels. Pass the element's `TextSize`. Clamped to `1`–`100`. Nothing is rendered when unset. |
+| `size`    | `number`  | `undefined` | The text size to pin, in design pixels. Pass the element's `TextSize`. Clamped to `1`–`100`, then multiplied by the UI scale. Nothing is rendered when unset. |
 | `enabled` | `boolean` | `true`      | Renders nothing when `false`. Pass `useIgnorePreferredTextSize()` to follow the provider switch. |
 
 ### Hooks and helpers
@@ -122,9 +122,11 @@ Components that only render children you pass in, such as [`HoverButton`](/compo
 
 ## Behaviour
 
-* Renders one `UITextSizeConstraint` named `PinTextSize`, with `MinTextSize` and `MaxTextSize` both set to `size`, clamped to Roblox's `1`–`100` range. Place it as a child of the text element.
+* Renders one `UITextSizeConstraint` named `PinTextSize`, with `MinTextSize` and `MaxTextSize` both set to `size` (clamped to `1`–`100`) times `useUiScale()`. Place it as a child of the text element.
 * Renders nothing when `size` is `undefined` or `enabled` is `false`.
-* The constraint is in the same pixels as `TextSize`. Under a `UiScaleRoot` the pinned value is the design size, and the `UIScale` still scales it, so pinned text follows the UI scale but not the player's Text Size setting.
+* A `UITextSizeConstraint` clamps the size Roblox renders after every ancestor `UIScale`, so its limits are screen pixels, not `TextSize`'s design pixels. That is why the pin is multiplied by the scale: under `UiScaleRoot scale={3}`, `size={20}` pins at `60`. Nested roots multiply, and the pin follows scale changes. With no root it is `size` clamped to `1`–`100`.
+* When the scaled size is over `100`, the most a `UITextSizeConstraint` allows, nothing is rendered. The text renders at its full scaled size, and the player's Text Size setting can affect it. Exactly `100` is still pinned.
+* Only `UiScaleRoot` scaling is included. A `UIScale` of your own above the element isn't, so the pin would hold the text at its pre-`UIScale` size there.
 * Roblox honours one `UITextSizeConstraint` per element. Don't add another constraint of your own alongside it.
 * A pinned element ignores RichText `<font size="...">` markup: every run renders at the pinned size.
 

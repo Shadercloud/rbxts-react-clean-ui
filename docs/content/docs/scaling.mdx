@@ -203,12 +203,13 @@ Roblox's Text Size accessibility setting ([`GuiService.PreferredTextSize`](https
 
 `ignorePreferredTextSize` defaults to `false`, which changes nothing. When it is on:
 
-* Every text element the library renders gets a `UITextSizeConstraint` named `PinTextSize` whose minimum and maximum are both the text's resolved size. That size comes from the theme's typography, after `scale`, breakpoints, and per-component typography, and the pin follows it when it changes.
+* Every text element the library renders gets a `UITextSizeConstraint` named `PinTextSize` whose minimum and maximum are both the text's resolved size times the effective `UiScaleRoot` scale. The resolved size comes from the theme's typography, after `scale`, breakpoints, and per-component typography, and the pin follows it and the scale when either changes.
 * All library text is drawn by [`Text`](/components/typography/text) or [`Input`](/components/form/input)'s text box, so this covers every component built on them, such as `Button`, `Select`, `Badge`, `Tabs`, `Tooltip`, `Toast`, `Menu`, `Table`, and the charts.
-* Text still scales with `UiScaleRoot`. The pin is in design pixels, and the `UIScale` scales it like everything else.
+* Text still scales with `UiScaleRoot`. A `UITextSizeConstraint` clamps the size Roblox renders after every ancestor `UIScale`, so its limits are screen pixels, not design pixels. The pin is therefore the design size times `useUiScale()`, and nested roots multiply: a 20 px label under `scale={3}` is pinned at 60.
+* A `UITextSizeConstraint` can't go above `100`. When the design size (clamped to `1`–`100`) times the scale is over `100`, that label gets no pin. It renders at its full scaled size, and the player's Text Size setting can affect it. A product of exactly `100` is still pinned.
 * Text with `TextScaled` gets no pin, because the player setting doesn't affect scaled text.
-* `Text`'s `shrinkToFit` still works: it shrinks with a `UIScale`, not `TextSize`.
-* On a `Text` with `minTextSize` or `maxTextSize`, the pin replaces that constraint and uses the resolved size clamped into the range.
+* `Text`'s `shrinkToFit` scales the pin along with the shrink, so the glyphs shrink with the box.
+* On a `Text` with `minTextSize` or `maxTextSize`, the pin replaces that constraint and uses the resolved size clamped into the range, then scaled. If that is over the `100` cap, the `minTextSize`/`maxTextSize` constraint is rendered instead.
 
 Components that only render children you pass in, such as `HoverButton`, `Switch`, `Modal`, `Fieldset`, and `Card`, draw no text of their own. A `Text` inside them is pinned, but your own native `textlabel`, `textbox`, or `textbutton` is not. Add [`PinTextSize`](/components/typography/pintextsize) to those, and read the switch with `useIgnorePreferredTextSize()` to follow it:
 
@@ -228,6 +229,10 @@ function NativeLabel() {
 ```
 
 A pinned label ignores RichText `<font size="...">` markup: every run renders at the label's size. The library emits no size markup itself, so this only affects RichText you supply.
+
+The pin only knows about `UiScaleRoot` scaling. A `UIScale` of your own above a pinned label isn't included, so the pin holds the text at its pre-`UIScale` size there.
+
+`toScreenTextSize(size, scale)` and `toScreenTextSizeRange(min, max, scale)` are the plain functions behind these conversions. `toScreenTextSize` clamps `size` to `1`–`100`, multiplies it by `scale`, and returns `undefined` when the result is over `100`. `toScreenTextSizeRange` multiplies both bounds by `scale` and clamps them to `1`–`100`, with the maximum never below the minimum.
 
 Turning the switch on removes an accessibility setting players may rely on. Consider exposing your own UI size option, for example through `UiScaleRoot`'s `scale`, so players can still make text larger.
 

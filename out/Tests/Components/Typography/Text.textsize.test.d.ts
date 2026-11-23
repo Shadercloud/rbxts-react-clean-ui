@@ -14,6 +14,6 @@ declare class TextPreferredTextSize {
     boundsReplaced(minTextSize: number, maxTextSize: number, expected: number): void;
     boundsKeptWhenOff(): void;
     spacedBoundsReplaced(): void;
-    shrinkKeepsPin(): void;
+    shrinkScalesPin(): void;
 }
 export = TextPreferredTextSize;

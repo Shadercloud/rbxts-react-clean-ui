@@ -23,6 +23,7 @@ local textSizeConstraintsOf = _layout.textSizeConstraintsOf
 local waitForDescendant = _layout.waitForDescendant
 local withMounted = _layout.withMounted
 local SPACED_TEXT = "Hey"
+local SHRINK_EPSILON = 0.01
 local function app(ignore, child)
 	return React.createElement(CleanUiProvider, {
 		theme = DefaultTheme,
@@ -260,15 +261,24 @@ do
 			end
 		end)
 	end
-	function TextPreferredTextSize:shrinkKeepsPin()
+	function TextPreferredTextSize:shrinkScalesPin()
 		withMounted(400, 300, app(true, React.createElement(Text, {
 			text = "A long title",
 			shrinkToFit = true,
 			maxWidth = 40,
 		})), function(mounted)
 			local label = waitForText(mounted.host)
+			local shrink = waitForDescendant(mounted.host, "ShrinkScale", function()
+				return true
+			end)
 			settleFrames(3)
-			assertTextSizePinned(label, 18)
+			Assert["true"](Assert, shrink.Scale < 1 - SHRINK_EPSILON, `Expected the text to shrink (ShrinkScale is {shrink.Scale})`)
+			local found = textSizeConstraintsOf(label)
+			Assert:equal(#found, 1, "Expected exactly one UITextSizeConstraint")
+			Assert:equal(found[1].Name, "PinTextSize", "Expected the pin constraint")
+			Assert:equal(found[1].MinTextSize, found[1].MaxTextSize, "Expected MinTextSize to equal MaxTextSize")
+			local expected = 18 * shrink.Scale
+			Assert["true"](Assert, math.abs(found[1].MinTextSize - expected) <= 1, `Expected the pin to be about {expected}, got {found[1].MinTextSize}`)
 		end)
 	end
 	local _decorator = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
@@ -566,24 +576,24 @@ do
 		TextPreferredTextSize.spacedBoundsReplaced = _descriptor_43.value
 	end
 	local _decorator_30 = Skip(not Runtime.isRoblox(), STUDIO_SKIP_MESSAGE)
-	local _decorator_31 = DisplayName("shrinkToFit leaves the pin at the style size since it shrinks through UIScale")
-	local _descriptor_44 = Test(TextPreferredTextSize, "shrinkKeepsPin", {
-		value = TextPreferredTextSize.shrinkKeepsPin,
+	local _decorator_31 = DisplayName("shrinkToFit pins at the style size times the ShrinkScale so the pin follows the shrink")
+	local _descriptor_44 = Test(TextPreferredTextSize, "shrinkScalesPin", {
+		value = TextPreferredTextSize.shrinkScalesPin,
 	})
 	if _descriptor_44 then
-		TextPreferredTextSize.shrinkKeepsPin = _descriptor_44.value
+		TextPreferredTextSize.shrinkScalesPin = _descriptor_44.value
 	end
-	local _descriptor_45 = _decorator_31(TextPreferredTextSize, "shrinkKeepsPin", {
-		value = TextPreferredTextSize.shrinkKeepsPin,
+	local _descriptor_45 = _decorator_31(TextPreferredTextSize, "shrinkScalesPin", {
+		value = TextPreferredTextSize.shrinkScalesPin,
 	})
 	if _descriptor_45 then
-		TextPreferredTextSize.shrinkKeepsPin = _descriptor_45.value
+		TextPreferredTextSize.shrinkScalesPin = _descriptor_45.value
 	end
-	local _descriptor_46 = _decorator_30(TextPreferredTextSize, "shrinkKeepsPin", {
-		value = TextPreferredTextSize.shrinkKeepsPin,
+	local _descriptor_46 = _decorator_30(TextPreferredTextSize, "shrinkScalesPin", {
+		value = TextPreferredTextSize.shrinkScalesPin,
 	})
 	if _descriptor_46 then
-		TextPreferredTextSize.shrinkKeepsPin = _descriptor_46.value
+		TextPreferredTextSize.shrinkScalesPin = _descriptor_46.value
 	end
 	TextPreferredTextSize = Tag("Studio")(TextPreferredTextSize) or TextPreferredTextSize
 end

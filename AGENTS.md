@@ -281,6 +281,11 @@ cd /c/Users/david/Documents/ROBLOX/dev-packages && \
 * Scope runs with a filter (`Grid`, `Increment`, `Components/Layout`) while
   iterating; run unfiltered `--studio` before reporting done.
 * `--lune` runs only `@Tag("Lune")`/untagged classes and finishes in seconds.
+  Unlike `--studio`, run it with **this package** as the workspace:
+  `node "$APPDATA/Code/User/globalStorage/shadercloud.vscode-lunit-companion/lunit-cli.js" --lune --standalone --workspace "$(pwd -W)"`
+  from this folder. From the dev-packages root the runner treats the project
+  as a game, skips every module under `node_modules` (where this package is
+  mounted), and errors on all tests with "no compiled test class named ...".
   It prints `failed to load test module ... module not found: .../@rbxts/react`
   warnings for every Studio-tagged file -- those are expected, not failures.
   Trust the final `[lunit] N tests via Lune: X passed, Y failed.` line and the

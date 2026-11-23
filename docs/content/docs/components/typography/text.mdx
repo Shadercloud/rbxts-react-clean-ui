@@ -249,15 +249,18 @@ Use `minTextSize` and `maxTextSize` to add a `UITextSizeConstraint`. They mainly
 />
 ```
 
-Both are clamped to Roblox's `1`–`100` range. An unset minimum is `1` and an unset maximum is `100`; a maximum below the minimum is raised to it. No constraint is rendered when both are unset.
+Both are in design pixels and are clamped to `1`–`100`. An unset minimum is `1` and an unset maximum is `100`; a maximum below the minimum is raised to it. No constraint is rendered when both are unset.
+
+A `UITextSizeConstraint` limits the size Roblox renders after every ancestor `UIScale`, so the constraint's limits are the props times the [`UiScaleRoot`](/components/layout/uiscaleroot) scale (and the shrink scale while `shrinkToFit` is on), clamped to Roblox's `1`–`100` rendered pixels. With no root and no shrink they equal the props. A bound over `100` rendered pixels is capped at `100`.
 
 ## Player text size
 
-Under `<CleanUiProvider ignorePreferredTextSize>`, `Text` pins its size so the player's Text Size setting can't enlarge it. The label, or every character label when letter-spaced, gets a `UITextSizeConstraint` named `PinTextSize` with both limits set to the resolved typography size. See [Player text size](/scaling#player-text-size) for the full picture.
+Under `<CleanUiProvider ignorePreferredTextSize>`, `Text` pins its size so the player's Text Size setting can't enlarge it. The label, or every character label when letter-spaced, gets a `UITextSizeConstraint` named `PinTextSize` with both limits set to the resolved typography size times the effective `UiScaleRoot` scale, so the text still grows with the UI. See [Player text size](/scaling#player-text-size) for the full picture.
 
 * With the switch off, or with `TextScaled`, no pin is rendered.
-* With `minTextSize` or `maxTextSize` set, the pin replaces that constraint and uses the typography size clamped into the range.
-* `shrinkToFit` is unaffected, since it shrinks with a `UIScale` rather than `TextSize`.
+* With `minTextSize` or `maxTextSize` set, the pin replaces that constraint and uses the typography size clamped into the range, then scaled.
+* When the scaled size is over `100`, the most a `UITextSizeConstraint` allows, no pin is rendered: the label renders at its full scaled size and the player's Text Size setting can affect it. Exactly `100` is still pinned. The `minTextSize`/`maxTextSize` constraint, if set, is rendered instead.
+* With `shrinkToFit`, the pin is multiplied by the shrink scale too, so the glyphs shrink with the box.
 * A pinned label ignores RichText `<font size="...">` markup in `text`.
 
 For your own native text elements, use [`PinTextSize`](/components/typography/pintextsize).
@@ -308,8 +311,8 @@ Some properties are managed internally by the component, including:
 | `outline`                  | `TypographyOutline \| boolean`       | The resolved typography style's `outline`, if any       | Draws a contextual `UIStroke` around the text. `true` uses the style's outline or the defaults, an object overrides it field by field, `false` disables it. See [Outline](#outline). |
 | `shrinkToFit`              | `boolean`                             | `false`                                                 | Scales the text down with a `UIScale` to fit `maxWidth` or the parent's content width. See [Shrink to fit](#shrink-to-fit). |
 | `shrinkMinScale`           | `number`                             | `0`                                                     | The smallest scale `shrinkToFit` may use, clamped to `0`–`1`.               |
-| `minTextSize`              | `number`                             | `1` (when `maxTextSize` is set)                         | Minimum text size for a `UITextSizeConstraint`, clamped to `1`–`100`.        |
-| `maxTextSize`              | `number`                             | `100` (when `minTextSize` is set)                       | Maximum text size for a `UITextSizeConstraint`, clamped to `minTextSize`–`100`. |
+| `minTextSize`              | `number`                             | `1` (when `maxTextSize` is set)                         | Minimum text size for a `UITextSizeConstraint`, in design pixels, clamped to `1`–`100`. Scaled by the UI scale. |
+| `maxTextSize`              | `number`                             | `100` (when `minTextSize` is set)                       | Maximum text size for a `UITextSizeConstraint`, in design pixels, clamped to `minTextSize`–`100`. Scaled by the UI scale. |
 
 `TypographyOutline` is `{ color?: Color3; thickness?: number; transparency?: number }`. Unset fields default to black, `1`, and `0`.
 

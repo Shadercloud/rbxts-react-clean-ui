@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.4.2
+
+### Fixes
+
+- **Pinned text scales with `UiScaleRoot` again.** `UITextSizeConstraint` clamps the text size Roblox renders after every ancestor `UIScale`, so 2.4.0's `ignorePreferredTextSize` pin and `<PinTextSize>` held text at its design size under a root: at scale 3 a 20 px label stayed 20 px while its box grew. The pin is now the design size times the effective scale (`useUiScale()`, so nested roots multiply), and it follows scale changes. With no root it is the same as before.
+- **Very large text is no longer capped at 100 px.** A `UITextSizeConstraint` can't go above 100. When the design size times the scale is over 100, no pin is emitted for that label, so it renders at full size (and the player's Text Size setting can affect it again).
+- **`shrinkToFit` shrinks pinned text.** Its `UIScale` was clamped by the pin too, so the box shrank while the glyphs didn't. The pin now follows the shrink scale.
+- **`Text`'s `minTextSize`/`maxTextSize` are in design pixels under a root.** They are multiplied by the effective scale (and the `shrinkToFit` scale), then clamped to Roblox's 1-100.
+- **`toScreenTextSize(size, scale)` / `toScreenTextSizeRange(min, max, scale)`** are new pure helpers for those conversions.
+
 ## 2.4.1
 
 ### Fixes
