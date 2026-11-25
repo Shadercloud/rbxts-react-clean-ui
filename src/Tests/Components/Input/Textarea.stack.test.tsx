@@ -3,6 +3,7 @@ import { Test, Assert, Decorators, Runtime, Tag, DisplayName } from "@rbxts/luni
 
 const { Skip, Each } = Decorators;
 import { Textarea } from "../../../Components/Input/Textarea";
+import { resolveTextareaWholePixels } from "../../../Components/Input/Textarea.layout";
 import { Container } from "../../../Components/Layout/Container";
 import { VStack } from "../../../Components/Layout/VStack";
 import { Text } from "../../../Components/Typography/Text";
@@ -38,11 +39,11 @@ const LONG_TEXT = longText(40);
 function counterLineHeight(): number {
 	const typography = TypographyHelper.getTypography(DefaultTheme, undefined, DefaultTheme.components.textarea?.counter);
 
-	return (TypographyHelper.toTextSize(typography.size) ?? 14) * (typography.lineHeight ?? 1);
+	return resolveTextareaWholePixels((TypographyHelper.toTextSize(typography.size) ?? 14) * (typography.lineHeight ?? 1));
 }
 
 function expectedRootHeight(showCount: boolean): number {
-	return FIELD_HEIGHT + (showCount ? SpacingHelper.GetPadding(DefaultTheme, "xs") + counterLineHeight() : 0);
+	return resolveTextareaWholePixels(FIELD_HEIGHT) + (showCount ? resolveTextareaWholePixels(SpacingHelper.GetPadding(DefaultTheme, "xs")) + counterLineHeight() : 0);
 }
 
 function storyColumn(value: string, showCount: boolean) {

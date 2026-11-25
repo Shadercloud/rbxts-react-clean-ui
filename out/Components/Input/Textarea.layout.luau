@@ -2,6 +2,7 @@
 local utf8Length = utf8.len
 local utf8Offset = utf8.offset
 local TEXTAREA_DEFAULT_ROWS = 4
+local WHOLE_PIXEL_EPSILON = 0.001
 local function finiteOrZero(value)
 	return if value == value and value ~= math.huge and value ~= -math.huge then value else 0
 end
@@ -12,17 +13,32 @@ local function resolveTextareaHeight(height, rows, lineHeight, paddingTop, paddi
 	local lines = math.max(1, math.floor(finiteOrZero(rows)))
 	return lines * math.max(0, lineHeight) + paddingTop + paddingBottom
 end
+local function resolveTextareaWholePixels(value)
+	return math.max(0, math.ceil(finiteOrZero(value) - WHOLE_PIXEL_EPSILON))
+end
 local function resolveTextareaScreenScale(screenHeight, designHeight, fallback)
+	local context = if fallback > 0 then fallback else 1
 	if screenHeight > 0 and designHeight > 0 then
+		if math.abs(screenHeight - designHeight * context) <= 1 then
+			return context
+		end
 		return screenHeight / designHeight
 	end
-	return if fallback > 0 then fallback else 1
+	return context
 end
-local function resolveTextareaCanvasHeight(textHeight, paddingTop, paddingBottom, viewportHeight)
+local function resolveTextareaCanvasHeight(textHeight, paddingTop, paddingBottom, viewportHeight, screenScale)
 	if viewportHeight == nil then
 		viewportHeight = 0
 	end
-	return math.max(math.max(0, finiteOrZero(textHeight)) + paddingTop + paddingBottom, viewportHeight)
+	if screenScale == nil then
+		screenScale = 1
+	end
+	local content = math.max(0, finiteOrZero(textHeight)) + paddingTop + paddingBottom
+	local tolerance = if screenScale > 0 then 1 / screenScale else 1
+	if content <= viewportHeight + tolerance then
+		return math.max(viewportHeight, 0)
+	end
+	return content
 end
 local function resolveTextareaWrapWidth(fieldWidth, paddingLeft, paddingRight, gutter)
 	return math.max(0, fieldWidth - paddingLeft - paddingRight - math.max(0, gutter))
@@ -47,6 +63,23 @@ local function resolveTextareaCaretText(text, cursorPosition)
 		return `{prefix} `
 	end
 	return prefix
+end
+local function resolveTextareaCaretLineText(text, cursorPosition)
+	local prefix = resolveTextareaCaretText(text, cursorPosition)
+	if prefix == nil then
+		return nil
+	end
+	local start = math.min(cursorPosition, #text + 1)
+	local _text = text
+	local _arg1 = start - 1
+	local before = string.sub(_text, 1, _arg1)
+	if before == "" or string.sub(before, -1) == "\n" then
+		return prefix
+	end
+	local stop = string.find(text, "%s", start)
+	local _text_1 = text
+	local _arg1_1 = if stop ~= nil then stop - 1 else #text
+	return prefix .. string.sub(_text_1, start, _arg1_1)
 end
 local function resolveTextareaLength(text)
 	local length = utf8Length(text)
@@ -98,11 +131,13 @@ local function formatTextareaCount(length, maxLength)
 end
 return {
 	resolveTextareaHeight = resolveTextareaHeight,
+	resolveTextareaWholePixels = resolveTextareaWholePixels,
 	resolveTextareaScreenScale = resolveTextareaScreenScale,
 	resolveTextareaCanvasHeight = resolveTextareaCanvasHeight,
 	resolveTextareaWrapWidth = resolveTextareaWrapWidth,
 	resolveTextareaCaretScroll = resolveTextareaCaretScroll,
 	resolveTextareaCaretText = resolveTextareaCaretText,
+	resolveTextareaCaretLineText = resolveTextareaCaretLineText,
 	resolveTextareaLength = resolveTextareaLength,
 	trimTextareaText = trimTextareaText,
 	formatTextareaCount = formatTextareaCount,

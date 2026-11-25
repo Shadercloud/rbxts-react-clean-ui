@@ -3,6 +3,8 @@ const utf8Offset = utf8.offset as unknown as (text: string, index: number) => nu
 
 export const TEXTAREA_DEFAULT_ROWS = 4;
 
+const WHOLE_PIXEL_EPSILON = 0.001;
+
 function finiteOrZero(value: number): number {
     return value === value && value !== math.huge && value !== -math.huge ? value : 0;
 }
@@ -23,12 +25,22 @@ export function resolveTextareaHeight(
     return lines * math.max(0, lineHeight) + paddingTop + paddingBottom;
 }
 
+export function resolveTextareaWholePixels(value: number): number {
+    return math.max(0, math.ceil(finiteOrZero(value) - WHOLE_PIXEL_EPSILON));
+}
+
 export function resolveTextareaScreenScale(screenHeight: number, designHeight: number, fallback: number): number {
+    const context = fallback > 0 ? fallback : 1;
+
     if (screenHeight > 0 && designHeight > 0) {
+        if (math.abs(screenHeight - designHeight * context) <= 1) {
+            return context;
+        }
+
         return screenHeight / designHeight;
     }
 
-    return fallback > 0 ? fallback : 1;
+    return context;
 }
 
 export function resolveTextareaCanvasHeight(
@@ -36,8 +48,16 @@ export function resolveTextareaCanvasHeight(
     paddingTop: number,
     paddingBottom: number,
     viewportHeight = 0,
+    screenScale = 1,
 ): number {
-    return math.max(math.max(0, finiteOrZero(textHeight)) + paddingTop + paddingBottom, viewportHeight);
+    const content = math.max(0, finiteOrZero(textHeight)) + paddingTop + paddingBottom;
+    const tolerance = screenScale > 0 ? 1 / screenScale : 1;
+
+    if (content <= viewportHeight + tolerance) {
+        return math.max(viewportHeight, 0);
+    }
+
+    return content;
 }
 
 export function resolveTextareaWrapWidth(
@@ -78,6 +98,25 @@ export function resolveTextareaCaretText(text: string, cursorPosition: number): 
     }
 
     return prefix;
+}
+
+export function resolveTextareaCaretLineText(text: string, cursorPosition: number): string | undefined {
+    const prefix = resolveTextareaCaretText(text, cursorPosition);
+
+    if (prefix === undefined) {
+        return undefined;
+    }
+
+    const start = math.min(cursorPosition, text.size() + 1);
+    const before = text.sub(1, start - 1);
+
+    if (before === "" || before.sub(-1) === "\n") {
+        return prefix;
+    }
+
+    const [stop] = text.find("%s", start);
+
+    return prefix + text.sub(start, stop !== undefined ? stop - 1 : text.size());
 }
 
 export function resolveTextareaLength(text: string): number {

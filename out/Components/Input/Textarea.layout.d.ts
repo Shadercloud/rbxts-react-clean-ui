@@ -1,10 +1,12 @@
 export declare const TEXTAREA_DEFAULT_ROWS = 4;
 export declare function resolveTextareaHeight(height: number | undefined, rows: number, lineHeight: number, paddingTop: number, paddingBottom: number): number;
+export declare function resolveTextareaWholePixels(value: number): number;
 export declare function resolveTextareaScreenScale(screenHeight: number, designHeight: number, fallback: number): number;
-export declare function resolveTextareaCanvasHeight(textHeight: number, paddingTop: number, paddingBottom: number, viewportHeight?: number): number;
+export declare function resolveTextareaCanvasHeight(textHeight: number, paddingTop: number, paddingBottom: number, viewportHeight?: number, screenScale?: number): number;
 export declare function resolveTextareaWrapWidth(fieldWidth: number, paddingLeft: number, paddingRight: number, gutter: number): number;
 export declare function resolveTextareaCaretScroll(caretTop: number, caretBottom: number, canvasY: number, viewportHeight: number): number;
 export declare function resolveTextareaCaretText(text: string, cursorPosition: number): string | undefined;
+export declare function resolveTextareaCaretLineText(text: string, cursorPosition: number): string | undefined;
 export declare function resolveTextareaLength(text: string): number;
 export declare function trimTextareaText(text: string, maxLength?: number): string;
 export declare function formatTextareaCount(length: number, maxLength?: number): string;

@@ -35,10 +35,11 @@ local TEXTAREA_DEFAULT_ROWS = _Textarea_layout.TEXTAREA_DEFAULT_ROWS
 local formatTextareaCount = _Textarea_layout.formatTextareaCount
 local resolveTextareaCanvasHeight = _Textarea_layout.resolveTextareaCanvasHeight
 local resolveTextareaCaretScroll = _Textarea_layout.resolveTextareaCaretScroll
-local resolveTextareaCaretText = _Textarea_layout.resolveTextareaCaretText
+local resolveTextareaCaretLineText = _Textarea_layout.resolveTextareaCaretLineText
 local resolveTextareaHeight = _Textarea_layout.resolveTextareaHeight
 local resolveTextareaLength = _Textarea_layout.resolveTextareaLength
 local resolveTextareaScreenScale = _Textarea_layout.resolveTextareaScreenScale
+local resolveTextareaWholePixels = _Textarea_layout.resolveTextareaWholePixels
 local resolveTextareaWrapWidth = _Textarea_layout.resolveTextareaWrapWidth
 local trimTextareaText = _Textarea_layout.trimTextareaText
 local GAMEPAD_SCROLL_SPEED = 480
@@ -46,6 +47,7 @@ local GAMEPAD_DEADZONE = 0.2
 local DEFAULT_SCROLLBAR_THICKNESS = 12
 local MEASURE_HEIGHT = 100000
 local FALLBACK_LINE_SLACK = 1.17
+local FALLBACK_FRAMES = 3
 local Textarea = React.forwardRef(function(props, forwardedRef)
 	local theme = React.useContext(CleanThemeContext)
 	local fieldset = React.useContext(FieldsetContext)
@@ -63,12 +65,17 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 	local measureRef = useRef()
 	local followRequested = useRef(false)
 	local lastWrittenY = useRef()
+	local neverMeasures = useRef(false)
+	local pendingFallback = useRef()
+	local pendingNudge = useRef()
+	local nudgedSource = useRef()
 	local value, setValue = useState(props.value)
 	local focused, setFocused = useState(false)
 	local hovered, setHovered = useState(false)
 	local textHeight, setTextHeight = useState(0)
 	local estimated, setEstimated = useState(false)
 	local screenFieldSize, setScreenFieldSize = useState(Vector2.zero)
+	local screenTextBoxWidth, setScreenTextBoxWidth = useState(0)
 	local focusedRef = useRef(false)
 	local heldText = useRef()
 	local reportedTexts = useRef({})
@@ -154,11 +161,14 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 	if _condition_8 == nil then
 		_condition_8 = math.huge
 	end
-	local fieldHeight = math.clamp(_exp_2, _condition_7, _condition_8)
+	local fieldHeight = resolveTextareaWholePixels(math.clamp(_exp_2, _condition_7, _condition_8))
 	local screenScale = resolveTextareaScreenScale(screenFieldSize.Y, fieldHeight, uiScale)
-	local wrapWidth = resolveTextareaWrapWidth(screenFieldSize.X / screenScale, padding.left, padding.right, gutter)
-	local canvasHeight = resolveTextareaCanvasHeight(textHeight, padding.top, padding.bottom, fieldHeight)
-	local counterGap = SpacingHelper:GetPadding(theme, "xs")
+	local wrapWidth = if screenTextBoxWidth > 0 then math.round(screenTextBoxWidth / screenScale) else resolveTextareaWrapWidth(math.floor(screenFieldSize.X / screenScale), padding.left, padding.right, gutter)
+	local canvasHeight = resolveTextareaWholePixels(resolveTextareaCanvasHeight(textHeight, padding.top, padding.bottom, fieldHeight, screenScale))
+	local textBoxSize = UDim2.new(1, -(padding.left + padding.right), 0, canvasHeight - padding.top + (if estimated then canvasHeight else 0))
+	local textBoxSizeRef = useRef(textBoxSize)
+	textBoxSizeRef.current = textBoxSize
+	local counterGap = resolveTextareaWholePixels(SpacingHelper:GetPadding(theme, "xs"))
 	local _condition_9 = TypographyHelper:toTextSize(counterTypography.size)
 	if _condition_9 == nil then
 		_condition_9 = 14
@@ -167,7 +177,7 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 	if _condition_10 == nil then
 		_condition_10 = 1
 	end
-	local counterHeight = _condition_9 * _condition_10
+	local counterHeight = resolveTextareaWholePixels(_condition_9 * _condition_10)
 	local rootHeight = fieldHeight + (if props.showCount == true then counterGap + counterHeight else 0)
 	local rootWidth = if props.width == nil then UDim.new(1, 0) else (SizeHelper:GetSize({
 		width = props.width,
@@ -200,6 +210,26 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 		end
 		return resolveTextareaScreenScale(_condition_12, layoutRef.current.fieldHeight, layoutRef.current.uiScale)
 	end
+	local estimateTextHeight = function()
+		local measure = measureRef.current
+		local current = layoutRef.current
+		if measure == nil or measure.Text == "" or current.wrapWidth <= 0 then
+			return nil
+		end
+		local size = TextService:GetTextSize(measure.Text, current.textSize, current.font, Vector2.new(current.wrapWidth, MEASURE_HEIGHT))
+		task.defer(function()
+			setTextHeight(size.Y * FALLBACK_LINE_SLACK)
+			setEstimated(true)
+		end)
+	end
+	local cancelFallback = function()
+		local _result_3 = pendingFallback.current
+		if _result_3 ~= nil then
+			_result_3:Disconnect()
+		end
+		pendingFallback.current = nil
+	end
+	local updateTextHeightRef, estimateTextHeightRef
 	local updateTextHeight = function()
 		local measure = measureRef.current
 		local current = layoutRef.current
@@ -208,17 +238,77 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 		end
 		local bounds = measure.TextBounds.Y
 		if bounds > 0 then
+			neverMeasures.current = false
+			cancelFallback()
 			setTextHeight(bounds / currentScale())
 			setEstimated(false)
-		elseif measure.Text ~= "" then
-			local size = TextService:GetTextSize(measure.Text, current.textSize, current.font, Vector2.new(current.wrapWidth, MEASURE_HEIGHT))
-			task.defer(function()
-				setTextHeight(size.Y * FALLBACK_LINE_SLACK)
-				setEstimated(true)
-			end)
-		else
-			setTextHeight(0)
+			return nil
 		end
+		if measure.Text == "" then
+			cancelFallback()
+			setTextHeight(0)
+			setEstimated(false)
+			return nil
+		end
+		if neverMeasures.current then
+			estimateTextHeight()
+			return nil
+		end
+		if pendingFallback.current ~= nil then
+			return nil
+		end
+		local frames = 0
+		pendingFallback.current = RunService.Heartbeat:Connect(function()
+			frames += 1
+			if frames < FALLBACK_FRAMES then
+				return nil
+			end
+			cancelFallback()
+			local latest = measureRef.current
+			if latest == nil or latest.Text == "" then
+				return nil
+			end
+			if latest.TextBounds.Y > 0 then
+				updateTextHeightRef.current()
+				return nil
+			end
+			neverMeasures.current = true
+			estimateTextHeightRef.current()
+		end)
+	end
+	updateTextHeightRef = useRef(updateTextHeight)
+	updateTextHeightRef.current = updateTextHeight
+	estimateTextHeightRef = useRef(estimateTextHeight)
+	estimateTextHeightRef.current = estimateTextHeight
+	local nudgeTextBox = function()
+		local _result_3 = pendingNudge.current
+		if _result_3 ~= nil then
+			_result_3:Disconnect()
+		end
+		local step = 0
+		pendingNudge.current = RunService.Heartbeat:Connect(function()
+			local textBox = ref.current
+			if textBox == nil then
+				local _result_4 = pendingNudge.current
+				if _result_4 ~= nil then
+					_result_4:Disconnect()
+				end
+				pendingNudge.current = nil
+				return nil
+			end
+			step += 1
+			if step == 1 then
+				local size = textBoxSizeRef.current
+				textBox.Size = UDim2.new(size.X, UDim.new(size.Y.Scale, size.Y.Offset - 1))
+				return nil
+			end
+			textBox.Size = textBoxSizeRef.current
+			local _result_4 = pendingNudge.current
+			if _result_4 ~= nil then
+				_result_4:Disconnect()
+			end
+			pendingNudge.current = nil
+		end)
 	end
 	local setTextBox = React.useCallback(function(instance)
 		ref.current = instance
@@ -262,7 +352,7 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 		if textBox == nil or probe == nil or not textBox:IsFocused() then
 			return nil
 		end
-		local caretText = resolveTextareaCaretText(textBox.Text, textBox.CursorPosition)
+		local caretText = resolveTextareaCaretLineText(textBox.Text, textBox.CursorPosition)
 		if caretText == nil then
 			return nil
 		end
@@ -321,6 +411,18 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 		if field ~= nil then
 			setScreenFieldSize(field.AbsoluteSize)
 		end
+		return function()
+			local _result_3 = pendingFallback.current
+			if _result_3 ~= nil then
+				_result_3:Disconnect()
+			end
+			pendingFallback.current = nil
+			local _result_4 = pendingNudge.current
+			if _result_4 ~= nil then
+				_result_4:Disconnect()
+			end
+			pendingNudge.current = nil
+		end
 	end, {})
 	React.useEffect(function()
 		if not labelActivated then
@@ -359,6 +461,13 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 		if textBox.Text ~= sourceText then
 			textBox.Text = sourceText
 		end
+	end, { focused, sourceText })
+	React.useEffect(function()
+		if focusedRef.current or nudgedSource.current == sourceText then
+			return nil
+		end
+		nudgedSource.current = sourceText
+		nudgeTextBox()
 	end, { focused, sourceText })
 	local _exp_3 = function()
 		local frame = scrollerRef.current
@@ -433,7 +542,7 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 		key = "TextBox",
 		ref = setTextBox,
 		Position = UDim2.fromOffset(padding.left, padding.top),
-		Size = UDim2.new(1, -(padding.left + padding.right), 0, canvasHeight - padding.top + (if estimated then canvasHeight else 0)),
+		Size = textBoxSize,
 		BackgroundTransparency = 1,
 		MultiLine = true,
 		TextWrapped = true,
@@ -514,6 +623,16 @@ local Textarea = React.forwardRef(function(props, forwardedRef)
 	if _spread_1 then
 		for _k, _v in _spread_1 do
 			_object_2[_k] = _v
+		end
+	end
+	_object_2.AbsoluteSize = function(rbx)
+		setScreenTextBoxWidth(rbx.AbsoluteSize.X)
+		local _result_3 = props.Change
+		if _result_3 ~= nil then
+			_result_3 = _result_3.AbsoluteSize
+			if _result_3 ~= nil then
+				_result_3(rbx)
+			end
 		end
 	end
 	_object_2.Text = function(rbx)

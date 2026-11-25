@@ -12,6 +12,7 @@ local _binding = Decorators
 local Skip = _binding.Skip
 local Each = _binding.Each
 local Textarea = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Input", "Textarea").Textarea
+local resolveTextareaWholePixels = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Input", "Textarea.layout").resolveTextareaWholePixels
 local Container = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "Container").Container
 local VStack = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Layout", "VStack").VStack
 local Text = TS.import(script, script.Parent.Parent.Parent.Parent, "Components", "Typography", "Text").Text
@@ -66,10 +67,10 @@ local function counterLineHeight()
 	if _condition_1 == nil then
 		_condition_1 = 1
 	end
-	return _condition * _condition_1
+	return resolveTextareaWholePixels(_condition * _condition_1)
 end
 local function expectedRootHeight(showCount)
-	return FIELD_HEIGHT + (if showCount then SpacingHelper:GetPadding(DefaultTheme, "xs") + counterLineHeight() else 0)
+	return resolveTextareaWholePixels(FIELD_HEIGHT) + (if showCount then resolveTextareaWholePixels(SpacingHelper:GetPadding(DefaultTheme, "xs")) + counterLineHeight() else 0)
 end
 local function storyColumn(value, showCount)
 	return React.createElement(Container, {

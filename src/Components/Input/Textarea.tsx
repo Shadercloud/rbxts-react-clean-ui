@@ -14,10 +14,11 @@ import {
     formatTextareaCount,
     resolveTextareaCanvasHeight,
     resolveTextareaCaretScroll,
-    resolveTextareaCaretText,
+    resolveTextareaCaretLineText,
     resolveTextareaHeight,
     resolveTextareaLength,
     resolveTextareaScreenScale,
+    resolveTextareaWholePixels,
     resolveTextareaWrapWidth,
     trimTextareaText,
 } from "./Textarea.layout";
@@ -27,6 +28,7 @@ const GAMEPAD_DEADZONE = 0.2;
 const DEFAULT_SCROLLBAR_THICKNESS = 12;
 const MEASURE_HEIGHT = 100000;
 const FALLBACK_LINE_SLACK = 1.17;
+const FALLBACK_FRAMES = 3;
 
 export interface TextareaProps
     extends ScalableElementProps,
@@ -61,6 +63,10 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
     const measureRef = useRef<TextLabel>();
     const followRequested = useRef(false);
     const lastWrittenY = useRef<number>();
+    const neverMeasures = useRef(false);
+    const pendingFallback = useRef<RBXScriptConnection>();
+    const pendingNudge = useRef<RBXScriptConnection>();
+    const nudgedSource = useRef<string>();
 
     const [value, setValue] = useState(props.value);
     const [focused, setFocused] = useState(false);
@@ -68,6 +74,7 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
     const [textHeight, setTextHeight] = useState(0);
     const [estimated, setEstimated] = useState(false);
     const [screenFieldSize, setScreenFieldSize] = useState(Vector2.zero);
+    const [screenTextBoxWidth, setScreenTextBoxWidth] = useState(0);
     const focusedRef = useRef(false);
     const heldText = useRef<string>();
     const reportedTexts = useRef(new Set<string>());
@@ -95,7 +102,7 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
 
     const widthConstraint = SizeHelper.GetSizeConstraint({ minWidth: props.minWidth, maxWidth: props.maxWidth });
     const heightConstraint = SizeHelper.GetSizeConstraint({ minHeight: props.minHeight, maxHeight: props.maxHeight });
-    const fieldHeight = math.clamp(
+    const fieldHeight = resolveTextareaWholePixels(math.clamp(
         resolveTextareaHeight(
             props.height !== undefined ? SizeHelper.toUDim(props.height).Offset : undefined,
             props.rows ?? textareaTheme?.rows ?? TEXTAREA_DEFAULT_ROWS,
@@ -105,12 +112,17 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
         ),
         heightConstraint?.MinSize.Y ?? 0,
         heightConstraint?.MaxSize.Y ?? math.huge,
-    );
+    ));
     const screenScale = resolveTextareaScreenScale(screenFieldSize.Y, fieldHeight, uiScale);
-    const wrapWidth = resolveTextareaWrapWidth(screenFieldSize.X / screenScale, padding.left, padding.right, gutter);
-    const canvasHeight = resolveTextareaCanvasHeight(textHeight, padding.top, padding.bottom, fieldHeight);
-    const counterGap = SpacingHelper.GetPadding(theme, "xs");
-    const counterHeight = (TypographyHelper.toTextSize(counterTypography.size) ?? 14) * (counterTypography.lineHeight ?? 1);
+    const wrapWidth = screenTextBoxWidth > 0
+        ? math.round(screenTextBoxWidth / screenScale)
+        : resolveTextareaWrapWidth(math.floor(screenFieldSize.X / screenScale), padding.left, padding.right, gutter);
+    const canvasHeight = resolveTextareaWholePixels(resolveTextareaCanvasHeight(textHeight, padding.top, padding.bottom, fieldHeight, screenScale));
+    const textBoxSize = new UDim2(1, -(padding.left + padding.right), 0, canvasHeight - padding.top + (estimated ? canvasHeight : 0));
+    const textBoxSizeRef = useRef(textBoxSize);
+    textBoxSizeRef.current = textBoxSize;
+    const counterGap = resolveTextareaWholePixels(SpacingHelper.GetPadding(theme, "xs"));
+    const counterHeight = resolveTextareaWholePixels((TypographyHelper.toTextSize(counterTypography.size) ?? 14) * (counterTypography.lineHeight ?? 1));
     const rootHeight = fieldHeight + (props.showCount === true ? counterGap + counterHeight : 0);
     const rootWidth = props.width === undefined ? new UDim(1, 0) : (SizeHelper.GetSize({ width: props.width }) as UDim2).X;
 
@@ -131,6 +143,27 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
         return resolveTextareaScreenScale(field?.AbsoluteSize.Y ?? 0, layoutRef.current.fieldHeight, layoutRef.current.uiScale);
     };
 
+    const estimateTextHeight = () => {
+        const measure = measureRef.current;
+        const current = layoutRef.current;
+
+        if (measure === undefined || measure.Text === "" || current.wrapWidth <= 0) {
+            return;
+        }
+
+        const size = TextService.GetTextSize(measure.Text, current.textSize, current.font, new Vector2(current.wrapWidth, MEASURE_HEIGHT));
+
+        task.defer(() => {
+            setTextHeight(size.Y * FALLBACK_LINE_SLACK);
+            setEstimated(true);
+        });
+    };
+
+    const cancelFallback = () => {
+        pendingFallback.current?.Disconnect();
+        pendingFallback.current = undefined;
+    };
+
     const updateTextHeight = () => {
         const measure = measureRef.current;
         const current = layoutRef.current;
@@ -142,18 +175,89 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
         const bounds = measure.TextBounds.Y;
 
         if (bounds > 0) {
+            neverMeasures.current = false;
+            cancelFallback();
             setTextHeight(bounds / currentScale());
             setEstimated(false);
-        } else if (measure.Text !== "") {
-            const size = TextService.GetTextSize(measure.Text, current.textSize, current.font, new Vector2(current.wrapWidth, MEASURE_HEIGHT));
-
-            task.defer(() => {
-                setTextHeight(size.Y * FALLBACK_LINE_SLACK);
-                setEstimated(true);
-            });
-        } else {
-            setTextHeight(0);
+            return;
         }
+
+        if (measure.Text === "") {
+            cancelFallback();
+            setTextHeight(0);
+            setEstimated(false);
+            return;
+        }
+
+        if (neverMeasures.current) {
+            estimateTextHeight();
+            return;
+        }
+
+        if (pendingFallback.current !== undefined) {
+            return;
+        }
+
+        let frames = 0;
+
+        pendingFallback.current = RunService.Heartbeat.Connect(() => {
+            frames += 1;
+
+            if (frames < FALLBACK_FRAMES) {
+                return;
+            }
+
+            cancelFallback();
+
+            const latest = measureRef.current;
+
+            if (latest === undefined || latest.Text === "") {
+                return;
+            }
+
+            if (latest.TextBounds.Y > 0) {
+                updateTextHeightRef.current();
+                return;
+            }
+
+            neverMeasures.current = true;
+            estimateTextHeightRef.current();
+        });
+    };
+
+    const updateTextHeightRef = useRef(updateTextHeight);
+    updateTextHeightRef.current = updateTextHeight;
+
+    const estimateTextHeightRef = useRef(estimateTextHeight);
+    estimateTextHeightRef.current = estimateTextHeight;
+
+    const nudgeTextBox = () => {
+        pendingNudge.current?.Disconnect();
+
+        let step = 0;
+
+        pendingNudge.current = RunService.Heartbeat.Connect(() => {
+            const textBox = ref.current;
+
+            if (textBox === undefined) {
+                pendingNudge.current?.Disconnect();
+                pendingNudge.current = undefined;
+                return;
+            }
+
+            step += 1;
+
+            if (step === 1) {
+                const size = textBoxSizeRef.current;
+
+                textBox.Size = new UDim2(size.X, new UDim(size.Y.Scale, size.Y.Offset - 1));
+                return;
+            }
+
+            textBox.Size = textBoxSizeRef.current;
+            pendingNudge.current?.Disconnect();
+            pendingNudge.current = undefined;
+        });
     };
 
     const setTextBox = React.useCallback(
@@ -219,7 +323,7 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
             return;
         }
 
-        const caretText = resolveTextareaCaretText(textBox.Text, textBox.CursorPosition);
+        const caretText = resolveTextareaCaretLineText(textBox.Text, textBox.CursorPosition);
 
         if (caretText === undefined) {
             return;
@@ -266,6 +370,13 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
         if (field !== undefined) {
             setScreenFieldSize(field.AbsoluteSize);
         }
+
+        return () => {
+            pendingFallback.current?.Disconnect();
+            pendingFallback.current = undefined;
+            pendingNudge.current?.Disconnect();
+            pendingNudge.current = undefined;
+        };
     }, []);
 
     React.useEffect(() => {
@@ -308,6 +419,15 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
         if (textBox.Text !== sourceText) {
             textBox.Text = sourceText;
         }
+    }, [focused, sourceText]);
+
+    React.useEffect(() => {
+        if (focusedRef.current || nudgedSource.current === sourceText) {
+            return;
+        }
+
+        nudgedSource.current = sourceText;
+        nudgeTextBox();
     }, [focused, sourceText]);
 
     React.useEffect(() => {
@@ -425,7 +545,7 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
                     key="TextBox"
                     ref={setTextBox}
                     Position={UDim2.fromOffset(padding.left, padding.top)}
-                    Size={new UDim2(1, -(padding.left + padding.right), 0, canvasHeight - padding.top + (estimated ? canvasHeight : 0))}
+                    Size={textBoxSize}
                     BackgroundTransparency={1}
                     MultiLine={true}
                     TextWrapped={true}
@@ -486,6 +606,11 @@ export const Textarea = React.forwardRef<TextBox, TextareaProps>((props, forward
                     }}
                     Change={{
                         ...props.Change,
+                        AbsoluteSize: (rbx) => {
+                            setScreenTextBoxWidth(rbx.AbsoluteSize.X);
+
+                            props.Change?.AbsoluteSize?.(rbx);
+                        },
                         Text: (rbx) => {
                             if (focusedRef.current) {
                                 const trimmed = trimTextareaText(rbx.Text, props.maxLength);

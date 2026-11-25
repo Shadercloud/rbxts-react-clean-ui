@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.5.1
+
+### Fixes
+
+- **Textarea: long text set while the box isn't focused now draws.** Roblox can leave a TextBox blank when about 20 or more lines are set by script while it isn't focused, for example a form reopening with a long saved draft. The text stays blank until the box is next touched. After any value change that doesn't come from typing (the mount value, a controlled `value` update, or the sync after blur), the TextBox is now shrunk by 1 px for one frame and restored. The nudge leaves the canvas and scroll position alone, doesn't fire `onChange` or apply `maxLength`, and runs once per distinct text.
+- **Textarea: caret follow no longer stops a line short in the middle of a wrapping word.** The caret line is now measured to the end of the word the caret is in, so when the word wraps, its second line counts. A single word longer than the field is still broken by the engine, and a caret inside it is measured at the word's last line.
+- **Textarea: no 1 px scrollbar sliver when the text exactly fits.** Under a `UIScale`, rounding could make the canvas a fraction taller than the view. Content within 1 screen pixel of the view height now uses the view height, so the bar shows only on a real overflow.
+- **Textarea: the TextBox no longer doubles in height before the first measurement.** In Studio, the frames before the hidden measuring labels reported briefly triggered the preview-renderer estimate. The last good height is now kept until a measurement arrives. The estimate is used only if the labels still report nothing after 3 frames, which happens only in the docs Loom preview.
+- **Textarea: heights are whole pixels, and the measuring labels match the text width exactly.** A row count whose line height isn't a whole number made a fractional field height, for example 124.8 with `rows={4}` in the default theme. Roblox drew it at 124, so the measured scale came out about 0.994 instead of 1 and text heights were inflated slightly. The field, counter, gap and canvas heights now round up to whole pixels before they're drawn or used in any calculation. The hidden measuring labels take their width from the TextBox's drawn width, so a line can't be measured as one line shorter than it draws. With `rows={4}` the field is now 125 px tall, 1 px taller than before.
+
+### Notes
+
+- Checked in Studio's device emulator (iPhone 17 Pro, simulated touch): a finger drag that starts anywhere in the field, on the text or in the padding, scrolls it, and doesn't focus it. A tap on the text or in the padding focuses it.
+
 ## 2.5.0
 
 ### Additions
