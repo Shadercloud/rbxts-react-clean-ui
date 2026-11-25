@@ -109,6 +109,10 @@ export interface ThemeTemplate {
             innerShadow?: InnerShadowStyle;
             states?: FieldStateStyles;
         };
+        textarea?: {
+            rows?: number;
+            counter?: Partial<TypographyStyle> | ScaledTypographyStyle;
+        };
         select: {
             borderColor: Color3;
             borderThickness: number;

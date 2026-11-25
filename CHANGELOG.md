@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.5.0
+
+### Additions
+
+- **`<Textarea>` (Input): a fixed-height multi-line text field.** Typing never resizes it or its parent. Its height comes from `height` (pixels), else `rows`, else `theme.components.textarea.rows` (4), and `minHeight`/`maxHeight` clamp the result. It is built on `<Scroller stableGutter>`, so the text always wraps at the field width minus padding minus the gutter, and the scrollbar can't reflow the text and flicker on and off. The canvas height comes from a hidden measuring label at the wrap width, plus padding, because a wrapped TextBox's own `TextBounds` is clipped to its height. The bar shows only when the text is taller than the field.
+- **Caret follow and scrolling.** While you type or move the caret with the arrow keys, the caret's line stays in view. A hidden probe label measures the text before `CursorPosition`, sliced by bytes. It scrolls with the mouse wheel, touch drag, and the gamepad right thumbstick while focused.
+- **`maxLength` and `showCount`.** `maxLength` trims typed and pasted input on a code-point boundary. A longer `value` from the parent is not rewritten. `showCount` draws a counter such as `77 / 1,500` under the field.
+- **The forwarded ref is the `TextBox`**, so `ref.current?.CaptureFocus()` focuses it. Like `<Input>`, it takes `value`, `controlled`, `onChange`, `placeholder`, `disabled`, `Event` (Focused/FocusLost) and gamepad selection props, and it uses the same `input` theme keys.
+- **New optional theme key `components.textarea`** (`rows`, `counter`), set in every shipped theme. Custom themes without it get 4 rows and the default counter style.
+
+### Notes
+
+- Measurements and scroll positions are converted with the scale taken from the field itself, so a plain `UIScale` ancestor works as well as `UiScaleRoot`.
+- The Textarea's own height is fixed (field height, plus the counter line and gap with `showCount`), so an `AutomaticSize` parent or a list layout never grows with its text.
+- In the docs Loom preview, the text height is measured with `TextService:GetTextSize`, because the preview never reports `TextBounds` for labels. The estimate is generous enough for every shipped theme's font, so the last line can always be scrolled into view, and the preview's own textarea scrollbar can no longer appear. Tight-lined fonts get some extra blank space below the text. Caret follow does nothing in the preview. These are limits of the preview renderer, not of Roblox.
+- If a partly typed word wraps to the next line, caret follow can land one line short until the next keystroke. With `RichText`, `CursorPosition` byte counts include markup.
+
 ## 2.4.2
 
 ### Fixes

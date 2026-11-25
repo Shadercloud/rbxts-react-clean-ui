@@ -286,6 +286,12 @@ local SandstoneTheme = createTheme({
 			cornerRadius = 4,
 			iconColor = Color3.fromHex("#8A7A61"),
 		},
+		textarea = {
+			rows = 4,
+			counter = {
+				color = Color3.fromHex("#8A7A61"),
+			},
+		},
 		select = {
 			dropDownBackgroundColor = Color3.fromHex("#FFF9ED"),
 			maxDropDownHeight = 200,

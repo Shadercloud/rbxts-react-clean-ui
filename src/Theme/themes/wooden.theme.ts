@@ -401,6 +401,12 @@ export const WoodenTheme = createTheme({
             },
             iconColor: Color3.fromHex("#FFF7CF"),
         },
+        textarea: {
+            rows: 4,
+            counter: {
+                color: Color3.fromHex("#FFF7CF"),
+            },
+        },
         card: {
             borderThickness: 0,
             cornerRadius: 0,

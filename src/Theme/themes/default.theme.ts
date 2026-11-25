@@ -304,6 +304,12 @@ export const DefaultTheme: ThemeTemplate = {
             },
             iconColor: Color3.fromHex("#8A8A8A"),
         },
+        textarea: {
+            rows: 4,
+            counter: {
+                color: Color3.fromHex("#8A8A8A"),
+            },
+        },
         select: {
             dropDownBackgroundColor: Color3.fromHex("#FFFFFF"),
             maxDropDownHeight: 200,

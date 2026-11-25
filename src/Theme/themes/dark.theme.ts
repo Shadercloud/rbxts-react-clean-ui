@@ -340,6 +340,12 @@ export const DarkTheme = createTheme({
             },
             iconColor: Color3.fromHex("#697386"),
         },
+        textarea: {
+            rows: 4,
+            counter: {
+                color: Color3.fromHex("#697386"),
+            },
+        },
 
         select: {
             dropDownBackgroundColor: Color3.fromHex("#20252E"),

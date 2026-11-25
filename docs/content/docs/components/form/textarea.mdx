@@ -1,0 +1,320 @@
+---
+title: Textarea
+description: A fixed-height, multi-line, scrollable text field that never resizes its parent.
+icon: TextWrap
+---
+
+`<Textarea>` is a multi-line text field built on Roblox's native [`TextBox`](https://create.roblox.com/docs/reference/engine/classes/TextBox), scrolled inside a [`Scroller`](/components/layout/scroller) (a wrapper around [`ScrollingFrame`](https://create.roblox.com/docs/reference/engine/classes/ScrollingFrame)).
+
+The field has a fixed height. Typing, pasting or deleting never changes the size of the component or its parent. Text that doesn't fit scrolls instead. The Scroller has `stableGutter` set, so the scrollbar's gutter is always reserved and the text never reflows when the bar appears or disappears.
+
+`Textarea` uses the same theme keys, value handling and [`Fieldset`](/components/form/fieldset) integration as [`Input`](/components/form/input).
+
+## Import
+
+```tsx
+import { Textarea } from "@rbxts/react-clean-ui";
+```
+
+## Basic usage
+
+<Demo preview="Scenes/Form/Textarea.loom.tsx" previewHeight={320}>
+```tsx
+import React, { useState } from "@rbxts/react";
+import { Textarea } from "@rbxts/react-clean-ui";
+
+export function NotesField() {
+    const [notes, setNotes] = useState("");
+
+    return (
+        <Textarea
+            value={notes}
+            onChange={setNotes}
+            placeholder="Write your notes..."
+        />
+    );
+}
+```
+</Demo>
+
+The `value` prop sets the initial text, and `onChange` is called with the new text whenever it changes. Without `height` or `rows`, the field shows 4 lines.
+
+## Rows
+
+Use `rows` to set how many lines are visible.
+
+```tsx
+<Textarea
+    value=""
+    placeholder="A short message"
+    rows={2}
+/>
+```
+
+The height is the number of rows times the line height, plus the top and bottom padding. The line height comes from the input typography's text size and `lineHeight`, so it follows `scale` and the theme's font size. `rows` is floored and is at least `1`.
+
+## Height
+
+Use `height` to set the field's height in pixels instead.
+
+```tsx
+<Textarea
+    value=""
+    placeholder="Describe the bug"
+    height={160}
+/>
+```
+
+`height` takes pixels only (`160`, `"160"` or `"160px"`). Percentages and `"Auto"` are not accepted.
+
+The field height is chosen in this order:
+
+1. `height`
+2. `rows`
+3. `theme.components.textarea.rows`
+4. `4` rows
+
+`minHeight` and `maxHeight` then clamp the result.
+
+```tsx
+<Textarea
+    value=""
+    rows={10}
+    maxHeight={120}
+/>
+```
+
+## Character limit and counter
+
+Use `maxLength` to limit how many characters the user can type or paste, and `showCount` to draw a counter under the field.
+
+```tsx
+<Textarea
+    value={description}
+    onChange={setDescription}
+    placeholder="Describe your item"
+    maxLength={1500}
+    showCount
+/>
+```
+
+The counter is right-aligned under the field and shows the current length, grouped with commas. With `maxLength` it reads `77 / 1,500`. Without it, it reads `77`. It updates on every keystroke.
+
+`showCount` can be used without `maxLength`:
+
+```tsx
+<Textarea value="" showCount />
+```
+
+## Controlled textarea
+
+By default, `Textarea` manages its own text after mounting with `value` as the initial text, and later changes to `value` from the parent are ignored. Set `controlled` to always display `value`.
+
+```tsx
+function ControlledTextarea() {
+    const [text, setText] = React.useState("Hello");
+
+    return (
+        <Textarea
+            controlled
+            value={text}
+            onChange={setText}
+        />
+    );
+}
+```
+
+As on `Input`, the box keeps what the user typed while it is focused. A changed `value` is applied once focus is lost.
+
+## Disabled
+
+Set `disabled` to stop the field from being edited or focused.
+
+```tsx
+<Textarea
+    value="This field is read only."
+    disabled
+/>
+```
+
+A disabled textarea forces `TextEditable` and `Interactable` to `false` on the `TextBox`, ignores activation of a paired `Fieldset.Label`, and takes the theme's `input.states.disabled` look, if one is set.
+
+## Focusing through the ref
+
+The forwarded ref is the inner `TextBox`, so you can focus or blur the field yourself.
+
+```tsx
+function FocusedTextarea() {
+    const ref = React.useRef<TextBox>();
+
+    React.useEffect(() => {
+        ref.current?.CaptureFocus();
+    }, []);
+
+    return (
+        <Textarea
+            ref={ref}
+            value=""
+            placeholder="Start typing..."
+        />
+    );
+}
+```
+
+## Roblox events
+
+Native `TextBox` events can be passed through the `Event` prop, as on `Input`. Use `Focused` and `FocusLost` to listen for focus and blur.
+
+```tsx
+<Textarea
+    value=""
+    Event={{
+        Focused: () => {
+            print("Textarea focused");
+        },
+
+        FocusLost: () => {
+            print("Textarea blurred");
+        },
+    }}
+/>
+```
+
+`Change` handlers are also forwarded. `Change.Text`, `Change.CursorPosition` and `Change.TextBounds` run after the component's own handling.
+
+## Scaling
+
+`Textarea` supports the shared `scale` prop. It sets the input typography, the counter typography and the row height.
+
+```tsx
+<Textarea value="" scale="sm" />
+
+<Textarea value="" scale="lg" />
+```
+
+## Spacing
+
+The shared `spacing` prop controls the padding around the text. The padding scrolls with the text.
+
+```tsx
+<Textarea value="" spacing="lg" />
+```
+
+## Width
+
+The textarea fills the available width by default. Use `width` to change it, and `minWidth`/`maxWidth` to clamp it.
+
+```tsx
+<Textarea value="" width="50%" minWidth={200} maxWidth={480} />
+```
+
+## Migrating from a native TextBox + ScrollingFrame
+
+A hand-built multi-line field usually puts a `TextBox` with `AutomaticSize.Y` inside a `ScrollingFrame`, and updates `CanvasSize` from `TextBounds` by hand. `Textarea` does all of that for you. Remove the `ScrollingFrame`, the `AutomaticSize` and the `CanvasSize` code, and render:
+
+```tsx
+<Textarea
+    value={text}
+    onChange={setText}
+    rows={6}
+/>
+```
+
+Use `height` instead of `rows` for a fixed pixel height.
+
+## Props
+
+### Textarea-specific props
+
+| Prop          | Type                           | Default         | Description                                                                                       |
+| ------------- | ------------------------------ | --------------- | ------------------------------------------------------------------------------------------------- |
+| `value`       | `string`                       | Required        | The initial text, or the displayed text when `controlled`.                                        |
+| `controlled`  | `boolean`                      | `false`         | Displays `value` directly instead of managing the text internally.                               |
+| `onChange`    | `(value: string) => void`      | `undefined`     | Called whenever the text changes.                                                                 |
+| `placeholder` | `string`                       | `undefined`     | Placeholder text shown while the field is empty.                                                  |
+| `disabled`    | `boolean`                      | `false`         | Prevents editing and focus, and applies the theme's `input.states.disabled` look.                 |
+| `height`      | `CssPixelSize`                 | `undefined`     | The field's height in pixels. Takes priority over `rows`.                                         |
+| `rows`        | `number`                       | Theme, or `4`   | The number of visible lines, used when `height` is unset.                                         |
+| `maxLength`   | `number`                       | `undefined`     | The most characters the user can type or paste, counted in code points.                          |
+| `showCount`   | `boolean`                      | `false`         | Draws a character counter under the field.                                                        |
+| `name`        | `string`                       | `"Textarea"`    | The name of the root instance.                                                                    |
+| `Event`       | `React.InstanceEvent<TextBox>` | `undefined`     | Native event handlers for the `TextBox`, including `Focused` and `FocusLost`.                     |
+| `width`       | `ResponsiveCssSize`            | `100%`          | The root's width.                                                                                 |
+| `minWidth`    | `CssPixelSize`                 | `undefined`     | Minimum width, applied through a `UISizeConstraint`.                                              |
+| `maxWidth`    | `CssPixelSize`                 | `undefined`     | Maximum width, applied through a `UISizeConstraint`.                                              |
+| `minHeight`   | `CssPixelSize`                 | `undefined`     | Lower clamp for the field height.                                                                 |
+| `maxHeight`   | `CssPixelSize`                 | `undefined`     | Upper clamp for the field height.                                                                 |
+| `ref`         | `React.Ref<TextBox>`           | `undefined`     | Receives the inner `TextBox`, so `ref.current?.CaptureFocus()` works.                             |
+
+### Shared props
+
+The textarea also supports props inherited from the following interfaces.
+
+| Interface                      | Purpose                                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------------------------- |
+| `ScalableElementProps`         | Sets the scale of the input typography, the counter typography and the row height.         |
+| `SpacedElementProps`           | Sets the padding around the text.                                                           |
+| `SizeElementProps`             | Provides `width` and the min/max sizes. `Size`, `AutomaticSize` and `height` are replaced. |
+| `React.InstanceProps<TextBox>` | Accepts native `TextBox` properties, such as `TextColor3` or `Change` handlers.            |
+
+`MultiLine`, `TextWrapped`, `ClearTextOnFocus`, the text alignment, `Text`, `FontFace`, `FontSize`, `LineHeight`, `TextScaled`, `TextTruncate` and the `TextBox`'s size are managed by the component, and any value passed for them is ignored. `Textarea` has no `validation`, `min`, `max` or `icon`.
+
+## Behaviour
+
+* The height is fixed. With `showCount`, the root is the field height plus one counter line and a small gap, and that is fixed too.
+* The text wraps at the field width minus the left and right padding and the scrollbar gutter, whether or not the scrollbar is showing. The scrollbar appears only once the text is taller than the field.
+* Clicking or tapping anywhere in the field, padding included, focuses it.
+* While the field is focused, typing and moving the caret keep the caret's line in view, with its padding. Scrolling by hand doesn't move the caret.
+* The mouse wheel and touch drags scroll the field. While it is focused, the gamepad's right thumbstick scrolls it too. The left stick is left alone for console on-screen keyboards.
+* `maxLength` only trims what the user types or pastes. A longer `value` set by the parent is shown in full until the user edits it. A trimmed edit is never cut through the middle of a character, and `onChange` only reports the trimmed text.
+* `maxLength` and the counter count Unicode code points, not bytes or graphemes. An emoji made of several code points counts as several characters.
+* The counter always groups digits with `,`, whatever the locale.
+* Activating a paired `Fieldset.Label` focuses the field, unless `disabled` is set.
+
+### Known limits
+
+* The caret's line is measured from the text before the caret. A partly typed word that wraps to the next line can leave caret follow one line short until the next keystroke.
+* With `RichText`, the caret position counts markup bytes too, so caret follow can be off near tags.
+
+## Theme values
+
+The field's look comes from `theme.components.input`, so a `Textarea` always matches the theme's `Input`:
+
+```ts
+theme.components.input.typography
+theme.components.input.placeholder
+theme.components.input.borderThickness
+theme.components.input.borderColor
+theme.components.input.cornerRadius
+theme.components.input.backgroundColor
+theme.components.input.backgroundTransparency
+theme.components.input.backgroundImage
+theme.components.input.backgroundGradient
+theme.components.input.boxShadow
+theme.components.input.innerShadow
+theme.components.input.states
+```
+
+See [Input → Theme Styling](/components/form/input#theme-styling) for what each key does. `iconColor` isn't used.
+
+`theme.components.textarea` is optional and adds two keys:
+
+| Key       | Type                                                  | Description                                                                               |
+| --------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `rows`    | `number`                                              | The default number of visible lines when neither `height` nor `rows` is set.             |
+| `counter` | `Partial<TypographyStyle> \| ScaledTypographyStyle`   | The counter's typography, resolved at the component's `scale`.                           |
+
+```ts
+const MyTheme = extendTheme(DefaultTheme, {
+    components: {
+        textarea: {
+            rows: 6,
+            counter: { color: Color3.fromHex("#8A8A8A") },
+        },
+    },
+});
+```
+
+Every shipped theme sets `rows: 4` and a muted counter colour.
+
+The scrollbar uses `theme.components.scroller`, as every [`Scroller`](/components/layout/scroller#theme-values) does. Its gutter is `scroller.gutter`, or the scrollbar `thickness` when that is unset.
